@@ -24,4 +24,44 @@ extension ActiveRemoteMessageModel: NewTabPageActiveRemoteMessageProviding {
     var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
         $remoteMessage.dropFirst().eraseToAnyPublisher()
     }
+
+    func isMessageSupported(_ message: RemoteMessageModel) -> Bool {
+        return message.content?.isSupported == true
+    }
+
+    func handleAction(_ action: RemoteAction?, andDismissUsing button: RemoteMessageButton) async {
+        if let action {
+            await handleAction(action)
+        }
+        await dismissRemoteMessage(with: .init(button))
+    }
+
+    private func handleAction(_ remoteAction: RemoteAction) async {
+        switch remoteAction {
+        case .url(let value), .share(let value, _), .survey(let value):
+            if let url = URL.makeURL(from: value) {
+                await openURLHandler(url)
+            }
+        case .appStore:
+            await openURLHandler(.appStore)
+        default:
+            break
+        }
+    }
+}
+
+extension RemoteMessageViewModel.ButtonAction {
+
+    init(_ button: RemoteMessageButton) {
+        switch button {
+        case .close:
+            self = .close
+        case .action:
+            self = .action
+        case .primaryAction:
+            self = .primaryAction
+        case .secondaryAction:
+            self = .secondaryAction
+        }
+    }
 }

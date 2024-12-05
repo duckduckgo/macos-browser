@@ -25,8 +25,7 @@ extension NewTabPageActionsManager {
     convenience init(
         appearancePreferences: AppearancePreferences,
         activeRemoteMessageModel: ActiveRemoteMessageModel,
-        privacyStats: PrivacyStatsCollecting,
-        openURLHandler: @escaping (URL) -> Void
+        privacyStats: PrivacyStatsCollecting
     ) {
         let privacyStatsModel = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
@@ -43,7 +42,7 @@ extension NewTabPageActionsManager {
 
         self.init(scriptClients: [
             NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences),
-            NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
+            NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel),
             NewTabPageNextStepsCardsClient(model: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener())),
             NewTabPageFavoritesClient(favoritesModel: favoritesModel),
             NewTabPagePrivacyStatsClient(model: privacyStatsModel)

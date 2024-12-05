@@ -17,39 +17,19 @@
 //
 
 import Combine
-import NewTabPage
 import RemoteMessaging
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-
-final class CapturingNewTabPageActiveRemoteMessageProvider: NewTabPageActiveRemoteMessageProviding {
-    @Published var remoteMessage: RemoteMessageModel?
-
-    var remoteMessagePublisher: AnyPublisher<RemoteMessaging.RemoteMessageModel?, Never> {
-        $remoteMessage.dropFirst().eraseToAnyPublisher()
-    }
-
-    func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) async {
-        dismissCalls.append(action)
-    }
-
-    var dismissCalls: [RemoteMessageViewModel.ButtonAction?] = []
-}
+@testable import NewTabPage
 
 final class NewTabPageRMFClientTests: XCTestCase {
     var client: NewTabPageRMFClient!
     var remoteMessageProvider: CapturingNewTabPageActiveRemoteMessageProvider!
-    var openURLCalls: [URL] = []
     var userScript: NewTabPageUserScript!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        openURLCalls = []
         remoteMessageProvider = CapturingNewTabPageActiveRemoteMessageProvider()
-        client = NewTabPageRMFClient(
-            remoteMessageProvider: remoteMessageProvider,
-            openURLHandler: { [weak self] in self?.openURLCalls.append($0) }
-        )
+        client = NewTabPageRMFClient(remoteMessageProvider: remoteMessageProvider)
         userScript = NewTabPageUserScript()
         client.registerMessageHandlers(for: userScript)
     }
@@ -113,7 +93,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
 
         let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfDismiss, parameters: parameters)
-        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.close])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.init(action: nil, button: .close)])
     }
 
     func testWhenMessageIdDoesNotMatchThenDismissHasNoEffect() async throws {
@@ -131,7 +111,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
 
         let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
-        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.action])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.init(action: .appStore, button: .action)])
     }
 
     func testWhenTwoActionMessageThenPrimaryActionSendsPrimaryActionToProvider() async throws {
@@ -139,7 +119,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
 
         let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
-        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.primaryAction])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.init(action: .appStore, button: .primaryAction)])
     }
 
     func testWhenMessageHasNoButtonThenPrimaryActionHasNoEffect() async throws {
@@ -158,54 +138,6 @@ final class NewTabPageRMFClientTests: XCTestCase {
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
     }
 
-    func testWhenSingleActionMessageThenPrimaryActionWithAppStoreOpensAppStoreURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .appStore)
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, [.appStore])
-    }
-
-    func testWhenSingleActionMessageThenPrimaryActionWithURLOpensURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .url(value: "http://example.com"))
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, ["http://example.com".url!])
-    }
-
-    func testWhenSingleActionMessageThenPrimaryActionWithSurveyOpensSurveyURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .survey(value: "http://example.com"))
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, ["http://example.com".url!])
-    }
-
-    func testWhenTwoActionMessageThenPrimaryActionWithAppStoreOpensAppStoreURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .dismiss)
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, [.appStore])
-    }
-
-    func testWhenTwoActionMessageThenPrimaryActionWithURLOpensURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .url(value: "http://example.com"), secondaryAction: .dismiss)
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, ["http://example.com".url!])
-    }
-
-    func testWhenTwoActionMessageThenPrimaryActionWithSurveyOpensSurveyURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .survey(value: "http://example.com"), secondaryAction: .dismiss)
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, ["http://example.com".url!])
-    }
-
     // MARK: - secondaryAction
 
     func testWhenTwoActionMessageThenSecondaryActionSendsSecondaryActionToProvider() async throws {
@@ -213,7 +145,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
 
         let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
-        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.secondaryAction])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.init(action: .appStore, button: .secondaryAction)])
     }
 
     func testWhenSingleActionMessageThenSecondaryActionHasNoEffect() async throws {
@@ -237,31 +169,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
 
         let parameters = NewTabPageUserScript.RemoteMessageParams(id: "different_sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
-        XCTAssertTrue(remoteMessageProvider.dismissCalls.isEmpty)
-    }
-
-    func testWhenTwoActionMessageThenSecondaryActionWithAppStoreOpensAppStoreURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .dismiss, secondaryAction: .appStore)
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, [.appStore])
-    }
-
-    func testWhenTwoActionMessageThenSecondaryActionWithURLOpensURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .url(value: "http://example.com"))
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, ["http://example.com".url!])
-    }
-
-    func testWhenTwoActionMessageThenSecondaryActionWithSurveyOpensSurveyURL() async throws {
-        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .survey(value: "http://example.com"))
-
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
-        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
-        XCTAssertEqual(openURLCalls, ["http://example.com".url!])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
     }
 
     // MARK: - Helper functions

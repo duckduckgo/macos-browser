@@ -26,7 +26,13 @@ public protocol NewTabPageActiveRemoteMessageProviding {
     var remoteMessage: RemoteMessageModel? { get set }
     var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> { get }
 
-    func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) async
+    func isMessageSupported(_ message: RemoteMessageModel) -> Bool
+
+    func handleAction(_ action: RemoteAction?, andDismissUsing button: RemoteMessageButton) async
+}
+
+public enum RemoteMessageButton: Equatable {
+    case close, action, primaryAction, secondaryAction
 }
 
 public final class NewTabPageRMFClient: NewTabPageScriptClient {
@@ -34,12 +40,10 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
     public let remoteMessageProvider: NewTabPageActiveRemoteMessageProviding
     public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
-    private let openURLHandler: (URL) -> Void
     private var cancellables = Set<AnyCancellable>()
 
-    public init(remoteMessageProvider: NewTabPageActiveRemoteMessageProviding, openURLHandler: @escaping (URL) -> Void) {
+    public init(remoteMessageProvider: NewTabPageActiveRemoteMessageProviding) {
         self.remoteMessageProvider = remoteMessageProvider
-        self.openURLHandler = openURLHandler
 
         remoteMessageProvider.remoteMessagePublisher
             .sink { [weak self] remoteMessage in
@@ -81,7 +85,7 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
             return nil
         }
 
-        await remoteMessageProvider.dismissRemoteMessage(with: .close)
+        await remoteMessageProvider.handleAction(nil, andDismissUsing: .close)
         return nil
     }
 
@@ -94,11 +98,9 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
 
         switch remoteMessageProvider.remoteMessage?.content {
         case let .bigSingleAction(_, _, _, _, primaryAction):
-            handleAction(remoteAction: primaryAction)
-            await remoteMessageProvider.dismissRemoteMessage(with: .action)
+            await remoteMessageProvider.handleAction(primaryAction, andDismissUsing: .action)
         case let .bigTwoAction(_, _, _, _, primaryAction, _, _):
-            handleAction(remoteAction: primaryAction)
-            await remoteMessageProvider.dismissRemoteMessage(with: .primaryAction)
+            await remoteMessageProvider.handleAction(primaryAction, andDismissUsing: .primaryAction)
         default:
             break
         }
@@ -114,30 +116,16 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
 
         switch remoteMessageProvider.remoteMessage?.content {
         case let .bigTwoAction(_, _, _, _, _, _, secondaryAction):
-            handleAction(remoteAction: secondaryAction)
-            await remoteMessageProvider.dismissRemoteMessage(with: .secondaryAction)
+            await remoteMessageProvider.handleAction(secondaryAction, andDismissUsing: .secondaryAction)
         default:
             break
         }
         return nil
     }
 
-    private func handleAction(remoteAction: RemoteAction) {
-        switch remoteAction {
-        case .url(let value), .share(let value, _), .survey(let value):
-            if let url = URL.makeURL(from: value) {
-                openURLHandler(url)
-            }
-        case .appStore:
-            openURLHandler(.appStore)
-        default:
-            break
-        }
-    }
-
     private func notifyRemoteMessageDidChange(_ remoteMessage: RemoteMessageModel?) {
         let data: NewTabPageUserScript.RMFData = {
-            guard let remoteMessage else {
+            guard let remoteMessage, remoteMessageProvider.isMessageSupported(remoteMessage) else {
                 return .init(content: nil)
             }
             return .init(content: NewTabPageUserScript.RMFMessage(remoteMessage))
@@ -178,7 +166,7 @@ public extension NewTabPageUserScript {
         }
 
         public init?(_ remoteMessageModel: RemoteMessageModel) {
-            guard let modelType = remoteMessageModel.content, modelType.isSupported else {
+            guard let modelType = remoteMessageModel.content else {
                 return nil
             }
 
