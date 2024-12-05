@@ -21,79 +21,15 @@ import NewTabPage
 import RemoteMessaging
 import TestUtils
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-
-final class CapturingNewTabPageContextMenuPresenter: NewTabPageContextMenuPresenting {
-    func showContextMenu(_ menu: NSMenu) {
-        showContextMenuCalls.append(menu)
-    }
-
-    var showContextMenuCalls: [NSMenu] = []
-}
-
-final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling {
-    struct OpenCall: Equatable {
-        let url: URL
-        let target: NewTabPageFavoritesModel.OpenTarget
-
-        init(_ url: URL, _ target: NewTabPageFavoritesModel.OpenTarget) {
-            self.url = url
-            self.target = target
-        }
-    }
-
-    struct MoveCall: Equatable {
-        let id: String
-        let toIndex: Int
-
-        init(_ id: String, _ toIndex: Int) {
-            self.id = id
-            self.toIndex = toIndex
-        }
-    }
-
-    var openCalls: [OpenCall] = []
-    var addNewFavoriteCallCount: Int = 0
-    var editCalls: [Bookmark] = []
-    var onFaviconMissingCallCount: Int = 0
-    var removeFavoriteCalls: [Bookmark] = []
-    var deleteBookmarkCalls: [Bookmark] = []
-    var moveCalls: [MoveCall] = []
-
-    func open(_ url: URL, target: NewTabPageFavoritesModel.OpenTarget) {
-        openCalls.append(.init(url, target))
-    }
-
-    func addNewFavorite() {
-        addNewFavoriteCallCount += 1
-    }
-
-    func edit(_ bookmark: Bookmark) {
-        editCalls.append(bookmark)
-    }
-
-    func onFaviconMissing() {
-        onFaviconMissingCallCount += 1
-    }
-
-    func removeFavorite(_ bookmark: Bookmark) {
-        removeFavoriteCalls.append(bookmark)
-    }
-
-    func deleteBookmark(_ bookmark: Bookmark) {
-        deleteBookmarkCalls.append(bookmark)
-    }
-
-    func move(_ bookmarkID: String, toIndex: Int) {
-        moveCalls.append(.init(bookmarkID, toIndex))
-    }
-}
+@testable import NewTabPage
 
 final class NewTabPageFavoritesClientTests: XCTestCase {
-    var client: NewTabPageFavoritesClient!
+    typealias NewTabPageFavoritesClientUnderTest = NewTabPageFavoritesClient<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>
+
+    var client: NewTabPageFavoritesClientUnderTest!
     var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
     var actionsHandler: CapturingNewTabPageFavoritesActionsHandler!
-    var favoritesModel: NewTabPageFavoritesModel!
+    var favoritesModel: NewTabPageFavoritesModel<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>!
     var userScript: NewTabPageUserScript!
 
     @MainActor
@@ -101,10 +37,11 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
         try super.setUpWithError()
         contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
         actionsHandler = CapturingNewTabPageFavoritesActionsHandler()
-        favoritesModel = NewTabPageFavoritesModel(
+        favoritesModel = NewTabPageFavoritesModel.init(
             actionsHandler: actionsHandler,
+            favoritesPublisher: Empty().eraseToAnyPublisher(),
             contextMenuPresenter: contextMenuPresenter,
-            settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor(MockKeyValueStore())
+            settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor(MockKeyValueStore(), getLegacySetting: nil)
         )
 
         client = NewTabPageFavoritesClient(favoritesModel: favoritesModel)
@@ -156,13 +93,13 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testThatGetDataReturnsFavoritesFromTheModel() async throws {
         favoritesModel.favorites = [
-            Bookmark(id: "1", url: "https://a.com", title: "A", isFavorite: true),
-            Bookmark(id: "10", url: "https://b.com", title: "B", isFavorite: true),
-            Bookmark(id: "5", url: "https://c.com", title: "C", isFavorite: true),
-            Bookmark(id: "2", url: "https://d.com", title: "D", isFavorite: true),
-            Bookmark(id: "3", url: "https://e.com", title: "E", isFavorite: true)
+            MockNewTabPageFavorite(id: "1", title: "A", url: "https://a.com"),
+            MockNewTabPageFavorite(id: "10", title: "B", url: "https://b.com"),
+            MockNewTabPageFavorite(id: "5", title: "C", url: "https://c.com"),
+            MockNewTabPageFavorite(id: "2", title: "D", url: "https://d.com"),
+            MockNewTabPageFavorite(id: "3", title: "E", url: "https://e.com")
         ]
-        let data: NewTabPageFavoritesClient.FavoritesData = try await handleMessage(named: .getData)
+        let data: NewTabPageFavoritesClientUnderTest.FavoritesData = try await handleMessage(named: .getData)
         XCTAssertEqual(data.favorites, [
             .init(id: "1", title: "A", url: "https://a.com", favicon: .init(maxAvailableSize: 132, src: "duck://favicon/https%3A//a.com")),
             .init(id: "10", title: "B", url: "https://b.com", favicon: .init(maxAvailableSize: 132, src: "duck://favicon/https%3A//b.com")),
@@ -174,20 +111,20 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testWhenFavoritesAreEmptyThenGetDataReturnsNoFavorites() async throws {
         favoritesModel.favorites = []
-        let data: NewTabPageFavoritesClient.FavoritesData = try await handleMessage(named: .getData)
+        let data: NewTabPageFavoritesClientUnderTest.FavoritesData = try await handleMessage(named: .getData)
         XCTAssertEqual(data.favorites, [])
     }
 
     // MARK: - move
 
     func testThatMoveActionIsForwardedToTheModel() async throws {
-        let action = NewTabPageFavoritesClient.FavoritesMoveAction(id: "abcd", fromIndex: 10, targetIndex: 4)
+        let action = NewTabPageFavoritesClientUnderTest.FavoritesMoveAction(id: "abcd", fromIndex: 10, targetIndex: 4)
         try await handleMessageExpectingNilResponse(named: .move, parameters: action)
         XCTAssertEqual(actionsHandler.moveCalls, [.init("abcd", 4)])
     }
 
     func testThatWhenFavoriteIsMovedToHigherIndexThenModelIncrementsIndex() async throws {
-        let action = NewTabPageFavoritesClient.FavoritesMoveAction(id: "abcd", fromIndex: 1, targetIndex: 4)
+        let action = NewTabPageFavoritesClientUnderTest.FavoritesMoveAction(id: "abcd", fromIndex: 1, targetIndex: 4)
         try await handleMessageExpectingNilResponse(named: .move, parameters: action)
         XCTAssertEqual(actionsHandler.moveCalls, [.init("abcd", 5)])
     }
@@ -195,13 +132,13 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     // MARK: - open
 
     func testThatOpenActionIsForwardedToTheModel() async throws {
-        let action = NewTabPageFavoritesClient.FavoritesOpenAction(id: "abcd", url: "https://example.com")
+        let action = NewTabPageFavoritesClientUnderTest.FavoritesOpenAction(id: "abcd", url: "https://example.com")
         try await handleMessageExpectingNilResponse(named: .open, parameters: action)
-        XCTAssertEqual(actionsHandler.openCalls, [.init("https://example.com".url!, .current)])
+        XCTAssertEqual(actionsHandler.openCalls, [.init(URL(string: "https://example.com")!, .current)])
     }
 
     func testWhenURLIsInvalidThenOpenActionIsNotForwardedToTheModel() async throws {
-        let action = NewTabPageFavoritesClient.FavoritesOpenAction(id: "abcd", url: "abcd")
+        let action = NewTabPageFavoritesClientUnderTest.FavoritesOpenAction(id: "abcd", url: "abcd")
         try await handleMessageExpectingNilResponse(named: .open, parameters: action)
         XCTAssertEqual(actionsHandler.openCalls, [])
     }
@@ -209,54 +146,40 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     // MARK: - openContextMenu
 
     func testThatOpenContextMenuActionForExistingFavoriteIsForwardedToTheModel() async throws {
-        favoritesModel.favorites = [.init(id: "abcd", url: "https://example.com", title: "A", isFavorite: true)]
-        let action = NewTabPageFavoritesClient.FavoritesContextMenuAction(id: "abcd")
+        favoritesModel.favorites = [.init(id: "abcd", title: "A", url: "https://example.com")]
+        let action = NewTabPageFavoritesClientUnderTest.FavoritesContextMenuAction(id: "abcd")
         try await handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 1)
     }
 
     func testThatOpenContextMenuActionForNotExistingFavoriteIsNotForwardedToTheModel() async throws {
         favoritesModel.favorites = []
-        let action = NewTabPageFavoritesClient.FavoritesContextMenuAction(id: "abcd")
+        let action = NewTabPageFavoritesClientUnderTest.FavoritesContextMenuAction(id: "abcd")
         try await handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 0)
     }
 
-    @MainActor
-    func testThatContextMenuActionsAreForwardedToTheHandler() async throws {
-        favoritesModel.favorites = [.init(id: "abcd", url: "https://example.com", title: "A", isFavorite: true)]
-        let action = NewTabPageFavoritesClient.FavoritesContextMenuAction(id: "abcd")
-        try await handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
-        XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 1)
-
-        let menu = try XCTUnwrap(contextMenuPresenter.showContextMenuCalls.first)
-        XCTAssertEqual(menu.items.count, 6)
-
-        menu.performActionForItem(at: 0)
-        XCTAssertEqual(actionsHandler.openCalls.last, CapturingNewTabPageFavoritesActionsHandler.OpenCall("https://example.com".url!, .newTab))
-
-        menu.performActionForItem(at: 1)
-        XCTAssertEqual(actionsHandler.openCalls.last, CapturingNewTabPageFavoritesActionsHandler.OpenCall("https://example.com".url!, .newWindow))
-
-        menu.performActionForItem(at: 3)
-        XCTAssertEqual(actionsHandler.editCalls.last, favoritesModel.favorites.first)
-
-        menu.performActionForItem(at: 4)
-        XCTAssertEqual(actionsHandler.removeFavoriteCalls.last, favoritesModel.favorites.first)
-
-        menu.performActionForItem(at: 5)
-        XCTAssertEqual(actionsHandler.deleteBookmarkCalls.last, favoritesModel.favorites.first)
-    }
-
     // MARK: - Helper functions
 
-    func handleMessage<Response: Encodable>(named methodName: NewTabPageFavoritesClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
+    func handleMessage<Response: Encodable>(
+        named methodName: NewTabPageFavoritesClientUnderTest.MessageName,
+        parameters: Any = [],
+        file: StaticString = #file,
+        line: UInt = #line
+    ) async throws -> Response {
+
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
         let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
         return try XCTUnwrap(response as? Response, file: file, line: line)
     }
 
-    func handleMessageExpectingNilResponse(named methodName: NewTabPageFavoritesClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
+    func handleMessageExpectingNilResponse(
+        named methodName: NewTabPageFavoritesClientUnderTest.MessageName,
+        parameters: Any = [],
+        file: StaticString = #file,
+        line: UInt = #line
+    ) async throws {
+
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
         let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
         XCTAssertNil(response, file: file, line: line)

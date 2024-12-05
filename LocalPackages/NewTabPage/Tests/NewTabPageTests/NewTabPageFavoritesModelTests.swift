@@ -19,28 +19,32 @@
 import Combine
 import TestUtils
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
+@testable import NewTabPage
 
 final class NewTabPageFavoritesModelTests: XCTestCase {
 
-    var model: NewTabPageFavoritesModel!
-    var bookmarkManager: MockBookmarkManager!
+    var model: NewTabPageFavoritesModel<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>!
     var settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor!
+    var favoritesSubject: PassthroughSubject<[MockNewTabPageFavorite], Never>!
 
     override func setUp() async throws {
         try await super.setUp()
 
-        settingsPersistor = UserDefaultsNewTabPageFavoritesSettingsPersistor(MockKeyValueStore())
+        settingsPersistor = UserDefaultsNewTabPageFavoritesSettingsPersistor(MockKeyValueStore(), getLegacySetting: nil)
 
-        bookmarkManager = MockBookmarkManager()
-        model = NewTabPageFavoritesModel(bookmarkManager: bookmarkManager, settingsPersistor: settingsPersistor)
+        favoritesSubject = PassthroughSubject<[MockNewTabPageFavorite], Never>()
+        model = NewTabPageFavoritesModel(
+            actionsHandler: CapturingNewTabPageFavoritesActionsHandler(),
+            favoritesPublisher: favoritesSubject.eraseToAnyPublisher(),
+            settingsPersistor: settingsPersistor
+        )
     }
 
     func testWhenBookmarkListIsUpdatedThenFavoritesListIsUpdated() async {
-        let favorite1 = Bookmark(id: "1", url: "https://example.com/1", title: "1", isFavorite: true)
-        let favorite2 = Bookmark(id: "2", url: "https://example.com/2", title: "2", isFavorite: true)
+        let favorite1 = MockNewTabPageFavorite(id: "1", title: "1", url: "https://example.com/1")
+        let favorite2 = MockNewTabPageFavorite(id: "2", title: "2", url: "https://example.com/2")
 
-        var favoritesUpdateEvents = [[Bookmark]]()
+        var favoritesUpdateEvents = [[MockNewTabPageFavorite]]()
         var cancellable: AnyCancellable?
 
         await withCheckedContinuation { continuation in
@@ -51,13 +55,9 @@ final class NewTabPageFavoritesModelTests: XCTestCase {
                     favoritesUpdateEvents.append($0)
                 })
 
-            bookmarkManager.list = BookmarkList()
-            bookmarkManager.list = BookmarkList(entities: [favorite1], topLevelEntities: [favorite1], favorites: [favorite1])
-            bookmarkManager.list = BookmarkList(
-                entities: [favorite1, favorite2],
-                topLevelEntities: [favorite1, favorite2],
-                favorites: [favorite1, favorite2]
-            )
+            favoritesSubject.send([])
+            favoritesSubject.send([favorite1])
+            favoritesSubject.send([favorite1, favorite2])
         }
 
         cancellable?.cancel()

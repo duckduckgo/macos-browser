@@ -34,6 +34,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "217.0.1"),
         .package(path: "../WebKitExtensions"),
+        .package(path: "../Utilities"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -43,6 +44,7 @@ let package = Package(
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "PrivacyStats", package: "BrowserServicesKit"),
+                .product(name: "RemoteMessaging", package: "BrowserServicesKit"),
                 .product(name: "TestUtils", package: "BrowserServicesKit"),
                 .product(name: "WebKitExtensions", package: "WebKitExtensions"),
             ],
@@ -54,6 +56,7 @@ let package = Package(
             name: "NewTabPageTests",
             dependencies: [
                 "NewTabPage",
+                "Utilities",
             ]
         ),
     ]

@@ -112,7 +112,7 @@ public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObje
 
     @MainActor
     public func openFavorite(withURL url: String) {
-        guard let url = URL(string: url) else { return }
+        guard let url = URL(string: url), url.isValid else { return }
         actionsHandler.open(url, target: .current)
     }
 
