@@ -5814,9 +5814,9 @@
 				374EFDF22D01C99700B30939 /* ActiveRemoteMessageModel+NewTabPage.swift */,
 				372D15EB2D00FA1400A11576 /* AppearancePreferences+NewTabPage.swift */,
 				372D15E82D00F18E00A11576 /* ContinueSetUpModel+NewTabPage.swift */,
+				3772BEDC2D019CDF0019B9EF /* DefaultsFavoritesActionHandler.swift */,
 				371BBC5D2D00CA3E008FA0C7 /* NewTabPageWebViewModel.swift */,
 				371BBC5A2D00C911008FA0C7 /* NewTabPageActionsManagerExtension.swift */,
-				3772BEDC2D019CDF0019B9EF /* DefaultsFavoritesActionHandler.swift */,
 			);
 			path = NewTabPage;
 			sourceTree = "<group>";
