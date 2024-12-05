@@ -332,7 +332,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
 #endif
-        PixelKit.configureExperimentKit(featureFlagger: featureFlagger)
+        PixelKit.configureExperimentKit(featureFlagger: featureFlagger, eventTracker: ExperimentEventTracker(store: UserDefaults.appConfiguration))
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
