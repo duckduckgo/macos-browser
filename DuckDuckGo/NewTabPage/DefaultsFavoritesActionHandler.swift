@@ -1,5 +1,5 @@
 //
-//  NewTabPageFavoritesActionsHandler.swift
+//  DefaultsFavoritesActionHandler.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,12 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Combine
 import NewTabPage
 
-protocol FavoritesActionsHandling {
-    @MainActor func open(_ url: URL, target: NewTabPageFavoritesModel.OpenTarget)
-    @MainActor func addNewFavorite()
-    @MainActor func edit(_ bookmark: Bookmark)
-    @MainActor func onFaviconMissing()
-
-    func removeFavorite(_ bookmark: Bookmark)
-    func deleteBookmark(_ bookmark: Bookmark)
-    func move(_ bookmarkID: String, toIndex: Int)
-}
-
 final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
+    typealias Favorite = Bookmark
+
     let bookmarkManager: BookmarkManager
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
@@ -38,7 +29,7 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     }
 
     @MainActor
-    func open(_ url: URL, target: NewTabPageFavoritesModel.OpenTarget) {
+    func open(_ url: URL, target: FavoriteOpenTarget) {
         guard let tabCollectionViewModel else {
             return
         }
@@ -56,13 +47,13 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
         }
     }
 
-    func removeFavorite(_ bookmark: Bookmark) {
-        bookmark.isFavorite = false
-        bookmarkManager.update(bookmark: bookmark)
+    func removeFavorite(_ favorite: Bookmark) {
+        favorite.isFavorite = false
+        bookmarkManager.update(bookmark: favorite)
     }
 
-    func deleteBookmark(_ bookmark: Bookmark) {
-        bookmarkManager.remove(bookmark: bookmark, undoManager: nil)
+    func deleteBookmark(for favorite: Bookmark) {
+        bookmarkManager.remove(bookmark: favorite, undoManager: nil)
     }
 
     @MainActor
@@ -72,9 +63,9 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     }
 
     @MainActor
-    func edit(_ bookmark: Bookmark) {
+    func edit(_ favorite: Bookmark) {
         guard let window else { return }
-        BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark).show(in: window)
+        BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: favorite).show(in: window)
     }
 
     func move(_ bookmarkID: String, toIndex index: Int) {
@@ -104,3 +95,5 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 }
+
+extension Bookmark: NewTabPageFavorite {}

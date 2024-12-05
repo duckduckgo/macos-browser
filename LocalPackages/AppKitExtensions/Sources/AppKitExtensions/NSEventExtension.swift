@@ -19,13 +19,17 @@
 import AppKit
 import Combine
 
-extension NSEvent {
+public extension NSEvent {
 
     struct EventMonitorType: OptionSet {
-        let rawValue: UInt8
+        public let rawValue: UInt8
 
-        static let local  = EventMonitorType(rawValue: 1 << 0)
-        static let global = EventMonitorType(rawValue: 1 << 1)
+        public init(rawValue: UInt8) {
+            self.rawValue = rawValue
+        }
+
+        public static let local  = EventMonitorType(rawValue: 1 << 0)
+        public static let global = EventMonitorType(rawValue: 1 << 1)
     }
 
     var deviceIndependentFlags: NSEvent.ModifierFlags {
@@ -91,7 +95,7 @@ extension NSEvent {
 
 }
 
-enum KeyEquivalentElement: ExpressibleByStringLiteral, Hashable {
+public enum KeyEquivalentElement: ExpressibleByStringLiteral, Hashable {
     public typealias StringLiteralType = String
 
     case charCode(String)
@@ -100,13 +104,13 @@ enum KeyEquivalentElement: ExpressibleByStringLiteral, Hashable {
     case option
     case control
 
-    static let backspace = KeyEquivalentElement.charCode("\u{8}")
-    static let tab = KeyEquivalentElement.charCode("\t")
-    static let left = KeyEquivalentElement.charCode("\u{2190}")
-    static let right = KeyEquivalentElement.charCode("\u{2192}")
-    static let escape = KeyEquivalentElement.charCode("\u{1B}")
+    public static let backspace = KeyEquivalentElement.charCode("\u{8}")
+    public static let tab = KeyEquivalentElement.charCode("\t")
+    public static let left = KeyEquivalentElement.charCode("\u{2190}")
+    public static let right = KeyEquivalentElement.charCode("\u{2192}")
+    public static let escape = KeyEquivalentElement.charCode("\u{1B}")
 
-    init(stringLiteral value: String) {
+    public init(stringLiteral value: String) {
         self = .charCode(value)
     }
 }
@@ -114,11 +118,11 @@ enum KeyEquivalentElement: ExpressibleByStringLiteral, Hashable {
 extension NSEvent.KeyEquivalent: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
     public typealias StringLiteralType = String
 
-    static let backspace: Self = [.backspace]
-    static let tab: Self = [.tab]
-    static let left: Self = [.left]
-    static let right: Self = [.right]
-    static let escape: Self = [.escape]
+    public static let backspace: Self = [.backspace]
+    public static let tab: Self = [.tab]
+    public static let left: Self = [.left]
+    public static let right: Self = [.right]
+    public static let escape: Self = [.escape]
 
     public init(stringLiteral value: String) {
         self = [.charCode(value)]
@@ -145,7 +149,7 @@ extension NSEvent.KeyEquivalent: ExpressibleByStringLiteral, ExpressibleByUnicod
         }
     }
 
-    var charCode: String {
+    public var charCode: String {
         for item in self {
             if case .charCode(let value) = item {
                 return value
@@ -154,7 +158,7 @@ extension NSEvent.KeyEquivalent: ExpressibleByStringLiteral, ExpressibleByUnicod
         return ""
     }
 
-    var modifierMask: NSEvent.ModifierFlags {
+    public var modifierMask: NSEvent.ModifierFlags {
         var result: NSEvent.ModifierFlags = []
         for item in self {
             switch item {

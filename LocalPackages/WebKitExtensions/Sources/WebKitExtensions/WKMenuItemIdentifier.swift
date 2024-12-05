@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import AppKit
+import AppKitExtensions
 
-enum WKMenuItemIdentifier: String, CaseIterable {
+public enum WKMenuItemIdentifier: String, CaseIterable {
     case copy = "WKMenuItemIdentifierCopy"
     case copyImage = "WKMenuItemIdentifierCopyImage"
     case copyLink = "WKMenuItemIdentifierCopyLink"
@@ -58,7 +58,13 @@ enum WKMenuItemIdentifier: String, CaseIterable {
     case checkSpellingWhileTyping = "WKMenuItemIdentifierCheckSpellingWhileTyping"
     case checkGrammarWithSpelling = "WKMenuItemIdentifierCheckGrammarWithSpelling"
 
-    init?(_ identifier: NSUserInterfaceItemIdentifier) {
+    public init?(_ identifier: NSUserInterfaceItemIdentifier) {
         self.init(rawValue: identifier.rawValue)
+    }
+}
+
+public extension NSMenu {
+    func item(with identifier: WKMenuItemIdentifier) -> NSMenuItem? {
+        return indexOfItem(withIdentifier: identifier.rawValue).map { self.items[$0] }
     }
 }

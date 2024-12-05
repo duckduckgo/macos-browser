@@ -35,11 +35,14 @@ extension NewTabPageActionsManager {
             getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
         )
 
+        let favoritesPublisher = LocalBookmarkManager.shared.listPublisher.map({ $0?.favoriteBookmarks ?? [] }).eraseToAnyPublisher()
+        let favoritesModel = NewTabPageFavoritesModel(actionsHandler: DefaultFavoritesActionsHandler(), favoritesPublisher: favoritesPublisher)
+
         self.init(scriptClients: [
             NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
             NewTabPageNextStepsCardsClient(model: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener())),
-            NewTabPageFavoritesClient(favoritesModel: NewTabPageFavoritesModel()),
+            NewTabPageFavoritesClient(favoritesModel: favoritesModel),
             NewTabPagePrivacyStatsClient(model: privacyStatsModel)
         ])
     }

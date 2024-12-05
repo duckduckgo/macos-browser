@@ -19,73 +19,73 @@
 import AppKit
 
 @resultBuilder
-struct ArrayBuilder<Element> {
+public struct ArrayBuilder<Element> {
 
     @inlinable
-    static func buildBlock() -> [Element] {
+    public static func buildBlock() -> [Element] {
         return []
     }
 
     @inlinable
-    static func buildBlock(_ element: Element) -> [Element] {
+    public static func buildBlock(_ element: Element) -> [Element] {
         return [element]
     }
 
     @inlinable
-    static func buildBlock(_ elements: Element...) -> [Element] {
+    public static func buildBlock(_ elements: Element...) -> [Element] {
         return elements
     }
 
     @inlinable
-    static func buildBlock(_ components: [Element]...) -> [Element] {
+    public static func buildBlock(_ components: [Element]...) -> [Element] {
         return components.flatMap { $0 }
     }
 
     @inlinable
-    static func buildOptional(_ components: [Element]?) -> [Element] {
+    public static func buildOptional(_ components: [Element]?) -> [Element] {
         return components ?? []
     }
 
     @inlinable
-    static func buildEither(first component: Element) -> [Element] {
+    public static func buildEither(first component: Element) -> [Element] {
         return [component]
     }
 
     @inlinable
-    static func buildEither(first component: [Element]) -> [Element] {
+    public static func buildEither(first component: [Element]) -> [Element] {
         component
     }
 
     @inlinable
-    static func buildEither(second component: [Element]) -> [Element] {
+    public static func buildEither(second component: [Element]) -> [Element] {
         component
     }
 
-    static func buildLimitedAvailability(_ component: [Element]) -> [Element] {
+    public static func buildLimitedAvailability(_ component: [Element]) -> [Element] {
         component
     }
 
     @inlinable
-    static func buildArray(_ components: [[Element]]) -> [Element] {
+    public static func buildArray(_ components: [[Element]]) -> [Element] {
         components.flatMap { $0 }
     }
 
     @inlinable
-    static func buildExpression(_ expression: [Element]) -> [Element] {
+    public static func buildExpression(_ expression: [Element]) -> [Element] {
         return expression
     }
 
     @inlinable
-    static func buildExpression(_ expression: Element) -> [Element] {
+    public static func buildExpression(_ expression: Element) -> [Element] {
         return [expression]
     }
 
     @inlinable
-    static func buildExpression(_ expression: Element?) -> [Element] {
+    public static func buildExpression(_ expression: Element?) -> [Element] {
         return expression.map { [$0] } ?? []
     }
 
-    static func buildExpression(_ expression: Void) -> [Element] {
+    public static func buildExpression(_ expression: Void) -> [Element] {
         return []
     }
 

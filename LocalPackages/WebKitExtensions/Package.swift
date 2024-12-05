@@ -33,12 +33,14 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "217.0.1"),
+        .package(path: "../AppKitExtensions")
     ],
     targets: [
         .target(
             name: "WebKitExtensions",
             dependencies: [
                 .product(name: "UserScript", package: "BrowserServicesKit"),
+                "AppKitExtensions"
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),

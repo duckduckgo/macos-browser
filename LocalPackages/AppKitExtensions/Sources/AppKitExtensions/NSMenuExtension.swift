@@ -17,10 +17,11 @@
 //
 
 import AppKit
+import Utilities
 
 typealias MenuBuilder = ArrayBuilder<NSMenuItem>
 
-extension NSMenu {
+public extension NSMenu {
 
     convenience init(title: String = "", items: [NSMenuItem]) {
         self.init(title: title)
@@ -39,10 +40,6 @@ extension NSMenu {
 
     func indexOfItem(withIdentifier id: String) -> Int? {
         return items.enumerated().first(where: { $0.element.identifier?.rawValue == id })?.offset
-    }
-
-    func item(with identifier: WKMenuItemIdentifier) -> NSMenuItem? {
-        return indexOfItem(withIdentifier: identifier.rawValue).map { self.items[$0] }
     }
 
     func indexOfItem(with action: Selector) -> Int? {

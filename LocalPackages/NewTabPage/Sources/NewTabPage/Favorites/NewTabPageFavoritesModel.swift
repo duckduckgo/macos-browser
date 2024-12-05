@@ -16,54 +16,57 @@
 //  limitations under the License.
 //
 
+import AppKitExtensions
 import Combine
 import Foundation
-import NewTabPage
 import Persistence
 
-protocol NewTabPageFavoritesSettingsPersistor: AnyObject {
+public protocol NewTabPageFavoritesSettingsPersistor: AnyObject {
     var isViewExpanded: Bool { get set }
 }
 
-final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavoritesSettingsPersistor {
+public final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavoritesSettingsPersistor {
     enum Keys {
         static let isViewExpanded = "new-tab-page.favorites.is-view-expanded"
     }
 
     private let keyValueStore: KeyValueStoring
 
-    init(_ keyValueStore: KeyValueStoring = UserDefaults.standard) {
+    public init(_ keyValueStore: KeyValueStoring = UserDefaults.standard) {
         self.keyValueStore = keyValueStore
         migrateFromNativeHomePageSettings()
     }
 
-    var isViewExpanded: Bool {
+    public var isViewExpanded: Bool {
         get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
     }
 
     private func migrateFromNativeHomePageSettings() {
-        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil else {
-            return
-        }
-        let legacyKey = UserDefaultsWrapper<Any>.Key.homePageShowAllFavorites.rawValue
-        isViewExpanded = keyValueStore.object(forKey: legacyKey) as? Bool ?? false
+//        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil else {
+//            return
+//        }
+//        let legacyKey = UserDefaultsWrapper<Any>.Key.homePageShowAllFavorites.rawValue
+//        isViewExpanded = keyValueStore.object(forKey: legacyKey) as? Bool ?? false
     }
 }
 
-final class NewTabPageFavoritesModel: NSObject {
+public enum FavoriteOpenTarget {
+    case current, newTab, newWindow
+}
 
-    enum OpenTarget {
-        case current, newTab, newWindow
-    }
+public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObject where FavoriteType: NewTabPageFavorite,
+                                                                                         ActionHandler: FavoritesActionsHandling,
+                                                                                         ActionHandler.FavoriteType == FavoriteType {
 
-    private let actionsHandler: FavoritesActionsHandling
+    private let actionsHandler: ActionHandler
     private let contextMenuPresenter: NewTabPageContextMenuPresenting
     private let settingsPersistor: NewTabPageFavoritesSettingsPersistor
     private var cancellables: Set<AnyCancellable> = []
 
-    init(
-        actionsHandler: FavoritesActionsHandling,
+    public init(
+        actionsHandler: ActionHandler,
+        favoritesPublisher: AnyPublisher<[FavoriteType], Never>,
         contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
         settingsPersistor: NewTabPageFavoritesSettingsPersistor = UserDefaultsNewTabPageFavoritesSettingsPersistor()
     ) {
@@ -72,62 +75,52 @@ final class NewTabPageFavoritesModel: NSObject {
         self.settingsPersistor = settingsPersistor
 
         isViewExpanded = settingsPersistor.isViewExpanded
-    }
 
-    convenience init(
-        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
-        settingsPersistor: NewTabPageFavoritesSettingsPersistor = UserDefaultsNewTabPageFavoritesSettingsPersistor()
-    ) {
-        self.init(
-            actionsHandler: DefaultFavoritesActionsHandler(bookmarkManager: bookmarkManager),
-            contextMenuPresenter: contextMenuPresenter,
-            settingsPersistor: settingsPersistor
-        )
+        super.init()
 
-        bookmarkManager.listPublisher
+        favoritesPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] list in
-                self?.favorites = list?.favoriteBookmarks ?? []
+            .sink { [weak self] favorites in
+                self?.favorites = favorites
             }
             .store(in: &cancellables)
     }
 
-    @Published var isViewExpanded: Bool {
+    @Published public var isViewExpanded: Bool {
         didSet {
             settingsPersistor.isViewExpanded = self.isViewExpanded
         }
     }
 
-    @Published var favorites: [Bookmark] = []
+    @Published public var favorites: [FavoriteType] = []
 
     // MARK: - Actions
 
     @MainActor
-    func openFavorite(withURL url: String) {
-        guard let url = url.url else { return }
+    public func openFavorite(withURL url: String) {
+        guard let url = URL(string: url) else { return }
         actionsHandler.open(url, target: .current)
     }
 
-    func moveFavorite(withID bookmarkID: String, fromIndex: Int, toIndex index: Int) {
+    public func moveFavorite(withID bookmarkID: String, fromIndex: Int, toIndex index: Int) {
         let targetIndex = index > fromIndex ? index + 1 : index
         actionsHandler.move(bookmarkID, toIndex: targetIndex)
     }
 
     @MainActor
-    func addNew() {
+    public func addNew() {
         actionsHandler.addNewFavorite()
     }
 
     @MainActor
-    func onFaviconMissing() {
+    public func onFaviconMissing() {
         actionsHandler.onFaviconMissing()
     }
 
     // MARK: Context Menu
 
     @MainActor
-    func showContextMenu(for bookmarkID: String) {
+    public func showContextMenu(for bookmarkID: String) {
         /**
          * This isn't very effective (may need to traverse up to entire array)
          * but it's only ever needed for context menus. I decided to skip
@@ -158,32 +151,32 @@ final class NewTabPageFavoritesModel: NSObject {
     }
 
     @MainActor
-    @objc func openInNewTab(_ sender: NSMenuItem) {
+    @objc public func openInNewTab(_ sender: NSMenuItem) {
         guard let url = sender.representedObject as? URL else { return }
         actionsHandler.open(url, target: .newTab)
     }
 
     @MainActor
-    @objc func openInNewWindow(_ sender: NSMenuItem) {
+    @objc public func openInNewWindow(_ sender: NSMenuItem) {
         guard let url = sender.representedObject as? URL else { return }
         actionsHandler.open(url, target: .newWindow)
     }
 
     @MainActor
-    @objc func editBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else { return }
+    @objc public func editBookmark(_ sender: NSMenuItem) {
+        guard let bookmark = sender.representedObject as? FavoriteType else { return }
         actionsHandler.edit(bookmark)
     }
 
     @MainActor
-    @objc func removeFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else { return }
-        actionsHandler.removeFavorite(bookmark)
+    @objc public func removeFavorite(_ sender: NSMenuItem) {
+        guard let favorite = sender.representedObject as? FavoriteType else { return }
+        actionsHandler.removeFavorite(favorite)
     }
 
     @MainActor
-    @objc func deleteBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else { return }
-        actionsHandler.deleteBookmark(bookmark)
+    @objc public func deleteBookmark(_ sender: NSMenuItem) {
+        guard let bookmark = sender.representedObject as? FavoriteType else { return }
+        actionsHandler.deleteBookmark(for: bookmark)
     }
 }

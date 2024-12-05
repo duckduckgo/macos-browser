@@ -18,7 +18,7 @@
 
 import Foundation
 
-extension NSAccessibilityProtocol {
+public extension NSAccessibilityProtocol {
 
     @discardableResult
     func withAccessibilityIdentifier(_ accessibilityIdentifier: String) -> Self {
