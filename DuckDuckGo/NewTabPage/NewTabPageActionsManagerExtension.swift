@@ -31,7 +31,8 @@ extension NewTabPageActionsManager {
         let privacyStatsModel = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared),
-            keyValueStore: UserDefaults.standard
+            keyValueStore: UserDefaults.standard,
+            getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
         )
 
         self.init(scriptClients: [

@@ -32,9 +32,9 @@ public final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPa
 
     private let keyValueStore: KeyValueStoring
 
-    public init(_ keyValueStore: KeyValueStoring) {
+    public init(_ keyValueStore: KeyValueStoring, getLegacySetting: @autoclosure () -> Bool?) {
         self.keyValueStore = keyValueStore
-        migrateFromNativeHomePageSettings()
+        migrateFromLegacyHomePageSettings(using: getLegacySetting)
     }
 
     public var isViewExpanded: Bool {
@@ -42,12 +42,11 @@ public final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPa
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
     }
 
-    private func migrateFromNativeHomePageSettings() {
-//        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil else {
-//            return
-//        }
-//        let legacyKey = UserDefaultsWrapper<Any>.Key.homePageShowRecentlyVisited.rawValue
-//        isViewExpanded = keyValueStore.object(forKey: legacyKey) as? Bool ?? false
+    private func migrateFromLegacyHomePageSettings(using getLegacySetting: () -> Bool?) {
+        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil, let legacySetting = getLegacySetting() else {
+            return
+        }
+        isViewExpanded = legacySetting
     }
 }
 
@@ -72,12 +71,13 @@ public final class NewTabPagePrivacyStatsModel {
     public convenience init(
         privacyStats: PrivacyStatsCollecting,
         trackerDataProvider: PrivacyStatsTrackerDataProviding,
-        keyValueStore: KeyValueStoring
+        keyValueStore: KeyValueStoring,
+        getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
     ) {
         self.init(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
-            settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore)
+            settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
         )
     }
 

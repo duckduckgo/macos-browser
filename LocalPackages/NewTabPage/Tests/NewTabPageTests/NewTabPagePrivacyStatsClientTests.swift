@@ -38,7 +38,7 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
 
         privacyStats = CapturingPrivacyStats()
         trackerDataProvider = MockPrivacyStatsTrackerDataProvider()
-        settingsPersistor = UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(MockKeyValueStore())
+        settingsPersistor = UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(MockKeyValueStore(), getLegacySetting: nil)
 
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
