@@ -74,7 +74,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
 
     lazy var extensions: [_WKWebExtension] = {
-        guard let onePassword = WebExtensionManager.loadWebExtension(path: "/Applications/1Password for Safari.app/Contents/PlugIns/1Password.appex/Contents/Resources/") else {
+        guard let nativeMessaging = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "add-on", ofType: nil)!) else {
             return []
         }
 
@@ -88,7 +88,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 //        let adBlock = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
 //        let nightEye = WebExtensionManager.loadWebExtension(path: "/Applications/Night Eye.app/Contents/PlugIns/Night Eye Extension.appex/Contents/Resources/")
 
-        return [onePassword]
+        return [nativeMessaging]
     }()
 
     // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.
@@ -137,7 +137,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         context.performAction(for: nil)
 
         // Uncomment the line below to enable debugging of the background script
-//        showBackgroundConsole(context: context)
+        showBackgroundConsole(context: context)
     }
 
     @MainActor
