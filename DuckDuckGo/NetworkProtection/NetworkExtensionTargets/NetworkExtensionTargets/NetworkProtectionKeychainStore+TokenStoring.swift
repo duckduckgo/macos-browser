@@ -22,7 +22,7 @@ import NetworkProtection
 import Networking
 
 extension NetworkProtectionKeychainStore: @retroactive TokenStoring {
-    static var name = "com.duckduckgo.networkprotection.token"
+    static var name = "com.duckduckgo.networkprotection.tokenContainer"
 
     public var tokenContainer: Networking.TokenContainer? {
         get {

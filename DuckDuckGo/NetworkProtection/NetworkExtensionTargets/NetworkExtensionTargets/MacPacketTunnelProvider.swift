@@ -29,18 +29,6 @@ import WireGuard
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
-    static var isAppex: Bool { // IS APP STORE VERSION
-#if NETP_SYSTEM_EXTENSION
-        false
-#else
-        true
-#endif
-    }
-
-    fileprivate static var subscriptionsAppGroup: String? {
-        isAppex ? Bundle.main.appGroup(bundle: .subs) : nil
-    }
-
     // MARK: - Additional Status Info
 
     /// Holds the date when the status was last changed so we can send it out as additional information
@@ -393,12 +381,20 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
+    static var tokenServiceName: String {
+#if NETP_SYSTEM_EXTENSION
+        "\(Bundle.main.bundleIdentifier!).authToken"
+#else
+        "com.duckduckgo.networkprotection.authToken"
+#endif
+    }
+
     // MARK: - Initialization
 
     let subscriptionManager: any SubscriptionManager
 
     @MainActor @objc public init() {
-        Logger.networkProtection.log("Initializing MacPacketTunnelProvider")
+        Logger.networkProtection.log("[+] MacPacketTunnelProvider")
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
 #else
@@ -434,22 +430,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let authEnvironment: OAuthEnvironment = subscriptionEnvironment.serviceEnvironment == .production ? .production : .staging
 
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
-#if NETP_SYSTEM_EXTENSION
-        let tokenServiceName = "\(Bundle.main.bundleIdentifier!).authToken"
-#else
-        let tokenServiceName = "com.duckduckgo.networkprotection.authToken"
-#endif
 
         let tokenStorage = NetworkProtectionKeychainStore(label: "DuckDuckGo Network Protection Auth Token",
-                                                          serviceName: tokenServiceName,
+                                                          serviceName: Self.tokenServiceName,
                                                           keychainType: Bundle.keychainType)
-
-        // TEST
-//        final class TemporaryTokenStorage: TokenStoring {
-//            var tokenContainer: Networking.TokenContainer?
-//        }
-//        let tokenStorage = TemporaryTokenStorage()
-
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage, authService: authService)
         apiService.authorizationRefresherCallback = { _ in
             guard let tokenContainer = tokenStorage.tokenContainer else {
@@ -458,10 +442,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             if tokenContainer.decodedAccessToken.isExpired() {
                 Logger.networkProtection.debug("Refreshing tokens")
                 let tokens = try await authClient.getTokens(policy: .localForceRefresh)
-                return tokens.accessToken
+                return VPNAuthTokenBuilder.getVPNAuthToken(from: tokens.accessToken)
             } else {
                 Logger.networkProtection.error("Trying to refresh valid token, using the old one")
-                return tokenContainer.accessToken
+                return VPNAuthTokenBuilder.getVPNAuthToken(from: tokenContainer.accessToken)
             }
         }
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
@@ -485,10 +469,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         // MARK: -
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-            Logger.networkProtection.log("Entitlements check...")
-            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
-            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled", privacy: .public)")
-            return .success(isNetworkProtectionEnabled)
+//            Logger.networkProtection.log("Entitlements check...")
+//            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
+//            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled", privacy: .public)")
+//            return .success(isNetworkProtectionEnabled)
+            return .success(true)
         }
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
