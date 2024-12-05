@@ -17,7 +17,6 @@
 //
 
 import Combine
-import NewTabPage
 import RemoteMessaging
 import TestUtils
 import XCTest
@@ -37,14 +36,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
         try super.setUpWithError()
         contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
         actionsHandler = CapturingNewTabPageFavoritesActionsHandler()
-        favoritesModel = NewTabPageFavoritesModel.init(
+        favoritesModel = NewTabPageFavoritesModel(
             actionsHandler: actionsHandler,
             favoritesPublisher: Empty().eraseToAnyPublisher(),
             contextMenuPresenter: contextMenuPresenter,
             settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor(MockKeyValueStore(), getLegacySetting: nil)
         )
 
-        client = NewTabPageFavoritesClient(favoritesModel: favoritesModel)
+        client = NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: 100)
 
         userScript = NewTabPageUserScript()
         client.registerMessageHandlers(for: userScript)
@@ -161,25 +160,13 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     // MARK: - Helper functions
 
-    func handleMessage<Response: Encodable>(
-        named methodName: NewTabPageFavoritesClientUnderTest.MessageName,
-        parameters: Any = [],
-        file: StaticString = #file,
-        line: UInt = #line
-    ) async throws -> Response {
-
+    func handleMessage<Response: Encodable>(named methodName: NewTabPageFavoritesClientUnderTest.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
         let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
         return try XCTUnwrap(response as? Response, file: file, line: line)
     }
 
-    func handleMessageExpectingNilResponse(
-        named methodName: NewTabPageFavoritesClientUnderTest.MessageName,
-        parameters: Any = [],
-        file: StaticString = #file,
-        line: UInt = #line
-    ) async throws {
-
+    func handleMessageExpectingNilResponse(named methodName: NewTabPageFavoritesClientUnderTest.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
         let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
         XCTAssertNil(response, file: file, line: line)

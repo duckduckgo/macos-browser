@@ -29,9 +29,11 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     public let favoritesModel: NewTabPageFavoritesModel<FavoriteType, ActionHandler>
     public weak var userScriptsSource: NewTabPageUserScriptsSource?
     private var cancellables: Set<AnyCancellable> = []
+    private let preferredFaviconSize: Int
 
-    public init(favoritesModel: NewTabPageFavoritesModel<FavoriteType, ActionHandler>) {
+    public init(favoritesModel: NewTabPageFavoritesModel<FavoriteType, ActionHandler>, preferredFaviconSize: Int) {
         self.favoritesModel = favoritesModel
+        self.preferredFaviconSize = preferredFaviconSize
 
         favoritesModel.$favorites.dropFirst()
             .sink { [weak self] favorites in
@@ -96,7 +98,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     public func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let favorites = favoritesModel.favorites.map {
-            NewTabPageFavoritesClient.Favorite($0, onFaviconMissing: favoritesModel.onFaviconMissing)
+            NewTabPageFavoritesClient.Favorite($0, preferredFaviconSize: preferredFaviconSize, onFaviconMissing: favoritesModel.onFaviconMissing)
         }
         return NewTabPageFavoritesClient.FavoritesData(favorites: favorites)
     }
@@ -104,7 +106,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     private func notifyDataUpdated(_ favorites: [NewTabPageFavorite]) {
         let favorites = favoritesModel.favorites.map {
-            NewTabPageFavoritesClient.Favorite($0, onFaviconMissing: favoritesModel.onFaviconMissing)
+            NewTabPageFavoritesClient.Favorite($0, preferredFaviconSize: preferredFaviconSize, onFaviconMissing: favoritesModel.onFaviconMissing)
         }
         pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageFavoritesClient.FavoritesData(favorites: favorites))
     }
@@ -210,14 +212,13 @@ public extension NewTabPageFavoritesClient {
         }
 
         @MainActor
-        init(_ bookmark: NewTabPageFavorite, onFaviconMissing: () -> Void) {
+        init(_ bookmark: NewTabPageFavorite, preferredFaviconSize: Int, onFaviconMissing: () -> Void) {
             id = bookmark.id
             title = bookmark.title
             url = bookmark.url
 
             if let url = bookmark.urlObject, let duckFaviconURL = URL.duckFavicon(for: url) {
-                // TODO: Int(Favicon.SizeCategory.medium.rawValue)
-                favicon = FavoriteFavicon(maxAvailableSize: 132, src: duckFaviconURL.absoluteString)
+                favicon = FavoriteFavicon(maxAvailableSize: preferredFaviconSize, src: duckFaviconURL.absoluteString)
             } else {
                 onFaviconMissing()
                 favicon = nil

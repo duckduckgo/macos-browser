@@ -101,4 +101,3 @@ extension NewTabPageNextStepsCardsClient.CardID {
         }
     }
 }
-

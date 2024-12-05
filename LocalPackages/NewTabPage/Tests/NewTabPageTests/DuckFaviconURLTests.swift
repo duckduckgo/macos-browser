@@ -22,7 +22,6 @@ import Combine
 
 final class DuckFaviconURLTests: XCTestCase {
 
-
     func testDuckFaviconURL() throws {
         XCTAssertEqual(
             URL.duckFavicon(for: URL(string: "https://example.com")!)?.absoluteString,
