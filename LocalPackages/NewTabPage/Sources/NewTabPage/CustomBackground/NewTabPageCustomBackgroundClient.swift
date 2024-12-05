@@ -1,0 +1,96 @@
+//
+//  NewTabPageCustomBackgroundClient.swift
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Common
+import Combine
+import UserScript
+import WebKit
+
+public protocol NewTabPageCustomBackgroundProviding: AnyObject {
+    var customizerData: NewTabPageUserScript.CustomizerData { get }
+}
+
+public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
+
+    let model: NewTabPageCustomBackgroundProviding
+    public weak var userScriptsSource: NewTabPageUserScriptsSource?
+
+    private var cancellables: Set<AnyCancellable> = []
+
+    public init(model: NewTabPageCustomBackgroundProviding) {
+        self.model = model
+    }
+
+    enum MessageName: String, CaseIterable {
+        case deleteImage = "customizer_deleteImage"
+        case onBackgroundUpdate = "customizer_onBackgroundUpdate"
+        case onImagesUpdate = "customizer_onImagesUpdate"
+        case onThemeUpdate = "customizer_onThemeUpdate"
+        case setBackground = "customizer_setBackground"
+        case setTheme = "customizer_setTheme"
+        case upload = "customizer_upload"
+    }
+
+    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+        userScript.registerMessageHandlers([
+            MessageName.deleteImage.rawValue: { [weak self] in try await self?.deleteImage(params: $0, original: $1) },
+            MessageName.setBackground.rawValue: { [weak self] in try await self?.setBackground(params: $0, original: $1) },
+            MessageName.setTheme.rawValue: { [weak self] in try await self?.setTheme(params: $0, original: $1) },
+            MessageName.upload.rawValue: { [weak self] in try await self?.upload(params: $0, original: $1) },
+        ])
+    }
+
+    @MainActor
+    func deleteImage(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    @MainActor
+    private func setBackground(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    @MainActor
+    private func setTheme(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    @MainActor
+    private func upload(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+}
+
+extension NewTabPageCustomBackgroundClient {
+
+    public enum CardID: String, Codable {
+        case bringStuff
+        case defaultApp
+        case emailProtection
+        case duckplayer
+        case addAppToDockMac
+    }
+
+    struct Card: Codable, Equatable {
+        let id: CardID
+    }
+
+    struct NextStepsData: Codable, Equatable {
+        public let content: [Card]?
+    }
+}

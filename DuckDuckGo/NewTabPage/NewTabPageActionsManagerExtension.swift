@@ -40,8 +40,10 @@ extension NewTabPageActionsManager {
             getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowAllFavorites, defaultValue: false).wrappedValue
         )
 
+        let customizationProvider = NewTabPageCustomizationProvider(homePageSettingsModel: NSApp.delegateTyped.homePageSettingsModel)
+
         self.init(scriptClients: [
-            NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences),
+            NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences, customBackgroundProvider: customizationProvider),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel),
             NewTabPageNextStepsCardsClient(model: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener())),
             NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: Int(Favicon.SizeCategory.medium.rawValue)),

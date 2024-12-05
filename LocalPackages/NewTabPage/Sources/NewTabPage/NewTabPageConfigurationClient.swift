@@ -37,13 +37,16 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     private var cancellables = Set<AnyCancellable>()
     private let sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding
+    private let customBackgroundProvider: NewTabPageCustomBackgroundProviding
     private let contextMenuPresenter: NewTabPageContextMenuPresenting
 
     public init(
         sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding,
+        customBackgroundProvider: NewTabPageCustomBackgroundProviding,
         contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter()
     ) {
         self.sectionsVisibilityProvider = sectionsVisibilityProvider
+        self.customBackgroundProvider = customBackgroundProvider
         self.contextMenuPresenter = contextMenuPresenter
 
         Publishers.Merge(sectionsVisibilityProvider.isFavoritesVisiblePublisher, sectionsVisibilityProvider.isPrivacyStatsVisiblePublisher)
@@ -132,6 +135,8 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 #else
         let env = "production"
 #endif
+
+        let customizerData = customBackgroundProvider.customizerData
         return NewTabPageUserScript.NewTabPageConfiguration(
             widgets: [
                 .init(id: .rmf),
@@ -145,7 +150,9 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
             ],
             env: env,
             locale: Bundle.main.preferredLocalizations.first ?? "en",
-            platform: .init(name: "macos")
+            platform: .init(name: "macos"),
+            settings: .init(customizerDrawer: .enabled),
+            customizer: customizerData
         )
     }
 
@@ -197,6 +204,8 @@ extension NewTabPageUserScript {
         var env: String
         var locale: String
         var platform: Platform
+        var settings: Settings
+        var customizer: CustomizerData
 
         struct Widget: Encodable, Equatable {
             public var id: WidgetId
@@ -223,6 +232,69 @@ extension NewTabPageUserScript {
 
         struct Platform: Encodable, Equatable {
             var name: String
+        }
+
+        struct Settings: Encodable, Equatable {
+            let customizerDrawer: BooleanSetting
+
+            enum BooleanSetting: String, Encodable {
+                case enabled, disabled
+
+                var isEnabled: Bool {
+                    self == .enabled
+                }
+            }
+        }
+    }
+
+    public struct CustomizerData: Encodable, Equatable {
+        public let background: Background
+        public let theme: Theme?
+        public let userImages: [UserImage]
+
+        public init(background: Background, theme: Theme?, userImages: [UserImage]) {
+            self.background = background
+            self.theme = theme
+            self.userImages = userImages
+        }
+
+        enum CodingKeys: CodingKey {
+            case background
+            case theme
+            case userImages
+        }
+
+        public func encode(to encoder: any Encoder) throws {
+            var container: KeyedEncodingContainer<NewTabPageUserScript.CustomizerData.CodingKeys> = encoder.container(keyedBy: NewTabPageUserScript.CustomizerData.CodingKeys.self)
+            try container.encode(self.background, forKey: NewTabPageUserScript.CustomizerData.CodingKeys.background)
+            try container.encode(self.theme?.rawValue ?? "system", forKey: NewTabPageUserScript.CustomizerData.CodingKeys.theme)
+            try container.encode(self.userImages, forKey: NewTabPageUserScript.CustomizerData.CodingKeys.userImages)
+        }
+    }
+
+    public enum Theme: String, Encodable {
+        case dark, light
+    }
+
+    public enum Background: Encodable, Equatable {
+        case `default`
+        case solidColor(String)
+        case hexColor(String)
+        case gradient(String)
+        case userImage(UserImage)
+    }
+
+    public struct UserImage: Encodable, Equatable {
+        public let colorScheme: Theme
+        public let id: String
+        public let src: String
+        public let thumb: String
+
+        public init(colorScheme: Theme, id: String, src: String, thumb: String) {
+            self.colorScheme = colorScheme
+            self.id = id
+            self.src = src
+            self.thumb = thumb
         }
     }
 }
