@@ -3198,6 +3198,8 @@
 		F1AFDBD42C231B9700710F2C /* SubscriptionErrorReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFDBD32C231B9700710F2C /* SubscriptionErrorReporterTests.swift */; };
 		F1AFDBD72C23221700710F2C /* SubscriptionErrorReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFDBD32C231B9700710F2C /* SubscriptionErrorReporterTests.swift */; };
 		F1AFDBD92C23221700710F2C /* SubscriptionAppStoreRestorerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFDBD12C231B7A00710F2C /* SubscriptionAppStoreRestorerTests.swift */; };
+		F1B09DA82D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B09DA72D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift */; };
+		F1B09DA92D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B09DA72D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift */; };
 		F1B33DF22BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */; };
 		F1B33DF32BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */; };
 		F1B33DF62BAD970E001128B3 /* SubscriptionErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF52BAD970E001128B3 /* SubscriptionErrorReporter.swift */; };
@@ -3223,14 +3225,12 @@
 		F1D042902BFB9FA300A31506 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F1D0428F2BFB9FA300A31506 /* Subscription */; };
 		F1D042942BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */; };
 		F1D042952BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */; };
-		F1D042992BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
-		F1D0429A2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
-		F1D0429B2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
-		F1D0429C2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
-		F1D0429D2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
-		F1D0429E2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
-		F1D0429F2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
-		F1D042A02BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D042992BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429A2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429D2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429E2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429F2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */; };
+		F1D042A02BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */; };
 		F1D042A12BFBB4DD00A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */; };
 		F1D042A22BFBB4DD00A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */; };
 		F1D43AEE2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
@@ -5016,6 +5016,7 @@
 		F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPixels.swift; sourceTree = "<group>"; };
 		F1AFDBD12C231B7A00710F2C /* SubscriptionAppStoreRestorerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAppStoreRestorerTests.swift; sourceTree = "<group>"; };
 		F1AFDBD32C231B9700710F2C /* SubscriptionErrorReporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionErrorReporterTests.swift; sourceTree = "<group>"; };
+		F1B09DA72D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtectionKeychainStore+TokenStoring.swift"; sourceTree = "<group>"; };
 		F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAppStoreRestorer.swift; sourceTree = "<group>"; };
 		F1B33DF52BAD970E001128B3 /* SubscriptionErrorReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionErrorReporter.swift; sourceTree = "<group>"; };
 		F1B8EC792C29957A00D395F5 /* SubscriptionFeatureAvailabilityMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriptionFeatureAvailabilityMock.swift; sourceTree = "<group>"; };
@@ -5024,7 +5025,7 @@
 		F1C70D7B2BFF510000599292 /* SubscriptionEnvironment+Default.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SubscriptionEnvironment+Default.swift"; sourceTree = "<group>"; };
 		F1CA67052C7DCA2300264E6A /* Logger+BitWarden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+BitWarden.swift"; sourceTree = "<group>"; };
 		F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DataBrokerProtectionSettings+Environment.swift"; sourceTree = "<group>"; };
-		F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SubscriptionManager+StandardConfiguration.swift"; sourceTree = "<group>"; };
+		F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionManager+StandardConfiguration.swift"; sourceTree = "<group>"; };
 		F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MainMenuActions+VanillaBrowser.swift"; sourceTree = "<group>"; };
 		F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriptionAttributionPixelHandler.swift; sourceTree = "<group>"; };
 		F1DA51852BF607D200CF29FA /* SubscriptionRedirectManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriptionRedirectManager.swift; sourceTree = "<group>"; };
@@ -6453,6 +6454,7 @@
 				EEBCA0C12BD7CDDA004DF19C /* Pixels */,
 				4B41ED9F2B15437A001EEDF4 /* NetworkProtectionNotificationsPresenterFactory.swift */,
 				EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */,
+				F1B09DA72D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift */,
 				7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */,
 			);
 			path = NetworkExtensionTargets;
@@ -9910,7 +9912,7 @@
 				F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */,
 				F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */,
 				F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */,
-				F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */,
+				F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */,
 				F1DA51852BF607D200CF29FA /* SubscriptionRedirectManager.swift */,
 				F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */,
 				1E25A4FD2CC937120080EFD4 /* SubscriptionCookieManageEventPixelMapping.swift */,
@@ -11522,7 +11524,7 @@
 				85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */,
 				3706FB19293F65D500E42796 /* FireViewController.swift in Sources */,
 				B6E3E55C2BC0041A00A41922 /* DownloadListStoreMock.swift in Sources */,
-				F1D0429A2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
+				F1D0429A2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				4B4D60D42A0C84F700BCD287 /* UserText+NetworkProtection.swift in Sources */,
 				3707C71F294B5D2900682A9F /* WKUserContentControllerExtension.swift in Sources */,
 				3706FB1A293F65D500E42796 /* OutlineSeparatorViewCell.swift in Sources */,
@@ -12699,6 +12701,7 @@
 				4B52354D2C854CB600AFAF64 /* DuckDuckGoUserAgent.swift in Sources */,
 				EEBCA0C72BD7CE2C004DF19C /* VPNFailureRecoveryPixel.swift in Sources */,
 				F1DA51932BF6081D00CF29FA /* AttributionPixelHandler.swift in Sources */,
+				F1B09DA92D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift in Sources */,
 				7B2E52252A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift in Sources */,
 				F1DA51892BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				B602E8232A1E260E006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */,
@@ -12713,7 +12716,6 @@
 				F1C70D7F2BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
 				EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */,
 				4B2D06292A11C0C900DE1F49 /* Bundle+VPN.swift in Sources */,
-				F1D0429C2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				F1DA51972BF6083A00CF29FA /* PrivacyProPixel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -12734,7 +12736,7 @@
 				7B2DDCFA2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */,
 				02FDA6592C764B970024CD8B /* ConfigurationManager.swift in Sources */,
 				7BA7CC4C2AD11EC70042E5CE /* NetworkProtectionControllerErrorStore.swift in Sources */,
-				F1D0429D2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
+				F1D0429D2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				7B8DB31A2B504D7500EC16DA /* VPNAppEventsHandler.swift in Sources */,
 				02FDA65F2C764E220024CD8B /* VPNPrivacyConfigurationManager.swift in Sources */,
 				7BA7CC532AD11FCE0042E5CE /* Bundle+VPN.swift in Sources */,
@@ -12780,7 +12782,7 @@
 				7B22D8702CCFD7B7006A76E1 /* TipKitController.swift in Sources */,
 				F1DA51952BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */,
 				4BA7C4D92B3F61FB00AFE511 /* BundleExtension.swift in Sources */,
-				F1D0429E2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
+				F1D0429E2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				02FDA65C2C764CB00024CD8B /* ConfigurationManager.swift in Sources */,
 				7BA7CC3F2AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
 				4B0EF7292B5780EB009D6481 /* VPNAppEventsHandler.swift in Sources */,
@@ -12840,9 +12842,9 @@
 				F1DA51962BF6083700CF29FA /* PrivacyProPixel.swift in Sources */,
 				EEBCA0C62BD7CE2C004DF19C /* VPNFailureRecoveryPixel.swift in Sources */,
 				4B4D60A12A0B2D6100BCD287 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
-				F1D0429B2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				B602E8182A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				B65DA5F52A77D3FA00CBEE8D /* BundleExtension.swift in Sources */,
+				F1B09DA82D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift in Sources */,
 				4B52354E2C854CB700AFAF64 /* DuckDuckGoUserAgent.swift in Sources */,
 				4B4D60892A0B2A1C00BCD287 /* NetworkProtectionUNNotificationsPresenter.swift in Sources */,
 				F1C70D7E2BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
@@ -12942,7 +12944,7 @@
 				9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */,
 				31ECDA132BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
-				F1D0429F2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
+				F1D0429F2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				31ECDA0E2BED317300AE679F /* BundleExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -12960,7 +12962,7 @@
 				9D9AE91E2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */,
 				31ECDA142BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
-				F1D042A02BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
+				F1D042A02BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				31ECDA0F2BED317300AE679F /* BundleExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -12977,7 +12979,7 @@
 				4B9DB0412A983B24000927DB /* WaitlistDialogView.swift in Sources */,
 				37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */,
 				B60C6F8D29B200AB007BFAA8 /* SavePanelAccessoryView.swift in Sources */,
-				F1D042992BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
+				F1D042992BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				37534CA3281132CB002621E7 /* TabLazyLoaderDataSource.swift in Sources */,
 				84537A042C998C28008723BC /* FireWindowSession.swift in Sources */,
 				3158B15C2B0BF76D00AF130C /* DataBrokerProtectionAppEvents.swift in Sources */,

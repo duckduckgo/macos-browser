@@ -573,7 +573,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
                 // It's important to note that we've seen instances where the above call to start()
                 // doesn't throw any errors, yet the tunnel fails to start.  In any case this pixel
-                // should be interpreted as "the controller successfully requrested the tunnel to be
+                // should be interpreted as "the controller successfully requested the tunnel to be
                 // started".  Meaning there's no error caught in this start attempt.  There are pixels
                 // in the packet tunnel provider side that can be used to debug additional logic.
                 //
@@ -652,7 +652,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             Logger.networkProtection.debug("Starting NetworkProtectionTunnelController, options: \(options, privacy: .public)")
             try tunnelManager.connection.startVPNTunnel(options: options)
         } catch {
-            Logger.networkProtection.fault("Failed to start VPN tunnel: \(error, privacy: .public)")
+            Logger.networkProtection.error("Failed to start VPN tunnel: \(error, privacy: .public)")
             throw StartError.startTunnelFailure(error)
         }
 
@@ -669,6 +669,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     @MainActor
     func stop() async {
+        Logger.networkProtection.log("Stop VPN")
         await stop(disableOnDemand: true)
     }
 
@@ -802,7 +803,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             Logger.networkProtection.log("🟢 TunnelController found token container")
             return tokenContainer
         } catch {
-            Logger.networkProtection.error("TunnelController found no token container")
+            Logger.networkProtection.fault("TunnelController found no token container")
             throw StartError.noAuthToken
         }
     }

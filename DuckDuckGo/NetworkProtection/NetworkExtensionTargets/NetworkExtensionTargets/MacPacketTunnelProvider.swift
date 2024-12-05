@@ -395,6 +395,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
+    let subscriptionManager: any SubscriptionManager
+
     @MainActor @objc public init() {
         Logger.networkProtection.log("Initializing MacPacketTunnelProvider")
 #if NETP_SYSTEM_EXTENSION
@@ -424,20 +426,75 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         subscriptionEnvironment.purchasePlatform = .stripe // we don't care about the purchasePlatform
 
         Logger.networkProtection.debug("Subscription ServiceEnvironment: \(subscriptionEnvironment.serviceEnvironment.rawValue, privacy: .public)")
+        let configuration = URLSessionConfiguration.default
+        configuration.httpCookieStorage = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        let urlSession = URLSession(configuration: configuration, delegate: SessionDelegate(), delegateQueue: nil)
+        let apiService = DefaultAPIService(urlSession: urlSession)
+        let authEnvironment: OAuthEnvironment = subscriptionEnvironment.serviceEnvironment == .production ? .production : .staging
 
-        let subscriptionManager = DefaultSubscriptionManager(keychainType: Bundle.keychainType, // note: the old public static let tokenStoreService = "com.duckduckgo.networkprotection.authToken" was used as kSecAttrService in NetworkProtectionKeychainStore, now is different. the old token recovery will not work in the extension, yes in main app
-                                                             environment: subscriptionEnvironment,
-                                                             userDefaults: defaults)
+        let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
+#if NETP_SYSTEM_EXTENSION
+        let tokenServiceName = "\(Bundle.main.bundleIdentifier!).authToken"
+#else
+        let tokenServiceName = "com.duckduckgo.networkprotection.authToken"
+#endif
+
+        let tokenStorage = NetworkProtectionKeychainStore(label: "DuckDuckGo Network Protection Auth Token",
+                                                          serviceName: tokenServiceName,
+                                                          keychainType: Bundle.keychainType)
+
+        // TEST
+//        final class TemporaryTokenStorage: TokenStoring {
+//            var tokenContainer: Networking.TokenContainer?
+//        }
+//        let tokenStorage = TemporaryTokenStorage()
+
+        let authClient = DefaultOAuthClient(tokensStorage: tokenStorage, authService: authService)
+        apiService.authorizationRefresherCallback = { _ in
+            guard let tokenContainer = tokenStorage.tokenContainer else {
+                throw OAuthClientError.internalError("Missing refresh token")
+            }
+            if tokenContainer.decodedAccessToken.isExpired() {
+                Logger.networkProtection.debug("Refreshing tokens")
+                let tokens = try await authClient.getTokens(policy: .localForceRefresh)
+                return tokens.accessToken
+            } else {
+                Logger.networkProtection.error("Trying to refresh valid token, using the old one")
+                return tokenContainer.accessToken
+            }
+        }
+        let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
+                                                                             baseURL: subscriptionEnvironment.serviceEnvironment.url)
+        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
+                                                                                     userDefaults: defaults)
+        let pixelHandler: SubscriptionManager.PixelHandler = { type in
+            switch type {
+            case .deadToken:
+                PixelKit.fire(SubscriptionPixels.privacyProDeadTokenDetected)
+            }
+        }
+
+        let subscriptionManager = DefaultSubscriptionManager(oAuthClient: authClient,
+                                                             subscriptionEndpointService: subscriptionEndpointService,
+                                                             subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+                                                             subscriptionEnvironment: subscriptionEnvironment,
+                                                             subscriptionFeatureFlagger: nil,
+                                                             pixelHandler: pixelHandler)
+
+        // MARK: -
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
             Logger.networkProtection.log("Entitlements check...")
             let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
-            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled" , privacy: .public)")
+            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled", privacy: .public)")
             return .success(isNetworkProtectionEnabled)
         }
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
+
+        self.subscriptionManager = subscriptionManager
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,

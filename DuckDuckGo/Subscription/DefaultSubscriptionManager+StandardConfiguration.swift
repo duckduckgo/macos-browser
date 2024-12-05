@@ -1,5 +1,5 @@
 //
-//  SubscriptionManager+StandardConfiguration.swift
+//  DefaultSubscriptionManager+StandardConfiguration.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -24,9 +24,9 @@ import Networking
 import os.log
 import BrowserServicesKit
 import FeatureFlags
+import NetworkProtection
 
 extension DefaultSubscriptionManager {
-
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
     public convenience init(keychainType: KeychainType,
                             environment: SubscriptionEnvironment,
@@ -41,15 +41,12 @@ extension DefaultSubscriptionManager {
                                     delegateQueue: nil)
         let apiService = DefaultAPIService(urlSession: urlSession)
         let authEnvironment: OAuthEnvironment = environment.serviceEnvironment == .production ? .production : .staging
-
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
         let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: keychainType)
-//        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: keychainType)
-
+        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: keychainType)
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
-//                                            legacyTokenStorage: legacyAccountStorage,
+                                            legacyTokenStorage: legacyAccountStorage,
                                             authService: authService)
-
         apiService.authorizationRefresherCallback = { _ in
             guard let tokenContainer = tokenStorage.tokenContainer else {
                 throw OAuthClientError.internalError("Missing refresh token")
@@ -67,7 +64,7 @@ extension DefaultSubscriptionManager {
 
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
                                                                              baseURL: environment.serviceEnvironment.url)
-//        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+//        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)! // main app
         let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
                                                                                      userDefaults: userDefaults)
         let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
