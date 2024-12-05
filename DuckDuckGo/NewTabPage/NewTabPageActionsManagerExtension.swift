@@ -30,7 +30,8 @@ extension NewTabPageActionsManager {
     ) {
         let privacyStatsModel = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
-            trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared)
+            trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared),
+            keyValueStore: UserDefaults.standard
         )
 
         self.init(scriptClients: [

@@ -17,12 +17,11 @@
 //
 
 import Combine
-import NewTabPage
 import PrivacyStats
 import TestUtils
 import TrackerRadarKit
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
+@testable import NewTabPage
 
 final class NewTabPagePrivacyStatsClientTests: XCTestCase {
     var client: NewTabPagePrivacyStatsClient!

@@ -32,7 +32,7 @@ let package = Package(
             targets: ["NewTabPage"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "217.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "217.0.1"),
         .package(path: "../WebKitExtensions"),
     ],
     targets: [
@@ -42,6 +42,8 @@ let package = Package(
             name: "NewTabPage",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
+                .product(name: "PrivacyStats", package: "BrowserServicesKit"),
+                .product(name: "TestUtils", package: "BrowserServicesKit"),
                 .product(name: "WebKitExtensions", package: "WebKitExtensions"),
             ],
             swiftSettings: [

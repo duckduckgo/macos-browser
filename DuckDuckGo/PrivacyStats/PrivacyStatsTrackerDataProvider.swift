@@ -18,12 +18,8 @@
 
 import BrowserServicesKit
 import Combine
+import NewTabPage
 import TrackerRadarKit
-
-public protocol PrivacyStatsTrackerDataProviding {
-    var trackerData: TrackerData { get }
-    var trackerDataUpdatesPublisher: AnyPublisher<Void, Never> { get }
-}
 
 final class PrivacyStatsTrackerDataProvider: PrivacyStatsTrackerDataProviding {
     var trackerData: TrackerData {

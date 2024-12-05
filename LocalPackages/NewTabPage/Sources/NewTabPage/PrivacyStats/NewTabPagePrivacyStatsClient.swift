@@ -19,16 +19,16 @@
 import Combine
 import Common
 import os.log
-import NewTabPage
 import UserScript
+import WebKit
 
-final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
+public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
 
-    weak var userScriptsSource: NewTabPageUserScriptsSource?
+    public weak var userScriptsSource: NewTabPageUserScriptsSource?
     private let model: NewTabPagePrivacyStatsModel
     private var cancellables: Set<AnyCancellable> = []
 
-    enum MessageName: String, CaseIterable {
+    public enum MessageName: String, CaseIterable {
         case getConfig = "stats_getConfig"
         case getData = "stats_getData"
         case onConfigUpdate = "stats_onConfigUpdate"
@@ -36,7 +36,7 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         case setConfig = "stats_setConfig"
     }
 
-    init(model: NewTabPagePrivacyStatsModel) {
+    public init(model: NewTabPagePrivacyStatsModel) {
         self.model = model
 
         model.$isViewExpanded.dropFirst()
@@ -56,7 +56,7 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
             .store(in: &cancellables)
     }
 
-    func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
         userScript.registerMessageHandlers([
             MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
             MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
@@ -64,7 +64,7 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         ])
     }
 
-    func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    public func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = model.isViewExpanded ? .expanded : .collapsed
         return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
     }
@@ -77,7 +77,7 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    public func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
             return nil
         }
@@ -91,27 +91,37 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    public func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         return await model.calculatePrivacyStats()
     }
 }
 
-extension NewTabPagePrivacyStatsClient {
+public extension NewTabPagePrivacyStatsClient {
 
     struct PrivacyStatsData: Encodable, Equatable {
-        let totalCount: Int64
-        let trackerCompanies: [TrackerCompany]
+        public let totalCount: Int64
+        public let trackerCompanies: [TrackerCompany]
 
-        static func == (lhs: PrivacyStatsData, rhs: PrivacyStatsData) -> Bool {
+        public init(totalCount: Int64, trackerCompanies: [TrackerCompany]) {
+            self.totalCount = totalCount
+            self.trackerCompanies = trackerCompanies
+        }
+
+        public static func == (lhs: PrivacyStatsData, rhs: PrivacyStatsData) -> Bool {
             lhs.totalCount == rhs.totalCount && Set(lhs.trackerCompanies) == Set(rhs.trackerCompanies)
         }
     }
 
     struct TrackerCompany: Encodable, Equatable, Hashable {
-        let count: Int64
-        let displayName: String
+        public let count: Int64
+        public let displayName: String
 
-        static func otherCompanies(count: Int64) -> TrackerCompany {
+        public init(count: Int64, displayName: String) {
+            self.count = count
+            self.displayName = displayName
+        }
+
+        public static func otherCompanies(count: Int64) -> TrackerCompany {
             TrackerCompany(count: count, displayName: "__other__")
         }
     }

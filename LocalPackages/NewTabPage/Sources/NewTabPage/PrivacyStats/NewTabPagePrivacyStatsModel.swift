@@ -18,47 +18,45 @@
 
 import Combine
 import os.log
-import NewTabPage
 import Persistence
 import PrivacyStats
 
-protocol NewTabPagePrivacyStatsSettingsPersistor: AnyObject {
+public protocol NewTabPagePrivacyStatsSettingsPersistor: AnyObject {
     var isViewExpanded: Bool { get set }
 }
 
-final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPagePrivacyStatsSettingsPersistor {
+public final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPagePrivacyStatsSettingsPersistor {
     enum Keys {
         static let isViewExpanded = "new-tab-page.privacy-stats.is-view-expanded"
     }
 
     private let keyValueStore: KeyValueStoring
 
-    init(_ keyValueStore: KeyValueStoring = UserDefaults.standard) {
+    public init(_ keyValueStore: KeyValueStoring) {
         self.keyValueStore = keyValueStore
         migrateFromNativeHomePageSettings()
     }
 
-    var isViewExpanded: Bool {
+    public var isViewExpanded: Bool {
         get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
     }
 
     private func migrateFromNativeHomePageSettings() {
-        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil else {
-            return
-        }
-        let legacyKey = UserDefaultsWrapper<Any>.Key.homePageShowRecentlyVisited.rawValue
-        isViewExpanded = keyValueStore.object(forKey: legacyKey) as? Bool ?? false
+//        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil else {
+//            return
+//        }
+//        let legacyKey = UserDefaultsWrapper<Any>.Key.homePageShowRecentlyVisited.rawValue
+//        isViewExpanded = keyValueStore.object(forKey: legacyKey) as? Bool ?? false
     }
 }
 
-final class NewTabPagePrivacyStatsModel {
+public final class NewTabPagePrivacyStatsModel {
 
-    let privacyStats: PrivacyStatsCollecting
+    public let privacyStats: PrivacyStatsCollecting
+    public let statsUpdatePublisher: AnyPublisher<Void, Never>
 
-    let statsUpdatePublisher: AnyPublisher<Void, Never>
-
-    @Published var isViewExpanded: Bool {
+    @Published public var isViewExpanded: Bool {
         didSet {
             settingsPersistor.isViewExpanded = self.isViewExpanded
         }
@@ -71,10 +69,22 @@ final class NewTabPagePrivacyStatsModel {
     private let statsUpdateSubject = PassthroughSubject<Void, Never>()
     private var cancellables: Set<AnyCancellable> = []
 
-    init(
+    public convenience init(
         privacyStats: PrivacyStatsCollecting,
         trackerDataProvider: PrivacyStatsTrackerDataProviding,
-        settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor = UserDefaultsNewTabPagePrivacyStatsSettingsPersistor()
+        keyValueStore: KeyValueStoring
+    ) {
+        self.init(
+            privacyStats: privacyStats,
+            trackerDataProvider: trackerDataProvider,
+            settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore)
+        )
+    }
+
+    public init(
+        privacyStats: PrivacyStatsCollecting,
+        trackerDataProvider: PrivacyStatsTrackerDataProviding,
+        settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     ) {
         self.privacyStats = privacyStats
         self.trackerDataProvider = trackerDataProvider
@@ -100,7 +110,7 @@ final class NewTabPagePrivacyStatsModel {
         refreshTopCompanies()
     }
 
-    func calculatePrivacyStats() async -> NewTabPagePrivacyStatsClient.PrivacyStatsData {
+    public func calculatePrivacyStats() async -> NewTabPagePrivacyStatsClient.PrivacyStatsData {
         let stats = await privacyStats.fetchPrivacyStats()
 
         var totalCount: Int64 = 0
