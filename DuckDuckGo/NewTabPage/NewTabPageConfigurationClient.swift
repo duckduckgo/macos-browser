@@ -131,6 +131,7 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         return NewTabPageUserScript.NewTabPageConfiguration(
             widgets: [
                 .init(id: .rmf),
+                .init(id: .nextSteps),
                 .init(id: .favorites),
                 .init(id: .privacyStats)
             ],
@@ -174,7 +175,7 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 extension NewTabPageUserScript {
 
     enum WidgetId: String, Codable {
-        case rmf, favorites, privacyStats
+        case rmf, nextSteps, favorites, privacyStats
     }
 
     struct ContextMenuParams: Codable {

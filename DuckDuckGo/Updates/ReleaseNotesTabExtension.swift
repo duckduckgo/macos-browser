@@ -82,7 +82,7 @@ final class ReleaseNotesTabExtension: NavigationResponder {
 
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        if navigationAction.url.isReleaseNotesScheme {
+        if navigationAction.url == .releaseNotes {
             return .allow
         }
         return .next
@@ -105,11 +105,11 @@ final class ReleaseNotesTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-#if !DEBUG
-        guard NSApp.runType != .uiTests, navigation.url.isReleaseNotesScheme else { return }
+        guard NSApp.runType != .uiTests, navigation.url == .releaseNotes else { return }
         let updateController = Application.appDelegate.updateController!
-        updateController.checkForUpdateIfNeeded()
-#endif
+        if updateController.latestUpdate?.needsLatestReleaseNote == true {
+            updateController.checkForUpdateSkippingRollout()
+        }
     }
 }
 

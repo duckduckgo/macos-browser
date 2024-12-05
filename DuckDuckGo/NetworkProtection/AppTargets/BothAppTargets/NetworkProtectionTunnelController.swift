@@ -658,7 +658,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
         PixelKit.fire(
             NetworkProtectionPixelEvent.networkProtectionNewUser,
-            frequency: .unique,
+            frequency: .uniqueByName,
             includeAppVersionParameter: true) { [weak self] fired, error in
                 guard let self, error == nil, fired else { return }
                 self.defaults.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)

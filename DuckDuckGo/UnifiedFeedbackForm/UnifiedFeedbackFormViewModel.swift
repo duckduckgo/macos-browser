@@ -49,8 +49,8 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
 
     enum Error: String, Swift.Error {
         case missingAccessToken
-        case invalidRequest
         case invalidResponse
+        case invalidRequest
     }
 
     enum ViewAction {
