@@ -204,6 +204,20 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
 
     // Special error page "Leave site" button action
     func leaveSiteAction() {
+        guard let errorData, let webView else { return }
+        switch errorData {
+        case .maliciousSite:
+            closeAndOpenNewTab()
+        case .ssl:
+            if webView.canGoBack {
+                _=webView.goBack()
+            } else {
+                closeAndOpenNewTab()
+            }
+        }
+    }
+
+    private func closeAndOpenNewTab() {
         Task { @MainActor in
             await self.webView?.openNewTabFromErrorPage()
             self.closeTab()
