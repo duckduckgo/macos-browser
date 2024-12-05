@@ -93,7 +93,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         //
         // There may be cases where this is a bad idea, for example a malicious site that redirects to a socialnetwork.com -
         // but if a flagged site sends you somewhere, you should still be cautious of that site so we want it to remain flagged.
-        if let threatKind = state.bypassedMaliciousSiteThreatKind, navigationAction.navigationType == .other {
+        if let threatKind = state.bypassedMaliciousSiteThreatKind, navigationAction.navigationType == .other { // TODO: Validate this .other handler works for actual .redirect-s
             exemptions[url] = threatKind
         }
         state.bypassedMaliciousSiteThreatKind = exemptions[url]
@@ -258,6 +258,7 @@ protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     @MainActor func openNewTabFromErrorPage() async
 }
 
+// TODO: Doesn‘t work for phishing
 extension ErrorPageTabExtensionNavigationDelegate {
     func reloadPageFromErrorPage() -> WKNavigation? {
         guard let webView = self as? WKWebView else { return nil }

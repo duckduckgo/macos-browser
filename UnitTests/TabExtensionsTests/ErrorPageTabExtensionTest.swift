@@ -44,7 +44,9 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     var detector: MockMaliciousSiteDetector!
     let errorURLString = "com.example.error"
     let phishingURLString = "https://privacy-test-pages.site/security/phishing.html"
-    private var closeTabCalled = false
+    private var onCloseTab: (() -> Void) = {
+        XCTFail("Unexpected call to closeTab")
+    }
 
     override func setUpWithError() throws {
         mockWebViewPublisher = PassthroughSubject<MockWKWebView, Never>()
@@ -63,7 +65,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     private func closeTab() {
-        closeTabCalled = true
+        onCloseTab()
     }
 
     @MainActor func testWhenCertificateExpired_ThenTabExtenstionErrorIsExpectedError() {
@@ -191,31 +193,37 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenLeaveSiteCalled_AndCanGoBackTrue_ThenWebViewGoesBack() {
+    func testWhenLeaveSiteCalled_AndCanGoBackTrue_ThenTabIsClosedAndNewTabOpened() async {
         // GIVEN
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         mockWebViewPublisher.send(mockWebView)
+
+        let eTabClosed = expectation(description: "Tab closed")
+        onCloseTab = { eTabClosed.fulfill() }
 
         // WHEN
         errorPageExtention.leaveSiteAction()
 
         // THEN
-        XCTAssertTrue(closeTabCalled)
+        await fulfillment(of: [eTabClosed], timeout: 1)
         XCTAssertTrue(mockWebView.openNewTabCalled)
     }
 
     @MainActor
-    func testWhenLeaveSiteCalled_AndCanGoBackFalse_ThenWebViewCloses() {
+    func testWhenLeaveSiteCalled_AndCanGoBackFalse_ThenTabIsClosedAndNewTabOpened() async {
         // GIVEN
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         mockWebView.canGoBack = false
         mockWebViewPublisher.send(mockWebView)
 
+        let eTabClosed = expectation(description: "Tab closed")
+        onCloseTab = { eTabClosed.fulfill() }
+
         // WHEN
         errorPageExtention.leaveSiteAction()
 
         // THEN
-        XCTAssertTrue(closeTabCalled)
+        await fulfillment(of: [eTabClosed], timeout: 1)
         XCTAssertTrue(mockWebView.openNewTabCalled)
     }
 
@@ -234,7 +242,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsCredentials() async {
+    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWebViewURL_ThenReturnsCredentials() async {
         // GIVEN
         let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
@@ -263,7 +271,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWebViewURL_ThenReturnsNoCredentials() async {
         // GIVEN
         let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodClientCertificate)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
@@ -280,14 +288,14 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsTheSameAsWebViewURL_ThenReturnsNoCredentials() async {
         // GIVEN
         let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         mockWebViewPublisher.send(mockWebView)
-        errorPageExtention.leaveSiteAction()
+        // errorPageExtention.leaveSiteAction()
 
         // WHEN
         let disposition = await errorPageExtention.didReceive(URLAuthenticationChallenge(protectionSpace: protectionSpace, proposedCredential: nil, previousFailureCount: 0, failureResponse: nil, error: nil, sender: ChallangeSender()), for: navigation)
@@ -297,7 +305,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsNotTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsNotTheSameAsWebViewURL_ThenReturnsNoCredentials() async {
         // GIVEN
         let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.different.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
