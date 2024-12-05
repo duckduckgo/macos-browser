@@ -1689,6 +1689,8 @@
 		562984712AC469E400AC20EB /* SyncPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5629846E2AC4610100AC20EB /* SyncPreferencesTests.swift */; };
 		56406D4B2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56406D4A2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift */; };
 		56406D4C2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56406D4A2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift */; };
+		5641734B2CFE168700F4B716 /* PixelExperimentKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5641734A2CFE168700F4B716 /* PixelExperimentKit */; };
+		5641734D2CFE169400F4B716 /* PixelExperimentKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5641734C2CFE169400F4B716 /* PixelExperimentKit */; };
 		56534DED29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */; };
 		56534DEE29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */; };
 		565E46E02B2725DD0013AC2A /* CriticalPathsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565E46DF2B2725DD0013AC2A /* CriticalPathsTests.swift */; };
@@ -5083,6 +5085,7 @@
 				567A23C52C7F75BB0010F66C /* SpecialErrorPages in Frameworks */,
 				372217822B33380700B8E9C2 /* TestUtils in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
+				5641734D2CFE169400F4B716 /* PixelExperimentKit in Frameworks */,
 				85E2BBD02B8F534A00DBEC7A /* History in Frameworks */,
 				4BF97AD52B43C43F00EB4240 /* NetworkProtection in Frameworks */,
 				560EB9372C78974C0080DBC8 /* Onboarding in Frameworks */,
@@ -5317,6 +5320,7 @@
 				CD3301242C8870DF009AA127 /* MaliciousSiteProtection in Frameworks */,
 				C18BF9CC2C73678500ED6B8A /* Freemium in Frameworks */,
 				F1DF95E32BD1807C0045E591 /* Crashes in Frameworks */,
+				5641734B2CFE168700F4B716 /* PixelExperimentKit in Frameworks */,
 				560EB9352C7897370080DBC8 /* Onboarding in Frameworks */,
 				85E2BBCE2B8F534000DBEC7A /* History in Frameworks */,
 				1EA7B8D32B7E078C000330A4 /* SubscriptionUI in Frameworks */,
@@ -10034,6 +10038,7 @@
 				CBECDB8D2CDBD62C005B8B87 /* PageRefreshMonitor */,
 				CBECDB8F2CDBD631005B8B87 /* BrokenSitePrompt */,
 				37DF37062CF38B9F005ED34B /* PrivacyStats */,
+				5641734C2CFE169400F4B716 /* PixelExperimentKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -10514,6 +10519,7 @@
 				CBECDB892CDBD616005B8B87 /* PageRefreshMonitor */,
 				CBECDB8B2CDBD61C005B8B87 /* BrokenSitePrompt */,
 				37DF37042CF38B96005ED34B /* PrivacyStats */,
+				5641734A2CFE168700F4B716 /* PixelExperimentKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -15365,7 +15371,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 217.0.2;
+				version = 218.0.0;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -15819,6 +15825,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Onboarding;
+		};
+		5641734A2CFE168700F4B716 /* PixelExperimentKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelExperimentKit;
+		};
+		5641734C2CFE169400F4B716 /* PixelExperimentKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelExperimentKit;
 		};
 		567A23C02C7F71570010F66C /* SpecialErrorPages */ = {
 			isa = XCSwiftPackageProductDependency;

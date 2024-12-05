@@ -119,7 +119,7 @@ extension HomePage.Views {
                 .onAppear {
                     if featureType == .dock {
                         PixelKit.fire(GeneralPixel.addToDockNewTabPageCardPresented,
-                                      frequency: .unique,
+                                      frequency: .uniqueByName,
                                       includeAppVersionParameter: false)
                     }
                 }
