@@ -32,9 +32,9 @@ public final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageF
 
     private let keyValueStore: KeyValueStoring
 
-    public init(_ keyValueStore: KeyValueStoring = UserDefaults.standard) {
+    public init(_ keyValueStore: KeyValueStoring = UserDefaults.standard, getLegacySetting: @autoclosure () -> Bool?) {
         self.keyValueStore = keyValueStore
-        migrateFromNativeHomePageSettings()
+        migrateFromLegacyHomePageSettings(using: getLegacySetting)
     }
 
     public var isViewExpanded: Bool {
@@ -42,12 +42,11 @@ public final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageF
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
     }
 
-    private func migrateFromNativeHomePageSettings() {
-//        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil else {
-//            return
-//        }
-//        let legacyKey = UserDefaultsWrapper<Any>.Key.homePageShowAllFavorites.rawValue
-//        isViewExpanded = keyValueStore.object(forKey: legacyKey) as? Bool ?? false
+    private func migrateFromLegacyHomePageSettings(using getLegacySetting: () -> Bool?) {
+        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil, let legacySetting = getLegacySetting() else {
+            return
+        }
+        isViewExpanded = legacySetting
     }
 }
 
@@ -64,11 +63,26 @@ public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObje
     private let settingsPersistor: NewTabPageFavoritesSettingsPersistor
     private var cancellables: Set<AnyCancellable> = []
 
+    public convenience init(
+        actionsHandler: ActionHandler,
+        favoritesPublisher: AnyPublisher<[FavoriteType], Never>,
+        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
+        keyValueStore: KeyValueStoring = UserDefaults.standard,
+        getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
+    ) {
+        self.init(
+            actionsHandler: actionsHandler,
+            favoritesPublisher: favoritesPublisher,
+            contextMenuPresenter: contextMenuPresenter,
+            settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
+        )
+    }
+
     public init(
         actionsHandler: ActionHandler,
         favoritesPublisher: AnyPublisher<[FavoriteType], Never>,
         contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
-        settingsPersistor: NewTabPageFavoritesSettingsPersistor = UserDefaultsNewTabPageFavoritesSettingsPersistor()
+        settingsPersistor: NewTabPageFavoritesSettingsPersistor
     ) {
         self.actionsHandler = actionsHandler
         self.contextMenuPresenter = contextMenuPresenter

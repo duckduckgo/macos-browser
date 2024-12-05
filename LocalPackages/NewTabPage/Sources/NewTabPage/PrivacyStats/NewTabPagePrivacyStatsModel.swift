@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Foundation
 import os.log
 import Persistence
 import PrivacyStats
@@ -32,7 +33,7 @@ public final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPa
 
     private let keyValueStore: KeyValueStoring
 
-    public init(_ keyValueStore: KeyValueStoring, getLegacySetting: @autoclosure () -> Bool?) {
+    public init(_ keyValueStore: KeyValueStoring = UserDefaults.standard, getLegacySetting: @autoclosure () -> Bool?) {
         self.keyValueStore = keyValueStore
         migrateFromLegacyHomePageSettings(using: getLegacySetting)
     }
@@ -71,7 +72,7 @@ public final class NewTabPagePrivacyStatsModel {
     public convenience init(
         privacyStats: PrivacyStatsCollecting,
         trackerDataProvider: PrivacyStatsTrackerDataProviding,
-        keyValueStore: KeyValueStoring,
+        keyValueStore: KeyValueStoring = UserDefaults.standard,
         getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
     ) {
         self.init(

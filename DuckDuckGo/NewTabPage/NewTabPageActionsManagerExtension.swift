@@ -31,12 +31,15 @@ extension NewTabPageActionsManager {
         let privacyStatsModel = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared),
-            keyValueStore: UserDefaults.standard,
             getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
         )
 
         let favoritesPublisher = LocalBookmarkManager.shared.listPublisher.map({ $0?.favoriteBookmarks ?? [] }).eraseToAnyPublisher()
-        let favoritesModel = NewTabPageFavoritesModel(actionsHandler: DefaultFavoritesActionsHandler(), favoritesPublisher: favoritesPublisher)
+        let favoritesModel = NewTabPageFavoritesModel(
+            actionsHandler: DefaultFavoritesActionsHandler(),
+            favoritesPublisher: favoritesPublisher,
+            getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowAllFavorites, defaultValue: false).wrappedValue
+        )
 
         self.init(scriptClients: [
             NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences),
