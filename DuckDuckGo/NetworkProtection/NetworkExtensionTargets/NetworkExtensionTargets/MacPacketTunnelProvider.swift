@@ -430,15 +430,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                              userDefaults: defaults)
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-            do {
-                Logger.networkProtection.log("Entitlements check...")
-                let entitlements = try await subscriptionManager.getEntitlements(forceRefresh: true)
-                Logger.networkProtection.log("Entitlements found: \(entitlements, privacy: .public)")
-                return .success(entitlements.contains(.networkProtection))
-            } catch {
-                Logger.networkProtection.error("Failed to get entitlements: \(error)")
-                return .failure(error)
-            }
+            Logger.networkProtection.log("Entitlements check...")
+            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
+            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled" , privacy: .public)")
+            return .success(isNetworkProtectionEnabled)
         }
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)

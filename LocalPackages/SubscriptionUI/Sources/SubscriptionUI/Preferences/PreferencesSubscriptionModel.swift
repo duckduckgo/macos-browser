@@ -23,12 +23,13 @@ import enum Combine.Publishers
 import Networking
 import FeatureFlags
 import BrowserServicesKit
+import os.log
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var subscriptionDetails: String?
-    @Published var subscriptionStatus: PrivacyProSubscription.Status?
+    @Published var subscriptionStatus: PrivacyProSubscription.Status = .unknown
 
     @Published var subscriptionStorefrontRegion: SubscriptionRegion = .usa
 
@@ -43,11 +44,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var email: String?
     var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
-    private var subscriptionPlatform: PrivacyProSubscription.Platform?
     let featureFlagger: FeatureFlagger
     var isROWLaunched: Bool = false
 
-    lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: sheetActionHandler,
+    private var subscriptionPlatform: PrivacyProSubscription.Platform?
+
+    lazy var sheetModel = SubscriptionAccessViewModel(
+        actionHandlers: sheetActionHandler,
         purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
 
     private let subscriptionManager: SubscriptionManager
@@ -55,7 +58,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public let userEventHandler: (UserEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
 
-//    private var fetchSubscriptionDetailsTask: Task<(), Never>?
+    private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
     private var signInObserver: Any?
     private var signOutObserver: Any?
@@ -77,9 +80,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     lazy var statePublisher: AnyPublisher<PreferencesSubscriptionState, Never> = {
-        let isSubscriptionActivePublisher: AnyPublisher<Bool?, Never> = $subscriptionStatus.map {
-            guard let status = $0 else { return nil}
-            return status != .expired && status != .inactive
+        let isSubscriptionActivePublisher: AnyPublisher<Bool, Never> = $subscriptionStatus.map {
+//            guard let status = $0 else { return false}
+            let status = $0
+            return status != .expired && status != .inactive && status != .unknown
         }.eraseToAnyPublisher()
 
         let hasAnyEntitlementPublisher = Publishers.CombineLatest3($hasAccessToVPN, $hasAccessToDBP, $hasAccessToITR).map {
@@ -90,10 +94,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             .map { isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement in
                 switch (isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement) {
                 case (false, _, _): return PreferencesSubscriptionState.noSubscription
-                case (true, .some(false), _): return PreferencesSubscriptionState.subscriptionExpired
-                case (true, nil, _): return PreferencesSubscriptionState.subscriptionPendingActivation
-                case (true, .some(true), false): return PreferencesSubscriptionState.subscriptionPendingActivation
-                case (true, .some(true), true): return PreferencesSubscriptionState.subscriptionActive
+                case (true, false, _): return PreferencesSubscriptionState.subscriptionExpired
+//                case (true, nil, _): return PreferencesSubscriptionState.subscriptionPendingActivation
+                case (true, true, false): return PreferencesSubscriptionState.subscriptionPendingActivation
+                case (true, true, true): return PreferencesSubscriptionState.subscriptionActive
                 }
             }
             .removeDuplicates()
@@ -114,10 +118,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         self.isUserAuthenticated = subscriptionManager.isUserAuthenticated
 
-        if subscriptionManager.isUserAuthenticated {
+        if self.isUserAuthenticated {
             Task {
                 await self.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
-                await self.loadEntitlements(policy: .local)
                 await self.updateAvailableSubscriptionFeatures()
             }
 
@@ -125,16 +128,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
 
         signInObserver = NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { [weak self] _ in
-            self?.updateUserAuthenticatedState(true)
+            self?.updateUserAuthenticatedState()
         }
 
         signOutObserver = NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { [weak self] _ in
-            self?.updateUserAuthenticatedState(false)
+            self?.updateUserAuthenticatedState()
         }
 
         subscriptionChangeObserver = NotificationCenter.default.addObserver(forName: .subscriptionDidChange, object: nil, queue: .main) { _ in
             Task { [weak self] in
-                await self?.updateSubscription(cachePolicy: .returnCacheDataDontLoad)
+                Logger.general.debug("SubscriptionDidChange notification received")
+                await self?.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
                 await self?.updateAvailableSubscriptionFeatures()
             }
         }
@@ -165,9 +169,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         isROWLaunched = featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW) || featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
     }
 
-    private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
-        self.isUserAuthenticated = isUserAuthenticated
-        self.email = subscriptionManager.userEmail
+    private func updateUserAuthenticatedState() {
+        isUserAuthenticated = subscriptionManager.isUserAuthenticated
+        email = subscriptionManager.userEmail
     }
 
     @MainActor
@@ -206,10 +210,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             NSWorkspace.shared.open(subscriptionManager.url(for: .manageSubscriptionsInAppStore))
         case .stripe:
             Task {
-                guard let customerPortalURL = try? await subscriptionManager.getCustomerPortalURL() else {
-                    return
+                do {
+                    let customerPortalURL = try await subscriptionManager.getCustomerPortalURL()
+                    openURLHandler(customerPortalURL)
+                } catch {
+                    Logger.general.log("Error getting customer portal URL: \(error, privacy: .public)")
                 }
-                openURLHandler(customerPortalURL)
             }
         }
     }
@@ -263,7 +269,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         Task {
             if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
                 if #available(macOS 12.0, iOS 15.0, *) {
-                    try await subscriptionManager.getTokenContainer(policy: .localForceRefresh)
+                    try await subscriptionManager.getTokenContainer(policy: .localValid)
                 }
             }
 
@@ -309,22 +315,18 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func fetchAndUpdateSubscriptionDetails() {
-        self.isUserAuthenticated = subscriptionManager.isUserAuthenticated
-        Task { [weak self] in
-            await self?.fetchEmailAndRemoteEntitlements()
+    private func fetchAndUpdateSubscriptionDetails() {
+        updateUserAuthenticatedState()
+
+        guard fetchSubscriptionDetailsTask == nil else { return }
+
+        fetchSubscriptionDetailsTask = Task { [weak self] in
+            defer {
+                self?.fetchSubscriptionDetailsTask = nil
+            }
+            await self?.fetchEmail()
             await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
         }
-//        guard fetchSubscriptionDetailsTask == nil else { return }
-//
-//        fetchSubscriptionDetailsTask = Task { [weak self] in
-//            defer {
-//                self?.fetchSubscriptionDetailsTask = nil
-//            }
-//
-//            await self?.fetchEmailAndRemoteEntitlements()
-//            await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
-//        }
     }
 
     private func currentStorefrontRegion() -> SubscriptionRegion {
@@ -342,54 +344,46 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         return region ?? .usa
     }
 
-    private func updateAvailableSubscriptionFeatures() {
-        let features = currentSubscriptionFeatures()
+    private func updateAvailableSubscriptionFeatures() async {
+        let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
+        let vpnFeature = features.first { $0.entitlement == .networkProtection }
+        let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }
+        let itrFeature = features.first { $0.entitlement == .identityTheftRestoration }
+        let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
+
         Task { @MainActor in
-            shouldShowVPN = features.contains(.networkProtection)
-            shouldShowDBP = features.contains(.dataBrokerProtection)
-            shouldShowITR = features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal)
+            // Should show
+            shouldShowVPN = vpnFeature != nil
+            shouldShowDBP = dbpFeature != nil
+            shouldShowITR = itrFeature != nil || itrgFeature != nil
+
+            // is active/enabled
+            hasAccessToVPN = vpnFeature?.enabled ?? false
+            hasAccessToDBP = dbpFeature?.enabled ?? false
+            hasAccessToITR = itrFeature?.enabled ?? false || itrgFeature?.enabled ?? false
         }
     }
 
-    private func currentSubscriptionFeatures() -> [SubscriptionEntitlement] {
-        if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
-            return subscriptionManager.currentEntitlements
-        } else {
-            return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
-        }
-    }
-
-    @MainActor
-    private func loadEntitlements(policy: TokensCachePolicy) async {
-        guard let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: policy) else {
-            hasAccessToVPN = false
-            hasAccessToDBP = false
-            hasAccessToITR = false
-            return
-        }
-
-        hasAccessToVPN = tokenContainer.decodedAccessToken.hasEntitlement(.networkProtection)
-        hasAccessToDBP = tokenContainer.decodedAccessToken.hasEntitlement(.dataBrokerProtection)
-
-        var hasITR = tokenContainer.decodedAccessToken.hasEntitlement(.identityTheftRestoration)
-        var hasITRGlobal = tokenContainer.decodedAccessToken.hasEntitlement(.identityTheftRestorationGlobal)
-        hasAccessToITR = hasITR || hasITRGlobal
-    }
-
-    @MainActor func fetchEmailAndRemoteEntitlements() async {
-        await loadEntitlements(policy: .localForceRefresh)
-        guard let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: .local) else { return }
-        email = tokenContainer.decodedAccessToken.email
+    @MainActor func fetchEmail() async {
+        let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: .local)
+        email = tokenContainer?.decodedAccessToken.email
     }
 
     @MainActor
     private func updateSubscription(cachePolicy: SubscriptionCachePolicy) async {
-        guard let subscription = try? await subscriptionManager.getSubscription(cachePolicy: cachePolicy) else {
-            return
+        updateUserAuthenticatedState()
+
+        guard isUserAuthenticated else { return }
+
+        do {
+            let subscription = try await subscriptionManager.getSubscription(cachePolicy: cachePolicy)
+            updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
+            subscriptionPlatform = subscription.platform
+            subscriptionStatus = subscription.status
+        } catch {
+            subscriptionPlatform = .unknown
+            subscriptionStatus = .unknown
         }
-        updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
-        subscriptionPlatform = subscription.platform
-        subscriptionStatus = subscription.status
     }
 
     @MainActor
@@ -418,8 +412,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var dateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .long
+#if DEBUG
+        dateFormatter.timeStyle = .medium
+#else
         dateFormatter.timeStyle = .none
-
+#endif
         return dateFormatter
     }()
 }

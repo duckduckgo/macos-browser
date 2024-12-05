@@ -38,14 +38,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     ])
     let subscriptionManager: SubscriptionManager
     var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
-
-    let stripePurchaseFlow: StripePurchaseFlow
+    let stripePurchaseFlow: any StripePurchaseFlow
     let subscriptionErrorReporter = DefaultSubscriptionErrorReporter()
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
     let uiHandler: SubscriptionUIHandling
-
     let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-
     private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     private let freemiumDBPPixelExperimentManager: FreemiumDBPPixelExperimentManaging
     private let notificationCenter: NotificationCenter
@@ -222,14 +219,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     return nil
                 }
 
-                Logger.subscription.info("[Purchase] Starting purchase for: \(subscriptionSelection.id, privacy: .public)")
+                Logger.subscription.log("[Purchase] Starting purchase for: \(subscriptionSelection.id, privacy: .public)")
 
                 await uiHandler.presentProgressViewController(withTitle: UserText.purchasingSubscriptionTitle)
 
                 // Check for active subscriptions
                 if await subscriptionManager.storePurchaseManager().hasActiveSubscription() {
                     PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
-                    Logger.subscription.info("[Purchase] Found active subscription during purchase")
+                    Logger.subscription.log("[Purchase] Found active subscription during purchase")
                     subscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
                     await showSubscriptionFoundAlert(originalMessage: message)
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
@@ -243,8 +240,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                                                                        storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                                        appStoreRestoreFlow: appStoreRestoreFlow)
 
-                Logger.subscription.info("[Purchase] Purchasing")
-                switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id) {
+                Logger.subscription.log("[Purchase] Purchasing")
+                let purchaseResult = await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id)
+                switch purchaseResult {
                 case .success(let transactionJWS):
                     purchaseTransactionJWS = transactionJWS
                 case .failure(let error):
@@ -278,11 +276,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 await uiHandler.updateProgressViewController(title: UserText.completingPurchaseTitle)
 
-                Logger.subscription.info("[Purchase] Completing purchase")
                 let completePurchaseResult = await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS)
                 switch completePurchaseResult {
                 case .success(let purchaseUpdate):
-                    Logger.subscription.info("[Purchase] Purchase complete")
+                    Logger.subscription.log("[Purchase] Purchase completed")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .legacyDailyAndCount)
                     sendFreemiumSubscriptionPixelIfFreemiumActivated()
                     saveSubscriptionUpgradeTimestampIfFreemiumActivated()
@@ -480,8 +477,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                                                                      storePurchaseManager: subscriptionManager.storePurchaseManager())
                 let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                 switch result {
-                case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .legacyDailyAndCount)
-                case .failure: break
+                case .success:
+                    PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .legacyDailyAndCount)
+                case .failure(let error):
+                    Logger.subscription.error("Failed to restore account from past purchase: \(error, privacy: .public)")
                 }
                 Task { @MainActor in
                     originalMessage.webView?.reload()

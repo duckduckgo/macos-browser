@@ -29,7 +29,7 @@ import Subscription
 protocol VPNFeatureGatekeeper {
     var isInstalled: Bool { get }
 
-    func canStartVPN() -> Bool
+    func canStartVPN() async -> Bool
     func isVPNVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
     func disableIfUserHasNoAccess() async
@@ -62,11 +62,12 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     /// For beta users this means they have an auth token.
     /// For subscription users this means they have entitlements.
     ///
-    func canStartVPN() -> Bool {
+    func canStartVPN() async -> Bool {
         guard subscriptionFeatureAvailability.isFeatureAvailable else {
             return false
         }
-        return subscriptionManager.isEntitlementActive(.networkProtection)
+        let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
+        return isNetworkProtectionEnabled
     }
 
     /// Whether the user can see the VPN entry points in the UI.

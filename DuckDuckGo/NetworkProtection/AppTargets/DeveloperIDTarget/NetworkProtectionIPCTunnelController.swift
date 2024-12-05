@@ -100,7 +100,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         }
 
         do {
-            guard featureGatekeeper.canStartVPN() else {
+            guard await featureGatekeeper.canStartVPN() else {
                 throw RequestError.notAuthorizedToEnableLoginItem
             }
 

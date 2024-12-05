@@ -899,23 +899,29 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
         self.subscriptionSettingsItem = makeSubscriptionSettingsItem(target: target)
 
         delegate = self
-        addMenuItems()
+        Task {
+            await addMenuItems()
+        }
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func addMenuItems() {
-        let features = subscriptionManager.currentEntitlements
+    private func addMenuItems() async {
+        let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
+        let vpnFeature = features.first { $0.entitlement == .networkProtection }
+        let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }
+        let itrFeature = features.first { $0.entitlement == .identityTheftRestoration }
+        let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
 
-        if features.contains(.networkProtection) {
+        if vpnFeature != nil {
             addItem(networkProtectionItem)
         }
-        if features.contains(.dataBrokerProtection) {
+        if dbpFeature != nil {
             addItem(dataBrokerProtectionItem)
         }
-        if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
+        if itrFeature != nil || itrgFeature != nil {
             addItem(identityTheftRestorationItem)
         }
         addItem(NSMenuItem.separator())
@@ -953,23 +959,27 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
         .targetting(target)
     }
 
-    private func refreshAvailabilityBasedOnEntitlements() {
-        guard subscriptionFeatureAvailability.isFeatureAvailable, subscriptionManager.isUserAuthenticated else { return }
-        let isNetworkProtectionItemEnabled = subscriptionManager.isEntitlementActive(.networkProtection)
-        let isDataBrokerProtectionItemEnabled = subscriptionManager.isEntitlementActive(.dataBrokerProtection)
-        let hasIdentityTheftRestoration = subscriptionManager.isEntitlementActive(.identityTheftRestoration)
-        let hasIdentityTheftRestorationGlobal = subscriptionManager.isEntitlementActive(.identityTheftRestorationGlobal)
-        let isIdentityTheftRestorationItemEnabled = hasIdentityTheftRestoration || hasIdentityTheftRestorationGlobal
+    private func refreshAvailabilityBasedOnEntitlements() async {
+//        guard subscriptionFeatureAvailability.isFeatureAvailable, subscriptionManager.isUserAuthenticated else { return }
+        let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
+        let vpnFeature = features.first { $0.entitlement == .networkProtection }
+        let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }
+        let itrFeature = features.first { $0.entitlement == .identityTheftRestoration }
+        let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
 
         Task { @MainActor in
-            self.networkProtectionItem.isEnabled = isNetworkProtectionItemEnabled
-            self.dataBrokerProtectionItem.isEnabled = isDataBrokerProtectionItemEnabled
-            self.identityTheftRestorationItem.isEnabled = isIdentityTheftRestorationItemEnabled
+            self.networkProtectionItem.isEnabled = vpnFeature?.enabled ?? false
+            self.dataBrokerProtectionItem.isEnabled = dbpFeature?.enabled ?? false
+            let hasIdentityTheftRestoration = itrFeature?.enabled ?? false
+            let hasIdentityTheftRestorationGlobal = itrgFeature?.enabled ?? false
+            self.identityTheftRestorationItem.isEnabled = hasIdentityTheftRestoration || hasIdentityTheftRestorationGlobal
         }
     }
 
     public func menuWillOpen(_ menu: NSMenu) {
-        refreshAvailabilityBasedOnEntitlements()
+        Task {
+            await refreshAvailabilityBasedOnEntitlements()
+        }
     }
 
 }

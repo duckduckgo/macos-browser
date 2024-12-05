@@ -22,7 +22,7 @@ import Subscription
 public protocol DataBrokerProtectionAuthenticationManaging {
     var isUserAuthenticated: Bool { get }
     var accessToken: String? { get }
-    func hasValidEntitlement() async throws -> Bool
+    func hasValidEntitlement() async -> Bool
     func shouldAskForInviteCode() -> Bool
     func redeem(inviteCode: String) async throws
     func getAuthHeader() -> String?
@@ -46,8 +46,8 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
         self.subscriptionManager = subscriptionManager
     }
 
-    public func hasValidEntitlement() -> Bool {
-        subscriptionManager.isEntitlementActive(.dataBrokerProtection)
+    public func hasValidEntitlement() async -> Bool {
+        await subscriptionManager.isFeatureActive(.dataBrokerProtection) //isEntitlementActive(.dataBrokerProtection)
     }
 
     public func getAuthHeader() -> String? {

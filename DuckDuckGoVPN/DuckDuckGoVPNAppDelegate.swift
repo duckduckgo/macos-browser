@@ -424,13 +424,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         guard subscriptionManager.isUserAuthenticated else { return }
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-            do {
-                let entitlements = try await self.subscriptionManager.getEntitlements(forceRefresh: true)
-                return .success(entitlements.contains(.networkProtection))
-            } catch {
-                Logger.networkProtection.error("Failed to get token: \(error)")
-                return .failure(error)
-            }
+            let isNetworkProtectionEnabled = await self.subscriptionManager.isFeatureActive(.networkProtection)
+            return .success(isNetworkProtectionEnabled)
         }
 
         Task {

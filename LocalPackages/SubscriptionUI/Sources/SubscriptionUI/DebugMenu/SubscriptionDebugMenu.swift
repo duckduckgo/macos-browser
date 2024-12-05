@@ -229,9 +229,13 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func checkEntitlements() {
-        let entitlements = subscriptionManager.currentEntitlements
-        let descriptions = entitlements.map({ entitlement in entitlement.rawValue })
-        showAlert(title: "Check Entitlements", message: descriptions.joined(separator: "\n"))
+        Task {
+            let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: true)
+            let descriptions = features.map({ feature in
+                "\(feature.entitlement.rawValue): Enabled: \(feature.enabled)"
+            })
+            showAlert(title: "Check Entitlements", message: descriptions.joined(separator: "\n"))
+        }
     }
 
     @objc

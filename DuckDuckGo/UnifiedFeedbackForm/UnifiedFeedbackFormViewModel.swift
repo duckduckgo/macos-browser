@@ -173,15 +173,24 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         self.source = source
         self.subscriptionManager = subscriptionManager
 
-        let features = subscriptionManager.currentEntitlements
-        if features.contains(.networkProtection) {
-            availableCategories.append(.vpn)
-        }
-        if features.contains(.dataBrokerProtection) {
-            availableCategories.append(.pir)
-        }
-        if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
-            availableCategories.append(.itr)
+        Task {
+            let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
+            let vpnFeature = features.first { $0.entitlement == .networkProtection }
+            let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }
+            let itrFeature = features.first { $0.entitlement == .identityTheftRestoration }
+            let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
+
+            if vpnFeature?.enabled ?? false {
+                availableCategories.append(.vpn)
+            }
+            if dbpFeature?.enabled ?? false {
+                availableCategories.append(.pir)
+            }
+            let idpEnabled = itrFeature?.enabled ?? false
+            let idpgEnabled = itrgFeature?.enabled ?? false
+            if idpEnabled || idpgEnabled {
+                availableCategories.append(.itr)
+            }
         }
     }
 
