@@ -26,19 +26,19 @@ public protocol NewTabPagePrivacyStatsSettingsPersistor: AnyObject {
     var isViewExpanded: Bool { get set }
 }
 
-public final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPagePrivacyStatsSettingsPersistor {
+final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPagePrivacyStatsSettingsPersistor {
     enum Keys {
         static let isViewExpanded = "new-tab-page.privacy-stats.is-view-expanded"
     }
 
     private let keyValueStore: KeyValueStoring
 
-    public init(_ keyValueStore: KeyValueStoring = UserDefaults.standard, getLegacySetting: @autoclosure () -> Bool?) {
+    init(_ keyValueStore: KeyValueStoring = UserDefaults.standard, getLegacySetting: @autoclosure () -> Bool?) {
         self.keyValueStore = keyValueStore
         migrateFromLegacyHomePageSettings(using: getLegacySetting)
     }
 
-    public var isViewExpanded: Bool {
+    var isViewExpanded: Bool {
         get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
     }
@@ -53,10 +53,10 @@ public final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPa
 
 public final class NewTabPagePrivacyStatsModel {
 
-    public let privacyStats: PrivacyStatsCollecting
-    public let statsUpdatePublisher: AnyPublisher<Void, Never>
+    let privacyStats: PrivacyStatsCollecting
+    let statsUpdatePublisher: AnyPublisher<Void, Never>
 
-    @Published public var isViewExpanded: Bool {
+    @Published var isViewExpanded: Bool {
         didSet {
             settingsPersistor.isViewExpanded = self.isViewExpanded
         }
@@ -82,7 +82,7 @@ public final class NewTabPagePrivacyStatsModel {
         )
     }
 
-    public init(
+    init(
         privacyStats: PrivacyStatsCollecting,
         trackerDataProvider: PrivacyStatsTrackerDataProviding,
         settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
@@ -111,7 +111,7 @@ public final class NewTabPagePrivacyStatsModel {
         refreshTopCompanies()
     }
 
-    public func calculatePrivacyStats() async -> NewTabPagePrivacyStatsClient.PrivacyStatsData {
+    func calculatePrivacyStats() async -> NewTabPagePrivacyStatsClient.PrivacyStatsData {
         let stats = await privacyStats.fetchPrivacyStats()
 
         var totalCount: Int64 = 0

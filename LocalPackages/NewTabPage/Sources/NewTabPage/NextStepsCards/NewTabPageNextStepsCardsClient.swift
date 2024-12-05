@@ -23,8 +23,8 @@ import WebKit
 
 public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
-    public let model: NewTabPageNextStepsCardsProviding
-    public let willDisplayCardsPublisher: AnyPublisher<[CardID], Never>
+    let model: NewTabPageNextStepsCardsProviding
+    let willDisplayCardsPublisher: AnyPublisher<[CardID], Never>
     public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private let willDisplayCardsSubject = PassthroughSubject<[CardID], Never>()
@@ -96,7 +96,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
             .store(in: &cancellables)
     }
 
-    public enum MessageName: String, CaseIterable {
+    enum MessageName: String, CaseIterable {
         case action = "nextSteps_action"
         case dismiss = "nextSteps_dismiss"
         case getConfig = "nextSteps_getConfig"
@@ -117,7 +117,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    public func action(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func action(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let card: Card = DecodableHelper.decode(from: params) else {
             return nil
         }
@@ -126,7 +126,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    public func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let card: Card = DecodableHelper.decode(from: params) else {
             return nil
         }
@@ -134,7 +134,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
         return nil
     }
 
-    public func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = model.isViewExpanded ? .expanded : .collapsed
 
         getConfigSubject.send(model.isViewExpanded)
@@ -142,7 +142,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    public func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
             return nil
         }
@@ -151,7 +151,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    public func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let cardIDs = model.cards
         let cards = cardIDs.map(Card.init(id:))
 
@@ -178,9 +178,9 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     }
 }
 
-public extension NewTabPageNextStepsCardsClient {
+extension NewTabPageNextStepsCardsClient {
 
-    enum CardID: String, Codable {
+    public enum CardID: String, Codable {
         case bringStuff
         case defaultApp
         case emailProtection
@@ -189,18 +189,10 @@ public extension NewTabPageNextStepsCardsClient {
     }
 
     struct Card: Codable, Equatable {
-        public let id: CardID
-
-        public init(id: CardID) {
-            self.id = id
-        }
+        let id: CardID
     }
 
     struct NextStepsData: Codable, Equatable {
         public let content: [Card]?
-
-        public init(content: [Card]?) {
-            self.content = content
-        }
     }
 }

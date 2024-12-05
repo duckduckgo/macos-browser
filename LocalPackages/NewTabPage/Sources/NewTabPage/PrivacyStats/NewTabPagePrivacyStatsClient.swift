@@ -28,7 +28,7 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
     private let model: NewTabPagePrivacyStatsModel
     private var cancellables: Set<AnyCancellable> = []
 
-    public enum MessageName: String, CaseIterable {
+    enum MessageName: String, CaseIterable {
         case getConfig = "stats_getConfig"
         case getData = "stats_getData"
         case onConfigUpdate = "stats_onConfigUpdate"
@@ -64,7 +64,7 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         ])
     }
 
-    public func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = model.isViewExpanded ? .expanded : .collapsed
         return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
     }
@@ -77,7 +77,7 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    public func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
             return nil
         }
@@ -91,37 +91,27 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    public func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         return await model.calculatePrivacyStats()
     }
 }
 
-public extension NewTabPagePrivacyStatsClient {
+extension NewTabPagePrivacyStatsClient {
 
     struct PrivacyStatsData: Encodable, Equatable {
-        public let totalCount: Int64
-        public let trackerCompanies: [TrackerCompany]
+        let totalCount: Int64
+        let trackerCompanies: [TrackerCompany]
 
-        public init(totalCount: Int64, trackerCompanies: [TrackerCompany]) {
-            self.totalCount = totalCount
-            self.trackerCompanies = trackerCompanies
-        }
-
-        public static func == (lhs: PrivacyStatsData, rhs: PrivacyStatsData) -> Bool {
+        static func == (lhs: PrivacyStatsData, rhs: PrivacyStatsData) -> Bool {
             lhs.totalCount == rhs.totalCount && Set(lhs.trackerCompanies) == Set(rhs.trackerCompanies)
         }
     }
 
     struct TrackerCompany: Encodable, Equatable, Hashable {
-        public let count: Int64
-        public let displayName: String
+        let count: Int64
+        let displayName: String
 
-        public init(count: Int64, displayName: String) {
-            self.count = count
-            self.displayName = displayName
-        }
-
-        public static func otherCompanies(count: Int64) -> TrackerCompany {
+        static func otherCompanies(count: Int64) -> TrackerCompany {
             TrackerCompany(count: count, displayName: "__other__")
         }
     }

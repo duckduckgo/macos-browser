@@ -21,23 +21,23 @@ import Combine
 import Foundation
 import Persistence
 
-public protocol NewTabPageFavoritesSettingsPersistor: AnyObject {
+protocol NewTabPageFavoritesSettingsPersistor: AnyObject {
     var isViewExpanded: Bool { get set }
 }
 
-public final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavoritesSettingsPersistor {
+final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavoritesSettingsPersistor {
     enum Keys {
         static let isViewExpanded = "new-tab-page.favorites.is-view-expanded"
     }
 
     private let keyValueStore: KeyValueStoring
 
-    public init(_ keyValueStore: KeyValueStoring = UserDefaults.standard, getLegacySetting: @autoclosure () -> Bool?) {
+    init(_ keyValueStore: KeyValueStoring = UserDefaults.standard, getLegacySetting: @autoclosure () -> Bool?) {
         self.keyValueStore = keyValueStore
         migrateFromLegacyHomePageSettings(using: getLegacySetting)
     }
 
-    public var isViewExpanded: Bool {
+    var isViewExpanded: Bool {
         get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
     }
@@ -78,7 +78,7 @@ public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObje
         )
     }
 
-    public init(
+    init(
         actionsHandler: ActionHandler,
         favoritesPublisher: AnyPublisher<[FavoriteType], Never>,
         contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
@@ -100,41 +100,42 @@ public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObje
             .store(in: &cancellables)
     }
 
-    @Published public var isViewExpanded: Bool {
+    @Published var isViewExpanded: Bool {
         didSet {
             settingsPersistor.isViewExpanded = self.isViewExpanded
         }
     }
 
-    @Published public var favorites: [FavoriteType] = []
+    @Published var favorites: [FavoriteType] = []
 
     // MARK: - Actions
 
     @MainActor
-    public func openFavorite(withURL url: String) {
+    func openFavorite(withURL url: String) {
         guard let url = URL(string: url), url.isValid else { return }
         actionsHandler.open(url, target: .current)
     }
 
-    public func moveFavorite(withID bookmarkID: String, fromIndex: Int, toIndex index: Int) {
+    @MainActor
+    func moveFavorite(withID bookmarkID: String, fromIndex: Int, toIndex index: Int) {
         let targetIndex = index > fromIndex ? index + 1 : index
         actionsHandler.move(bookmarkID, toIndex: targetIndex)
     }
 
     @MainActor
-    public func addNew() {
+    func addNew() {
         actionsHandler.addNewFavorite()
     }
 
     @MainActor
-    public func onFaviconMissing() {
+    func onFaviconMissing() {
         actionsHandler.onFaviconMissing()
     }
 
     // MARK: Context Menu
 
     @MainActor
-    public func showContextMenu(for bookmarkID: String) {
+    func showContextMenu(for bookmarkID: String) {
         /**
          * This isn't very effective (may need to traverse up to entire array)
          * but it's only ever needed for context menus. I decided to skip

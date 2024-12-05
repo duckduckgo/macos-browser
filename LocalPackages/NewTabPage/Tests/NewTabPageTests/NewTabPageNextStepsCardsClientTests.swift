@@ -21,37 +21,6 @@ import TestUtils
 import XCTest
 @testable import NewTabPage
 
-final class CapturingNewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsProviding {
-
-    @Published var isViewExpanded: Bool = false
-    var isViewExpandedPublisher: AnyPublisher<Bool, Never> {
-        $isViewExpanded.dropFirst().removeDuplicates().eraseToAnyPublisher()
-    }
-
-    @Published var cards: [NewTabPageNextStepsCardsClient.CardID] = []
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> {
-        $cards.dropFirst().removeDuplicates().eraseToAnyPublisher()
-    }
-
-    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID) {
-        handleActionCalls.append(card)
-    }
-
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID) {
-        dismissCalls.append(card)
-    }
-
-    func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID]) {
-        willDisplayCardsCalls.append(cards)
-        willDisplayCardsImpl?(cards)
-    }
-
-    var handleActionCalls: [NewTabPageNextStepsCardsClient.CardID] = []
-    var dismissCalls: [NewTabPageNextStepsCardsClient.CardID] = []
-    var willDisplayCardsCalls: [[NewTabPageNextStepsCardsClient.CardID]] = []
-    var willDisplayCardsImpl: (([NewTabPageNextStepsCardsClient.CardID]) -> Void)?
-}
-
 final class NewTabPageNextStepsCardsClientTests: XCTestCase {
     var client: NewTabPageNextStepsCardsClient!
     var model: CapturingNewTabPageNextStepsCardsProvider!
@@ -143,38 +112,38 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
 
     func testThatWillDisplayCardsPublisherIsSentAfterGetDataAndGetConfigAreCalled() async throws {
         model.cards = [.addAppToDockMac, .duckplayer]
-        _ = try await client.getData(params: [], original: .init())
-        _ = try await client.getConfig(params: [], original: .init())
+        try await handleMessageIgnoringResponse(named: .getData)
+        try await handleMessageIgnoringResponse(named: .getConfig)
 
         XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
     }
 
     func testThatWillDisplayCardsPublisherIsNotSentBeforeGetConfigIsCalled() async throws {
         model.cards = [.addAppToDockMac, .duckplayer]
-        _ = try await client.getData(params: [], original: .init())
-        _ = try await client.getData(params: [], original: .init())
-        _ = try await client.getData(params: [], original: .init())
-        _ = try await client.getData(params: [], original: .init())
-        _ = try await client.getData(params: [], original: .init())
+        try await handleMessageIgnoringResponse(named: .getData)
+        try await handleMessageIgnoringResponse(named: .getData)
+        try await handleMessageIgnoringResponse(named: .getData)
+        try await handleMessageIgnoringResponse(named: .getData)
+        try await handleMessageIgnoringResponse(named: .getData)
 
         XCTAssertEqual(model.willDisplayCardsCalls, [])
 
-        _ = try await client.getConfig(params: [], original: .init())
+        try await handleMessageIgnoringResponse(named: .getConfig)
 
         XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
     }
 
     func testThatWillDisplayCardsPublisherIsNotSentBeforeGetDataIsCalled() async throws {
         model.cards = [.addAppToDockMac, .duckplayer]
-        _ = try await client.getConfig(params: [], original: .init())
-        _ = try await client.getConfig(params: [], original: .init())
-        _ = try await client.getConfig(params: [], original: .init())
-        _ = try await client.getConfig(params: [], original: .init())
-        _ = try await client.getConfig(params: [], original: .init())
+        try await handleMessageIgnoringResponse(named: .getConfig)
+        try await handleMessageIgnoringResponse(named: .getConfig)
+        try await handleMessageIgnoringResponse(named: .getConfig)
+        try await handleMessageIgnoringResponse(named: .getConfig)
+        try await handleMessageIgnoringResponse(named: .getConfig)
 
         XCTAssertEqual(model.willDisplayCardsCalls, [])
 
-        _ = try await client.getData(params: [], original: .init())
+        try await handleMessageIgnoringResponse(named: .getData)
 
         XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
     }
@@ -275,8 +244,8 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
     // MARK: - Helper functions
 
     func triggerInitialCardsEventAndResetMockState() async throws {
-        _ = try await client.getConfig(params: [], original: .init())
-        _ = try await client.getData(params: [], original: .init())
+        try await handleMessageIgnoringResponse(named: .getConfig)
+        try await handleMessageIgnoringResponse(named: .getData)
         model.willDisplayCardsCalls = []
     }
 
@@ -284,6 +253,11 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
         let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
         return try XCTUnwrap(response as? Response, file: file, line: line)
+    }
+
+    func handleMessageIgnoringResponse(named methodName: NewTabPageNextStepsCardsClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
+        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
+        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
     }
 
     func handleMessageExpectingNilResponse(named methodName: NewTabPageNextStepsCardsClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {

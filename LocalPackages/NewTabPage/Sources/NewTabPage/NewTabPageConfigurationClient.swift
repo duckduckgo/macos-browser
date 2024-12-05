@@ -54,7 +54,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
             .store(in: &cancellables)
     }
 
-    public enum MessageName: String, CaseIterable {
+    enum MessageName: String, CaseIterable {
         case contextMenu
         case initialSetup
         case reportInitException
@@ -176,62 +176,53 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     }
 }
 
-public extension NewTabPageUserScript {
+extension NewTabPageUserScript {
 
     enum WidgetId: String, Codable {
         case rmf, nextSteps, favorites, privacyStats
     }
 
     struct ContextMenuParams: Codable {
-        public let visibilityMenuItems: [ContextMenuItem]
+        let visibilityMenuItems: [ContextMenuItem]
 
-        public init(visibilityMenuItems: [ContextMenuItem]) {
-            self.visibilityMenuItems = visibilityMenuItems
-        }
-
-        public struct ContextMenuItem: Codable {
-            public let id: WidgetId
-            public let title: String
-
-            public init(id: WidgetId, title: String) {
-                self.id = id
-                self.title = title
-            }
+        struct ContextMenuItem: Codable {
+            let id: WidgetId
+            let title: String
         }
     }
 
     struct NewTabPageConfiguration: Encodable {
-        public var widgets: [Widget]
-        public var widgetConfigs: [WidgetConfig]
-        public var env: String
-        public var locale: String
-        public var platform: Platform
+        var widgets: [Widget]
+        var widgetConfigs: [WidgetConfig]
+        var env: String
+        var locale: String
+        var platform: Platform
 
-        public struct Widget: Encodable, Equatable {
+        struct Widget: Encodable, Equatable {
             public var id: WidgetId
         }
 
-        public struct WidgetConfig: Codable, Equatable {
+        struct WidgetConfig: Codable, Equatable {
 
-            public enum WidgetVisibility: String, Codable {
+            enum WidgetVisibility: String, Codable {
                 case visible, hidden
 
-                public var isVisible: Bool {
+                var isVisible: Bool {
                     self == .visible
                 }
             }
 
-            public init(id: WidgetId, isVisible: Bool) {
+            init(id: WidgetId, isVisible: Bool) {
                 self.id = id
                 self.visibility = isVisible ? .visible : .hidden
             }
 
-            public var id: WidgetId
-            public var visibility: WidgetVisibility
+            var id: WidgetId
+            var visibility: WidgetVisibility
         }
 
-        public struct Platform: Encodable, Equatable {
-            public var name: String
+        struct Platform: Encodable, Equatable {
+            var name: String
         }
     }
 }

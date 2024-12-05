@@ -60,7 +60,7 @@ public final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessage
         messageHandlers[methodName]
     }
 
-    public func pushMessage(named method: String, params: Encodable?, using script: NewTabPageUserScript) {
+    func pushMessage(named method: MessageName, params: Encodable?, using script: NewTabPageUserScript) {
         guard let webView = script.webView else {
             return
         }
@@ -68,33 +68,24 @@ public final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessage
     }
 }
 
-public extension NewTabPageUserScript {
+extension NewTabPageUserScript {
 
-    public struct WidgetConfig: Codable {
-        public let animation: Animation?
-        public let expansion: Expansion
+    struct WidgetConfig: Codable {
+        let animation: Animation?
+        let expansion: Expansion
 
-        public init(animation: Animation?, expansion: Expansion) {
-            self.animation = animation
-            self.expansion = expansion
-        }
-
-        public enum Expansion: String, Codable {
+        enum Expansion: String, Codable {
             case collapsed, expanded
         }
 
-        public struct Animation: Codable, Equatable {
-            public let kind: AnimationKind
+        struct Animation: Codable, Equatable {
+            let kind: AnimationKind
 
-            public init(kind: AnimationKind) {
-                self.kind = kind
-            }
+            static let none = Animation(kind: .none)
+            static let viewTransitions = Animation(kind: .viewTransitions)
+            static let auto = Animation(kind: .auto)
 
-            public static let none = Animation(kind: .none)
-            public static let viewTransitions = Animation(kind: .viewTransitions)
-            public static let auto = Animation(kind: .auto)
-
-            public enum AnimationKind: String, Codable {
+            enum AnimationKind: String, Codable {
                 case none
                 case viewTransitions = "view-transitions"
                 case auto = "auto-animate"

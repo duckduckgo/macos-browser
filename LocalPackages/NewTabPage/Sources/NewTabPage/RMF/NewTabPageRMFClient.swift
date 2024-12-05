@@ -22,22 +22,13 @@ import RemoteMessaging
 import UserScript
 import WebKit
 
-public protocol NewTabPageActiveRemoteMessageProviding {
-    var remoteMessage: RemoteMessageModel? { get set }
-    var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> { get }
-
-    func isMessageSupported(_ message: RemoteMessageModel) -> Bool
-
-    func handleAction(_ action: RemoteAction?, andDismissUsing button: RemoteMessageButton) async
-}
-
 public enum RemoteMessageButton: Equatable {
     case close, action, primaryAction, secondaryAction
 }
 
 public final class NewTabPageRMFClient: NewTabPageScriptClient {
 
-    public let remoteMessageProvider: NewTabPageActiveRemoteMessageProviding
+    let remoteMessageProvider: NewTabPageActiveRemoteMessageProviding
     public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables = Set<AnyCancellable>()
@@ -52,7 +43,7 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
             .store(in: &cancellables)
     }
 
-    public enum MessageName: String, CaseIterable {
+    enum MessageName: String, CaseIterable {
         case rmfGetData = "rmf_getData"
         case rmfOnDataUpdate = "rmf_onDataUpdate"
         case rmfDismiss = "rmf_dismiss"
@@ -135,24 +126,24 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 }
 
-public extension NewTabPageUserScript {
+extension NewTabPageUserScript {
 
     struct RemoteMessageParams: Codable {
-        public let id: String
+        let id: String
     }
 
     struct RMFData: Encodable {
-        public let content: RMFMessage?
+        let content: RMFMessage?
     }
 
     enum RMFMessage: Encodable, Equatable {
         case small(SmallMessage), medium(MediumMessage), bigSingleAction(BigSingleActionMessage), bigTwoAction(BigTwoActionMessage)
 
-        public func encode(to encoder: any Encoder) throws {
+        func encode(to encoder: any Encoder) throws {
             try message.encode(to: encoder)
         }
 
-        public var message: Encodable {
+        var message: Encodable {
             switch self {
             case .small(let message):
                 return message
@@ -165,7 +156,7 @@ public extension NewTabPageUserScript {
             }
         }
 
-        public init?(_ remoteMessageModel: RemoteMessageModel) {
+        init?(_ remoteMessageModel: RemoteMessageModel) {
             guard let modelType = remoteMessageModel.content else {
                 return nil
             }
@@ -190,41 +181,41 @@ public extension NewTabPageUserScript {
     }
 
     struct SmallMessage: Encodable, Equatable {
-        public let messageType = "small"
+        let messageType = "small"
 
-        public let id: String
-        public let titleText: String
-        public let descriptionText: String
+        let id: String
+        let titleText: String
+        let descriptionText: String
     }
 
     struct MediumMessage: Encodable, Equatable {
-        public let messageType = "medium"
+        let messageType = "medium"
 
-        public let id: String
-        public let titleText: String
-        public let descriptionText: String
-        public let icon: RMFIcon
+        let id: String
+        let titleText: String
+        let descriptionText: String
+        let icon: RMFIcon
     }
 
     struct BigSingleActionMessage: Encodable, Equatable {
-        public let messageType = "big_single_action"
+        let messageType = "big_single_action"
 
-        public let id: String
-        public let titleText: String
-        public let descriptionText: String
-        public let icon: RMFIcon
-        public let primaryActionText: String
+        let id: String
+        let titleText: String
+        let descriptionText: String
+        let icon: RMFIcon
+        let primaryActionText: String
     }
 
     struct BigTwoActionMessage: Encodable, Equatable {
-        public let messageType = "big_two_action"
+        let messageType = "big_two_action"
 
-        public let id: String
-        public let titleText: String
-        public let descriptionText: String
-        public let icon: RMFIcon
-        public let primaryActionText: String
-        public let secondaryActionText: String
+        let id: String
+        let titleText: String
+        let descriptionText: String
+        let icon: RMFIcon
+        let primaryActionText: String
+        let secondaryActionText: String
     }
 
     enum RMFIcon: String, Encodable {
@@ -234,7 +225,7 @@ public extension NewTabPageUserScript {
         case appUpdate = "AppUpdate"
         case privacyPro = "PrivacyPro"
 
-        public init(_ placeholder: RemotePlaceholder) {
+        init(_ placeholder: RemotePlaceholder) {
             switch placeholder {
             case .announce:
                 self = .announce

@@ -24,7 +24,7 @@ import WebKitExtensions
 
 public final class NewTabPageUserContentController: WKUserContentController {
 
-    public let newTabPageUserScriptProvider: NewTabPageUserScriptProvider
+    private let newTabPageUserScriptProvider: NewTabPageUserScriptProvider
 
     @MainActor
     public init(newTabPageUserScript: NewTabPageUserScript) {
@@ -50,18 +50,18 @@ public final class NewTabPageUserContentController: WKUserContentController {
 }
 
 @MainActor
-public final class NewTabPageUserScriptProvider: UserScriptsProvider {
-    public lazy var userScripts: [UserScript] = [specialPagesUserScript]
+private final class NewTabPageUserScriptProvider: UserScriptsProvider {
+    lazy var userScripts: [UserScript] = [specialPagesUserScript]
 
-    public let specialPagesUserScript: SpecialPagesUserScript
+    let specialPagesUserScript: SpecialPagesUserScript
 
-    public init(newTabPageUserScript: NewTabPageUserScript) {
+    init(newTabPageUserScript: NewTabPageUserScript) {
         specialPagesUserScript = SpecialPagesUserScript()
         specialPagesUserScript.registerSubfeature(delegate: newTabPageUserScript)
     }
 
     @MainActor
-    public func loadWKUserScripts() async -> [WKUserScript] {
+    func loadWKUserScripts() async -> [WKUserScript] {
         return await withTaskGroup(of: WKUserScriptBox.self) { @MainActor group in
             var wkUserScripts = [WKUserScript]()
             userScripts.forEach { userScript in
