@@ -137,7 +137,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 #endif
 
         let customizerData = customBackgroundProvider.customizerData
-        return NewTabPageUserScript.NewTabPageConfiguration(
+        let config = NewTabPageUserScript.NewTabPageConfiguration(
             widgets: [
                 .init(id: .rmf),
                 .init(id: .nextSteps),
@@ -151,9 +151,10 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
             env: env,
             locale: Bundle.main.preferredLocalizations.first ?? "en",
             platform: .init(name: "macos"),
-            settings: .init(customizerDrawer: .enabled),
+            settings: .init(customizerDrawer: .init(state: .enabled)),
             customizer: customizerData
         )
+        return config
     }
 
     @MainActor
@@ -235,14 +236,18 @@ extension NewTabPageUserScript {
         }
 
         struct Settings: Encodable, Equatable {
-            let customizerDrawer: BooleanSetting
+            let customizerDrawer: Setting
+        }
 
-            enum BooleanSetting: String, Encodable {
-                case enabled, disabled
+        struct Setting: Encodable, Equatable {
+            let state: BooleanSetting
+        }
 
-                var isEnabled: Bool {
-                    self == .enabled
-                }
+        enum BooleanSetting: String, Encodable {
+            case enabled, disabled
+
+            var isEnabled: Bool {
+                self == .enabled
             }
         }
     }
@@ -282,6 +287,39 @@ extension NewTabPageUserScript {
         case hexColor(String)
         case gradient(String)
         case userImage(UserImage)
+
+        enum CodingKeys: CodingKey {
+            case kind
+            case value
+        }
+
+        var kind: String {
+            switch self {
+            case .default:
+                return "default"
+            case .solidColor:
+                return "solidColor"
+            case .hexColor:
+                return "hexColor"
+            case .gradient:
+                return "gradient"
+            case .userImage:
+                return "userImage"
+            }
+        }
+
+        public func encode(to encoder: any Encoder) throws {
+            var container: KeyedEncodingContainer<NewTabPageUserScript.Background.CodingKeys> = encoder.container(keyedBy: NewTabPageUserScript.Background.CodingKeys.self)
+            try container.encode(kind, forKey: NewTabPageUserScript.Background.CodingKeys.kind)
+            switch self {
+            case .default:
+                break
+            case .solidColor(let value), .hexColor(let value), .gradient(let value):
+                try container.encode(value, forKey: NewTabPageUserScript.Background.CodingKeys.value)
+            case .userImage(let image):
+                try container.encode(image, forKey: NewTabPageUserScript.Background.CodingKeys.value)
+            }
+        }
     }
 
     public struct UserImage: Encodable, Equatable {

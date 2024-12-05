@@ -379,11 +379,11 @@ private extension URL {
     }
 
     var isCustomBackgroundImage: Bool {
-        return isNewTabPage && pathComponents.prefix(2) == ["background", "images"]
+        return isNewTabPage && pathComponents.prefix(3) == ["/", "background", "images"]
     }
 
     var isCustomBackgroundImageThumbnail: Bool {
-        return isNewTabPage && pathComponents.prefix(2) == ["background", "thumbnails"]
+        return isNewTabPage && pathComponents.prefix(3) == ["/", "background", "thumbnails"]
     }
 
 }
