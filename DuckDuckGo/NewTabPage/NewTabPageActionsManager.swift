@@ -130,8 +130,16 @@ extension NewTabPageActionsManager {
         self.init(scriptClients: [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
+            NewTabPageNextStepsCardsClient(model: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener())),
             NewTabPageFavoritesClient(favoritesModel: NewTabPageFavoritesModel()),
             NewTabPagePrivacyStatsClient(model: privacyStatsModel)
         ])
+    }
+}
+
+struct NewTabPageTabOpener: ContinueSetUpModelTabOpening {
+    @MainActor
+    func openTab(_ tab: Tab) {
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
     }
 }
