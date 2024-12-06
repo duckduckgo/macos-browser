@@ -18,10 +18,10 @@
 
 import Foundation
 
+///
+/// Copy related to VPN used only in both main app targets
+///
 extension UserText {
-
-    static let networkProtectionTunnelName = NSLocalizedString("network.protection.tunnel.name", value: "DuckDuckGo VPN", comment: "The name of the NetP VPN that will be visible in the system to the user")
-
     static let networkProtection = NSLocalizedString("network.protection", value: "VPN", comment: "Menu item for opening the VPN")
 
     // MARK: - Navigation Bar
@@ -47,24 +47,6 @@ extension UserText {
     static let networkProtectionNavBarStatusMenuVPNSettings = NSLocalizedString("network.protection.status.menu.vpn.settings", value: "VPN Settings…", comment: "The status menu 'VPN Settings' menu item")
 
     static let networkProtectionNavBarStatusMenuFAQ = NSLocalizedString("network.protection.status.menu.faq", value: "FAQs and Support…", comment: "The status menu 'FAQ' menu item")
-
-    // MARK: - System Extension Installation Messages
-
-    private static let networkProtectionSystemSettingsLegacy = NSLocalizedString("network.protection.configuration.system-settings.legacy", value: "Go to Security & Privacy in System Preferences to allow DuckDuckGo VPN to activate", comment: "Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 12 and below")
-    private static let networkProtectionSystemSettingsModern = NSLocalizedString("network.protection.configuration.system-settings.modern", value: "Go to Privacy & Security in System Settings to allow DuckDuckGo VPN to activate", comment: "Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 13 and above")
-
-    // Dynamically selected based on macOS version, not directly convertible to static string
-    static var networkProtectionSystemSettings: String {
-        if #available(macOS 13.0, *) {
-            return networkProtectionSystemSettingsModern
-        } else {
-            return networkProtectionSystemSettingsLegacy
-        }
-    }
-
-    static let networkProtectionUnknownActivationError = NSLocalizedString("network.protection.system.extension.unknown.activation.error", value: "There was an unexpected error. Please try again.", comment: "Message shown to users when they try to enable NetP and there is an unexpected activation error.")
-
-    static let networkProtectionPleaseReboot = NSLocalizedString("network.protection.system.extension.please.reboot", value: "VPN update available. Restart your Mac to reconnect.", comment: "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation")
 }
 
 extension UserText {
@@ -292,12 +274,5 @@ extension UserText {
 
     static let uninstallVPNInformativeText = NSLocalizedString("vpn.uninstall.alert.informative.text", value: "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device.", comment: "Informative text for the alert that comes up when the user decides to uninstall our VPN")
 
-    // MARK: - VPN Screen
 
-    static let netPVPNLocationNearest = NSLocalizedString("network.protection.vpn.location.nearest", value: "(Nearest)", comment: "Description of the location type in the VPN status view")
-
-    // "network.protection.vpn.location.subtitle.formatted.city.and.country" - Subtitle for the preferred location item that formats a city and country. E.g Chicago, United States
-    static func netPVPNSettingsLocationSubtitleFormattedCityAndCountry(city: String, country: String) -> String {
-        return "\(city), \(country)"
-    }
 }

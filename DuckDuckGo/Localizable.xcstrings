@@ -37120,8 +37120,8 @@
         }
       }
     },
-    "network.protection.vpn.location.nearest" : {
-      "comment" : "Description of the location type in the VPN status view",
+    "network.protection.vpn.location.formatter.nearest.location.descriptor" : {
+      "comment" : "Description added after the nearest location in the VPN status view\nNearest available location setting description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {

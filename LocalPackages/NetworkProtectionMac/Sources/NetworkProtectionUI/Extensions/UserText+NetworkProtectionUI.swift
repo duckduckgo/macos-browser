@@ -29,7 +29,6 @@ final class UserText {
     static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.on", bundle: Bundle.module, value: "DuckDuckGo VPN is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
     static let networkProtectionStatusViewTimerZero = "00:00:00"
 
-    static let netPVPNLocationNearest = NSLocalizedString("network.protection.vpn.location.nearest", bundle: Bundle.module, value: "(Nearest)", comment: "Description of the location type in the VPN status view")
     static let vpnLocationConnected = NSLocalizedString("network.protection.vpn.location.connected", bundle: Bundle.module, value: "Connected Location", comment: "Description of the location type in the VPN status view")
     static let vpnLocationSelected = NSLocalizedString("network.protection.vpn.location.selected", bundle: Bundle.module, value: "Selected Location", comment: "Description of the location type in the VPN status view")
     static let vpnDnsServer = NSLocalizedString("network.protection.vpn.dns-server", bundle: Bundle.module, value: "DNS Server", comment: "Title for the DNS server section in the VPN status view")
