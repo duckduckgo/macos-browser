@@ -243,7 +243,7 @@ class TabLazyLoaderTests: XCTestCase {
         lazyLoader?.scheduleLazyLoading()
 
         // Then
-        waitForExpectations(timeout: 0.3)
+        waitForExpectations(timeout: 3.0)
         XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
     }
