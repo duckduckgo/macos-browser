@@ -8332,8 +8332,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "en" : {
@@ -8344,44 +8344,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         }
       }
@@ -8392,8 +8392,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2024.4.3"
+            "state" : "translated",
+            "value" : "Download v2024.9.0"
           }
         },
         "en" : {
@@ -8404,44 +8404,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2024.4.3"
+            "state" : "translated",
+            "value" : "Download v2024.9.0"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2024.4.3"
+            "state" : "translated",
+            "value" : "Download v2024.9.0"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2024.4.3"
+            "state" : "translated",
+            "value" : "Download v2024.9.0"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2024.4.3"
+            "state" : "translated",
+            "value" : "Download v2024.9.0"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2024.4.3"
+            "state" : "translated",
+            "value" : "Download v2024.9.0"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2024.4.3"
+            "state" : "translated",
+            "value" : "Download v2024.9.0"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2024.4.3"
+            "state" : "translated",
+            "value" : "Download v2024.9.0"
           }
         }
       }
@@ -10248,7 +10248,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancella"
+            "value" : "Elimina"
           }
         },
         "nl" : {
@@ -18319,7 +18319,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nicht schließen"
+            "value" : "Don’t Close"
           }
         },
         "en" : {
@@ -18331,43 +18331,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No cerrar"
+            "value" : "Don’t Close"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ne pas fermer"
+            "value" : "Don’t Close"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Non chiudere"
+            "value" : "Don’t Close"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Niet sluiten"
+            "value" : "Don’t Close"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie zamykaj"
+            "value" : "Don’t Close"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não fechar"
+            "value" : "Don’t Close"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не закрывать"
+            "value" : "Don’t Close"
           }
         }
       }
@@ -19456,10 +19456,58 @@
       "comment" : "Call to action for the OS specific downloads issue",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Open Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir configuración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri Impostazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Instellingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ustawienia"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Definições"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть Настройки"
           }
         }
       }
@@ -19468,10 +19516,58 @@
       "comment" : "Call to action for the OS specific downloads issue",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie man Updates durchführt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "How To Update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo actualizar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment faire une mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Come aggiornare"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een update uitvoeren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jak zaktualizować"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como atualizar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Как выполнить обновление"
           }
         }
       }
@@ -19480,10 +19576,58 @@
       "comment" : "This error message will appear in an error banner when users cannot download files on macOS 14.7.1 or 15.0.1",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Download ist aufgrund eines bekannten Problems unter macOS 14.7.1 und 15.0.1 fehlgeschlagen. Aktualisiere auf macOS 15.1 und versuche erneut, die Datei herunterzuladen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "The download failed because of a known issue on macOS 14.7.1 and 15.0.1. Update to macOS 15.1 and try downloading again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La descarga ha fallado debido a un problema conocido en macOS 14.7.1 y 15.0.1. Pásate a macOS 15.1 e intenta descargarlo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le téléchargement a échoué en raison d'un problème connu sur macOS 14.7.1 et 15.0.1. Passez à macOS 15.1 et réessayez de télécharger."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il download non è riuscito a causa di un problema noto su macOS 14.7.1 e 15.0.1. Aggiorna a macOS 15.1 e prova a effettuare di nuovo il download."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De download is mislukt door een bekend probleem in macOS 14.7.1 en 15.0.1. Werk je systeem bij naar macOS 15.1 en probeer de bestanden opnieuw te downloaden."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pobieranie nie powiodło się z powodu znanego błędu w systemach macOS 14.7.1 i 15.0.1. Zaktualizuj do macOS 15.1 i spróbuj pobrać ponownie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A transferência falhou devido a um problema conhecido no macOS 14.7.1 e 15.0.1. Atualiza para o macOS 15.1 e tenta transferir novamente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вследствие известной проблемы с macOS версий 14.7.1 и 15.0.1. возник сбой при загрузке. Обновите macOS до версии 15.1 и повторите попытку."
           }
         }
       }
@@ -33730,7 +33874,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancella"
+            "value" : "Elimina"
           }
         },
         "nl" : {
@@ -42201,7 +42345,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancella"
+            "value" : "Elimina"
           }
         },
         "nl" : {
@@ -47086,7 +47230,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancella"
+            "value" : "Elimina"
           }
         },
         "nl" : {
@@ -56216,9 +56360,57 @@
       "comment" : "Tooltip for the button which removes the history entry from the history",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from browsing history"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Remove from browsing history"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from browsing history"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from browsing history"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from browsing history"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from browsing history"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from browsing history"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from browsing history"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Remove from browsing history"
           }
         }

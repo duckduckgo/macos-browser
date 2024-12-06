@@ -8,7 +8,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "DuckDuckGo-VPN-Netzwerkerweiterung"
           }
         },
         "en" : {
@@ -20,43 +20,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Extensión de red VPN de DuckDuckGo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Extension du réseau VPN DuckDuckGo"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Estensione della rete VPN di DuckDuckGo"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "DuckDuckGo-extensie met VPN-netwerk"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Rozszerzenie sieci VPN DuckDuckGo"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Extensão de rede da DuckDuckGo VPN"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Сетевое расширение DuckDuckGo VPN"
           }
         }
       }
