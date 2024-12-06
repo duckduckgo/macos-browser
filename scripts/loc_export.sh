@@ -83,9 +83,9 @@ declare -a unwanted_paths=(
     "DuckDuckGoNotifications/Localizable.xcstrings"
     "DuckDuckGoVPN/Info-AppStore-InfoPlist.xcstrings"
     "DuckDuckGoVPN/InfoPlist.xcstrings"
-    "DuckDuckGoVPN/Localizable.xcstrings"
+    "NetworkProtectionAppExtension/Info.plist"
+    "NetworkProtectionAppExtension/InfoPlist.xcstrings"
     "VPNProxyExtension/InfoPlist.xcstrings"
-    "DuckDuckGoNotifications/Resources/InfoPlist.xcstrings"
     "DuckDuckGo/Suggestions/View/Base.lproj/Suggestion.storyboard"
 )
 
