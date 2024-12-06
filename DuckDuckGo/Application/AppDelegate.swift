@@ -71,7 +71,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let fileStore: FileStore
 
 #if APPSTORE
-    private let crashCollection = CrashCollection(platform: .macOSAppStore)
+    private let crashCollection = CrashCollection(CrashReportSender(platform: .macOSAppStore))
 #else
     private let crashReporter = CrashReporter()
 #endif
