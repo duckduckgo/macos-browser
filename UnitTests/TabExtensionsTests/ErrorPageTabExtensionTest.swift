@@ -413,9 +413,8 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
         return nil
     }
 
-    func reloadPageFromErrorPage() -> WKNavigation? {
+    func reloadPageFromErrorPage() {
         reloadCalled = true
-        return nil
     }
 
     @MainActor func openNewTabFromErrorPage() async {

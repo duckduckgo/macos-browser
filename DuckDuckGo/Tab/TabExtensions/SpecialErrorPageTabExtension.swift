@@ -268,18 +268,18 @@ protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     func load(_ request: URLRequest) -> WKNavigation?
     func goBack() -> WKNavigation?
     func close()
-    @discardableResult func reloadPageFromErrorPage() -> WKNavigation?
+    @MainActor func reloadPageFromErrorPage()
     @MainActor func openNewTabFromErrorPage() async
 }
 
 // TODO: Doesn‘t work for phishing
 extension ErrorPageTabExtensionNavigationDelegate {
-    func reloadPageFromErrorPage() -> WKNavigation? {
-        guard let webView = self as? WKWebView else { return nil }
-        if let item = webView.backForwardList.currentItem {
-            return webView.go(to: item)
-        }
-        return nil
+
+    @MainActor func reloadPageFromErrorPage() {
+        guard let webView = self as? WKWebView, let url = webView.url else { return }
+        // reloading creates an extra back history record;
+        // `webView.go(to: backForwardList.currentItem)` breaks downloads as we don‘t load “Back” requests (with `returnCacheElseLoad` cache policy)
+        webView.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: nil, in: .defaultClient)
     }
 
     @MainActor func openNewTabFromErrorPage() async {
