@@ -318,6 +318,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case contentBlockingFetchLRCSucceeded
     case contentBlockingNoMatchInLRC
     case contentBlockingLRCMissing
+    case contentBlockingCompilationTaskPerformance(retryCount: Int, timeBucketAggregation: CompileTimeBucketAggregation)
 
     case secureVaultInitError(error: Error)
     case secureVaultError(error: Error)
@@ -946,6 +947,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .contentBlockingLRCMissing:
             return "content_blocking_lrc_missing"
 
+        case .contentBlockingCompilationTaskPerformance(let retryCount, let timeBucketAggregation):
+            return "m_content_blocking_compilation_loops_\(retryCount)_time_\(timeBucketAggregation)"
+
         case .secureVaultInitError:
             return "secure_vault_init_error"
         case .secureVaultError:
@@ -1441,5 +1445,31 @@ enum GeneralPixel: PixelKitEventV2 {
             }
         }
 
+    }
+
+    public enum CompileTimeBucketAggregation: String, CustomStringConvertible {
+
+        public var description: String { rawValue }
+
+        case lessThan1 = "1"
+        case lessThan2 = "2"
+        case lessThan5 = "5"
+        case lessThan10 = "10"
+        case more
+
+        public init(number: Double) {
+            switch number {
+            case ...1:
+                self = .lessThan1
+            case ...2:
+                self = .lessThan2
+            case ...5:
+                self = .lessThan5
+            case ...10:
+                self = .lessThan10
+            default:
+                self = .more
+            }
+        }
     }
 }
