@@ -40,7 +40,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         static let entitlements: [SubscriptionEntitlement] = [.dataBrokerProtection,
                                                             .identityTheftRestoration,
                                                             .networkProtection]
-        
+
         static let mostRecentTransactionJWS = "dGhpcyBpcyBub3QgYSByZWFsIEFw(...)cCBTdG9yZSB0cmFuc2FjdGlvbiBKV1M="
         static let subscriptionOptions = SubscriptionOptions(
             platform: SubscriptionPlatformName.macos,

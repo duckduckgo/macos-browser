@@ -35,7 +35,7 @@ final class MaliciousSiteProtectionTests: XCTestCase {
     var dataManager: MaliciousSiteProtection.DataManager!
 
     override func setUp() async throws {
-        apiService = MockAPIService()//apiResponse: .failure(CancellationError()))
+        apiService = MockAPIService()
         let mockFileStore = MockMaliciousSiteFileStore()
         mockDataProvider = MockMaliciousSiteDataProvider()
         dataManager = MaliciousSiteProtection.DataManager(fileStore: mockFileStore, embeddedDataProvider: mockDataProvider, fileNameProvider: { _ in "file.json" })
