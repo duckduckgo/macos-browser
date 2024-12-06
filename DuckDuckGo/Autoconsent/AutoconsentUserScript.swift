@@ -194,6 +194,24 @@ extension AutoconsentUserScript {
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         }
     }
+    
+    func matchDomainList(domain: String?, domainsList: [String]) -> Bool {
+        guard let domain = domain else { return false }
+        let trimmedDomains = domainsList.filter { !$0.trimmingWhitespace().isEmpty }
+
+        // Break domain apart to handle www.*
+        var tempDomain = domain
+        while tempDomain.contains(".") {
+            if trimmedDomains.contains(tempDomain) {
+                return true
+            }
+
+            let comps = tempDomain.split(separator: ".")
+            tempDomain = comps.dropFirst().joined(separator: ".")
+        }
+
+        return false
+    }
 
     @MainActor
     func handleInit(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
@@ -236,9 +254,10 @@ extension AutoconsentUserScript {
         }
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
-        let enableFilterList = config.isSubfeatureEnabled(AutoconsentSubfeature.filterlist)
+        let filterlistExceptions = remoteConfig["filterlistExceptions"] as? [String] ?? []
+        let enableFilterList = config.isSubfeatureEnabled(AutoconsentSubfeature.filterlist) && !self.matchDomainList(domain: topURLDomain, domainsList: filterlistExceptions)
 
-        replyHandler([
+        let autoconsentConfig = [
             "type": "initResp",
             "rules": nil, // rules are bundled with the content script atm
             "config": [
@@ -251,7 +270,10 @@ extension AutoconsentUserScript {
                 "isMainWorld": false,
                 "enableFilterList": enableFilterList
             ] as [String: Any?]
-        ] as [String: Any?], nil)
+        ] as [String: Any?]
+        Logger.autoconsent.debug("autoconsent config: \(String(describing: autoconsentConfig))")
+
+        replyHandler(autoconsentConfig, nil)
     }
 
     @MainActor
