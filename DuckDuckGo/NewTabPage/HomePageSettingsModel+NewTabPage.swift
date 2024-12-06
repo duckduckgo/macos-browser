@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import NewTabPage
 import SwiftUI
 
@@ -34,6 +35,26 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
             theme: .init(appearancePreferences.currentThemeName),
             userImages: homePageSettingsModel.availableUserBackgroundImages.map(NewTabPageUserScript.UserImage.init)
         )
+    }
+
+    var background: NewTabPageUserScript.Background {
+        get {
+            .init(homePageSettingsModel.customBackground)
+        }
+        set {
+            homePageSettingsModel.customBackground = .init(newValue)
+        }
+    }
+
+    var backgroundPublisher: AnyPublisher<NewTabPageUserScript.Background, Never> {
+        homePageSettingsModel.$customBackground.dropFirst().removeDuplicates()
+            .map(NewTabPageUserScript.Background.init)
+            .eraseToAnyPublisher()
+    }
+
+    @MainActor
+    func presentUploadDialog() async{
+        await homePageSettingsModel.addNewImage()
     }
 }
 
@@ -56,6 +77,27 @@ extension NewTabPageUserScript.Background {
     }
 }
 
+extension CustomBackground {
+    init?(_ background: NewTabPageUserScript.Background) {
+        switch background {
+        case .default:
+            return nil
+        case .solidColor(let color), .hexColor(let color):
+            guard let solidColor = SolidColorBackground(color) else {
+                return nil
+            }
+            self = .solidColor(solidColor)
+        case .gradient(let gradient):
+            guard let gradient = GradientBackground(rawValue: gradient) else {
+                return nil
+            }
+            self = .gradient(gradient)
+        case .userImage(let userImage):
+            self = .userImage(.init(fileName: userImage.id, colorScheme: .init(userImage.colorScheme)))
+        }
+    }
+}
+
 extension NewTabPageUserScript.UserImage {
     init(_ userBackgroundImage: UserBackgroundImage) {
         self.init(
@@ -64,6 +106,17 @@ extension NewTabPageUserScript.UserImage {
             src: "/background/images/\(userBackgroundImage.fileName)",
             thumb: "/background/thumbnails/\(userBackgroundImage.fileName)"
         )
+    }
+}
+
+extension ColorScheme {
+    init(_ theme: NewTabPageUserScript.Theme) {
+        switch theme {
+        case .dark:
+            self = .dark
+        case .light:
+            self = .light
+        }
     }
 }
 

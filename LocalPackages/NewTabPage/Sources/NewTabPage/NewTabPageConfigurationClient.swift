@@ -277,11 +277,15 @@ extension NewTabPageUserScript {
         }
     }
 
-    public enum Theme: String, Encodable {
+    public enum Theme: String, Codable {
         case dark, light
     }
 
-    public enum Background: Encodable, Equatable {
+    struct BackgroundData: Codable, Equatable {
+        let background: Background
+    }
+
+    public enum Background: Codable, Equatable {
         case `default`
         case solidColor(String)
         case hexColor(String)
@@ -298,9 +302,9 @@ extension NewTabPageUserScript {
             case .default:
                 return "default"
             case .solidColor:
-                return "solidColor"
+                return "color"
             case .hexColor:
-                return "hexColor"
+                return "hex"
             case .gradient:
                 return "gradient"
             case .userImage:
@@ -308,21 +312,39 @@ extension NewTabPageUserScript {
             }
         }
 
+        public init(from decoder: any Decoder) throws {
+            let container: KeyedDecodingContainer<CodingKeys> = try decoder.container(keyedBy: CodingKeys.self)
+            let kind = try container.decode(String.self, forKey: CodingKeys.kind)
+            switch kind {
+            case "color", "hex":
+                let value = try container.decode(String.self, forKey: CodingKeys.value)
+                self = .solidColor(value)
+            case "gradient":
+                let value = try container.decode(String.self, forKey: CodingKeys.value)
+                self = .gradient(value)
+            case "userImage":
+                let value = try container.decode(UserImage.self, forKey: CodingKeys.value)
+                self = .userImage(value)
+            default:
+                self = .default
+            }
+        }
+
         public func encode(to encoder: any Encoder) throws {
-            var container: KeyedEncodingContainer<NewTabPageUserScript.Background.CodingKeys> = encoder.container(keyedBy: NewTabPageUserScript.Background.CodingKeys.self)
-            try container.encode(kind, forKey: NewTabPageUserScript.Background.CodingKeys.kind)
+            var container: KeyedEncodingContainer<CodingKeys> = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(kind, forKey: CodingKeys.kind)
             switch self {
             case .default:
                 break
             case .solidColor(let value), .hexColor(let value), .gradient(let value):
-                try container.encode(value, forKey: NewTabPageUserScript.Background.CodingKeys.value)
+                try container.encode(value, forKey: CodingKeys.value)
             case .userImage(let image):
-                try container.encode(image, forKey: NewTabPageUserScript.Background.CodingKeys.value)
+                try container.encode(image, forKey: CodingKeys.value)
             }
         }
     }
 
-    public struct UserImage: Encodable, Equatable {
+    public struct UserImage: Codable, Equatable {
         public let colorScheme: Theme
         public let id: String
         public let src: String

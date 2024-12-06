@@ -23,6 +23,11 @@ import WebKit
 
 public protocol NewTabPageCustomBackgroundProviding: AnyObject {
     var customizerData: NewTabPageUserScript.CustomizerData { get }
+    var backgroundPublisher: AnyPublisher<NewTabPageUserScript.Background, Never> { get }
+
+    var background: NewTabPageUserScript.Background { get set }
+
+    @MainActor func presentUploadDialog() async
 }
 
 public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
@@ -34,6 +39,14 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     public init(model: NewTabPageCustomBackgroundProviding) {
         self.model = model
+
+        model.backgroundPublisher
+            .sink { [weak self] background in
+                Task { @MainActor in
+                    self?.notifyBackgroundUpdated(background)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     enum MessageName: String, CaseIterable {
@@ -62,6 +75,10 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     private func setBackground(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let data: NewTabPageUserScript.BackgroundData = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        model.background = data.background
         return nil
     }
 
@@ -72,7 +89,14 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     private func upload(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        await model.presentUploadDialog()
         return nil
+    }
+
+    @MainActor
+    private func notifyBackgroundUpdated(_ background: NewTabPageUserScript.Background) {
+        print(String(data: try! JSONEncoder().encode(NewTabPageUserScript.BackgroundData(background: background)), encoding: .utf8)!)
+        pushMessage(named: MessageName.onBackgroundUpdate.rawValue, params: background)
     }
 }
 
