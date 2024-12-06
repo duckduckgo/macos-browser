@@ -17,8 +17,8 @@
 //
 
 import XCTest
-import BrowserServicesKit
-import Subscription
+@testable import BrowserServicesKit
+@testable import Subscription
 import TestUtils
 import SubscriptionTestingUtilities
 
@@ -112,6 +112,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
     func testWhenAccessTokenAndEntitlementAreFound_andIsNotActiveFreemiumUser_thenFeatureIsEnabled() async {
         // Given
         mockSubscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
+        mockSubscriptionManager.resultFeatures = [ SubscriptionFeature(entitlement: .dataBrokerProtection, enabled: true) ]
         mockFreemiumDBPUserStateManager.didActivate = false
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
