@@ -71,7 +71,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
 #if SPARKLE
     func checkForUpdate() {
-        updateController?.checkForUpdateIfNeeded()
+        updateController?.checkForUpdateSkippingRollout()
     }
 
     func runUpdate() {

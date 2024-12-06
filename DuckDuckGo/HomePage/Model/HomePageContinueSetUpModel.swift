@@ -158,6 +158,9 @@ extension HomePage.Models {
             // HTML NTP doesn't refresh on appear so we have to connect to the appear signal
             // (the notification in this case) to trigger a refresh.
             NotificationCenter.default.addObserver(self, selector: #selector(refreshFeaturesForHTMLNewTabPage(_:)), name: .newTabPageWebViewDidAppear, object: nil)
+
+            // This is just temporarily here to run an A/A test to check the new experiment framework works as expected
+            _ = Application.appDelegate.featureFlagger.getCohortIfEnabled(for: CredentialsSavingFlag())
         }
 
         @MainActor func performAction(for featureType: FeatureType) {
@@ -443,5 +446,21 @@ extension AppVersion {
             return majorVersionNumber
         }
         return "\(components[0]).\(components[1])"
+    }
+}
+
+// This is just temporarily here to run an A/A test to check the new experiment framework works as expected
+public struct CredentialsSavingFlag: FeatureFlagExperimentDescribing {
+    public init() {}
+
+    public typealias CohortType = Cohort
+
+    public var rawValue = "credentialSaving"
+
+    public var source: FeatureFlagSource = .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
+
+    public enum Cohort: String, FlagCohort {
+        case control
+        case blue
     }
 }
