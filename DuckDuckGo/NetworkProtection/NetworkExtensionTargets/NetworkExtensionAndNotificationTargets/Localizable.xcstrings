@@ -1,0 +1,150 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "network.protection.entitlement.expired.notification.body" : {
+      "comment" : "The body of the notification when Privacy Pro subscription expired",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscribe to Privacy Pro to reconnect DuckDuckGo VPN."
+          }
+        }
+      }
+    },
+    "network.protection.entitlement.expired.notification.title" : {
+      "comment" : "The title of the notification when Privacy Pro subscription expired",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN disconnected"
+          }
+        }
+      }
+    },
+    "network.protection.failure.notification.subtitle" : {
+      "comment" : "The subtitle of the notification shown when DuckDuckGo VPN fails to reconnect",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unable to connect at this time. Please try again later."
+          }
+        }
+      }
+    },
+    "network.protection.failure.notification.title" : {
+      "comment" : "The title of the notification shown when DuckDuckGo VPN fails to reconnect",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN failed to connect"
+          }
+        }
+      }
+    },
+    "network.protection.interrupted.notification.subtitle" : {
+      "comment" : "The subtitle of the notification shown when DuckDuckGo VPN's connection is interrupted",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Attempting to reconnect now..."
+          }
+        }
+      }
+    },
+    "network.protection.interrupted.notification.title" : {
+      "comment" : "The title of the notification shown when DuckDuckGo VPN's connection is interrupted",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN was interrupted"
+          }
+        }
+      }
+    },
+    "network.protection.success.notification.subtitle" : {
+      "comment" : "The subtitle of the notification shown when the VPN reconnects successfully",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your location and online activity are protected."
+          }
+        }
+      }
+    },
+    "network.protection.success.notification.subtitle.including.serverLocation" : {
+      "comment" : "The body of the notification shown when DuckDuckGo VPN connects successfully with the city + state/country as formatted parameter",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Routing device traffic through %@."
+          }
+        }
+      }
+    },
+    "network.protection.success.notification.title" : {
+      "comment" : "The title of the notification shown when DuckDuckGo VPN connects successfully",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN is ON"
+          }
+        }
+      }
+    },
+    "network.protection.superceded.action.reconnect.title" : {
+      "comment" : "The title of the `Reconnect` notification action button shown when VPN connection is replaced by another app VPN connection taking over",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reconnect"
+          }
+        }
+      }
+    },
+    "network.protection.superceded.notification.subtitle" : {
+      "comment" : "The subtitle of the notification shown when VPN connection is replaced by another app VPN connection taking over",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Another VPN app on your Mac may have disabled it."
+          }
+        }
+      }
+    },
+    "network.protection.superceded.notification.title" : {
+      "comment" : "The title of the notification shown when VPN connection is replaced by another app VPN connection taking over",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN disconnected"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
