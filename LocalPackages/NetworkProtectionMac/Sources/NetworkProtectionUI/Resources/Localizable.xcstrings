@@ -2274,7 +2274,7 @@
       }
     },
     "network.protection.status.connected" : {
-      "comment" : "The label for the NetP VPN when connected\nThe label for the NetP VPN when connecting",
+      "comment" : "The label for the NetP VPN when connected",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -2329,6 +2329,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Подключен"
+          }
+        }
+      }
+    },
+    "network.protection.status.connecting" : {
+      "comment" : "The label for the NetP VPN when connecting",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connecting..."
           }
         }
       }
@@ -2693,44 +2705,14 @@
         }
       }
     },
-    "network.protection.status.view.feature.on" : {
-      "comment" : "Text shown in NetworkProtection's status view when NetP is OFF.\nText shown in NetworkProtection's status view when NetP is ON.",
+    "network.protection.status.view.feature.isoff" : {
+      "comment" : "Text shown in NetworkProtection's status view when NetP is OFF.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo-VPN ist Aus"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "DuckDuckGo VPN is OFF"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo VPN está desactivado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le VPN DuckDuckGo est désactivé"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo VPN è disattivata"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo VPN is uitgeschakeld"
           }
         },
         "pl" : {
@@ -2738,16 +2720,100 @@
             "state" : "translated",
             "value" : "Usługa DuckDuckGo VPN jest wyłączona"
           }
+        }
+      }
+    },
+    "network.protection.status.view.feature.ison" : {
+      "comment" : "Text shown in NetworkProtection's status view when NetP is ON.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN is ON"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usługa DuckDuckGo VPN jest włączona"
+          }
+        }
+      }
+    },
+    "network.protection.status.view.feature.off" : {
+      "comment" : "Text shown in NetworkProtection's status view when NetP is OFF.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN is OFF"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usługa DuckDuckGo VPN jest wyłączona"
+          }
+        }
+      }
+    },
+    "network.protection.status.view.feature.on" : {
+      "comment" : "Text shown in NetworkProtection's status view when NetP is ON.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DuckDuckGo-VPN ist Aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN is ON"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DuckDuckGo VPN está desactivado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le VPN DuckDuckGo est désactivé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DuckDuckGo VPN è disattivata"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DuckDuckGo VPN is uitgeschakeld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usługa DuckDuckGo VPN jest włączona"
+          }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "A DuckDuckGo VPN está Desativada"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "DuckDuckGo VPN отключен"
           }
         }

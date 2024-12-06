@@ -25,8 +25,8 @@ final class UserText {
     static let networkProtectionStatusViewConnLabel = NSLocalizedString("network.protection.status.view.connection.label", bundle: Bundle.module, value: "VPN", comment: "Connection label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewLocation = NSLocalizedString("network.protection.status.view.location", bundle: Bundle.module, value: "Location", comment: "Location label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewIPAddress = NSLocalizedString("network.protection.status.view.ip.address", bundle: Bundle.module, value: "IP Address", comment: "IP Address label shown in NetworkProtection's status view.")
-    static let networkProtectionStatusViewFeatureOff = NSLocalizedString("network.protection.status.view.feature.on", bundle: Bundle.module, value: "DuckDuckGo VPN is OFF", comment: "Text shown in NetworkProtection's status view when NetP is OFF.")
-    static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.on", bundle: Bundle.module, value: "DuckDuckGo VPN is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
+    static let networkProtectionStatusViewFeatureOff = NSLocalizedString("network.protection.status.view.feature.isoff", bundle: Bundle.module, value: "DuckDuckGo VPN is OFF", comment: "Text shown in NetworkProtection's status view when NetP is OFF.")
+    static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.ison", bundle: Bundle.module, value: "DuckDuckGo VPN is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
     static let networkProtectionStatusViewTimerZero = "00:00:00"
 
     static let vpnLocationConnected = NSLocalizedString("network.protection.vpn.location.connected", bundle: Bundle.module, value: "Connected Location", comment: "Description of the location type in the VPN status view")
@@ -65,7 +65,7 @@ final class UserText {
     static let networkProtectionStatusDisconnected = NSLocalizedString("network.protection.status.disconnected", bundle: Bundle.module, value: "Not connected", comment: "The label for the NetP VPN when disconnected")
     static let networkProtectionStatusDisconnecting = NSLocalizedString("network.protection.status.disconnecting", bundle: Bundle.module, value: "Disconnecting...", comment: "The label for the NetP VPN when disconnecting")
     static let networkProtectionStatusConnected = NSLocalizedString("network.protection.status.connected", bundle: Bundle.module, value: "Connected", comment: "The label for the NetP VPN when connected")
-    static let networkProtectionStatusConnecting = NSLocalizedString("network.protection.status.connected", bundle: Bundle.module, value: "Connecting...", comment: "The label for the NetP VPN when connecting")
+    static let networkProtectionStatusConnecting = NSLocalizedString("network.protection.status.connecting", bundle: Bundle.module, value: "Connecting...", comment: "The label for the NetP VPN when connecting")
 
     // MARK: - Connection Issues
 
