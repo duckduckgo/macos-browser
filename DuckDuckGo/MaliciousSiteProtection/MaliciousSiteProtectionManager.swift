@@ -47,11 +47,11 @@ extension MaliciousSiteProtectionManager {
 
         private enum Constants {
             // TODO: Rollback the revision and filter (with -f) set when malware is available on the server
-            static let embeddedDataRevision = 1695638
-            static let phishingEmbeddedHashPrefixDataSHA = "a9fdca1e3c852ac288b738314732847c0daf27caf3ed30a349ecaaae04682e7e"
-            static let phishingEmbeddedFilterSetDataSHA = "5452a5a36651c3edb5f87716042175b5a3074acb5cc62a279dbca75479fc1eda"
-            static let malwareEmbeddedHashPrefixDataSHA = "b248a417fbd003de95fd273ae01d1b336fe2599b7d1c60b8f71786a943ab4a83"
-            static let malwareEmbeddedFilterSetDataSHA = "6c63a19c15868083f80b9936cafc482ae9e6f01d27246aa91789197b6f5ba9e7"
+            static let embeddedDataRevision = 1696473
+            static let phishingEmbeddedHashPrefixDataSHA = "cdb609c37e950b7d0dcdaa80ae4071cf2c87223cfdd189caafae723722bd3158"
+            static let phishingEmbeddedFilterSetDataSHA = "4e52518aba04b0fd360fada76c9899001d3137d4a745cc13c484a54115a0fcd8"
+            static let malwareEmbeddedHashPrefixDataSHA = "6b5eb296e9e10ae9ea41c5b5356f532226d647e4f3b832c30ac670102446ea7a"
+            static let malwareEmbeddedFilterSetDataSHA = "4dc971fffaf244ee99267f28222a2c116743e35ef837dcbc0199693ed6a691cd"
         }
 
         func revision(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> Int {
