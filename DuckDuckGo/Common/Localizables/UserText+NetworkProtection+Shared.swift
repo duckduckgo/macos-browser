@@ -25,7 +25,7 @@ extension UserText {
 
     // MARK: Location formatter
 
-    static let locationFormatterNearestLocation = NSLocalizedString("network.protection.vpn.location.formatter.nearest.location.descriptor", value: "Nearest Location", comment: "Nearest available location setting description")
+    static let locationFormatterNearestLocation = NSLocalizedString("network.protection.vpn.location.formatter.nearest.location", value: "Nearest Location", comment: "Nearest available location setting description")
 
     static let locationFormatterNearestLocationDescriptor = NSLocalizedString("network.protection.vpn.location.formatter.nearest.location.descriptor", value: "(Nearest)", comment: "Description added after the nearest location in the VPN status view")
 

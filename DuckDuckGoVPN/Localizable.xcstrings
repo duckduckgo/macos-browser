@@ -121,8 +121,20 @@
         }
       }
     },
+    "network.protection.vpn.location.formatter.nearest.location" : {
+      "comment" : "Nearest available location setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nearest Location"
+          }
+        }
+      }
+    },
     "network.protection.vpn.location.formatter.nearest.location.descriptor" : {
-      "comment" : "Description added after the nearest location in the VPN status view\nNearest available location setting description",
+      "comment" : "Description added after the nearest location in the VPN status view",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {

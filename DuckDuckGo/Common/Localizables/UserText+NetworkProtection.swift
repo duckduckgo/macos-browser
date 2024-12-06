@@ -44,9 +44,9 @@ extension UserText {
 
     static let networkProtectionNavBarStatusViewSendFeedback = NSLocalizedString("network.protection.navbar.status.view.send.feedback", value: "Send Feedback…", comment: "Menu item for 'Send Feedback' in the VPN status view that's shown in the navigation bar")
 
-    static let networkProtectionNavBarStatusMenuVPNSettings = NSLocalizedString("network.protection.status.menu.vpn.settings", value: "VPN Settings…", comment: "The status menu 'VPN Settings' menu item")
+    static let networkProtectionNavBarStatusViewVPNSettings = NSLocalizedString("network.protection.navbar.status.view.vpn.settings", value: "VPN Settings…", comment: "The status menu 'VPN Settings' menu item")
 
-    static let networkProtectionNavBarStatusMenuFAQ = NSLocalizedString("network.protection.status.menu.faq", value: "FAQs and Support…", comment: "The status menu 'FAQ' menu item")
+    static let networkProtectionNavBarStatusViewFAQ = NSLocalizedString("network.protection.navbar.status.view.faq", value: "FAQs and Support…", comment: "The status menu 'FAQ' menu item")
 }
 
 extension UserText {

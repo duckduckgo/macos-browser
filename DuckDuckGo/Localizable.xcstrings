@@ -37024,6 +37024,18 @@
         }
       }
     },
+    "network.protection.navbar.status.view.faq" : {
+      "comment" : "The status menu 'FAQ' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "FAQs and Support…"
+          }
+        }
+      }
+    },
     "network.protection.navbar.status.view.send.feedback" : {
       "comment" : "Menu item for 'Send Feedback' in the VPN status view that's shown in the navigation bar",
       "extractionState" : "extracted_with_value",
@@ -37036,6 +37048,18 @@
         }
       }
     },
+    "network.protection.navbar.status.view.vpn.settings" : {
+      "comment" : "The status menu 'VPN Settings' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN Settings…"
+          }
+        }
+      }
+    },
     "network.protection.status.button.tooltip" : {
       "comment" : "The tooltip for NetP's nav bar button",
       "extractionState" : "extracted_with_value",
@@ -37044,30 +37068,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "VPN"
-          }
-        }
-      }
-    },
-    "network.protection.status.menu.faq" : {
-      "comment" : "The status menu 'FAQ' menu item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "FAQs and Support…"
-          }
-        }
-      }
-    },
-    "network.protection.status.menu.vpn.settings" : {
-      "comment" : "The status menu 'VPN Settings' menu item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN Settings…"
           }
         }
       }
@@ -37120,8 +37120,20 @@
         }
       }
     },
+    "network.protection.vpn.location.formatter.nearest.location" : {
+      "comment" : "Nearest available location setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nearest Location"
+          }
+        }
+      }
+    },
     "network.protection.vpn.location.formatter.nearest.location.descriptor" : {
-      "comment" : "Description added after the nearest location in the VPN status view\nNearest available location setting description",
+      "comment" : "Description added after the nearest location in the VPN status view",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
