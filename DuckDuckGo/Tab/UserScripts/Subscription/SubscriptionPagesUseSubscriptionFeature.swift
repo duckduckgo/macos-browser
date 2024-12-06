@@ -278,7 +278,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .legacyDailyAndCount)
                     sendFreemiumSubscriptionPixelIfFreemiumActivated()
                     saveSubscriptionUpgradeTimestampIfFreemiumActivated()
-                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
+                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .uniqueByName)
                     subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
                     sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated()
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
@@ -354,14 +354,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         switch featureSelection.productFeature {
         case .networkProtection:
-            PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .unique)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .uniqueByName)
             notificationCenter.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .dataBrokerProtection:
-            PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .uniqueByName)
             notificationCenter.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await uiHandler.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration, .identityTheftRestorationGlobal:
-            PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .uniqueByName)
             let url = subscriptionManager.url(for: .identityTheftRestoration)
             await uiHandler.showTab(with: .identityTheftRestoration(url))
         case .unknown:
@@ -402,12 +402,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func subscriptionsAddEmailSuccess(params: Any, original: WKScriptMessage) async -> Encodable? {
-        PixelKit.fire(PrivacyProPixel.privacyProAddEmailSuccess, frequency: .unique)
+        PixelKit.fire(PrivacyProPixel.privacyProAddEmailSuccess, frequency: .uniqueByName)
         return nil
     }
 
     func subscriptionsWelcomeFaqClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
-        PixelKit.fire(PrivacyProPixel.privacyProWelcomeFAQClick, frequency: .unique)
+        PixelKit.fire(PrivacyProPixel.privacyProWelcomeFAQClick, frequency: .uniqueByName)
         return nil
     }
 

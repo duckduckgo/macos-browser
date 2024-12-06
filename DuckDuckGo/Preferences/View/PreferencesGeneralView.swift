@@ -191,7 +191,7 @@ extension Preferences {
                         .disabled(downloadsModel.alwaysRequestDownloadLocation)
 
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
-                                       isOn: $downloadsModel.alwaysRequestDownloadLocation)
+                                       isOn: $downloadsModel.alwaysRequestDownloadLocation).accessibilityIdentifier("PreferencesGeneralView.alwaysAskWhereToSaveFiles")
                     }
                 }
 
