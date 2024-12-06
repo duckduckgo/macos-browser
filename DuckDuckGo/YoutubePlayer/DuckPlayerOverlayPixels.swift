@@ -16,84 +16,93 @@
 //  limitations under the License.
 //
 import PixelKit
+import WebKit
 
 protocol DuckPlayerOverlayPixelFiring {
 
     var pixelFiring: PixelFiring? { get set }
-    var navigationHistory: [URL] { get set }
-
-    func handleNavigationAndFirePixels(url: URL?, duckPlayerMode: DuckPlayerMode)
+    var webView: WKWebView? { get set }
+    var duckPlayerMode: DuckPlayerMode { get set }
+    func fireNavigationPixelsIfNeeded(webView: WKWebView)
+    func fireReloadPixelIfNeeded(url: URL)
 }
 
-final class DuckPlayerOverlayUsagePixels: DuckPlayerOverlayPixelFiring {
+final class DuckPlayerOverlayUsagePixels: NSObject, DuckPlayerOverlayPixelFiring {
 
     var pixelFiring: PixelFiring?
-    var navigationHistory: [URL] = []
+    var duckPlayerMode: DuckPlayerMode = .disabled
 
-    private var idleTimer: Timer?
-    private var idleTimeInterval: TimeInterval
+    weak var webView: WKWebView? {
+        didSet {
+            if let webView = webView {
+                addObservers(to: webView)
+            }
+        }
+    }
 
-    init(pixelFiring: PixelFiring? = PixelKit.shared,
-         navigationHistory: [URL] = [],
-         timeoutInterval: TimeInterval = 30.0) {
+    private var lastVisitedURL: URL? // Tracks the last known URL
+
+    init(pixelFiring: PixelFiring? = PixelKit.shared) {
         self.pixelFiring = pixelFiring
-        self.idleTimeInterval = timeoutInterval
     }
 
-    func handleNavigationAndFirePixels(url: URL?, duckPlayerMode: DuckPlayerMode) {
-        guard let url = url else { return }
-        let comparisonURL = url.forComparison()
+    deinit {
+        removeObservers()
+    }
 
-        // Only append the URL if it's different from the last entry in normalized form
-        navigationHistory.append(comparisonURL)
+    func fireNavigationPixelsIfNeeded(webView: WKWebView) {
 
-        // DuckPlayer is in Ask Mode, there's navigation history, and last URL is a YouTube Watch Video
-        guard duckPlayerMode == .alwaysAsk,
-              navigationHistory.count > 1,
-              let currentURL = navigationHistory.last,
-              let previousURL = navigationHistory.dropLast().last,
-              previousURL.isYoutubeWatch else { return }
-
-        var isReload = false
-        // Check for a reload condition: when current videoID is the same as Previous
-        if let currentVideoID = currentURL.youtubeVideoParams?.videoID,
-           let previousVideoID = previousURL.youtubeVideoParams?.videoID,
-           !previousURL.isDuckPlayer, !currentURL.isDuckPlayer {
-            isReload = currentVideoID == previousVideoID
+        guard let currentURL = webView.url else {
+            return
         }
+        
+        let backItemURL = webView.backForwardList.backItem?.url
 
-        // Fire the reload pixel if this is a reload navigation
-        if isReload {
-            pixelFiring?.fire(GeneralPixel.duckPlayerYouTubeOverlayNavigationRefresh)
-        } else {
-            // Determine if it’s a back navigation by looking further back in history
-            let isBackNavigation = navigationHistory.count > 2 &&
-                                   navigationHistory[navigationHistory.count - 3].forComparison() == currentURL.forComparison()
-
-            // Fire the appropriate pixel based on navigation type
-            if isBackNavigation {
-                pixelFiring?.fire(GeneralPixel.duckPlayerYouTubeOverlayNavigationBack)
-            } else if previousURL.isYoutubeWatch && currentURL.isYoutube {
-                // Forward navigation within YouTube (including non-video URLs)
-                pixelFiring?.fire(GeneralPixel.duckPlayerYouTubeNavigationWithinYouTube)
-            } else if previousURL.isYoutubeWatch && !currentURL.isYoutube && !currentURL.isDuckPlayer {
-                // Navigation outside YouTube
-                pixelFiring?.fire(GeneralPixel.duckPlayerYouTubeOverlayNavigationOutsideYoutube)
-                navigationHistory.removeAll()
+        if lastVisitedURL != nil {
+            // Back navigation
+            if currentURL == backItemURL {
+                firePixelIfNeeded(GeneralPixel.duckPlayerYouTubeOverlayNavigationBack, url: lastVisitedURL)
+            }
+            // Regular navigation
+            else {
+                if currentURL.isYoutube {
+                    firePixelIfNeeded(GeneralPixel.duckPlayerYouTubeNavigationWithinYouTube, url: lastVisitedURL)
+                } else {
+                    firePixelIfNeeded(GeneralPixel.duckPlayerYouTubeOverlayNavigationOutsideYoutube, url: lastVisitedURL)
+                }
             }
         }
 
-        // Truncation logic: Remove all URLs up to the last occurrence of the current URL in normalized form
-        if navigationHistory.count > 0 {
-            if let lastOccurrenceIndex = (0..<navigationHistory.count - 1).last(where: { navigationHistory[$0].forComparison() == comparisonURL }) {
-                navigationHistory = Array(navigationHistory.prefix(upTo: lastOccurrenceIndex + 1))
-            }
+        // Update the last visited URL
+        lastVisitedURL = currentURL
+    }
+
+    func fireReloadPixelIfNeeded(url: URL) {
+        firePixelIfNeeded(GeneralPixel.duckPlayerYouTubeOverlayNavigationRefresh, url: url)
+    }
+
+    // MARK: - Observer Management
+
+    private func addObservers(to webView: WKWebView) {
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: [.new, .old], context: nil)
+    }
+
+    private func removeObservers() {
+        guard let webView = webView else { return }
+        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        guard let webView = object as? WKWebView else { return }
+
+        if keyPath == #keyPath(WKWebView.url) {
+            fireNavigationPixelsIfNeeded(webView: webView)
         }
-
     }
 
-    private func firePixel(_ pixel: PixelKitEventV2) {
-        pixelFiring?.fire(pixel)
+    private func firePixelIfNeeded(_ pixel: PixelKitEventV2, url: URL?) {
+        if let url, url.isYoutubeWatch, duckPlayerMode == .alwaysAsk {
+            pixelFiring?.fire(pixel)
+        }
     }
-
 }
