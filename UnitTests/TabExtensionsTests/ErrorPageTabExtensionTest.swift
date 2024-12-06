@@ -193,10 +193,56 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenLeaveSiteCalled_AndCanGoBackTrue_ThenTabIsClosedAndNewTabOpened() async {
+    func testWhenLeaveSiteCalled_AndCanGoBackTrue_ThenWebViewGoesBack() {
         // GIVEN
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         mockWebViewPublisher.send(mockWebView)
+        let error = WKError.serverCertificateUntrustedError(sslErrorCode: -9843, url: errorURLString)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [], isCurrent: true, isCommitted: true)
+        errorPageExtention.navigation(navigation, didFailWith: error)
+
+        // WHEN
+        mockWebView.canGoBack = true
+        errorPageExtention.leaveSiteAction()
+
+        // THEN
+        XCTAssertFalse(mockWebView.openNewTabCalled)
+        XCTAssertTrue(mockWebView.goBackCalled)
+    }
+
+    @MainActor
+    func testWhenLeaveSiteCalled_AndCanGoBackFalse_ThenTabIsClosedAndNewTabOpened() async {
+        // GIVEN
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        mockWebViewPublisher.send(mockWebView)
+        let error = WKError.serverCertificateUntrustedError(sslErrorCode: -9843, url: errorURLString)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [], isCurrent: true, isCommitted: true)
+        errorPageExtention.navigation(navigation, didFailWith: error)
+
+        let eTabClosed = expectation(description: "Tab closed")
+        onCloseTab = { eTabClosed.fulfill() }
+
+        // WHEN
+        mockWebView.canGoBack = false
+        errorPageExtention.leaveSiteAction()
+
+        // THEN
+        await fulfillment(of: [eTabClosed], timeout: 1)
+        XCTAssertTrue(mockWebView.openNewTabCalled)
+    }
+
+    @MainActor
+    func testWhenLeaveSiteCalledForPhishingWebsite_ThenTabIsClosedAndNewTabOpened() async {
+        // GIVEN
+        let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
+        let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
+        let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
+        let mainFrameTarget = FrameInfo(webView: nil, handle: FrameHandle(rawValue: 1 as UInt64)!, isMainFrame: true, url: URL(string: phishingURLString)!, securityOrigin: .empty)
+        let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
+        var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
+        mockWebViewPublisher.send(mockWebView)
+        _=await errorPageExtention.decidePolicy(for: navigationAction, preferences: &preferences)
+        errorPageExtention.navigation(mainFrameNavigation, didFailWith: WKError(_nsError: MaliciousSiteError(code: .phishing, failingUrl: URL(string: phishingURLString)!) as NSError))
 
         let eTabClosed = expectation(description: "Tab closed")
         onCloseTab = { eTabClosed.fulfill() }
@@ -210,11 +256,18 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenLeaveSiteCalled_AndCanGoBackFalse_ThenTabIsClosedAndNewTabOpened() async {
+    func testWhenLeaveSiteCalledForMalwareWebsite_ThenTabIsClosedAndNewTabOpened() async {
         // GIVEN
-        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
-        mockWebView.canGoBack = false
+        detector.isMalicious = { _ in .malware }
+        let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
+        let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
+        let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
+        let mainFrameTarget = FrameInfo(webView: nil, handle: FrameHandle(rawValue: 1 as UInt64)!, isMainFrame: true, url: URL(string: phishingURLString)!, securityOrigin: .empty)
+        let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
+        var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
         mockWebViewPublisher.send(mockWebView)
+        _=await errorPageExtention.decidePolicy(for: navigationAction, preferences: &preferences)
+        errorPageExtention.navigation(mainFrameNavigation, didFailWith: WKError(_nsError: MaliciousSiteError(code: .malware, failingUrl: URL(string: phishingURLString)!) as NSError))
 
         let eTabClosed = expectation(description: "Tab closed")
         onCloseTab = { eTabClosed.fulfill() }
