@@ -1523,14 +1523,14 @@ private extension NSViewController {
 
 extension BrowserTabViewController {
     override func restoreUserActivityState(_ userActivity: NSUserActivity) {
-        guard userActivity.activityType == "com.duckduckgo.mobile.ios.web-browsing", let url = userActivity.webpageURL else {
+        guard supportsHandoff(), userActivity.activityType == "com.duckduckgo.mobile.ios.web-browsing", let url = userActivity.webpageURL else {
             return
         }
         openNewTab(with: .url(url, credential: nil, source: .appOpenUrl))
     }
 
     func becomeCurrentActivity() {
-        guard !tabCollectionViewModel.isBurner else { return }
+        guard supportsHandoff() else { return }
 
         if userActivity?.webpageURL == nil {
             userActivity?.invalidate()
@@ -1542,7 +1542,7 @@ extension BrowserTabViewController {
     }
 
     private func updateCurrentActivity(url: URL?) {
-        guard !tabCollectionViewModel.isBurner else { return }
+        guard supportsHandoff() else { return }
 
         let newURL: URL? = {
             guard let url, let scheme = url.scheme, ["http", "https"].contains(scheme) else { return nil }
@@ -1559,5 +1559,9 @@ extension BrowserTabViewController {
         userActivity?.webpageURL = newURL
 
         userActivity?.becomeCurrent()
+    }
+
+    private func supportsHandoff() -> Bool {
+        !tabCollectionViewModel.isBurner && featureFlagger.isFeatureOn(.handoff)
     }
 }
