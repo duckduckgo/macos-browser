@@ -1104,6 +1104,7 @@ extension BrowserTabViewController: TabDelegate {
         keyWindowSelectedTabCancellable = nil
         subscribeToPinnedTabs()
         hideWebViewSnapshotIfNeeded()
+        becomeCurrentActivity()
     }
 
     func windowDidResignKey() {
@@ -1529,6 +1530,8 @@ extension BrowserTabViewController {
     }
 
     func becomeCurrentActivity() {
+        guard !tabCollectionViewModel.isBurner else { return }
+
         if userActivity?.webpageURL == nil {
             userActivity?.invalidate()
             userActivity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
@@ -1539,6 +1542,8 @@ extension BrowserTabViewController {
     }
 
     private func updateCurrentActivity(url: URL?) {
+        guard !tabCollectionViewModel.isBurner else { return }
+
         let newURL: URL? = {
             guard let url, let scheme = url.scheme, ["http", "https"].contains(scheme) else { return nil }
             return url
