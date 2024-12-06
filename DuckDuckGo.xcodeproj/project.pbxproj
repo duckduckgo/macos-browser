@@ -222,6 +222,8 @@
 		1EC711512D033D200009EB5C /* UserText+NetworkProtection+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC7114F2D033D200009EB5C /* UserText+NetworkProtection+Shared.swift */; };
 		1EC711522D033D280009EB5C /* UserText+NetworkProtection+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC7114F2D033D200009EB5C /* UserText+NetworkProtection+Shared.swift */; };
 		1EC711532D033D280009EB5C /* UserText+NetworkProtection+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC7114F2D033D200009EB5C /* UserText+NetworkProtection+Shared.swift */; };
+		1EC711552D03421B0009EB5C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1EC711542D03421B0009EB5C /* Localizable.xcstrings */; };
+		1EC711562D03421B0009EB5C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1EC711542D03421B0009EB5C /* Localizable.xcstrings */; };
 		1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		1ED910D62B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		1EEB2D7A2C986A40000D908B /* SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEB2D792C986A40000D908B /* SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift */; };
@@ -3562,6 +3564,7 @@
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
 		1E862A882A9FC01200F84D4B /* SubscriptionUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SubscriptionUI; sourceTree = "<group>"; };
 		1EC7114F2D033D200009EB5C /* UserText+NetworkProtection+Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserText+NetworkProtection+Shared.swift"; sourceTree = "<group>"; };
+		1EC711542D03421B0009EB5C /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTheftRestorationPagesUserScript.swift; sourceTree = "<group>"; };
 		1EEB2D792C986A40000D908B /* SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift; sourceTree = "<group>"; };
 		31031EB62CC94C6C00684340 /* AIChatRemoteSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatRemoteSettingsTests.swift; sourceTree = "<group>"; };
@@ -7233,6 +7236,7 @@
 				EE34245D2BA0853900173B1B /* VPNUninstaller.swift */,
 				7BA7CC112AD11DC80042E5CE /* TunnelControllerIPCService.swift */,
 				7BA7CC172AD11DC80042E5CE /* UserText.swift */,
+				1EC711542D03421B0009EB5C /* Localizable.xcstrings */,
 				7BA7CC122AD11DC80042E5CE /* Assets.xcassets */,
 				7BA7CC162AD11DC80042E5CE /* DuckDuckGoVPN.entitlements */,
 				7BA7CC182AD11DC80042E5CE /* DuckDuckGoVPNDebug.entitlements */,
@@ -10813,6 +10817,7 @@
 			files = (
 				BDE981DA2BBD10D600645880 /* vpn-light-mode.json in Resources */,
 				7BA7CC482AD11E5C0042E5CE /* Assets.xcassets in Resources */,
+				1EC711552D03421B0009EB5C /* Localizable.xcstrings in Resources */,
 				BDE981D92BBD10D600645880 /* vpn-dark-mode.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10823,6 +10828,7 @@
 			files = (
 				BDADBDCD2BD2BC5700421B9B /* vpn-light-mode.json in Resources */,
 				7BA7CC472AD11E5C0042E5CE /* Assets.xcassets in Resources */,
+				1EC711562D03421B0009EB5C /* Localizable.xcstrings in Resources */,
 				BDADBDCC2BD2BC4D00421B9B /* vpn-dark-mode.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

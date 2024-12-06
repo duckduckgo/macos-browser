@@ -1,0 +1,138 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "network.protection.configuration.system-settings.legacy" : {
+      "comment" : "Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 12 and below",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to Security & Privacy in System Preferences to allow DuckDuckGo VPN to activate"
+          }
+        }
+      }
+    },
+    "network.protection.configuration.system-settings.modern" : {
+      "comment" : "Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 13 and above",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to Privacy & Security in System Settings to allow DuckDuckGo VPN to activate"
+          }
+        }
+      }
+    },
+    "network.protection.status.menu.faq" : {
+      "comment" : "The status menu 'FAQ' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "FAQs and Support…"
+          }
+        }
+      }
+    },
+    "network.protection.status.menu.send.feedback" : {
+      "comment" : "The status menu 'Send Feedback' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Feedback…"
+          }
+        }
+      }
+    },
+    "network.protection.status.menu.share.feedback" : {
+      "comment" : "The status menu 'Share VPN Feedback' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Share VPN Feedback…"
+          }
+        }
+      }
+    },
+    "network.protection.status.menu.vpn.open-duckduckgo" : {
+      "comment" : "The status menu 'Open DuckDuckGo' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open DuckDuckGo…"
+          }
+        }
+      }
+    },
+    "network.protection.status.menu.vpn.settings" : {
+      "comment" : "The status menu 'VPN Settings' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN Settings…"
+          }
+        }
+      }
+    },
+    "network.protection.system.extension.please.reboot" : {
+      "comment" : "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN update available. Restart your Mac to reconnect."
+          }
+        }
+      }
+    },
+    "network.protection.system.extension.unknown.activation.error" : {
+      "comment" : "Message shown to users when they try to enable NetP and there is an unexpected activation error.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "There was an unexpected error. Please try again."
+          }
+        }
+      }
+    },
+    "network.protection.tunnel.name" : {
+      "comment" : "The name of the NetP VPN that will be visible in the system to the user",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.location.formatter.nearest.location.descriptor" : {
+      "comment" : "Description added after the nearest location in the VPN status view\nNearest available location setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "(Nearest)"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
