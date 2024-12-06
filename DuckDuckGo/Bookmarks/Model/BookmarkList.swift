@@ -44,7 +44,14 @@ struct BookmarkList {
 
     private(set) var allBookmarkURLsOrdered: [IdentifiableBookmark]
     private var favoriteBookmarksOrdered: [IdentifiableBookmark]
-    private var itemsDict: [String: [Bookmark]]
+    private var itemsDict: [String: [Bookmark]] {
+        didSet {
+            updateLowercasedItemsDict()
+        }
+    }
+
+    // Copy of itemsDict used for efficient lookups of variant URLs
+    private(set) var lowercasedItemsDict: [String: [Bookmark]] = [:]
 
     var totalBookmarks: Int {
         return allBookmarkURLsOrdered.count
@@ -76,6 +83,7 @@ struct BookmarkList {
         self.allBookmarkURLsOrdered = keysOrdered
         self.itemsDict = itemsDict
         self.topLevelEntities = topLevelEntities
+        updateLowercasedItemsDict()
     }
 
     mutating func insert(_ bookmark: Bookmark) {
@@ -147,6 +155,13 @@ struct BookmarkList {
 
     func bookmarks() -> [IdentifiableBookmark] {
         return allBookmarkURLsOrdered
+    }
+
+    private mutating func updateLowercasedItemsDict() {
+        lowercasedItemsDict = itemsDict.reduce(into: [:]) { result, entry in
+            let lowercasedKey = entry.key.lowercased()
+            result[lowercasedKey] = entry.value
+        }
     }
 
 }
