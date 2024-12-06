@@ -23540,6 +23540,18 @@
         }
       }
     },
+    "feedback-form.title" : {
+      "comment" : "Title for each screen of the feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Help Improve Privacy Pro"
+          }
+        }
+      }
+    },
     "feedback.bug.description" : {
       "comment" : "Label in the feedback form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
@@ -26056,6 +26068,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Переименовать папку"
+          }
+        }
+      }
+    },
+    "general.feedback-form.category.itr" : {
+      "comment" : "Description for the feedback form when the issue is related to Identity Theft Restoration (ITR)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Identity Theft Restoration"
+          }
+        }
+      }
+    },
+    "general.feedback-form.category.pir" : {
+      "comment" : "Description for the feedback form when the issue is related to Personal Info Removal (PIR)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Personal Information Removal"
+          }
+        }
+      }
+    },
+    "general.feedback-form.category.ppro" : {
+      "comment" : "Description for the feedback form when the issue is related to subscription and payments",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription and Payments"
+          }
+        }
+      }
+    },
+    "general.feedback-form.category.select-feature" : {
+      "comment" : "Title for the feature selection state of the general feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select a category"
+          }
+        }
+      }
+    },
+    "general.feedback-form.category.vpn" : {
+      "comment" : "Description for the feedback form when the issue is related to VPN",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN"
           }
         }
       }
@@ -32611,6 +32683,66 @@
         }
       }
     },
+    "itr.feedback-form.category.access-code" : {
+      "comment" : "Description for the feedback form when there is an issue with the access code",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Issue with access code"
+          }
+        }
+      }
+    },
+    "itr.feedback-form.category.contact-advisor" : {
+      "comment" : "Description for the feedback form when the user is unable to contact an advisor",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unable to contact advisor"
+          }
+        }
+      }
+    },
+    "itr.feedback-form.category.select-category" : {
+      "comment" : "Title for the category selection state of the ITR feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select a category"
+          }
+        }
+      }
+    },
+    "itr.feedback-form.category.something-else" : {
+      "comment" : "Description for the feedback form when the user has an issue not categorized in other options",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Something else"
+          }
+        }
+      }
+    },
+    "itr.feedback-form.category.unhelpful" : {
+      "comment" : "Description for the feedback form when the call to an advisor was unhelpful",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Call to Advisor was unhelpful"
+          }
+        }
+      }
+    },
     "JavaScript Console" : {
       "comment" : "Main Menu View-Developer item",
       "localizations" : {
@@ -36804,6 +36936,198 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вперёд"
+          }
+        }
+      }
+    },
+    "network.protection" : {
+      "comment" : "Menu item for opening the VPN",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN"
+          }
+        }
+      }
+    },
+    "network.protection.configuration.system-settings.legacy" : {
+      "comment" : "Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 12 and below",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to Security & Privacy in System Preferences to allow DuckDuckGo VPN to activate"
+          }
+        }
+      }
+    },
+    "network.protection.configuration.system-settings.modern" : {
+      "comment" : "Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 13 and above",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to Privacy & Security in System Settings to allow DuckDuckGo VPN to activate"
+          }
+        }
+      }
+    },
+    "network.protection.invite.dialog.message" : {
+      "comment" : "Message for the VPN invite dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter your invite code to get started."
+          }
+        }
+      }
+    },
+    "network.protection.invite.dialog.title" : {
+      "comment" : "Title for the VPN invite dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter your invite code"
+          }
+        }
+      }
+    },
+    "network.protection.invite.field.prompt" : {
+      "comment" : "Prompt for the VPN invite code text field",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Code"
+          }
+        }
+      }
+    },
+    "network.protection.invite.success.title" : {
+      "comment" : "Message for the VPN invite success view\nTitle for the VPN invite success view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere."
+          }
+        }
+      }
+    },
+    "network.protection.navbar.status.view.send.feedback" : {
+      "comment" : "Menu item for 'Send Feedback' in the VPN status view that's shown in the navigation bar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Feedback…"
+          }
+        }
+      }
+    },
+    "network.protection.status.button.tooltip" : {
+      "comment" : "The tooltip for NetP's nav bar button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN"
+          }
+        }
+      }
+    },
+    "network.protection.status.menu.faq" : {
+      "comment" : "The status menu 'FAQ' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "FAQs and Support…"
+          }
+        }
+      }
+    },
+    "network.protection.status.menu.vpn.settings" : {
+      "comment" : "The status menu 'VPN Settings' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN Settings…"
+          }
+        }
+      }
+    },
+    "network.protection.system.extension.please.reboot" : {
+      "comment" : "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN update available. Restart your Mac to reconnect."
+          }
+        }
+      }
+    },
+    "network.protection.system.extension.unknown.activation.error" : {
+      "comment" : "Message shown to users when they try to enable NetP and there is an unexpected activation error.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "There was an unexpected error. Please try again."
+          }
+        }
+      }
+    },
+    "network.protection.tunnel.name" : {
+      "comment" : "The name of the NetP VPN that will be visible in the system to the user",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.location.country.item.formatted.cities.count" : {
+      "comment" : "Subtitle of countries item when there are multiple cities, example: '5 cities'",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%d cities"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.location.nearest" : {
+      "comment" : "Description of the location type in the VPN status view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "(Nearest)"
           }
         }
       }
@@ -45946,6 +46270,78 @@
         }
       }
     },
+    "pir.feedback-form.category.no-info-on-specific-site" : {
+      "comment" : "Description for the feedback form when the scan didn't find user's info on a specific site",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The scan didn't find my info on a specific site"
+          }
+        }
+      }
+    },
+    "pir.feedback-form.category.not-me" : {
+      "comment" : "Description for the feedback form when the scan found records that don’t belong to the user",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The scan found records which aren't me"
+          }
+        }
+      }
+    },
+    "pir.feedback-form.category.other" : {
+      "comment" : "Description for the feedback form when the user has an issue not categorized in other options",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Something else"
+          }
+        }
+      }
+    },
+    "pir.feedback-form.category.removal-stuck" : {
+      "comment" : "Description for the feedback form when the removal process is stuck",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The removal process is stuck"
+          }
+        }
+      }
+    },
+    "pir.feedback-form.category.scan-stuck" : {
+      "comment" : "Description for the feedback form when the scan process is stuck",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The scan for records is stuck"
+          }
+        }
+      }
+    },
+    "pir.feedback-form.category.select-category" : {
+      "comment" : "Title for the category selection state of the PIR feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select a category"
+          }
+        }
+      }
+    },
     "Please submit a report to help us fix the issue." : {
       "comment" : "Data import failure Report dialog title.",
       "localizations" : {
@@ -51334,6 +51730,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Год"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.button.cancel" : {
+      "comment" : "Title for the Cancel button of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.button.done" : {
+      "comment" : "Title for the Done button of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.button.submit" : {
+      "comment" : "Title for the Submit button of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Submit"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.button.submitting" : {
+      "comment" : "Title for the Submitting state of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Submitting…"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.category.otp" : {
+      "comment" : "Description for the feedback form when there is an issue with the one-time password",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Issue with one-time password"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.category.select-category" : {
+      "comment" : "Title for the category selection state of the feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select a category"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.category.something-else" : {
+      "comment" : "Description for the feedback form when the user has an issue not categorized in other options",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Something else"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.disclaimer" : {
+      "comment" : "Text for the disclaimer of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reports are anonymous and sent to DuckDuckGo to help improve our service"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.email.label" : {
+      "comment" : "Label for the email field of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Provide an email if you’d like us to contact you about this issue (we may not be able to respond to all issues):"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.email.placeholder" : {
+      "comment" : "Placeholder for the email field of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Email (optional)"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.general-feedback.placeholder" : {
+      "comment" : "Placeholder for the General Feedback step in the Privacy Pro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Please give us your feedback:"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.request-feature.placeholder" : {
+      "comment" : "Placeholder for the Feature Request step in the Privacy Pro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "What feature would you like to see?"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.sending-confirmation.description" : {
+      "comment" : "Title for the feedback sent view description of the feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your Feedback will help us improve Privacy Pro."
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.sending-confirmation.error" : {
+      "comment" : "Title for the feedback sending error text of the feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "We couldn't send your feedback right now, please try again."
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.sending-confirmation.title" : {
+      "comment" : "Title for the feedback sent view title of the feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Thank you!"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.text-1" : {
+      "comment" : "Text for the body of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Found an issue not covered in our [help center](duck://)? We definitely want to know about it.\n\nTell us what's going on:"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.text-2" : {
+      "comment" : "Text for the body of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "In addition to the details entered into this form, your app issue report will contain:"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.text-3" : {
+      "comment" : "Bullet text for the body of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "• Whether specific DuckDuckGo features are enabled"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.text-4" : {
+      "comment" : "Bullet text for the body of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "• Aggregate DuckDuckGo app diagnostics"
+          }
+        }
+      }
+    },
+    "ppro.feedback-form.text-5" : {
+      "comment" : "Text for the body of the PPro feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features."
           }
         }
       }
@@ -63883,6 +64519,762 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Подробнее"
+          }
+        }
+      }
+    },
+    "vpn.advanced.settings.title" : {
+      "comment" : "VPN Advanced section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Advanced"
+          }
+        }
+      }
+    },
+    "vpn.button.title.open.vpn" : {
+      "comment" : "Uninstall VPN button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open VPN…"
+          }
+        }
+      }
+    },
+    "vpn.button.title.uninstall.vpn" : {
+      "comment" : "Open VPN button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Uninstall DuckDuckGo VPN…"
+          }
+        }
+      }
+    },
+    "vpn.dns.server.apply.button.title" : {
+      "comment" : "Title for the Apply custom DNS server button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Apply"
+          }
+        }
+      }
+    },
+    "vpn.dns.server.disclaimer" : {
+      "comment" : "Disclaimer for the custom DNS server option",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn't secure or reliable."
+          }
+        }
+      }
+    },
+    "vpn.dns.server.ipv4.description" : {
+      "comment" : "Description of the IPv4 text field",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "IPv4 Address:"
+          }
+        }
+      }
+    },
+    "vpn.dns.server.picker.custom.button.title" : {
+      "comment" : "Button title of the custom DNS server option",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change…"
+          }
+        }
+      }
+    },
+    "vpn.dns.server.picker.custom.title" : {
+      "comment" : "Title of the custom DNS server option",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Custom"
+          }
+        }
+      }
+    },
+    "vpn.dns.server.picker.default.title" : {
+      "comment" : "Title of the default DNS server option",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo (Recommended)"
+          }
+        }
+      }
+    },
+    "vpn.dns.server.sheet.title" : {
+      "comment" : "Title of the DNS Server sheet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Custom DNS Server"
+          }
+        }
+      }
+    },
+    "vpn.dns.server.title" : {
+      "comment" : "Title of the DNS Server section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DNS Server"
+          }
+        }
+      }
+    },
+    "vpn.excluded.domains.add.domain" : {
+      "comment" : "Add Domain button for the excluded sites view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Website"
+          }
+        }
+      }
+    },
+    "vpn.excluded.domains.title" : {
+      "comment" : "Title for the excluded sites view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Excluded Websites"
+          }
+        }
+      }
+    },
+    "vpn.excluded.sites.title" : {
+      "comment" : "Excluded Sites title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Excluded Websites"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.button.cancel" : {
+      "comment" : "Title for the Cancel button of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.button.done" : {
+      "comment" : "Title for the Done button of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.button.submit" : {
+      "comment" : "Title for the Submit button of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Submit"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.button.submitting" : {
+      "comment" : "Title for the Submitting state of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Submitting…"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.browser-crash-or-freeze" : {
+      "comment" : "Title for the browser crash/freeze category of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN causes browser to crash or freeze"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.fails-to-connect" : {
+      "comment" : "Title for the 'VPN fails to connect' category of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN fails to connect"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.feature-request" : {
+      "comment" : "Title for the 'VPN feature request' category of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN feature request"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.issues-with-apps" : {
+      "comment" : "Title for the category 'VPN causes issues with other apps or websites' category of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN causes issues with other apps or websites"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.local-device-connectivity" : {
+      "comment" : "Title for the local device connectivity category of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN won't let me connect to local device"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.other" : {
+      "comment" : "Title for the 'other VPN feedback' category of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Other VPN feedback"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.select-category" : {
+      "comment" : "Title for the category selection state of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select a category"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.too-slow" : {
+      "comment" : "Title for the 'VPN is too slow' category of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN connection is too slow"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.category.unable-to-install" : {
+      "comment" : "Title for the 'unable to install' category of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unable to install VPN"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.sending-confirmation.description" : {
+      "comment" : "Title for the feedback sent view description of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your feedback will help us improve the DuckDuckGo VPN."
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.sending-confirmation.error" : {
+      "comment" : "Title for the feedback sending error text of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "We couldn't send your feedback right now, please try again."
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.sending-confirmation.title" : {
+      "comment" : "Title for the feedback sent view title of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Thank you!"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.text-1" : {
+      "comment" : "Text for the body of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Please describe what's happening, what you expected to happen, and the steps that led to the issue:"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.text-2" : {
+      "comment" : "Text for the body of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "In addition to the details entered into this form, your app issue report will contain:"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.text-3" : {
+      "comment" : "Bullet text for the body of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "• Whether specific DuckDuckGo features are enabled"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.text-4" : {
+      "comment" : "Bullet text for the body of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "• Aggregate DuckDuckGo app diagnostics"
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.text-5" : {
+      "comment" : "Text for the body of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features."
+          }
+        }
+      }
+    },
+    "vpn.feedback-form.title" : {
+      "comment" : "Title for each screen of the VPN feedback form",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Help Improve the DuckDuckGo VPN"
+          }
+        }
+      }
+    },
+    "vpn.general.title" : {
+      "comment" : "General section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "General"
+          }
+        }
+      }
+    },
+    "vpn.location.change.button.title" : {
+      "comment" : "Title of the VPN location preference change button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change..."
+          }
+        }
+      }
+    },
+    "vpn.location.custom.section.title" : {
+      "comment" : "Title of the VPN location list cancel button (Note: seems like a duplicate key with a different purpose, please check)\nTitle of the VPN location list custom section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "vpn.location.description.nearest" : {
+      "comment" : "Nearest city setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nearest"
+          }
+        }
+      }
+    },
+    "vpn.location.description.nearest.available" : {
+      "comment" : "Nearest available location setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nearest Location"
+          }
+        }
+      }
+    },
+    "vpn.location.list.title" : {
+      "comment" : "Title of the VPN location list screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN Location"
+          }
+        }
+      }
+    },
+    "vpn.location.nearest.available.title" : {
+      "comment" : "Subtitle underneath the nearest available vpn location preference text.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically connect to the nearest server we can find."
+          }
+        }
+      }
+    },
+    "vpn.location.recommended.section.title" : {
+      "comment" : "Title of the VPN location list recommended section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Recommended"
+          }
+        }
+      }
+    },
+    "vpn.location.submit.button.title" : {
+      "comment" : "Title of the VPN location list submit button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Submit"
+          }
+        }
+      }
+    },
+    "vpn.location.title" : {
+      "comment" : "Location section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "vpn.notifications.connection.drops.or.status.changes.title" : {
+      "comment" : "Title of the VPN notification option",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN connection drops or status changes"
+          }
+        }
+      }
+    },
+    "vpn.notifications.settings.title" : {
+      "comment" : "Notifications section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Notifications"
+          }
+        }
+      }
+    },
+    "vpn.setting.add.excluded.domain.action.button.title" : {
+      "comment" : "Add excluded domain button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Exclude Website"
+          }
+        }
+      }
+    },
+    "vpn.setting.add.excluded.domain.cancel.button.title" : {
+      "comment" : "Add excluded domain cancel button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "vpn.setting.add.excluded.domain.title" : {
+      "comment" : "Add excluded domain title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Exclude Website From VPN"
+          }
+        }
+      }
+    },
+    "vpn.setting.description.always.on" : {
+      "comment" : "Always ON setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled."
+          }
+        }
+      }
+    },
+    "vpn.setting.description.exclude.local.networks" : {
+      "comment" : "Exclude Local Networks setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bypass the VPN for local network connections, like to a printer."
+          }
+        }
+      }
+    },
+    "vpn.setting.description.secure.dns" : {
+      "comment" : "Secure DNS description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo routes DNS queries through our DNS servers so your internet provider can't see what websites you visit."
+          }
+        }
+      }
+    },
+    "vpn.setting.excluded.domains.description" : {
+      "comment" : "Excluded Sites description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Excluded websites will bypass the VPN."
+          }
+        }
+      }
+    },
+    "vpn.setting.excluded.domains.manage.button.title" : {
+      "comment" : "Excluded Sites management button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manage Excluded Websites…"
+          }
+        }
+      }
+    },
+    "vpn.setting.title.connect.on.login" : {
+      "comment" : "Connect on Login setting title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connect to VPN when logging in to your computer"
+          }
+        }
+      }
+    },
+    "vpn.setting.title.exclude.local.networks" : {
+      "comment" : "Exclude Local Networks setting title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Exclude local networks"
+          }
+        }
+      }
+    },
+    "vpn.setting.title.show.in.browser.toolbar" : {
+      "comment" : "Display VPN status in the browser toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show VPN in browser toolbar"
+          }
+        }
+      }
+    },
+    "vpn.setting.title.show.in.menu.bar" : {
+      "comment" : "Display VPN status in the menu bar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show VPN in menu bar"
+          }
+        }
+      }
+    },
+    "vpn.shortcuts.settings.title" : {
+      "comment" : "Shortcuts section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shortcuts"
+          }
+        }
+      }
+    },
+    "vpn.uninstall.alert.informative.text" : {
+      "comment" : "Informative text for the alert that comes up when the user decides to uninstall our VPN",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device."
+          }
+        }
+      }
+    },
+    "vpn.uninstall.alert.title" : {
+      "comment" : "Alert title when the user selects to uninstall our VPN",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to uninstall the VPN?"
           }
         }
       }
