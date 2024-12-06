@@ -62,6 +62,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private var signInObserver: Any?
     private var signOutObserver: Any?
+    private var entitlementsObserver: Any?
     private var subscriptionChangeObserver: Any?
 
     public enum UserEvent {
@@ -119,9 +120,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.isUserAuthenticated = subscriptionManager.isUserAuthenticated
 
         if self.isUserAuthenticated {
-            Task {
-                await self.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
-                await self.updateAvailableSubscriptionFeatures()
+            Task { [weak self] in
+                await self?.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
             }
 
             self.email = subscriptionManager.userEmail
@@ -138,7 +138,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         subscriptionChangeObserver = NotificationCenter.default.addObserver(forName: .subscriptionDidChange, object: nil, queue: .main) { _ in
             Task { [weak self] in
                 Logger.general.debug("SubscriptionDidChange notification received")
-                await self?.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
+                await self?.updateSubscription(cachePolicy: .returnCacheDataDontLoad)
+            }
+        }
+
+        entitlementsObserver = NotificationCenter.default.addObserver(forName: .entitlementsDidChange, object: nil, queue: .main) { [weak self] _ in
+            Task { [weak self] in
                 await self?.updateAvailableSubscriptionFeatures()
             }
         }
@@ -156,6 +161,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if let subscriptionChangeObserver {
             NotificationCenter.default.removeObserver(subscriptionChangeObserver)
         }
+
+        if let entitlementsObserver {
+            NotificationCenter.default.removeObserver(entitlementsObserver)
+        }
     }
 
     @MainActor
@@ -170,8 +179,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     private func updateUserAuthenticatedState() {
-        isUserAuthenticated = subscriptionManager.isUserAuthenticated
-        email = subscriptionManager.userEmail
+        Task { @MainActor in
+            isUserAuthenticated = subscriptionManager.isUserAuthenticated
+            email = subscriptionManager.userEmail
+        }
     }
 
     @MainActor
@@ -369,20 +380,24 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         email = tokenContainer?.decodedAccessToken.email
     }
 
-    @MainActor
     private func updateSubscription(cachePolicy: SubscriptionCachePolicy) async {
         updateUserAuthenticatedState()
 
-        guard isUserAuthenticated else { return }
-
-        do {
-            let subscription = try await subscriptionManager.getSubscription(cachePolicy: cachePolicy)
-            updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
-            subscriptionPlatform = subscription.platform
-            subscriptionStatus = subscription.status
-        } catch {
-            subscriptionPlatform = .unknown
-            subscriptionStatus = .unknown
+        if isUserAuthenticated {
+            do {
+                let subscription = try await subscriptionManager.getSubscription(cachePolicy: cachePolicy)
+                Task { @MainActor in
+                    updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
+                    subscriptionPlatform = subscription.platform
+                    subscriptionStatus = subscription.status
+                }
+            } catch {
+                Task { @MainActor in
+                    subscriptionPlatform = .unknown
+                    subscriptionStatus = .unknown
+                }
+            }
+            await self.updateAvailableSubscriptionFeatures()
         }
     }
 

@@ -3160,6 +3160,13 @@
 		F118EA7E2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
 		F118EA852BEACC7000F77634 /* NonStandardPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA842BEACC7000F77634 /* NonStandardPixel.swift */; };
 		F118EA862BEACC7000F77634 /* NonStandardPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA842BEACC7000F77634 /* NonStandardPixel.swift */; };
+		F11B3CA82D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */; };
+		F11B3CA92D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */; };
+		F11B3CAA2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */; };
+		F11B3CAB2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */; };
+		F11B3CAC2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */; };
+		F11B3CAD2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */; };
+		F11B3CAE2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */; };
 		F1476FC02C1359FB00EAE46A /* SubscriptionUIHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1476FBF2C1359FB00EAE46A /* SubscriptionUIHandler.swift */; };
 		F1476FC12C1359FB00EAE46A /* SubscriptionUIHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1476FBF2C1359FB00EAE46A /* SubscriptionUIHandler.swift */; };
 		F14E5D562CFE1BE200B91BE6 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
@@ -5014,6 +5021,7 @@
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
 		F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift"; sourceTree = "<group>"; };
 		F118EA842BEACC7000F77634 /* NonStandardPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonStandardPixel.swift; sourceTree = "<group>"; };
+		F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift"; sourceTree = "<group>"; };
 		F1476FBF2C1359FB00EAE46A /* SubscriptionUIHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUIHandler.swift; sourceTree = "<group>"; };
 		F14E5D522CFE024D00B91BE6 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = SOURCE_ROOT; };
 		F17114812C7C98FB009836C1 /* Logger+Favicons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Favicons.swift"; sourceTree = "<group>"; };
@@ -9938,6 +9946,7 @@
 				F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */,
 				F1D042982BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift */,
 				F1DA51852BF607D200CF29FA /* SubscriptionRedirectManager.swift */,
+				F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */,
 				F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */,
 				1E25A4FD2CC937120080EFD4 /* SubscriptionCookieManageEventPixelMapping.swift */,
 				F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */,
@@ -11562,6 +11571,7 @@
 				319FCFF22CC81D54004F9288 /* AIChatRemoteSettings.swift in Sources */,
 				3706FB22293F65D500E42796 /* NSTextViewExtension.swift in Sources */,
 				3706FB23293F65D500E42796 /* DownloadsCellView.swift in Sources */,
+				F11B3CA92D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
 				3706FB25293F65D500E42796 /* PublishedAfter.swift in Sources */,
 				9FBB0C062CBD223D0006B6A6 /* ViewHighlighter.swift in Sources */,
 				BBB881892C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */,
@@ -12753,6 +12763,7 @@
 				7BD7B0032C19D3830039D20A /* VPNIPCResources.swift in Sources */,
 				7B22D86F2CCFD7B7006A76E1 /* TipKitController.swift in Sources */,
 				F1DA51942BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */,
+				F11B3CAB2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
 				7BA7CC562AD11FFB0042E5CE /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				7B2DDCFA2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */,
 				02FDA6592C764B970024CD8B /* ConfigurationManager.swift in Sources */,
@@ -12802,6 +12813,7 @@
 				7BD7B0042C19D3830039D20A /* VPNIPCResources.swift in Sources */,
 				7B22D8702CCFD7B7006A76E1 /* TipKitController.swift in Sources */,
 				F1DA51952BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */,
+				F11B3CAC2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
 				4BA7C4D92B3F61FB00AFE511 /* BundleExtension.swift in Sources */,
 				F1D0429E2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				02FDA65C2C764CB00024CD8B /* ConfigurationManager.swift in Sources */,
@@ -12845,6 +12857,7 @@
 			files = (
 				4B4BEC3D2A11B56B001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift in Sources */,
 				4B4BEC412A11B5BD001D9AC5 /* NetworkProtectionUNNotificationsPresenter.swift in Sources */,
+				F11B3CAA2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
 				4B4BEC432A11B5C7001D9AC5 /* Bundle+VPN.swift in Sources */,
 				4B4BEC452A11B5EE001D9AC5 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				4B4BEC422A11B5C7001D9AC5 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
@@ -12968,6 +12981,7 @@
 				31ECDA132BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
 				F1D0429F2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				31ECDA0E2BED317300AE679F /* BundleExtension.swift in Sources */,
+				F11B3CAD2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12986,6 +13000,7 @@
 				31ECDA142BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
 				F1D042A02BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				31ECDA0F2BED317300AE679F /* BundleExtension.swift in Sources */,
+				F11B3CAE2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13169,6 +13184,7 @@
 				85589E8727BBB8F20038AD11 /* HomePageFavoritesModel.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				BDBA85932C5D255200BC54F5 /* VPNFeedbackCategory.swift in Sources */,
+				F11B3CA82D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
 				B602E7CF2A93A5FF00F12201 /* WKBackForwardListExtension.swift in Sources */,
 				4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */,
 				B62B48562ADE730D000DECE5 /* FileImportView.swift in Sources */,

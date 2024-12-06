@@ -65,8 +65,8 @@ extension DefaultSubscriptionManager {
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
                                                                              baseURL: environment.serviceEnvironment.url)
 //        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)! // main app
-        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
-                                                                                     userDefaults: userDefaults)
+//        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
+//                                                                                     userDefaults: userDefaults)
         let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
             guard let featureFlagger else {
                 // With no featureFlagger provided there is no gating of features
@@ -96,18 +96,18 @@ extension DefaultSubscriptionManager {
         }
 
         if #available(macOS 12.0, *) {
-            self.init(storePurchaseManager: DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+            self.init(storePurchaseManager: DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionEndpointService,
                                                                         subscriptionFeatureFlagger: subscriptionFeatureFlagger),
                       oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
-                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+//                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                       subscriptionEnvironment: environment,
                       subscriptionFeatureFlagger: subscriptionFeatureFlagger,
                       pixelHandler: pixelHandler)
         } else {
             self.init(oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
-                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+//                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                       subscriptionEnvironment: environment,
                       subscriptionFeatureFlagger: subscriptionFeatureFlagger,
                       pixelHandler: pixelHandler)

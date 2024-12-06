@@ -225,6 +225,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 // Check for active subscriptions
                 if await subscriptionManager.storePurchaseManager().hasActiveSubscription() {
+                    // Sandbox note: Looks like our BE is not receiving updates when a subscription transitions from grace period to expired, so during testing we can end up with a subscription in grace period and we will not be able to purchase a new one, only restore it because Transaction.currentEntitlements will not return the subscription to restore.
                     PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
                     Logger.subscription.log("[Purchase] Found active subscription during purchase")
                     subscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)

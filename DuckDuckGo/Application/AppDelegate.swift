@@ -376,6 +376,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             didFinishLaunching = true
         }
 
+        subscriptionManager.loadInitialData()
+
         HistoryCoordinator.shared.loadHistory {
             HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
         }
@@ -409,8 +411,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statisticsLoader?.load()
 
         startupSync()
-
-        subscriptionManager.loadInitialData()
 
         let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
 

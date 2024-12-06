@@ -450,8 +450,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
                                                                              baseURL: subscriptionEnvironment.serviceEnvironment.url)
-        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
-                                                                                     userDefaults: defaults)
+//        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
+//                                                                                     userDefaults: defaults)
         let pixelHandler: SubscriptionManager.PixelHandler = { type in
             switch type {
             case .deadToken:
@@ -461,7 +461,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         let subscriptionManager = DefaultSubscriptionManager(oAuthClient: authClient,
                                                              subscriptionEndpointService: subscriptionEndpointService,
-                                                             subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+//                                                             subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                                                              subscriptionEnvironment: subscriptionEnvironment,
                                                              subscriptionFeatureFlagger: nil,
                                                              pixelHandler: pixelHandler)
