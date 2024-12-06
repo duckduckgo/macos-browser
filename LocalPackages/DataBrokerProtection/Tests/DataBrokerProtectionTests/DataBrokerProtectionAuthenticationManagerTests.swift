@@ -72,7 +72,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
         subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
-        let result = authenticationManager.hasValidEntitlement()
+        let result = await authenticationManager.hasValidEntitlement()
         XCTAssertTrue(result, "Entitlement check should return true for valid entitlement")
     }
 
@@ -81,7 +81,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
 
-        let result = authenticationManager.hasValidEntitlement()
+        let result = await authenticationManager.hasValidEntitlement()
         XCTAssertFalse(result, "Entitlement check should return false for valid entitlement")
     }
 }

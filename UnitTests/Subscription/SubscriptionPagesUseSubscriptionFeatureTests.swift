@@ -40,16 +40,15 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         static let entitlements: [SubscriptionEntitlement] = [.dataBrokerProtection,
                                                             .identityTheftRestoration,
                                                             .networkProtection]
-
+        
         static let mostRecentTransactionJWS = "dGhpcyBpcyBub3QgYSByZWFsIEFw(...)cCBTdG9yZSB0cmFuc2FjdGlvbiBKV1M="
-        static let subscriptionOptions = SubscriptionOptions(platform: SubscriptionPlatformName.macos,
-                                                             options: [
-                                                                SubscriptionOption(id: "1",
-                                                                                   cost: SubscriptionOptionCost(displayPrice: "9 USD", recurrence: "monthly")),
-                                                                SubscriptionOption(id: "2",
-                                                                                   cost: SubscriptionOptionCost(displayPrice: "99 USD", recurrence: "yearly"))
-                                                             ],
-                                                             features: [.networkProtection, .dataBrokerProtection, .identityTheftRestoration])
+        static let subscriptionOptions = SubscriptionOptions(
+            platform: SubscriptionPlatformName.macos,
+            options: [
+                SubscriptionOption(id: "1", cost: SubscriptionOptionCost(displayPrice: "9 USD", recurrence: "monthly")),
+                SubscriptionOption(id: "2", cost: SubscriptionOptionCost(displayPrice: "99 USD", recurrence: "yearly"))
+            ],
+            availableEntitlements: [.networkProtection, .dataBrokerProtection, .identityTheftRestoration])
         static let mockParams: [String: String] = [:]
         @MainActor static let mockScriptMessage = MockWKScriptMessage(name: "", body: "", webView: WKWebView() )
     }

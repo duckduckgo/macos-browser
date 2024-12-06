@@ -58,14 +58,13 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
                                                    price: "99",
                                                    currency: "USD")]
 
-        static let subscriptionOptions = SubscriptionOptions(platform: SubscriptionPlatformName.stripe,
-                                                             options: [
-                                                                SubscriptionOption(id: "1",
-                                                                                   cost: SubscriptionOptionCost(displayPrice: "$9.00", recurrence: "monthly")),
-                                                                SubscriptionOption(id: "2",
-                                                                                   cost: SubscriptionOptionCost(displayPrice: "$99.00", recurrence: "yearly"))
-                                                             ],
-                                                             features: [.networkProtection, .dataBrokerProtection, .identityTheftRestoration])
+        static let subscriptionOptions = SubscriptionOptions(
+            platform: SubscriptionPlatformName.stripe,
+            options: [
+                SubscriptionOption(id: "1", cost: SubscriptionOptionCost(displayPrice: "$9.00", recurrence: "monthly")),
+                SubscriptionOption(id: "2", cost: SubscriptionOptionCost(displayPrice: "$99.00", recurrence: "yearly"))
+            ],
+            availableEntitlements: [.networkProtection, .dataBrokerProtection, .identityTheftRestoration])
         static let mockParams: [String: String] = [:]
         @MainActor static let mockScriptMessage = MockWKScriptMessage(name: "", body: "", webView: WKWebView() )
     }

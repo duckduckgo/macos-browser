@@ -47,7 +47,7 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
     }
 
     public func hasValidEntitlement() async -> Bool {
-        await subscriptionManager.isFeatureActive(.dataBrokerProtection) //isEntitlementActive(.dataBrokerProtection)
+        await subscriptionManager.isFeatureActive(.dataBrokerProtection)
     }
 
     public func getAuthHeader() -> String? {
