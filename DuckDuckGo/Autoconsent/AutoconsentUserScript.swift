@@ -194,7 +194,7 @@ extension AutoconsentUserScript {
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         }
     }
-    
+
     func matchDomainList(domain: String?, domainsList: [String]) -> Bool {
         guard let domain = domain else { return false }
         let trimmedDomains = domainsList.filter { !$0.trimmingWhitespace().isEmpty }
