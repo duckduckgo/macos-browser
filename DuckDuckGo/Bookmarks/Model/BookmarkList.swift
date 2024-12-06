@@ -160,7 +160,9 @@ struct BookmarkList {
     private mutating func updateLowercasedItemsDict() {
         lowercasedItemsDict = itemsDict.reduce(into: [:]) { result, entry in
             let lowercasedKey = entry.key.lowercased()
-            result[lowercasedKey] = entry.value
+            if result[lowercasedKey] == nil {
+                result[lowercasedKey] = entry.value
+            }
         }
     }
 

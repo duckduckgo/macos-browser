@@ -180,6 +180,92 @@ final class BookmarkListTests: XCTestCase {
         XCTAssertEqual(result.isFavorite, false)
     }
 
+    func testWhenBookmarkIsInserted_ThenLowercasedItemsDictContainsLowercasedKey() {
+        var bookmarkList = BookmarkList()
+
+        let bookmark = Bookmark.aCaseSensitiveBookmark
+        bookmarkList.insert(bookmark)
+
+        let lowercasedKey = bookmark.url.lowercased()
+        let items = bookmarkList.lowercasedItemsDict[lowercasedKey]
+
+        XCTAssertNotNil(items)
+        XCTAssertEqual(items?.count, 1)
+        XCTAssertEqual(items?.first?.id, bookmark.id)
+    }
+
+    func testWhenBookmarkIsRemoved_ThenLowercasedItemsDictDoesNotContainBookmark() {
+        var bookmarkList = BookmarkList()
+
+        let bookmark = Bookmark.aCaseSensitiveBookmark
+        bookmarkList.insert(bookmark)
+
+        bookmarkList.remove(bookmark)
+
+        let lowercasedKey = bookmark.url.lowercased()
+        let items = bookmarkList.lowercasedItemsDict[lowercasedKey]
+
+        XCTAssertNil(items)
+    }
+
+    func testWhenBookmarkUrlIsUpdated_ThenLowercasedItemsDictReflectsUpdatedUrl() throws {
+        var bookmarkList = BookmarkList()
+
+        let bookmark = Bookmark.aCaseSensitiveBookmark
+        bookmarkList.insert(bookmark)
+
+        let newURL = "www.example.com"
+        let updatedBookmark = try XCTUnwrap(bookmarkList.updateUrl(of: bookmark, to: newURL))
+
+        let originalKey = bookmark.url.lowercased()
+        let newKey = newURL.lowercased()
+
+        XCTAssertEqual(bookmarkList.lowercasedItemsDict[originalKey], [])
+        XCTAssertNotNil(bookmarkList.lowercasedItemsDict[newKey])
+
+        let items = bookmarkList.lowercasedItemsDict[newKey]
+        XCTAssertEqual(items?.count, 1)
+        XCTAssertEqual(items?.first?.id, updatedBookmark.id)
+        XCTAssertEqual(items?.first?.url, updatedBookmark.url)
+    }
+
+    func testWhenBookmarkIsUpdatedWithNewTitleAndFavoriteStatus_ThenLowercasedItemsDictPreservesKey() {
+        var bookmarkList = BookmarkList()
+
+        let bookmark = Bookmark.aCaseSensitiveBookmark
+        bookmarkList.insert(bookmark)
+
+        let newTitle = "Updated Title"
+        let newIsFavorite = !bookmark.isFavorite
+        let updatedBookmark = bookmarkList.update(bookmark: bookmark, newURL: bookmark.url, newTitle: newTitle, newIsFavorite: newIsFavorite)
+
+        let lowercasedKey = bookmark.url.lowercased()
+        let items = bookmarkList.lowercasedItemsDict[lowercasedKey]
+
+        XCTAssertNotNil(items)
+        XCTAssertEqual(items?.count, 1)
+        XCTAssertEqual(items?.first?.id, updatedBookmark?.id)
+        XCTAssertEqual(items?.first?.title, newTitle)
+        XCTAssertEqual(items?.first?.isFavorite, newIsFavorite)
+    }
+
+    func testWhenMultipleBookmarksWithSameURLDifferentCasesAreInserted_ThenLowercasedItemsDictContainsFirstOne() {
+        var bookmarkList = BookmarkList()
+
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "www.Example.com", title: "Example 1", isFavorite: true)
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "www.example.COM", title: "Example 2", isFavorite: false)
+
+        bookmarkList.insert(bookmark1)
+        bookmarkList.insert(bookmark2)
+
+        let lowercasedKey = "www.example.com"
+        let items = bookmarkList.lowercasedItemsDict[lowercasedKey]
+
+        XCTAssertNotNil(items)
+        XCTAssertTrue(items?.contains(where: { $0.id == bookmark1.id }) ?? false)
+        XCTAssertFalse(items?.contains(where: { $0.id == bookmark2.id }) ?? false)
+    }
+
 }
 
 fileprivate extension Bookmark {
@@ -187,6 +273,13 @@ fileprivate extension Bookmark {
     @MainActor(unsafe)
     static var aBookmark: Bookmark = Bookmark(id: UUID().uuidString,
                                               url: URL.duckDuckGo.absoluteString,
+                                              title: "Title",
+                                              isFavorite: false,
+                                              faviconManagement: FaviconManagerMock())
+
+    @MainActor(unsafe)
+    static var aCaseSensitiveBookmark: Bookmark = Bookmark(id: UUID().uuidString,
+                                              url: "www.DuckDuckGo.com",
                                               title: "Title",
                                               isFavorite: false,
                                               faviconManagement: FaviconManagerMock())
