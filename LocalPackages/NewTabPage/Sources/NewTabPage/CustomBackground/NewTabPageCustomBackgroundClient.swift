@@ -23,11 +23,15 @@ import WebKit
 
 public protocol NewTabPageCustomBackgroundProviding: AnyObject {
     var customizerData: NewTabPageUserScript.CustomizerData { get }
-    var backgroundPublisher: AnyPublisher<NewTabPageUserScript.Background, Never> { get }
 
     var background: NewTabPageUserScript.Background { get set }
+    var backgroundPublisher: AnyPublisher<NewTabPageUserScript.Background, Never> { get }
+
+    var theme: NewTabPageUserScript.Theme? { get set }
+    var themePublisher: AnyPublisher<NewTabPageUserScript.Theme?, Never> { get }
 
     @MainActor func presentUploadDialog() async
+    func deleteImage(with imageID: String) async
 }
 
 public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
@@ -44,6 +48,14 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
             .sink { [weak self] background in
                 Task { @MainActor in
                     self?.notifyBackgroundUpdated(background)
+                }
+            }
+            .store(in: &cancellables)
+
+        model.themePublisher
+            .sink { [weak self] theme in
+                Task { @MainActor in
+                    self?.notifyThemeUpdated(theme)
                 }
             }
             .store(in: &cancellables)
@@ -70,6 +82,10 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     func deleteImage(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let data: NewTabPageUserScript.DeleteImageData = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        await model.deleteImage(with: data.id)
         return nil
     }
 
@@ -84,6 +100,10 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     private func setTheme(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let data: NewTabPageUserScript.ThemeData = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        model.theme = data.theme
         return nil
     }
 
@@ -95,8 +115,12 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     private func notifyBackgroundUpdated(_ background: NewTabPageUserScript.Background) {
-        print(String(data: try! JSONEncoder().encode(NewTabPageUserScript.BackgroundData(background: background)), encoding: .utf8)!)
         pushMessage(named: MessageName.onBackgroundUpdate.rawValue, params: background)
+    }
+
+    @MainActor
+    private func notifyThemeUpdated(_ theme: NewTabPageUserScript.Theme?) {
+        pushMessage(named: MessageName.onThemeUpdate.rawValue, params: NewTabPageUserScript.ThemeData(theme: theme))
     }
 }
 

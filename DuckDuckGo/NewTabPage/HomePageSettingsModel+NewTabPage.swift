@@ -52,9 +52,31 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
             .eraseToAnyPublisher()
     }
 
+    var theme: NewTabPageUserScript.Theme? {
+        get {
+            .init(appearancePreferences.currentThemeName)
+        }
+        set {
+            appearancePreferences.currentThemeName = .init(newValue)
+        }
+    }
+
+    var themePublisher: AnyPublisher<NewTabPageUserScript.Theme?, Never> {
+        appearancePreferences.$currentThemeName.dropFirst().removeDuplicates()
+            .map(NewTabPageUserScript.Theme.init)
+            .eraseToAnyPublisher()
+    }
+
     @MainActor
     func presentUploadDialog() async{
         await homePageSettingsModel.addNewImage()
+    }
+
+    func deleteImage(with imageID: String) async {
+        guard let image = homePageSettingsModel.availableUserBackgroundImages.first(where: { $0.id == imageID }) else {
+            return
+        }
+        homePageSettingsModel.customImagesManager?.deleteImage(image)
     }
 }
 
@@ -116,6 +138,19 @@ extension ColorScheme {
             self = .dark
         case .light:
             self = .light
+        }
+    }
+}
+
+extension ThemeName {
+    init(_ theme: NewTabPageUserScript.Theme?) {
+        switch theme {
+        case .dark:
+            self = .dark
+        case .light:
+            self = .light
+        default:
+            self = .systemDefault
         }
     }
 }

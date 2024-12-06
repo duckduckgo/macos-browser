@@ -277,6 +277,29 @@ extension NewTabPageUserScript {
         }
     }
 
+    public struct ThemeData: Codable, Equatable {
+        let theme: Theme?
+
+        enum CodingKeys: CodingKey {
+            case theme
+        }
+
+        public init(theme: Theme?) {
+            self.theme = theme
+        }
+
+        public func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: NewTabPageUserScript.ThemeData.CodingKeys.self)
+            try container.encodeIfPresent(self.theme?.rawValue ?? "system", forKey: NewTabPageUserScript.ThemeData.CodingKeys.theme)
+        }
+
+        public init(from decoder: any Decoder) throws {
+            let container: KeyedDecodingContainer<NewTabPageUserScript.ThemeData.CodingKeys> = try decoder.container(keyedBy: NewTabPageUserScript.ThemeData.CodingKeys.self)
+            let themeRawValue = try container.decode(String.self, forKey: NewTabPageUserScript.ThemeData.CodingKeys.theme)
+            theme = Theme(rawValue: themeRawValue)
+        }
+    }
+
     public enum Theme: String, Codable {
         case dark, light
     }
@@ -356,5 +379,9 @@ extension NewTabPageUserScript {
             self.src = src
             self.thumb = thumb
         }
+    }
+
+    struct DeleteImageData: Codable, Equatable {
+        let id: String
     }
 }
