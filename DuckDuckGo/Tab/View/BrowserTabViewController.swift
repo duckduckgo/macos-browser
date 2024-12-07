@@ -323,6 +323,8 @@ final class BrowserTabViewController: NSViewController {
 
                 self.adjustFirstResponder(force: true)
                 removeExistingDialog()
+
+                self.updateCurrentActivity(url: selectedTabViewModel?.tab.content.urlForWebView)
             }
             .store(in: &cancellables)
     }
@@ -615,6 +617,13 @@ final class BrowserTabViewController: NSViewController {
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
             self?.updateStateAndPresentContextualOnboarding()
         }.store(in: &tabViewModelCancellables)
+
+        tabViewModel?.tab.webView.publisher(for: \.url)
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] url in
+                self?.updateCurrentActivity(url: url)
+            }.store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
@@ -1095,6 +1104,7 @@ extension BrowserTabViewController: TabDelegate {
         keyWindowSelectedTabCancellable = nil
         subscribeToPinnedTabs()
         hideWebViewSnapshotIfNeeded()
+        becomeCurrentActivity()
     }
 
     func windowDidResignKey() {
@@ -1509,4 +1519,49 @@ private extension NSViewController {
         }
     }
 
+}
+
+extension BrowserTabViewController {
+    override func restoreUserActivityState(_ userActivity: NSUserActivity) {
+        guard supportsHandoff(), userActivity.activityType == "com.duckduckgo.mobile.ios.web-browsing", let url = userActivity.webpageURL else {
+            return
+        }
+        openNewTab(with: .url(url, credential: nil, source: .appOpenUrl))
+    }
+
+    func becomeCurrentActivity() {
+        guard supportsHandoff() else { return }
+
+        if userActivity?.webpageURL == nil {
+            userActivity?.invalidate()
+            userActivity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
+            userActivity?.webpageURL = nil
+        }
+
+        userActivity?.becomeCurrent()
+    }
+
+    private func updateCurrentActivity(url: URL?) {
+        guard supportsHandoff() else { return }
+
+        let newURL: URL? = {
+            guard let url, let scheme = url.scheme, ["http", "https"].contains(scheme) else { return nil }
+            return url
+        }()
+        guard newURL != userActivity?.webpageURL else { return }
+
+        userActivity?.invalidate()
+        if newURL != nil {
+            userActivity = NSUserActivity(activityType: "com.duckduckgo.mobile.ios.web-browsing")
+        } else {
+            userActivity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
+        }
+        userActivity?.webpageURL = newURL
+
+        userActivity?.becomeCurrent()
+    }
+
+    private func supportsHandoff() -> Bool {
+        !tabCollectionViewModel.isBurner && featureFlagger.isFeatureOn(.handoff)
+    }
 }

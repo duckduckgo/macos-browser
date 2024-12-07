@@ -540,6 +540,10 @@
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>com.duckduckgo.mobile.ios.web-browsing</string>
+	</array>
 	<key>SUBSCRIPTION_APP_GROUP</key>
 	<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	<key>SUEnableAutomaticChecks</key>

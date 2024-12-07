@@ -555,6 +555,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             await subscriptionCookieManager.refreshSubscriptionCookie()
         }
+
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.browserTabViewController.becomeCurrentActivity()
     }
 
     private func initializeSync() {
@@ -625,6 +627,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func application(_ sender: NSApplication, openFiles files: [String]) {
         urlEventHandler.handleFiles(files)
+    }
+
+    func application(_ application: NSApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any NSUserActivityRestoring]) -> Void) -> Bool {
+        guard userActivity.activityType == "com.duckduckgo.mobile.ios.web-browsing",
+              let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else {
+            return false
+        }
+
+        restorationHandler([mainWindowController.browserTabViewController])
+
+        return true
     }
 
     // MARK: - PixelKit
