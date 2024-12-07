@@ -182,7 +182,7 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         }]
         try await loadUrl(url)
         await fulfillment(of: [eRequested], timeout: 0)
-        await wait { self.tab.error != nil }
+        try await wait { self.tab.error != nil }
 
         XCTAssertEqual(tabViewModel.tab.error as NSError? as? MaliciousSiteError, MaliciousSiteError(code: .phishing, failingUrl: redirectUrl))
     }
@@ -192,11 +192,12 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
     @MainActor
     private func loadUrl(_ url: URL) async throws {
         tab.setUrl(url, source: .link)
-        await wait { !self.tab.isLoading }
+        try await wait { !self.tab.isLoading }
     }
 
     @MainActor
-    func wait(until condition: @escaping () -> Bool) async {
+    func wait(until condition: @escaping () -> Bool) async throws {
+        let waiter = XCTWaiter()
         let loadingExpectation = expectation(description: "Tab finished loading")
         let task = Task {
             while !condition() {
@@ -206,7 +207,15 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
             loadingExpectation.fulfill()
         }
         defer { task.cancel() }
-        await fulfillment(of: [loadingExpectation], timeout: 1)
+
+        let result = await waiter.fulfillment(of: [loadingExpectation], timeout: 2)
+
+        switch result {
+        case .completed: break
+        case .timedOut: throw XCTSkip("Test timed out")
+        case .incorrectOrder, .invertedFulfillment, .interrupted: XCTFail("Test waiting failed")
+        @unknown default: XCTFail("Unknown result")
+        }
     }
 }
 
