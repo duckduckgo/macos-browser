@@ -67,6 +67,12 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
             .eraseToAnyPublisher()
     }
 
+    var userImagesPublisher: AnyPublisher<[NewTabPageUserScript.UserImage], Never> {
+        homePageSettingsModel.$availableUserBackgroundImages.dropFirst().removeDuplicates()
+            .map { $0.map(NewTabPageUserScript.UserImage.init) }
+            .eraseToAnyPublisher()
+    }
+
     @MainActor
     func presentUploadDialog() async{
         await homePageSettingsModel.addNewImage()

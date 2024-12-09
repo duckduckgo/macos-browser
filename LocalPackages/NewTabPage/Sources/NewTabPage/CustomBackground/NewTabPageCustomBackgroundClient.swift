@@ -30,6 +30,8 @@ public protocol NewTabPageCustomBackgroundProviding: AnyObject {
     var theme: NewTabPageUserScript.Theme? { get set }
     var themePublisher: AnyPublisher<NewTabPageUserScript.Theme?, Never> { get }
 
+    var userImagesPublisher: AnyPublisher<[NewTabPageUserScript.UserImage], Never> { get }
+
     @MainActor func presentUploadDialog() async
     func deleteImage(with imageID: String) async
 }
@@ -56,6 +58,14 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
             .sink { [weak self] theme in
                 Task { @MainActor in
                     self?.notifyThemeUpdated(theme)
+                }
+            }
+            .store(in: &cancellables)
+
+        model.userImagesPublisher
+            .sink { [weak self] images in
+                Task { @MainActor in
+                    self?.notifyImagesUpdated(images)
                 }
             }
             .store(in: &cancellables)
@@ -121,6 +131,11 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
     @MainActor
     private func notifyThemeUpdated(_ theme: NewTabPageUserScript.Theme?) {
         pushMessage(named: MessageName.onThemeUpdate.rawValue, params: NewTabPageUserScript.ThemeData(theme: theme))
+    }
+
+    @MainActor
+    private func notifyImagesUpdated(_ images: [NewTabPageUserScript.UserImage]) {
+        pushMessage(named: MessageName.onImagesUpdate.rawValue, params: NewTabPageUserScript.UserImagesData(userImages: images))
     }
 }
 

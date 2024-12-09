@@ -367,6 +367,10 @@ extension NewTabPageUserScript {
         }
     }
 
+    struct UserImagesData: Codable, Equatable {
+        let userImages: [UserImage]
+    }
+
     public struct UserImage: Codable, Equatable {
         public let colorScheme: Theme
         public let id: String
