@@ -20,6 +20,7 @@ import Bookmarks
 import Combine
 import Foundation
 import os.log
+import Utilities
 
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
