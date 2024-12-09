@@ -31,10 +31,11 @@ final class DuckPlayerOverlayUsagePixels: NSObject, DuckPlayerOverlayPixelFiring
 
     var pixelFiring: PixelFiring?
     var duckPlayerMode: DuckPlayerMode = .disabled
+    private var isObserving = false
 
     weak var webView: WKWebView? {
         didSet {
-            if let webView = webView {
+            if let webView {
                 addObservers(to: webView)
             }
         }
@@ -47,7 +48,9 @@ final class DuckPlayerOverlayUsagePixels: NSObject, DuckPlayerOverlayPixelFiring
     }
 
     deinit {
-        removeObservers()
+        if let webView {
+            removeObservers(from: webView)
+        }
     }
 
     func fireNavigationPixelsIfNeeded(webView: WKWebView) {
@@ -84,12 +87,16 @@ final class DuckPlayerOverlayUsagePixels: NSObject, DuckPlayerOverlayPixelFiring
     // MARK: - Observer Management
 
     private func addObservers(to webView: WKWebView) {
+        removeObservers(from: webView)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: [.new, .old], context: nil)
+        isObserving = true
     }
 
-    private func removeObservers() {
-        guard let webView = webView else { return }
-        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
+    private func removeObservers(from webView: WKWebView) {
+        if isObserving {
+            webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
+            isObserving = false
+        }
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
