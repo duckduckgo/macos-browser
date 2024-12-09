@@ -15370,7 +15370,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "graeme/partial-form-save";
+				branch = "graeme/partial-form-save-refactor";
 				kind = branch;
 			};
 		};
