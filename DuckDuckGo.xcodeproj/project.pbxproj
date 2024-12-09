@@ -3090,8 +3090,6 @@
 		D6BC8AC82C5A95B10025375B /* DuckPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = D6BC8AC72C5A95B10025375B /* DuckPlayer */; };
 		D6E0ACB12CE36DCA005D3486 /* DuckPlayerOverlayPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E0ACB02CE36DC4005D3486 /* DuckPlayerOverlayPixels.swift */; };
 		D6E0ACB22CE36DCA005D3486 /* DuckPlayerOverlayPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E0ACB02CE36DC4005D3486 /* DuckPlayerOverlayPixels.swift */; };
-		D6E0ACB42CE36FB0005D3486 /* DuckPlayerOverlayPixelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E0ACB32CE36FA8005D3486 /* DuckPlayerOverlayPixelsTests.swift */; };
-		D6E0ACB52CE36FB0005D3486 /* DuckPlayerOverlayPixelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E0ACB32CE36FA8005D3486 /* DuckPlayerOverlayPixelsTests.swift */; };
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
 		EA18D1CA272F0DC8006DC101 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
 		EA8AE76A279FBDB20078943E /* ClickToLoadTDSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */; };
@@ -4973,7 +4971,6 @@
 		CDE248A72C821FFE00F9399D /* MaliciousSiteProtectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaliciousSiteProtectionState.swift; sourceTree = "<group>"; };
 		D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButtonMenuFactory.swift; sourceTree = "<group>"; };
 		D6E0ACB02CE36DC4005D3486 /* DuckPlayerOverlayPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOverlayPixels.swift; sourceTree = "<group>"; };
-		D6E0ACB32CE36FA8005D3486 /* DuckPlayerOverlayPixelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOverlayPixelsTests.swift; sourceTree = "<group>"; };
 		EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadUserScript.swift; sourceTree = "<group>"; };
 		EA18D1C9272F0DC8006DC101 /* social_images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = social_images; sourceTree = "<group>"; };
 		EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToLoadTDSTests.swift; sourceTree = "<group>"; };
@@ -5846,7 +5843,6 @@
 		376718FE28E58504003A2A15 /* YoutubePlayer */ = {
 			isa = PBXGroup;
 			children = (
-				D6E0ACB32CE36FA8005D3486 /* DuckPlayerOverlayPixelsTests.swift */,
 				3199AF812C80736B003AEBDC /* DuckPlayerOnboardingLocationValidatorTests.swift */,
 				3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */,
 				567DA94429E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift */,
@@ -12421,7 +12417,6 @@
 				3706FE27293F661700E42796 /* AppPrivacyConfigurationTests.swift in Sources */,
 				B626A7652992506A00053070 /* SerpHeadersNavigationResponderTests.swift in Sources */,
 				9F6434712BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift in Sources */,
-				D6E0ACB52CE36FB0005D3486 /* DuckPlayerOverlayPixelsTests.swift in Sources */,
 				9F26060C2B85C20B00819292 /* AddEditBookmarkDialogViewModelTests.swift in Sources */,
 				567A23DF2C89980A0010F66C /* OnboardingNavigationDelegateTests.swift in Sources */,
 				562532A12BC069190034D316 /* ZoomPopoverViewModelTests.swift in Sources */,
@@ -14009,7 +14004,6 @@
 				B630E7FE29C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */,
 				370270C02C78EB13002E44E4 /* HomePageSettingsModelTests.swift in Sources */,
 				4B9292BB2667103100AD2C21 /* BookmarkNodeTests.swift in Sources */,
-				D6E0ACB42CE36FB0005D3486 /* DuckPlayerOverlayPixelsTests.swift in Sources */,
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				56CE77612C7DFCF800AC1ED2 /* OnboardingSuggestedSearchesProviderTests.swift in Sources */,

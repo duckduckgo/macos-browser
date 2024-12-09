@@ -73,7 +73,7 @@ final class DuckPlayerTabExtension {
         self.preferences = preferences
         self.onboardingDecider = onboardingDecider
         self.duckPlayerOverlayUsagePixels = duckPlayerOverlayPixels
-        
+
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
@@ -334,7 +334,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
         // Fire Overlay Shown Pixels
         fireOverlayShownPixelIfNeeded(url: navigation.url)
-        
+
     }
 
     @MainActor

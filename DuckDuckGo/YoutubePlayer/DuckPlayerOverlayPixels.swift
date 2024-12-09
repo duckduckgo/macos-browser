@@ -55,7 +55,7 @@ final class DuckPlayerOverlayUsagePixels: NSObject, DuckPlayerOverlayPixelFiring
         guard let currentURL = webView.url else {
             return
         }
-        
+
         let backItemURL = webView.backForwardList.backItem?.url
 
         if lastVisitedURL != nil {
