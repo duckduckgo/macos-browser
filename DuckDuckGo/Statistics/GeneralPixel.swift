@@ -676,7 +676,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .duckPlayerContingencyLearnMoreClicked:
             return "duckplayer_mac_contingency_learn-more-clicked"
 
-        // Duck Player Temporary Overlay Pixels
+            // Duck Player Temporary Overlay Pixels
         case .duckPlayerYouTubeOverlayNavigationBack:
             return "duckplayer_youtube_overlay_navigation_back"
         case .duckPlayerYouTubeOverlayNavigationRefresh:
@@ -1489,5 +1489,8 @@ enum GeneralPixel: PixelKitEventV2 {
                 self = .more
             }
         }
+
+        enum AutofillParameterKeys {
+            static var backfilled = "backfilled"
+        }
     }
-}
