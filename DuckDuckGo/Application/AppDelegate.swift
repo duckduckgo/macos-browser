@@ -32,6 +32,7 @@ import Networking
 import NewTabPage
 import Persistence
 import PixelKit
+import PixelExperimentKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
@@ -284,7 +285,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 keyValueStore: UserDefaults.appConfiguration,
                 actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
             ),
-            experimentManager: ExperimentCohortsManager(store: ExperimentsDataStore()),
+            experimentManager: ExperimentCohortsManager(store: ExperimentsDataStore(), fireCohortAssigned: PixelKit.fireExperimentEnrollmentPixel(subfeatureID:experiment:)),
             for: FeatureFlag.self
         )
 
@@ -333,6 +334,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
 #endif
+        PixelKit.configureExperimentKit(featureFlagger: featureFlagger, eventTracker: ExperimentEventTracker(store: UserDefaults.appConfiguration))
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

@@ -34,6 +34,7 @@ final class Update {
     let date: Date
     let releaseNotes: [String]
     let releaseNotesPrivacyPro: [String]
+    let needsLatestReleaseNote: Bool
 
     var title: String {
         let formatter = DateFormatter()
@@ -47,7 +48,8 @@ final class Update {
                   build: String,
                   date: Date,
                   releaseNotes: [String],
-                  releaseNotesPrivacyPro: [String]) {
+                  releaseNotesPrivacyPro: [String],
+                  needsLatestReleaseNote: Bool) {
         self.isInstalled = isInstalled
         self.type = type
         self.version = version
@@ -55,12 +57,13 @@ final class Update {
         self.date = date
         self.releaseNotes = releaseNotes
         self.releaseNotesPrivacyPro = releaseNotesPrivacyPro
+        self.needsLatestReleaseNote = needsLatestReleaseNote
     }
 
 }
 
 extension Update {
-    convenience init(appcastItem: SUAppcastItem, isInstalled: Bool) {
+    convenience init(appcastItem: SUAppcastItem, isInstalled: Bool, needsLatestReleaseNote: Bool) {
         let isCritical = appcastItem.isCriticalUpdate
         let version = appcastItem.displayVersionString
         let build = appcastItem.versionString
@@ -73,7 +76,8 @@ extension Update {
                   build: build,
                   date: date,
                   releaseNotes: releaseNotes,
-                  releaseNotesPrivacyPro: releaseNotesPrivacyPro)
+                  releaseNotesPrivacyPro: releaseNotesPrivacyPro,
+                  needsLatestReleaseNote: needsLatestReleaseNote)
     }
 }
 

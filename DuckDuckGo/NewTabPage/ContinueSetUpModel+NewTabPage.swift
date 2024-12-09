@@ -63,7 +63,7 @@ extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding 
             return
         }
         PixelKit.fire(GeneralPixel.addToDockNewTabPageCardPresented,
-                      frequency: .unique,
+                      frequency: .uniqueByName,
                       includeAppVersionParameter: false)
     }
 }
