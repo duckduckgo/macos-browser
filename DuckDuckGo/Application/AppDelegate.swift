@@ -327,7 +327,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
         if NSApplication.runType.requiresEnvironment {
-            privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
+            privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase(), errorEvents: PrivacyStatsErrorHandler())
         } else {
             privacyStats = MockPrivacyStats()
         }
