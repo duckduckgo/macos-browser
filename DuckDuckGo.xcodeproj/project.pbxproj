@@ -15224,7 +15224,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = smodi/compilation_time_tracking;
+				branch = ac9dd5070255ad5a994b99c6e6b0fde73b0c7fb3;
 				kind = branch;
 			};
 		};
