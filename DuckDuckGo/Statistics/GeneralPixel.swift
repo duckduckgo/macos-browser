@@ -1448,7 +1448,7 @@ enum GeneralPixel: PixelKitEventV2 {
     }
 
     enum AutofillParameterKeys {
-            static var backfilled = "backfilled"
+        static var backfilled = "backfilled"
     }
 
     public enum CompileTimeBucketAggregation: String, CustomStringConvertible {
