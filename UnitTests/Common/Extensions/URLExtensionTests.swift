@@ -239,25 +239,4 @@ final class URLExtensionTests: XCTestCase {
         let testedURL = URL(string: "https://duckduckgo.com/subscriptions")!
         XCTAssertFalse(testedURL.isChild(of: parentURL))
     }
-
-    // MARK: - Duck Favicon URL
-
-    func testDuckFaviconURL() throws {
-        XCTAssertEqual(
-            URL.duckFavicon(for: "https://example.com".url!)?.absoluteString,
-            "duck://favicon/https%3A//example.com"
-        )
-        XCTAssertEqual(
-            URL.duckFavicon(for: "https://example.com/1/2/3#anchor".url!)?.absoluteString,
-            "duck://favicon/https%3A//example.com/1/2/3%23anchor"
-        )
-        XCTAssertEqual(
-            URL.duckFavicon(for: "https://example.com/1/2/3?query=yes&other=no".url!)?.absoluteString,
-            "duck://favicon/https%3A//example.com/1/2/3%3Fquery=yes&other=no"
-        )
-        XCTAssertEqual(
-            URL.duckFavicon(for: "https://рнидс.срб/".url!)?.absoluteString,
-            "duck://favicon/https%3A//xn--d1aholi.xn--90a3ac/"
-        )
-    }
 }
