@@ -148,10 +148,11 @@ final class AppContentBlocking {
 
         case .contentBlockingLRCMissing:
                     domainEvent = .contentBlockingLRCMissing
-        case .contentBlockingCompilationTime:
-            // Temporarily avoid firing this pixel. This can be re-enabled if it's determined to be necessary later.
-            // domainEvent = .contentBlockingCompilationTime
-            return
+
+        case .contentBlockingCompilationTaskPerformance(let iterationCount, let timeBucketAggregation):
+            let timeBucket = GeneralPixel.CompileTimeBucketAggregation(number: timeBucketAggregation)
+            domainEvent = .contentBlockingCompilationTaskPerformance(iterationCount: iterationCount,
+                                                                     timeBucketAggregation: timeBucket)
         }
 
         PixelKit.fire(DebugEvent(domainEvent, error: error), withAdditionalParameters: parameters) { _, error in
