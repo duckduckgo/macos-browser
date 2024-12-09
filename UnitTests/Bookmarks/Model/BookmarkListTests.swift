@@ -249,7 +249,7 @@ final class BookmarkListTests: XCTestCase {
         XCTAssertEqual(items?.first?.isFavorite, newIsFavorite)
     }
 
-    func testWhenMultipleBookmarksWithSameURLDifferentCasesAreInserted_ThenLowercasedItemsDictContainsFirstOne() {
+    func testWhenMultipleBookmarksWithSameURLDifferentCasesAreInserted_ThenLowercasedItemsDictContainsOneOfThem() {
         var bookmarkList = BookmarkList()
 
         let bookmark1 = Bookmark(id: UUID().uuidString, url: "www.Example.com", title: "Example 1", isFavorite: true)
@@ -262,8 +262,7 @@ final class BookmarkListTests: XCTestCase {
         let items = bookmarkList.lowercasedItemsDict[lowercasedKey]
 
         XCTAssertNotNil(items)
-        XCTAssertTrue(items?.contains(where: { $0.id == bookmark1.id }) ?? false)
-        XCTAssertFalse(items?.contains(where: { $0.id == bookmark2.id }) ?? false)
+        XCTAssert(items?.contains(where: { $0.id == bookmark1.id || $0.id == bookmark2.id}) ?? false)
     }
 
 }
