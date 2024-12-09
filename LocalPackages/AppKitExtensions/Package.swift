@@ -10,11 +10,13 @@ let package = Package(
         .library(name: "AppKitExtensions", targets: ["AppKitExtensions"]),
     ],
     dependencies: [
+        .package(path: "../Utilities"),
     ],
     targets: [
         .target(
             name: "AppKitExtensions",
             dependencies: [
+                "Utilities"
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))

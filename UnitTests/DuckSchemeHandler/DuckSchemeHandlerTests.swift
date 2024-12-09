@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-import Common
 import BrowserServicesKit
 import Combine
-import PhishingDetection
+import Common
+import MaliciousSiteProtection
+import XCTest
+
+@testable import DuckDuckGo_Privacy_Browser
 
 final class DuckSchemeHandlerTests: XCTestCase {
 
@@ -124,9 +125,8 @@ final class DuckSchemeHandlerTests: XCTestCase {
     @MainActor
     func testErrorPageSchemeHandlerSetsError() {
         // Given
-        let urlString = "https://privacy-test-pages.site/security/badware/phishing.html"
-        let phishingUrl = URL(string: urlString)!
-        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString.data(using: .utf8)!)
+        let phishingUrl = URL(string: "https://privacy-test-pages.site/security/badware/phishing.html")!
+        let encodedURL = URLTokenValidator.base64URLEncode(phishingUrl)
         let token = URLTokenValidator.shared.generateToken(for: phishingUrl)
         let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
         let errorURL = URL(string: errorURLString)!
@@ -137,20 +137,15 @@ final class DuckSchemeHandlerTests: XCTestCase {
         handler.webView(webView, start: schemeTask)
 
         // Then
-        let error = PhishingDetectionError.detected
-        let expectedError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
-            NSURLErrorFailingURLErrorKey: phishingUrl,
-            NSLocalizedDescriptionKey: error.errorUserInfo[NSLocalizedDescriptionKey] ?? "Phishing detected"
-        ])
-        XCTAssertNotNil(schemeTask.error)
-        XCTAssertEqual(schemeTask.error! as NSError, expectedError)
+        let expectedError = MaliciousSiteError(code: .phishing, failingUrl: phishingUrl)
+        XCTAssertEqual(schemeTask.error as NSError?, expectedError as NSError)
     }
 
     @MainActor
     func testErrorPageSchemeHandlerSetsError_WhenTokenInvalid() {
         // Given
-        let urlString = "https://privacy-test-pages.site/security/badware/phishing.html"
-        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString.data(using: .utf8)!)
+        let url = URL(string: "https://privacy-test-pages.site/security/badware/phishing.html")!
+        let encodedURL = URLTokenValidator.base64URLEncode(url)
         let token = "ababababababababababab"
         let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
         let errorURL = URL(string: errorURLString)!
@@ -161,13 +156,8 @@ final class DuckSchemeHandlerTests: XCTestCase {
         handler.webView(webView, start: schemeTask)
 
         // Then
-        let error = WKError.unknown
-        let expectedError = NSError(domain: "Unexpected Error", code: error.rawValue, userInfo: [
-            NSURLErrorFailingURLErrorKey: "about:blank",
-            NSLocalizedDescriptionKey: "Unexpected Error"
-        ])
         XCTAssertNotNil(schemeTask.error)
-        XCTAssertEqual(schemeTask.error! as NSError, expectedError)
+        XCTAssertEqual((schemeTask.error! as? URLError)?.code, .badURL)
     }
 
     @MainActor
