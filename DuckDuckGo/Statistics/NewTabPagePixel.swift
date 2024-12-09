@@ -28,6 +28,32 @@ import PixelKit
  */
 enum NewTabPagePixel: PixelKitEventV2 {
 
+    /**
+     * Event Trigger: "Show Less" button is clicked in Privacy Stats table on the New Tab Page, to collapse the table.
+     *
+     * > Note: This isn't the section collapse setting (like for Favorites or Next Steps), but the sub-setting
+     *   to control whether the view should contain 5 most frequently blocked top companies or all top companies.
+     *
+     * Anomaly Investigation:
+     * - This pixel is fired from `NewTabPagePrivacyStatsModel` in response to a message sent by the user script.
+     * - In case of anomalies, check if the subscription between the user script and the model isn't causing the pixel
+     *   to be fired more than once per interaction.
+     */
+    case blockedTrackingAttemptsShowLess
+
+    /**
+     * Event Trigger: "Show More" button is clicked in Privacy Stats table on the New Tab Page, to expand the table.
+     *
+     * > Note: This isn't the section collapse setting (like for Favorites or Next Steps), but the sub-setting
+     *   to control whether the view should contain 5 most frequently blocked top companies or all top companies.
+     *
+     * Anomaly Investigation:
+     * - This pixel is fired from `NewTabPagePrivacyStatsModel` in response to a message sent by the user script.
+     * - In case of anomalies, check if the subscription between the user script and the model isn't causing the pixel
+     *   to be fired more than once per interaction.
+     */
+    case blockedTrackingAttemptsShowMore
+
     // MARK: - Debug
 
     /**
@@ -41,7 +67,9 @@ enum NewTabPagePixel: PixelKitEventV2 {
 
     var name: String {
         switch self {
-        case .privacyStatsDatabaseError: return "m_mac_new-tab-page.privacy-stats.database.error"
+        case .blockedTrackingAttemptsShowLess: return "m_mac_new-tab-page_blocked-tracking-attempts_show-less"
+        case .blockedTrackingAttemptsShowMore: return "m_mac_new-tab-page_blocked-tracking-attempts_show-more"
+        case .privacyStatsDatabaseError: return "m_mac_new-tab-page_privacy-stats_database_error"
         }
     }
 
