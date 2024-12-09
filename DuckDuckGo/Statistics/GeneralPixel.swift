@@ -318,7 +318,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case contentBlockingFetchLRCSucceeded
     case contentBlockingNoMatchInLRC
     case contentBlockingLRCMissing
-    case contentBlockingCompilationTaskPerformance(retryCount: Int, timeBucketAggregation: CompileTimeBucketAggregation)
+    case contentBlockingCompilationTaskPerformance(iterationCount: Int, timeBucketAggregation: CompileTimeBucketAggregation)
 
     case secureVaultInitError(error: Error)
     case secureVaultError(error: Error)
@@ -947,8 +947,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .contentBlockingLRCMissing:
             return "content_blocking_lrc_missing"
 
-        case .contentBlockingCompilationTaskPerformance(let retryCount, let timeBucketAggregation):
-            return "content_blocking_compilation_loops_\(retryCount)_time_\(timeBucketAggregation)"
+        case .contentBlockingCompilationTaskPerformance(let iterationCount, let timeBucketAggregation):
+            return "content_blocking_compilation_loops_\(iterationCount)_time_\(timeBucketAggregation)"
 
         case .secureVaultInitError:
             return "secure_vault_init_error"

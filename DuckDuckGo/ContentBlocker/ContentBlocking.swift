@@ -149,9 +149,9 @@ final class AppContentBlocking {
         case .contentBlockingLRCMissing:
                     domainEvent = .contentBlockingLRCMissing
 
-        case .contentBlockingCompilationTaskPerformance(let retryCount, let timeBucketAggregation):
+        case .contentBlockingCompilationTaskPerformance(let iterationCount, let timeBucketAggregation):
             let timeBucket = GeneralPixel.CompileTimeBucketAggregation(number: timeBucketAggregation)
-            domainEvent = .contentBlockingCompilationTaskPerformance(retryCount: retryCount,
+            domainEvent = .contentBlockingCompilationTaskPerformance(iterationCount: iterationCount,
                                                                      timeBucketAggregation: timeBucket)
         }
 
