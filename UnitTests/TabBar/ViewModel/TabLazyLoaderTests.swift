@@ -59,7 +59,7 @@ private final class TabMock: LazyLoadable {
 
         reloadClosure = { tab in
             // instantly notify that loading has finished (or failed)
-            Task {
+            Task { @MainActor in
                 reloadExpectation?.fulfill()
                 tab.loadingFinishedSubject.send(tab)
             }
@@ -267,7 +267,7 @@ class TabLazyLoaderTests: XCTestCase {
         for i in 0..<(2 * maxNumberOfLazyLoadedTabs) {
             let tab = TabMock(isUrl: true, url: "http://\(i).com".url!, selectedTimestamp: Date(timeIntervalSince1970: .init(i)))
             tab.reloadClosure = { tab in
-                Task {
+                Task { @MainActor in
                     reloadedTabsIndices.append(i)
                     tab.loadingFinishedSubject.send(tab)
                     reloadExpectation.fulfill()
