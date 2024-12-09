@@ -106,7 +106,7 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .isPrivacyProLaunchedROWOverride:
             return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROWOverride))
         case .autofillPartialFormSaves:
-            return .internalOnly()
+            return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         }
     }
 }
