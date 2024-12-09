@@ -24,7 +24,7 @@ final class PrivacyStatsErrorHandler: EventMapping<PrivacyStatsError> {
 
     init() {
         super.init { event, _, _, _ in
-            PixelKit.fire(DebugEvent(NewTabPagePixel.privacyStatsDatabaseError, error: event.underlyingError), frequency: .dailyAndCount)
+            PixelKit.fire(DebugEvent(NewTabPagePixel.privacyStatsDatabaseError, error: event), frequency: .dailyAndCount)
         }
     }
 
