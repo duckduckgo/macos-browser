@@ -21,14 +21,15 @@ import Cocoa
 import Combine
 import Common
 import FeatureFlags
-import SwiftUI
-import WebKit
-import Subscription
-import PixelKit
-import os.log
-import Onboarding
 import Freemium
+import NewTabPage
+import Onboarding
+import os.log
+import PixelKit
+import Subscription
+import SwiftUI
 import UserScript
+import WebKit
 
 protocol BrowserTabViewControllerDelegate: AnyObject {
     func highlightFireButton()

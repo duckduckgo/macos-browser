@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Utilities
 
 typealias NSAttributedStringBuilder = ArrayBuilder<NSAttributedString>
 extension NSAttributedString {
