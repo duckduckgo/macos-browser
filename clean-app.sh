@@ -14,7 +14,7 @@ delete_data() {
         rm -r "${data_path}" || { echo "Failed to delete ${data_path}"; exit 1; }
         echo " Done."
     else
-        printf '\nnothing to do for %s\n' "${data_path}"
+        printf '\nNothing to do for %s\n' "${data_path}"
     fi
 }
 
@@ -63,7 +63,7 @@ for config_id in "${config_bundle_ids[@]}"; do
         rm -r "${path}" || { echo "Failed to delete ${path}"; exit 1; }
         echo "Done."
     else
-        printf '\nnothing to do for %s\n' "${path}"
+        printf '\nNothing to do for %s\n' "${path}"
     fi
 
 done
