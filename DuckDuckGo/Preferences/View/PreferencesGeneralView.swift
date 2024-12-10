@@ -196,7 +196,7 @@ extension Preferences {
                 }
 
                 // SECTION 7: Phishing Detection
-                if featureFlagger.isFeatureOn(.maliciousSiteProtectionErrorPage) {
+                if featureFlagger.isFeatureOn(.maliciousSiteProtection) {
                     PreferencePaneSection(UserText.maliciousSiteDetectionHeader, spacing: 0) {
                         PreferencePaneSubSection {
                             ToggleMenuItem(UserText.maliciousSiteDetectionIsEnabled,

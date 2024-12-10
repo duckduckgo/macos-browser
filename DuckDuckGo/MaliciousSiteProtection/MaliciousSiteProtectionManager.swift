@@ -125,14 +125,14 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     }
 
     private func setupBindings() {
-        if featureFlagger.isFeatureOn(.maliciousSiteProtectionErrorPage) {
+        if featureFlagger.isFeatureOn(.maliciousSiteProtection) {
             subscribeToDetectionPreferences()
             return
         }
 
         guard let overridesHandler = featureFlagger.localOverrides?.actionHandler as? FeatureFlagOverridesPublishingHandler<FeatureFlag> else { return }
         featureFlagsCancellable = overridesHandler.flagDidChangePublisher
-            .filter { $0.0 == .maliciousSiteProtectionErrorPage }
+            .filter { $0.0 == .maliciousSiteProtection }
             .sink { [weak self] change in
                 guard let self else { return }
                 if change.1 {
