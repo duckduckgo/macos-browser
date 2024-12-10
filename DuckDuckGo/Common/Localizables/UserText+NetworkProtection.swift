@@ -273,6 +273,4 @@ extension UserText {
     static let uninstallVPNAlertTitle = NSLocalizedString("vpn.uninstall.alert.title", value: "Are you sure you want to uninstall the VPN?", comment: "Alert title when the user selects to uninstall our VPN")
 
     static let uninstallVPNInformativeText = NSLocalizedString("vpn.uninstall.alert.informative.text", value: "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device.", comment: "Informative text for the alert that comes up when the user decides to uninstall our VPN")
-
-
 }
