@@ -83,6 +83,7 @@ typealias TabExtensionsBuilderArguments = (
     isTabBurner: Bool,
     contentPublisher: AnyPublisher<Tab.TabContent, Never>,
     setContent: (Tab.TabContent) -> Void,
+    closeTab: () -> Void,
     titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
@@ -126,6 +127,7 @@ extension TabExtensionsBuilder {
         let specialErrorPageTabExtension = add {
             SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                          scriptsPublisher: userScripts.compactMap { $0 },
+                                         closeTab: args.closeTab,
                                          maliciousSiteDetector: dependencies.maliciousSiteDetector)
         }
 

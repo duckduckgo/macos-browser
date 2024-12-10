@@ -391,6 +391,8 @@ extension URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/")!
     }
 
+    static var maliciousSiteProtectionLearnMore = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/")!
+
     static var searchSettings: URL {
         return URL(string: "https://duckduckgo.com/settings/")!
     }
