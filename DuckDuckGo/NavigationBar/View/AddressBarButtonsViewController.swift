@@ -535,11 +535,7 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.position = .right
             privacyEntryPointButton.position = .left
         }
-        let isFlaggedAsMalicious = (tabViewModel?.tab.privacyInfo?.malicousSiteThreatKind != .none)
-        privacyEntryPointButton.isAnimationEnabled = !isFlaggedAsMalicious
-        privacyEntryPointButton.normalTintColor = isFlaggedAsMalicious ? .fireButtonRedPressed : .privacyEnabled
-        privacyEntryPointButton.mouseOverTintColor = isFlaggedAsMalicious ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
-        privacyEntryPointButton.mouseDownTintColor = isFlaggedAsMalicious ? .alertRedPressed : privacyEntryPointButton.mouseDownTintColor
+
         privacyEntryPointButton.sendAction(on: .leftMouseUp)
 
         imageButton.applyFaviconStyle()
