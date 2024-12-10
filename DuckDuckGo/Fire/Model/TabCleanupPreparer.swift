@@ -20,7 +20,7 @@ import Foundation
 import PixelKit
 
 protocol TabDataClearing {
-    func prepareForDataClearing(caller: TabCleanupPreparer)
+    @MainActor func prepareForDataClearing(caller: TabCleanupPreparer)
 }
 
 /**

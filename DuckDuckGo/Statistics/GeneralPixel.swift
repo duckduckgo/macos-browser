@@ -1442,4 +1442,8 @@ enum GeneralPixel: PixelKitEventV2 {
         }
 
     }
+
+    enum AutofillParameterKeys {
+        static var backfilled = "backfilled"
+    }
 }

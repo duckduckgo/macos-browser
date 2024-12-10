@@ -101,7 +101,7 @@ enum Preferences {
                                 searchModel: SearchPreferences.shared,
                                 tabsModel: TabsPreferences.shared,
                                 dataClearingModel: DataClearingPreferences.shared,
-                                phishingDetectionModel: PhishingDetectionPreferences.shared,
+                                phishingDetectionModel: MaliciousSiteProtectionPreferences.shared,
                                 dockCustomizer: DockCustomizer())
                 case .sync:
                     SyncView()
@@ -163,7 +163,7 @@ enum Preferences {
                     case .activateAddEmailClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .legacyDailyAndCount)
                     case .postSubscriptionAddEmailClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
+                        PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .uniqueByName)
                     case .restorePurchaseStoreClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .legacyDailyAndCount)
                     case .addDeviceEnterEmail:

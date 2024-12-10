@@ -95,6 +95,7 @@ final class DownloadsViewController: NSViewController {
         clearDownloadsButton.imagePosition = .imageOnly
         clearDownloadsButton.imageScaling = .scaleProportionallyDown
         clearDownloadsButton.toolTip = UserText.clearDownloadHistoryTooltip
+        clearDownloadsButton.setAccessibilityIdentifier("DownloadsViewController.clearDownloadsButton")
         clearDownloadsButton.cornerRadius = 4
         clearDownloadsButton.backgroundInset = CGPoint(x: 2, y: 2)
         clearDownloadsButton.normalTintColor = .button

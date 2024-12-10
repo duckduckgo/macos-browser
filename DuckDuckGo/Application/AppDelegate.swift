@@ -29,8 +29,10 @@ import FeatureFlags
 import History
 import MetricKit
 import Networking
+import NewTabPage
 import Persistence
 import PixelKit
+import PixelExperimentKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
@@ -96,12 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) lazy var newTabPageActionsManager: NewTabPageActionsManaging = NewTabPageActionsManager(
         appearancePreferences: .shared,
         activeRemoteMessageModel: activeRemoteMessageModel,
-        privacyStats: privacyStats,
-        openURLHandler: { url in
-            Task { @MainActor in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
-            }
-        }
+        privacyStats: privacyStats
     )
     let privacyStats: PrivacyStatsCollecting
     let activeRemoteMessageModel: ActiveRemoteMessageModel
@@ -266,13 +263,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
                 )
             )
-            activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingClient: remoteMessagingClient)
+            activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingClient: remoteMessagingClient, openURLHandler: { url in
+                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+            })
         } else {
             // As long as remoteMessagingClient is private to App Delegate and activeRemoteMessageModel
             // is used only by HomePage RootView as environment object,
             // it's safe to not initialize the client for unit tests to avoid side effects.
             remoteMessagingClient = nil
-            activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingStore: nil, remoteMessagingAvailabilityProvider: nil)
+            activeRemoteMessageModel = ActiveRemoteMessageModel(
+                remoteMessagingStore: nil,
+                remoteMessagingAvailabilityProvider: nil,
+                openURLHandler: { _ in }
+            )
         }
 
         featureFlagger = DefaultFeatureFlagger(
@@ -282,7 +285,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 keyValueStore: UserDefaults.appConfiguration,
                 actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
             ),
-            experimentManager: ExperimentCohortsManager(store: ExperimentsDataStore()),
+            experimentManager: ExperimentCohortsManager(store: ExperimentsDataStore(), fireCohortAssigned: PixelKit.fireExperimentEnrollmentPixel(subfeatureID:experiment:)),
             for: FeatureFlag.self
         )
 
@@ -331,6 +334,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
 #endif
+        PixelKit.configureExperimentKit(featureFlagger: featureFlagger, eventTracker: ExperimentEventTracker(store: UserDefaults.appConfiguration))
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

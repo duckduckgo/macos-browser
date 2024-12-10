@@ -18,6 +18,7 @@
 
 import BrowserServicesKit
 import Combine
+import NewTabPage
 import WebKit
 
 /**
@@ -52,7 +53,12 @@ final class NewTabPageWebViewModel: NSObject {
 
         windowCancellable = webView.publisher(for: \.window)
             .map { $0 != nil }
-            .assign(to: \.isViewOnScreen, on: activeRemoteMessageModel)
+            .sink { [weak activeRemoteMessageModel] isOnScreen in
+                activeRemoteMessageModel?.isViewOnScreen = isOnScreen
+                if isOnScreen {
+                    NotificationCenter.default.post(name: .newTabPageWebViewDidAppear, object: nil)
+                }
+            }
     }
 }
 
@@ -60,4 +66,23 @@ extension NewTabPageWebViewModel: WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         navigationAction.request.url == .newtab ? .allow : .cancel
     }
+}
+
+extension Notification.Name {
+    static var newTabPageWebViewDidAppear = Notification.Name("newTabPageWebViewDidAppear")
+}
+
+extension WKWebViewConfiguration {
+
+    @MainActor
+    func applyNewTabPageWebViewConfiguration(with featureFlagger: FeatureFlagger, newTabPageUserScript: NewTabPageUserScript) {
+        if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
+            setURLSchemeHandler(
+                DuckURLSchemeHandler(featureFlagger: featureFlagger, isNTPSpecialPageSupported: true),
+                forURLScheme: URL.NavigationalScheme.duck.rawValue
+            )
+        }
+        preferences[.developerExtrasEnabled] = true
+        self.userContentController = NewTabPageUserContentController(newTabPageUserScript: newTabPageUserScript)
+     }
 }

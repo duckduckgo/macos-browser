@@ -25,9 +25,9 @@ public class FreemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperime
         super.init { event, _, params, _ in
             switch event {
             case .subscription:
-                PixelKit.fire(event, frequency: .unique, withAdditionalParameters: params)
+                PixelKit.fire(event, frequency: .uniqueByName, withAdditionalParameters: params)
             default:
-                PixelKit.fire(event, frequency: .unique)
+                PixelKit.fire(event, frequency: .uniqueByName)
             }
 
         }

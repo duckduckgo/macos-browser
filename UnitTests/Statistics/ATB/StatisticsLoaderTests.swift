@@ -19,6 +19,7 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+import PixelExperimentKit
 @testable import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -27,6 +28,8 @@ class StatisticsLoaderTests: XCTestCase {
     private var mockAttributionsPixelHandler: MockAttributionsPixelHandler!
     private var mockStatisticsStore: StatisticsStore!
     private var testee: StatisticsLoader!
+    private var fireAppRetentionExperimentPixelsCalled = false
+    private var fireSearchExperimentPixelsCalled = false
     let pixelKit = PixelKit(dryRun: true,
                             appVersion: "1.0.0",
                             defaultHeaders: [:],
@@ -38,7 +41,10 @@ class StatisticsLoaderTests: XCTestCase {
 
         mockAttributionsPixelHandler = MockAttributionsPixelHandler()
         mockStatisticsStore = MockStatisticsStore()
-        testee = StatisticsLoader(statisticsStore: mockStatisticsStore, attributionPixelHandler: mockAttributionsPixelHandler)
+        testee = StatisticsLoader(statisticsStore: mockStatisticsStore,
+                                  attributionPixelHandler: mockAttributionsPixelHandler,
+                                  fireAppRetentionExperimentPixels: { self.fireAppRetentionExperimentPixelsCalled = true },
+                                  fireSearchExperimentPixels: { self.fireSearchExperimentPixelsCalled = true })
     }
 
     override func tearDown() {
@@ -47,6 +53,8 @@ class StatisticsLoaderTests: XCTestCase {
         mockStatisticsStore = nil
         mockAttributionsPixelHandler = nil
         testee = nil
+        fireAppRetentionExperimentPixelsCalled = false
+        fireSearchExperimentPixelsCalled = false
         super.tearDown()
     }
 
@@ -251,6 +259,7 @@ class StatisticsLoaderTests: XCTestCase {
         testee.refreshRetentionAtb(isSearch: true) {
             XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
             XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "v77-5")
+            XCTAssertTrue(self.fireSearchExperimentPixelsCalled)
             expect.fulfill()
         }
 
@@ -270,6 +279,8 @@ class StatisticsLoaderTests: XCTestCase {
             XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "searchRetentionAtb")
             XCTAssertTrue(self.mockStatisticsStore.isAppRetentionFiredToday)
+            XCTAssertTrue(self.fireAppRetentionExperimentPixelsCalled)
+            XCTAssertFalse(self.fireSearchExperimentPixelsCalled)
             expect.fulfill()
         }
 
@@ -289,6 +300,8 @@ class StatisticsLoaderTests: XCTestCase {
             XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "appRetentionAtb")
             XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "searchRetentionAtb")
             XCTAssertTrue(self.mockStatisticsStore.isAppRetentionFiredToday)
+            XCTAssertTrue(self.fireAppRetentionExperimentPixelsCalled)
+            XCTAssertFalse(self.fireSearchExperimentPixelsCalled)
             expect.fulfill()
         }
 
@@ -304,6 +317,8 @@ class StatisticsLoaderTests: XCTestCase {
             XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             XCTAssertNil(self.mockStatisticsStore.searchRetentionAtb)
             XCTAssertTrue(self.mockStatisticsStore.isAppRetentionFiredToday)
+            XCTAssertTrue(self.fireAppRetentionExperimentPixelsCalled)
+            XCTAssertFalse(self.fireSearchExperimentPixelsCalled)
             expect.fulfill()
         }
 

@@ -20,9 +20,9 @@ import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
-import WebKit
-import PhishingDetection
+import MaliciousSiteProtection
 import PrivacyDashboard
+import WebKit
 
 final class TabViewModel {
 
@@ -397,13 +397,20 @@ final class TabViewModel {
         switch tab.content {
             // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
-            if tab.error?.errorCode == NSURLErrorServerCertificateUntrusted {
+            switch tab.error as NSError? {
+            case let error as URLError? where error?.code == .serverCertificateUntrusted:
                 title = UserText.sslErrorPageTabTitle
-            } else if tab.error?.errorCode == PhishingDetectionError.detected.errorCode {
-                title = UserText.phishingErrorPageTabTitle
-            } else {
+            case .some(let error as MaliciousSiteError):
+                switch error.code {
+                case .phishing:
+                    title = UserText.phishingErrorPageTabTitle
+                // case .malware:
+                //     title = UserText.malwareErrorPageTabTitle
+                }
+            default:
                 title = UserText.tabErrorTitle
             }
+
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
         case .settings:
@@ -477,10 +484,17 @@ final class TabViewModel {
     }
 
     private func errorFaviconToShow(error: WKError?) -> NSImage {
-        if error?.errorCode == NSURLErrorServerCertificateUntrusted || error?.errorCode == PhishingDetectionError.detected.errorCode {
+        switch error as NSError? {
+        case let error as URLError? where error?.code == .serverCertificateUntrusted:
             return .redAlertCircle16
+        case .some(let error as MaliciousSiteError):
+            switch error.code {
+            case .phishing/*, .malware*/:
+                return .redAlertCircle16
+            }
+        default:
+            return.alertCircleColor16
         }
-        return.alertCircleColor16
     }
 
     // MARK: - Privacy icon animation

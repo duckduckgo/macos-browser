@@ -67,7 +67,7 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionNewUser,
-             frequency: .unique,
+             frequency: .uniqueByName,
              and: .expect(pixelName: "m_mac_netp_daily_active_u"),
              file: #filePath,
              line: #line)

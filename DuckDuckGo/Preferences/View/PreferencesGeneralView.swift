@@ -19,11 +19,11 @@
 import AppKit
 import Combine
 import FeatureFlags
+import MaliciousSiteProtection
+import PixelKit
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
-import PixelKit
-import PhishingDetection
 
 extension Preferences {
 
@@ -33,7 +33,7 @@ extension Preferences {
         @ObservedObject var searchModel: SearchPreferences
         @ObservedObject var tabsModel: TabsPreferences
         @ObservedObject var dataClearingModel: DataClearingPreferences
-        @ObservedObject var phishingDetectionModel: PhishingDetectionPreferences
+        @ObservedObject var phishingDetectionModel: MaliciousSiteProtectionPreferences
         @State private var showingCustomHomePageSheet = false
         @State private var isAddedToDock = false
         var dockCustomizer: DockCustomizer
@@ -191,21 +191,21 @@ extension Preferences {
                         .disabled(downloadsModel.alwaysRequestDownloadLocation)
 
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
-                                       isOn: $downloadsModel.alwaysRequestDownloadLocation)
+                                       isOn: $downloadsModel.alwaysRequestDownloadLocation).accessibilityIdentifier("PreferencesGeneralView.alwaysAskWhereToSaveFiles")
                     }
                 }
 
                 // SECTION 7: Phishing Detection
-                if featureFlagger.isFeatureOn(.phishingDetectionPreferences) {
-                    PreferencePaneSection(UserText.phishingDetectionHeader) {
+                if featureFlagger.isFeatureOn(.maliciousSiteProtectionErrorPage) {
+                    PreferencePaneSection(UserText.maliciousSiteDetectionHeader) {
                         PreferencePaneSubSection {
-                            ToggleMenuItem(UserText.phishingDetectionIsEnabled,
+                            ToggleMenuItem(UserText.maliciousSiteDetectionIsEnabled,
                                            isOn: $phishingDetectionModel.isEnabled)
                                 .onChange(of: phishingDetectionModel.isEnabled) { newValue in
-                                    PixelKit.fire(PhishingDetectionEvents.settingToggled(to: newValue))
+                                    PixelKit.fire(MaliciousSiteProtection.Event.settingToggled(to: newValue))
                                 }
                         }.padding(.bottom, 5)
-                        Text(UserText.phishingDetectionEnabledWarning)
+                        Text(UserText.maliciousDetectionEnabledWarning)
                             .font(.footnote)
                             .foregroundColor(.red)
                             .padding(.top, 5)

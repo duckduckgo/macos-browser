@@ -262,7 +262,8 @@ jobs:
             github_handle:"${{ github.actor }}" \
             is_scheduled_release:"${{ github.event_name == 'schedule' }}" \
             release_task_id:"${{ steps.task-id.outputs.asana_task_id }}" \
-            target_section_id:"${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }}"
+            target_section_id:"${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }}" \
+            tag:"${{ env.TAG }}"
 
       - name: Get tasks since last internal release
         id: get-tasks-since-last-internal-release

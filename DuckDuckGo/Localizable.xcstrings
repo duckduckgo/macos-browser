@@ -45503,7 +45503,7 @@
       }
     },
     "phishing-detection.enabled.warning" : {
-      "comment" : "A description box to warn users away from disabling phishing protection",
+      "comment" : "A description box to warn users away from disabling malicious site protection",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -45563,7 +45563,7 @@
       }
     },
     "phishing.error.page.tab.title" : {
-      "comment" : "Title shown in an error page tab that warn users of security risks on a website that has been flagged as malicious.",
+      "comment" : "Title shown in an error page tab that warn users of security risks on a website that has been flagged as Phishing.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
