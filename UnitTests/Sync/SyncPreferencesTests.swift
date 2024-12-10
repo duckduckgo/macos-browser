@@ -144,9 +144,10 @@ final class SyncPreferencesTests: XCTestCase {
 
     @MainActor func testOnTurnOffSyncThenSyncServiceIsDisconnected() async {
         let expectation = XCTestExpectation(description: "Disconnect completed")
-        Task {
+        Task { @MainActor in
             syncPreferences.turnOffSync()
             XCTAssertNil(managementDialogModel.currentDialog)
+            await Task.yield()
             expectation.fulfill()
         }
         await fulfillment(of: [expectation], timeout: 5.0)
@@ -221,8 +222,9 @@ final class SyncPreferencesTests: XCTestCase {
     func test_WhenSyncIsTurnedOff_ErrorHandlerSyncDidTurnOffCalled() async {
         let expectation = XCTestExpectation(description: "Sync Turned off")
 
-        Task {
+        Task { @MainActor in
             syncPreferences.turnOffSync()
+            await Task.yield()
             expectation.fulfill()
         }
 

@@ -144,11 +144,6 @@ extension URL {
     // base url for Error Page Alternate HTML loaded into Web View
     static let error = URL(string: "duck://error")!
 
-    static func duckFavicon(for faviconURL: URL) -> URL? {
-        let encodedURL = faviconURL.absoluteString.percentEncoded(withAllowedCharacters: .urlPathAllowed)
-        return URL(string: "duck://favicon/\(encodedURL)")
-    }
-
     static let dataBrokerProtection = URL(string: "duck://personal-information-removal")!
 
 #if !SANDBOX_TEST_TOOL

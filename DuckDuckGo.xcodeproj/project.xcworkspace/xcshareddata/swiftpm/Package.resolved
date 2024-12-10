@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "alex/malware-protection-6",
-        "revision" : "684db7b6bb5804c452f5ffa2169b4181d40b2026"
+        "revision" : "9975e63265e617ce9c25ae1be6d531f6de5e6592",
+        "version" : "221.0.0"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "c992041d16ec10d790e6204dce9abf9966d1363c",
-        "version" : "15.1.0"
+        "revision" : "88982a3802ac504e2f1a118a73bfdf2d8f4a7735",
+        "version" : "16.0.0"
       }
     },
     {

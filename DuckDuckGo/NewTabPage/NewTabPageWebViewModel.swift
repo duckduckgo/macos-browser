@@ -18,6 +18,7 @@
 
 import BrowserServicesKit
 import Combine
+import NewTabPage
 import WebKit
 
 /**
@@ -69,4 +70,19 @@ extension NewTabPageWebViewModel: WKNavigationDelegate {
 
 extension Notification.Name {
     static var newTabPageWebViewDidAppear = Notification.Name("newTabPageWebViewDidAppear")
+}
+
+extension WKWebViewConfiguration {
+
+    @MainActor
+    func applyNewTabPageWebViewConfiguration(with featureFlagger: FeatureFlagger, newTabPageUserScript: NewTabPageUserScript) {
+        if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
+            setURLSchemeHandler(
+                DuckURLSchemeHandler(featureFlagger: featureFlagger, isNTPSpecialPageSupported: true),
+                forURLScheme: URL.NavigationalScheme.duck.rawValue
+            )
+        }
+        preferences[.developerExtrasEnabled] = true
+        self.userContentController = NewTabPageUserContentController(newTabPageUserScript: newTabPageUserScript)
+     }
 }
