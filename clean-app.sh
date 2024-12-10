@@ -8,27 +8,32 @@ delete_data() {
 	if defaults read "${bundle_id}" &>/dev/null; then
 		defaults delete "${bundle_id}"
 	fi
-	rm -rf "${HOME}/Library/Containers/${bundle_id}/Data"
+	rm -r "${HOME}/Library/Containers/${bundle_id}/Data"
 
 	echo " Done."
 }
 
 bundle_id=
+config_id=
 
 case "$1" in
 	debug)
 		bundle_id="com.duckduckgo.macos.browser.debug"
+        config_ids="*com.duckduckgo.macos.browser.app-configuration.debug"
 		netp_bundle_ids_glob="*com.duckduckgo.macos.browser.network-protection*debug"
 		;;
 	review)
 		bundle_id="com.duckduckgo.macos.browser.review"
+        config_ids="*com.duckduckgo.macos.browser.app-configuration.review"
 		netp_bundle_ids_glob="*com.duckduckgo.macos.browser.network-protection*review"
 		;;
 	debug-appstore)
 		bundle_id="com.duckduckgo.mobile.ios.debug"
+        config_ids="*com.duckduckgo.mobile.ios.app-configuration.debug"
 		;;
 	review-appstore)
 		bundle_id="com.duckduckgo.mobile.ios.review"
+        config_ids="*com.duckduckgo.mobile.ios.app-configuration.review"
 		;;
 	*)
 		echo "usage: clean-app debug|review|debug-appstore|review-appstore"
@@ -37,6 +42,21 @@ case "$1" in
 esac
 
 delete_data "${bundle_id}"
+
+# shellcheck disable=SC2046
+read -r -a config_bundle_ids <<< $(
+    find "${HOME}/Library/Group Containers/" \
+        -type d \
+        -maxdepth 1 \
+        -name "${config_ids}" \
+        -exec basename {} \;
+)
+for config_id in "${config_bundle_ids[@]}"; do
+    path="${HOME}/Library/Group Containers/${config_id}"
+    printf '%s' "Deleting data at ${path}... "
+    rm -r "${path}"
+    echo "Done."
+done
 
 if [[ -n "${netp_bundle_ids_glob}" ]]; then
 	# shellcheck disable=SC2046
