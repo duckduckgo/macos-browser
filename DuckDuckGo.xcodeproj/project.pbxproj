@@ -10477,6 +10477,7 @@
 				B6E6B9EF2BA1FD90008AA7E1 /* Sources */,
 				B6E6B9F02BA1FD90008AA7E1 /* Frameworks */,
 				B6AEB5532BA3029B00781A09 /* Cleanup entitlements */,
+				1E666CE92D09883A0021A580 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -10636,7 +10637,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		1E6525E72D030964003B89C8 /* Resources */ = {
+		1E666CE92D09883A0021A580 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
