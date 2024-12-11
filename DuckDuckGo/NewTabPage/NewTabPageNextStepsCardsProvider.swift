@@ -53,7 +53,7 @@ final class NewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsProviding 
 
     var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> {
         let features = continueSetUpModel.$featuresMatrix.dropFirst().removeDuplicates()
-        let cardsDidBecomeOutdated = appearancePreferences.$isContinueSetUpCardsViewOutdated.dropFirst().removeDuplicates()
+        let cardsDidBecomeOutdated = appearancePreferences.$isContinueSetUpCardsViewOutdated.removeDuplicates()
 
         return Publishers.CombineLatest(features, cardsDidBecomeOutdated)
             .map { features, isOutdated -> [NewTabPageNextStepsCardsClient.CardID] in

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -5000,6 +5000,10 @@
 		FD23FD2C2886A81D007F6985 /* AutoconsentManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoconsentManagement.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		3792D51A2D09C72200FC15D6 /* NewTabPage */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = NewTabPage; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		3706FCA6293F65D500E42796 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -8035,6 +8039,7 @@
 				1D3B1AB7293405F5006F4388 /* PasswordManagers */,
 				B6106BA126A7BE430013B453 /* Permissions */,
 				CD34F0BE2C886462006826BE /* MaliciousSiteProtection */,
+				3792D51A2D09C72200FC15D6 /* NewTabPage */,
 				37D2377E287EFECD00BCE03B /* PinnedTabs */,
 				4B0511EE262CAEB300F6079C /* Preferences */,
 				31E163BB293A577200963C10 /* PrivacyReferenceTests */,
@@ -9975,6 +9980,9 @@
 				B6AEB5552BA3042300781A09 /* PBXTargetDependency */,
 				37079A93294236F20031BB3C /* PBXTargetDependency */,
 			);
+			fileSystemSynchronizedGroups = (
+				3792D51A2D09C72200FC15D6 /* NewTabPage */,
+			);
 			name = "Unit Tests App Store";
 			packageProductDependencies = (
 				3706FDD6293F661700E42796 /* OHHTTPStubs */,
@@ -10461,6 +10469,9 @@
 			dependencies = (
 				B6E6BA1D2BA2E049008AA7E1 /* PBXTargetDependency */,
 				B6CAC23D2B8F0EC6006CD402 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				3792D51A2D09C72200FC15D6 /* NewTabPage */,
 			);
 			name = "Unit Tests";
 			packageProductDependencies = (
