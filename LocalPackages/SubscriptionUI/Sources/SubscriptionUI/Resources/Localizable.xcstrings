@@ -2881,6 +2881,12 @@
             "value" : "VPN"
           }
         },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
