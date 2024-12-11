@@ -29,7 +29,7 @@ struct Choice: Codable, Sendable {
     let elements: [PageElement]
 }
 
-final class ClickAction: Action {
+struct ClickAction: Action {
     let id: String
     let actionType: ActionType
     let elements: [PageElement]?
