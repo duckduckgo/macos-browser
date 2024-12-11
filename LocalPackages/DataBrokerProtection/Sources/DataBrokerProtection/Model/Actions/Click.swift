@@ -35,47 +35,46 @@ struct ClickAction: Action {
     let elements: [PageElement]?
     let dataSource: DataSource?
     let choices: [Choice]?
-    let defaultClick: Default?
+    let `default`: Default?
 
-    enum Default: Codable {
-        case null
-        case elements([PageElement])
+    let hasDefault: Bool
 
-        // Custom decoding to handle the different cases
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            if container.allKeys.isEmpty {
-                self = .null
-            } else {
-                let elements = try container.decode([PageElement].self, forKey: .elements)
-                self = .elements(elements)
-            }
-        }
-
-        // Custom encoding to handle the different cases
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            switch self {
-            case .null:
-                // Encode an empty object to represent null
-                break
-            case .elements(let elements):
-                try container.encode(elements, forKey: .elements)
-            }
-        }
-
-        private enum CodingKeys: String, CodingKey {
-            case elements
-        }
+    struct Default: Codable {
+        let elements: [PageElement]?
     }
 
-    // Use CodingKeys so that we can use "default" as the JSON key name, which is invalid in Swift
-    private enum CodingKeys: String, CodingKey {
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.actionType = try container.decode(ActionType.self, forKey: .actionType)
+        self.elements = try container.decodeIfPresent([PageElement].self, forKey: .elements)
+        self.dataSource = try container.decodeIfPresent(DataSource.self, forKey: .dataSource)
+        self.choices = try container.decodeIfPresent([Choice].self, forKey: .choices)
+        self.default = try container.decodeIfPresent(Default.self, forKey: .default)
+        self.hasDefault = container.contains(.default)
+    }
+
+    enum CodingKeys: String, CodingKey {
         case id
         case actionType
         case elements
         case dataSource
         case choices
-        case defaultClick = "default"
+        case `default`
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.id, forKey: .id)
+        try container.encode(self.actionType, forKey: .actionType)
+        try container.encodeIfPresent(self.elements, forKey: .elements)
+        try container.encodeIfPresent(self.dataSource, forKey: .dataSource)
+        try container.encodeIfPresent(self.choices, forKey: .choices)
+
+        if self.hasDefault {
+            try container.encode(self.default, forKey: .default)
+        } else {
+            try container.encodeNil(forKey: .default)
+        }
     }
 }
