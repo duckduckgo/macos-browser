@@ -45,13 +45,22 @@ final class NewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsProviding 
     }
 
     var cards: [NewTabPageNextStepsCardsClient.CardID] {
-        continueSetUpModel.featuresMatrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
+        guard !appearancePreferences.isContinueSetUpCardsViewOutdated else {
+            return []
+        }
+        return continueSetUpModel.featuresMatrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
     }
 
     var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> {
-        continueSetUpModel.$featuresMatrix.dropFirst().removeDuplicates()
-            .map { matrix in
-                matrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
+        let features = continueSetUpModel.$featuresMatrix.dropFirst().removeDuplicates()
+        let cardsDidBecomeOutdated = appearancePreferences.$isContinueSetUpCardsViewOutdated.filter({ $0 })
+
+        return Publishers.CombineLatest(features, cardsDidBecomeOutdated)
+            .map { features, isOutdated -> [NewTabPageNextStepsCardsClient.CardID] in
+                guard !isOutdated else {
+                    return []
+                }
+                return features.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
             }
             .eraseToAnyPublisher()
     }
