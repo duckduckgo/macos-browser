@@ -57,7 +57,20 @@ enum NewTabPagePixel: PixelKitEventV2 {
     // MARK: - Debug
 
     /**
-     * Event Trigger: Privacy Stats reports a database error, as outlined by `PrivacyStatsError`. This is a debug (health) pixel.
+     * Event Trigger: Privacy Stats database fails to be initialized. Firing this pixel is followed by an app crash with a `fatalError`.
+     * This pixel can be fired when there's no space on disk, when database migration fails or when database was tampered with.
+     * This is a debug (health) pixel.
+     *
+     * Anomaly Investigation:
+     * - If this spikes in production it may mean we've released a new PriacyStats database model version
+     *   and didn't handle migration correctly in which case we need a hotfix.
+     * - Otherwise it may happen occasionally for users with not space left on device.
+     */
+    case privacyStatsCouldNotLoadDatabase
+
+    /**
+     * Event Trigger: Privacy Stats reports a database error when fetching, storing or clearing data,
+     * as outlined by `PrivacyStatsError`. This is a debug (health) pixel.
      *
      * Anomaly Investigation:
      * - The errors here are all Core Data errors. The error code identifies the specific enum case of `PrivacyStatsError`.
@@ -69,7 +82,8 @@ enum NewTabPagePixel: PixelKitEventV2 {
         switch self {
         case .blockedTrackingAttemptsShowLess: return "m_mac_new-tab-page_blocked-tracking-attempts_show-less"
         case .blockedTrackingAttemptsShowMore: return "m_mac_new-tab-page_blocked-tracking-attempts_show-more"
-        case .privacyStatsDatabaseError: return "m_mac_new-tab-page_privacy-stats_database_error"
+        case .privacyStatsCouldNotLoadDatabase: return "new-tab-page_privacy-stats_could-not-load-database"
+        case .privacyStatsDatabaseError: return "new-tab-page_privacy-stats_database_error"
         }
     }
 

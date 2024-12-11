@@ -5992,10 +5992,10 @@
 		37C9F78E2CF1C855004D73A1 /* PrivacyStats */ = {
 			isa = PBXGroup;
 			children = (
-				37E307AA2D0745D500599500 /* PrivacyStatsErrorHandler.swift */,
 				37FC2A162CF903000048E226 /* Mocks */,
-				370245FC2CF7C64B00CD79A3 /* PrivacyStatsTrackerDataProvider.swift */,
 				37DF37082CF38CD3005ED34B /* PrivacyStatsDatabase.swift */,
+				37E307AA2D0745D500599500 /* PrivacyStatsErrorHandler.swift */,
+				370245FC2CF7C64B00CD79A3 /* PrivacyStatsTrackerDataProvider.swift */,
 			);
 			path = PrivacyStats;
 			sourceTree = "<group>";
