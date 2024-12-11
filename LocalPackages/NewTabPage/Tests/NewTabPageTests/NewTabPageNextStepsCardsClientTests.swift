@@ -134,7 +134,7 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
 
         XCTAssertEqual(model.willDisplayCardsCalls, [])
 
-        try await performAndWaitForWillDisplayCards() {
+        try await performAndWaitForWillDisplayCards {
             try await handleMessageIgnoringResponse(named: .getConfig)
         }
 
