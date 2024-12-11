@@ -190,7 +190,7 @@
 		1DDD3EC12B84F5D5004CBF2B /* PreferencesCookiePopupProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDD3EBF2B84F5D5004CBF2B /* PreferencesCookiePopupProtectionView.swift */; };
 		1DDD3EC42B84F96B004CBF2B /* CookiePopupProtectionPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDD3EC32B84F96B004CBF2B /* CookiePopupProtectionPreferences.swift */; };
 		1DDD3EC52B84F96B004CBF2B /* CookiePopupProtectionPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDD3EC32B84F96B004CBF2B /* CookiePopupProtectionPreferences.swift */; };
-		1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
+		1DDF076328F815AD00EDFBE3 /* NativeMessagingCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* NativeMessagingCommunicator.swift */; };
 		1DDF076428F815AD00EDFBE3 /* BWManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075E28F815AD00EDFBE3 /* BWManager.swift */; };
 		1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */; };
 		1DEDB3642C19934C006B6D1B /* MoreOptionsMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEDB3632C19934C006B6D1B /* MoreOptionsMenuButton.swift */; };
@@ -1034,7 +1034,7 @@
 		3706FEBF293F6EFF00E42796 /* BWError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076028F815AD00EDFBE3 /* BWError.swift */; };
 		3706FEC0293F6EFF00E42796 /* BWRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB39292B63B00065E5D6 /* BWRequest.swift */; };
 		3706FEC1293F6EFF00E42796 /* BWCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */; };
-		3706FEC3293F6F0600E42796 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
+		3706FEC3293F6F0600E42796 /* NativeMessagingCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* NativeMessagingCommunicator.swift */; };
 		3706FEC5293F6F0600E42796 /* BWInstallationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDEE8C28FC14760092FAA6 /* BWInstallationService.swift */; };
 		3706FEC6293F6F0600E42796 /* BWKeyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6216B129069BBF00386B2C /* BWKeyStorage.swift */; };
 		3706FEC8293F6F7500E42796 /* BWManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3706FEC7293F6F7500E42796 /* BWManagement.swift */; };
@@ -3508,7 +3508,7 @@
 		1DDD3EBF2B84F5D5004CBF2B /* PreferencesCookiePopupProtectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesCookiePopupProtectionView.swift; sourceTree = "<group>"; };
 		1DDD3EC32B84F96B004CBF2B /* CookiePopupProtectionPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CookiePopupProtectionPreferences.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCredential.swift; sourceTree = "<group>"; };
-		1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
+		1DDF075D28F815AD00EDFBE3 /* NativeMessagingCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeMessagingCommunicator.swift; sourceTree = "<group>"; };
 		1DDF075E28F815AD00EDFBE3 /* BWManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWManager.swift; sourceTree = "<group>"; };
 		1DDF075F28F815AD00EDFBE3 /* BWStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWStatus.swift; sourceTree = "<group>"; };
 		1DDF076028F815AD00EDFBE3 /* BWError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWError.swift; sourceTree = "<group>"; };
@@ -5466,7 +5466,7 @@
 			isa = PBXGroup;
 			children = (
 				4BBDEE8C28FC14760092FAA6 /* BWInstallationService.swift */,
-				1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */,
+				1DDF075D28F815AD00EDFBE3 /* NativeMessagingCommunicator.swift */,
 				1D02633428D8A9A9005CBB41 /* BWEncryption.h */,
 				1D02633528D8A9A9005CBB41 /* BWEncryption.m */,
 				1D43EB30292788C70065E5D6 /* BWEncryptionOutput.h */,
@@ -11403,7 +11403,7 @@
 				3148727B2CC689C200EEF89B /* AIChatToolBarPopUpOnboardingViewModel.swift in Sources */,
 				BBFB72802C48047C0088884C /* SortBookmarksViewModel.swift in Sources */,
 				37197EA72942443D00394917 /* AuthenticationAlert.swift in Sources */,
-				3706FEC3293F6F0600E42796 /* BWCommunicator.swift in Sources */,
+				3706FEC3293F6F0600E42796 /* NativeMessagingCommunicator.swift in Sources */,
 				3706FAFA293F65D500E42796 /* CleanThisHistoryMenuItem.swift in Sources */,
 				1DA6D0FE2A1FF9A100540406 /* HTTPCookie.swift in Sources */,
 				3706FAFC293F65D500E42796 /* DownloadListItem.swift in Sources */,
@@ -13157,7 +13157,7 @@
 				4BE6547E271FCD4D008D1D63 /* PasswordManagementIdentityModel.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
-				1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */,
+				1DDF076328F815AD00EDFBE3 /* NativeMessagingCommunicator.swift in Sources */,
 				9FEE98652B846870002E44E8 /* AddEditBookmarkView.swift in Sources */,
 				85589E9127BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift in Sources */,
 				85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */,
