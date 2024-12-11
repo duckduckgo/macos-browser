@@ -62,6 +62,7 @@ extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding 
         guard cards.contains(.addAppToDockMac) else {
             return
         }
+        continueSetUpCardsViewDidAppear()
         PixelKit.fire(GeneralPixel.addToDockNewTabPageCardPresented,
                       frequency: .uniqueByName,
                       includeAppVersionParameter: false)
