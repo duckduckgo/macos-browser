@@ -487,13 +487,16 @@ final class SaveCredentialsViewController: NSViewController {
     }
 
     private func evaluateCredentialsAndFirePixels(for action: Action, credentials: SecureVaultModels.WebsiteCredentials?) {
+        let backfilledKey = GeneralPixel.AutofillParameterKeys.backfilled
         switch action {
         case .displayed:
             if let credentials = credentials {
                 if isPasswordUpdated(credentials: credentials) {
-                    PixelKit.fire(GeneralPixel.autofillLoginsUpdatePasswordInlineDisplayed)
+                    let backfilled = credentials.password.flatMap { String(data: $0, encoding: .utf8) }.isNilOrEmpty
+                    PixelKit.fire(GeneralPixel.autofillLoginsUpdatePasswordInlineDisplayed, withAdditionalParameters: [backfilledKey: String(describing: backfilled)])
                 } else {
-                    PixelKit.fire(GeneralPixel.autofillLoginsUpdateUsernameInlineDisplayed)
+                    let backfilled = credentials.account.username.isNilOrEmpty
+                    PixelKit.fire(GeneralPixel.autofillLoginsUpdateUsernameInlineDisplayed, withAdditionalParameters: [backfilledKey: String(describing: backfilled)])
                 }
             } else {
                 if usernameField.stringValue.trimmingWhitespace().isEmpty {
@@ -505,14 +508,18 @@ final class SaveCredentialsViewController: NSViewController {
         case .confirmed, .dismissed:
             if let credentials = credentials {
                 if isUsernameUpdated(credentials: credentials) {
+                    let backfilled = credentials.account.username.isNilOrEmpty
                     firePixel(for: action,
                               confirmedPixel: GeneralPixel.autofillLoginsUpdateUsernameInlineConfirmed,
-                              dismissedPixel: GeneralPixel.autofillLoginsUpdateUsernameInlineDismissed)
+                              dismissedPixel: GeneralPixel.autofillLoginsUpdateUsernameInlineDismissed,
+                              withAdditionalParameters: [backfilledKey: String(describing: backfilled)])
                 }
                 if isPasswordUpdated(credentials: credentials) {
+                    let backfilled = credentials.password.flatMap { String(data: $0, encoding: .utf8) }.isNilOrEmpty
                     firePixel(for: action,
                               confirmedPixel: GeneralPixel.autofillLoginsUpdatePasswordInlineConfirmed,
-                              dismissedPixel: GeneralPixel.autofillLoginsUpdatePasswordInlineDismissed)
+                              dismissedPixel: GeneralPixel.autofillLoginsUpdatePasswordInlineDismissed,
+                              withAdditionalParameters: [backfilledKey: String(describing: backfilled)])
                 }
             } else {
                 if usernameField.stringValue.trimmingWhitespace().isEmpty {
@@ -528,9 +535,9 @@ final class SaveCredentialsViewController: NSViewController {
         }
     }
 
-    private func firePixel(for action: Action, confirmedPixel: PixelKitEventV2, dismissedPixel: PixelKitEventV2) {
+    private func firePixel(for action: Action, confirmedPixel: PixelKitEventV2, dismissedPixel: PixelKitEventV2, withAdditionalParameters parameters: [String: String]? = nil) {
         let pixel = action == .confirmed ? confirmedPixel : dismissedPixel
-        PixelKit.fire(pixel)
+        PixelKit.fire(pixel, withAdditionalParameters: parameters)
     }
 
 }

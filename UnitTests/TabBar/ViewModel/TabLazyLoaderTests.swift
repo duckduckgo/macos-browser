@@ -59,7 +59,7 @@ private final class TabMock: LazyLoadable {
 
         reloadClosure = { tab in
             // instantly notify that loading has finished (or failed)
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 reloadExpectation?.fulfill()
                 tab.loadingFinishedSubject.send(tab)
             }
@@ -146,7 +146,7 @@ class TabLazyLoaderTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), false)
     }
 
-    func testWhenSelectedTabIsNotUrlThenLazyLoadingStartsImmediately() throws {
+    func testWhenSelectedTabIsNotUrlThenLazyLoadingStartsImmediately() async throws {
         let reloadExpectation = expectation(description: "TabMock.reload() called")
         reloadExpectation.expectedFulfillmentCount = 2
 
@@ -157,21 +157,14 @@ class TabLazyLoaderTests: XCTestCase {
         ]
         dataSource.selectedTab = dataSource.tabs.first
 
-        let lazyLoader = TabLazyLoader(dataSource: dataSource)
+        let lazyLoader = try XCTUnwrap(TabLazyLoader(dataSource: dataSource))
 
-        var didFinishEvents: [Bool] = []
-        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
-
-        // When
-        lazyLoader?.scheduleLazyLoading()
-
-        // Then
-        waitForExpectations(timeout: 0.3)
-        XCTAssertEqual(didFinishEvents.count, 1)
-        XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
+        await waitForLoadingDidFinishEvent(lazyLoader, and: [reloadExpectation]) {
+            lazyLoader.scheduleLazyLoading()
+        }
     }
 
-    func testThatLazyLoadingStartsAfterCurrentUrlTabFinishesLoading() throws {
+    func testThatLazyLoadingStartsAfterCurrentUrlTabFinishesLoading() async throws {
         let reloadExpectation = expectation(description: "TabMock.reload() called")
         reloadExpectation.expectedFulfillmentCount = 2
 
@@ -184,19 +177,12 @@ class TabLazyLoaderTests: XCTestCase {
         ]
         dataSource.selectedTab = dataSource.tabs.first
 
-        let lazyLoader = TabLazyLoader(dataSource: dataSource)
+        let lazyLoader = try XCTUnwrap(TabLazyLoader(dataSource: dataSource))
 
-        var didFinishEvents: [Bool] = []
-        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
-
-        // When
-        lazyLoader?.scheduleLazyLoading()
-        selectedUrlTab.reload()
-
-        // Then
-        waitForExpectations(timeout: 0.3)
-        XCTAssertEqual(didFinishEvents.count, 1)
-        XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
+        await waitForLoadingDidFinishEvent(lazyLoader, and: [reloadExpectation]) {
+            lazyLoader.scheduleLazyLoading()
+            selectedUrlTab.reload()
+        }
     }
 
     func testThatLazyLoadingDoesNotStartIfCurrentUrlTabDoesNotFinishLoading() async throws {
@@ -223,7 +209,7 @@ class TabLazyLoaderTests: XCTestCase {
         await fulfillment(of: [reloadExpectation], timeout: 0.1)
     }
 
-    func testThatLazyLoadingStopsAfterLoadingMaximumNumberOfTabs() throws {
+    func testThatLazyLoadingStopsAfterLoadingMaximumNumberOfTabs() async throws {
         let maxNumberOfLazyLoadedTabs = TabLazyLoader<TabLazyLoaderDataSourceMock>.Const.maxNumberOfLazyLoadedTabs
         let reloadExpectation = expectation(description: "TabMock.reload() called")
         reloadExpectation.expectedFulfillmentCount = maxNumberOfLazyLoadedTabs
@@ -234,21 +220,14 @@ class TabLazyLoaderTests: XCTestCase {
         }
         dataSource.selectedTab = dataSource.tabs.first
 
-        let lazyLoader = TabLazyLoader(dataSource: dataSource)
+        let lazyLoader = try XCTUnwrap(TabLazyLoader(dataSource: dataSource))
 
-        var didFinishEvents: [Bool] = []
-        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
-
-        // When
-        lazyLoader?.scheduleLazyLoading()
-
-        // Then
-        waitForExpectations(timeout: 3.0)
-        XCTAssertEqual(didFinishEvents.count, 1)
-        XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
+        await waitForLoadingDidFinishEvent(lazyLoader, and: [reloadExpectation]) {
+            lazyLoader.scheduleLazyLoading()
+        }
     }
 
-    func testThatLazyLoadingSkipsTabsSelectedInCurrentSession() throws {
+    func testThatLazyLoadingSkipsTabsSelectedInCurrentSession() async throws {
         let reloadExpectation = expectation(description: "TabMock.reload() called")
         reloadExpectation.expectedFulfillmentCount = 2
 
@@ -257,34 +236,27 @@ class TabLazyLoaderTests: XCTestCase {
         dataSource.tabs = [
             selectedUrlTab,
             TabMock(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation), // we expect this to be lazy loaded
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation), // we expect this to be lazy loaded
             TabMock(isUrl: true, reloadExpectation: reloadExpectation),
             TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = selectedUrlTab
 
-        let lazyLoader = TabLazyLoader(dataSource: dataSource)
+        let lazyLoader = try XCTUnwrap(TabLazyLoader(dataSource: dataSource))
 
-        var didFinishEvents: [Bool] = []
-        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
+        await waitForLoadingDidFinishEvent(lazyLoader, and: [reloadExpectation]) {
+            lazyLoader.scheduleLazyLoading()
 
-        // When
-        lazyLoader?.scheduleLazyLoading()
+            dataSource.selectedTabSubject.send(dataSource.tabs[1])
+            dataSource.selectedTabSubject.send(dataSource.tabs[4])
+            dataSource.selectedTabSubject.send(dataSource.tabs[5])
 
-        dataSource.selectedTabSubject.send(dataSource.tabs[1])
-        dataSource.selectedTabSubject.send(dataSource.tabs[4])
-        dataSource.selectedTabSubject.send(dataSource.tabs[5])
-
-        selectedUrlTab.reload()
-
-        // Then
-        waitForExpectations(timeout: 1)
-        XCTAssertEqual(didFinishEvents.count, 1)
-        XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
+            selectedUrlTab.reload()
+        }
     }
 
-    func testWhenTabNumberExceedsMaximumForLazyLoadingThenAdjacentTabsAreLoadedFirst() throws {
+    func testWhenTabNumberExceedsMaximumForLazyLoadingThenAdjacentTabsAreLoadedFirst() async throws {
         let maxNumberOfLazyLoadedTabs = TabLazyLoader<TabLazyLoaderDataSourceMock>.Const.maxNumberOfLazyLoadedTabs
         let reloadExpectation = expectation(description: "TabMock.reload() called")
         reloadExpectation.expectedFulfillmentCount = maxNumberOfLazyLoadedTabs + 1
@@ -295,7 +267,7 @@ class TabLazyLoaderTests: XCTestCase {
         for i in 0..<(2 * maxNumberOfLazyLoadedTabs) {
             let tab = TabMock(isUrl: true, url: "http://\(i).com".url!, selectedTimestamp: Date(timeIntervalSince1970: .init(i)))
             tab.reloadClosure = { tab in
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     reloadedTabsIndices.append(i)
                     tab.loadingFinishedSubject.send(tab)
                     reloadExpectation.fulfill()
@@ -308,28 +280,23 @@ class TabLazyLoaderTests: XCTestCase {
         dataSource.selectedTab = dataSource.tabs[3]
         dataSource.selectedTabIndex = .unpinned(3)
 
-        let lazyLoader = TabLazyLoader(dataSource: dataSource)
+        let lazyLoader = try XCTUnwrap(TabLazyLoader(dataSource: dataSource))
 
-        var didFinishEvents: [Bool] = []
-        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
+        await waitForLoadingDidFinishEvent(lazyLoader, and: [reloadExpectation]) {
+            lazyLoader.scheduleLazyLoading()
+            dataSource.selectedTab?.reload()
+        }
 
-        // When
-        lazyLoader?.scheduleLazyLoading()
-        dataSource.selectedTab?.reload()
-
-        // Then
-        waitForExpectations(timeout: 0.3)
-        XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(reloadedTabsIndices, [3, 4, 2, 5, 1, 6, 0, 7, 8, 9, 10, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30])
     }
 
     /**
      * This test sets up 2 tabs suitable for lazy loading.
-     * When the first one is reloaded, it artificially triggers currently selected tab reload.
+     * When the first one is lazy loaded, it artificially triggers currently selected tab reload.
      * This effectively pauses lazy loading and prevents the other tab from being reloaded
      * until currently selected tab is marked as done loading.
      */
-    func testWhenSelectedTabIsLoadingThenLazyLoadingIsPaused() throws {
+    func testWhenSelectedTabIsLoadingThenLazyLoadingIsPaused() async throws {
         var reloadedTabsUrls = [URL?]()
 
         let tabReloadClosure: (TabMock) -> Void = { tab in
@@ -351,28 +318,44 @@ class TabLazyLoaderTests: XCTestCase {
         dataSource.tabs = [.mockNotUrl, newTab, oldTab]
         dataSource.selectedTab = dataSource.tabs.first
 
-        let lazyLoader = TabLazyLoader(dataSource: dataSource)
+        let lazyLoader = try XCTUnwrap(TabLazyLoader(dataSource: dataSource))
 
-        var didFinishEvents: [Bool] = []
         var isLazyLoadingPausedEvents: [Bool] = []
+        lazyLoader.isLazyLoadingPausedPublisher.sink(receiveValue: { isLazyLoadingPausedEvents.append($0) }).store(in: &cancellables)
 
-        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
-        lazyLoader?.isLazyLoadingPausedPublisher.sink(receiveValue: { isLazyLoadingPausedEvents.append($0) }).store(in: &cancellables)
+        await waitForLoadingDidFinishEvent(lazyLoader) {
+            lazyLoader.scheduleLazyLoading()
+            XCTAssertEqual(reloadedTabsUrls, [newTab.url])
 
-        // When
-        lazyLoader?.scheduleLazyLoading()
+            // unpause lazy loading here
+            dataSource.isSelectedTabLoading = false
+            dataSource.isSelectedTabLoadingSubject.send(false)
+        }
 
-        XCTAssertEqual(reloadedTabsUrls, [newTab.url])
-
-        // unpause lazy loading here
-        dataSource.isSelectedTabLoading = false
-        dataSource.isSelectedTabLoadingSubject.send(false)
-
-        // Then
         XCTAssertEqual(reloadedTabsUrls, [newTab.url, oldTab.url])
-        XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(isLazyLoadingPausedEvents, [false, true, false])
-        XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
     }
 
+    func waitForLoadingDidFinishEvent<DataSource>(
+        _ lazyLoader: TabLazyLoader<DataSource>,
+        and otherExpectations: [XCTestExpectation] = [],
+        expectedDidFinishValue expectedValue: Bool = true,
+        file: StaticString = #file,
+        line: UInt = #line,
+        _ block: () async -> Void
+    ) async {
+
+        let expectation = self.expectation(description: "loadingDidFinish")
+        var result = false
+        let cancellable = lazyLoader.lazyLoadingDidFinishPublisher.sink { didLoadAnyTabs in
+            result = didLoadAnyTabs
+            expectation.fulfill()
+        }
+
+        await block()
+
+        await fulfillment(of: otherExpectations + [expectation], timeout: 2)
+        cancellable.cancel()
+        XCTAssertEqual(result, expectedValue, file: file, line: line)
+    }
 }

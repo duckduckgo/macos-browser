@@ -1290,6 +1290,8 @@
 		37E260902C8A3ABE006EE07F /* HomePageSettingsModelNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E2608E2C8A3ABE006EE07F /* HomePageSettingsModelNavigator.swift */; };
 		37E260922C8A3EB4006EE07F /* MockHomePageSettingsModelNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E260912C8A3EB4006EE07F /* MockHomePageSettingsModelNavigator.swift */; };
 		37E260932C8A3EB4006EE07F /* MockHomePageSettingsModelNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E260912C8A3EB4006EE07F /* MockHomePageSettingsModelNavigator.swift */; };
+		37E307A72D072A1600599500 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37E307A62D072A1600599500 /* Common */; };
+		37E307A92D072A1E00599500 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37E307A82D072A1E00599500 /* Common */; };
 		37EE81412D00DBC40068034A /* WebKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 37EE81402D00DBC40068034A /* WebKitExtensions */; };
 		37EE81432D00DBCC0068034A /* WebKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 37EE81422D00DBCC0068034A /* WebKitExtensions */; };
 		37F19A6528E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */; };
@@ -1947,6 +1949,10 @@
 		84B49F0F2CB10F0900FF08BB /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 84B49F0E2CB10F0900FF08BB /* OHHTTPStubsSwift */; };
 		84BBC7FF2CFA0D2F00BAE57A /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 84BBC7FE2CFA0D2F00BAE57A /* TestUtils */; };
 		84BBC8012CFA0D3800BAE57A /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 84BBC8002CFA0D3800BAE57A /* TestUtils */; };
+		84C96E462CF9BB6400A80A01 /* malwareFilterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E442CF9BB6400A80A01 /* malwareFilterSet.json */; };
+		84C96E472CF9BB6400A80A01 /* malwareHashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */; };
+		84C96E482CF9BB6400A80A01 /* malwareFilterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E442CF9BB6400A80A01 /* malwareFilterSet.json */; };
+		84C96E492CF9BB6400A80A01 /* malwareHashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DDB90A2C92B66E008C997B /* WKVisitedLinkStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */; };
@@ -3052,8 +3058,6 @@
 		D6BC8AC82C5A95B10025375B /* DuckPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = D6BC8AC72C5A95B10025375B /* DuckPlayer */; };
 		D6E0ACB12CE36DCA005D3486 /* DuckPlayerOverlayPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E0ACB02CE36DC4005D3486 /* DuckPlayerOverlayPixels.swift */; };
 		D6E0ACB22CE36DCA005D3486 /* DuckPlayerOverlayPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E0ACB02CE36DC4005D3486 /* DuckPlayerOverlayPixels.swift */; };
-		D6E0ACB42CE36FB0005D3486 /* DuckPlayerOverlayPixelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E0ACB32CE36FA8005D3486 /* DuckPlayerOverlayPixelsTests.swift */; };
-		D6E0ACB52CE36FB0005D3486 /* DuckPlayerOverlayPixelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E0ACB32CE36FA8005D3486 /* DuckPlayerOverlayPixelsTests.swift */; };
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
 		EA18D1CA272F0DC8006DC101 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
 		EA8AE76A279FBDB20078943E /* ClickToLoadTDSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */; };
@@ -4178,6 +4182,8 @@
 		84537A022C998C24008723BC /* FireWindowSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireWindowSession.swift; sourceTree = "<group>"; };
 		848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuViewController.swift; sourceTree = "<group>"; };
 		84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+UnitTests.swift"; sourceTree = "<group>"; };
+		84C96E442CF9BB6400A80A01 /* malwareFilterSet.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = malwareFilterSet.json; sourceTree = "<group>"; };
+		84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = malwareHashPrefixes.json; sourceTree = "<group>"; };
 		84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperTests.swift; sourceTree = "<group>"; };
 		84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKVisitedLinkStoreWrapper.swift; sourceTree = "<group>"; };
 		84F1C8CE2C7705B500716446 /* BookmarksBarMenuPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuPopover.swift; sourceTree = "<group>"; };
@@ -4916,7 +4922,6 @@
 		CDE248A72C821FFE00F9399D /* MaliciousSiteProtectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaliciousSiteProtectionState.swift; sourceTree = "<group>"; };
 		D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButtonMenuFactory.swift; sourceTree = "<group>"; };
 		D6E0ACB02CE36DC4005D3486 /* DuckPlayerOverlayPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOverlayPixels.swift; sourceTree = "<group>"; };
-		D6E0ACB32CE36FA8005D3486 /* DuckPlayerOverlayPixelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOverlayPixelsTests.swift; sourceTree = "<group>"; };
 		EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadUserScript.swift; sourceTree = "<group>"; };
 		EA18D1C9272F0DC8006DC101 /* social_images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = social_images; sourceTree = "<group>"; };
 		EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToLoadTDSTests.swift; sourceTree = "<group>"; };
@@ -5120,6 +5125,7 @@
 				4B41EDAB2B1544B2001EEDF4 /* LoginItems in Frameworks */,
 				7B00997D2B6508B700FE7C31 /* NetworkProtectionProxy in Frameworks */,
 				7BEEA5122AD1235B00A9E72B /* NetworkProtectionIPC in Frameworks */,
+				37E307A72D072A1600599500 /* Common in Frameworks */,
 				7B8FDD202CDD88C500720907 /* FeatureFlags in Frameworks */,
 				7BA7CC5F2AD1210C0042E5CE /* Networking in Frameworks */,
 				02A15D942C88D78F001A4237 /* Persistence in Frameworks */,
@@ -5143,6 +5149,7 @@
 				7BA7CC612AD1211C0042E5CE /* Networking in Frameworks */,
 				F198C71C2BD18A61000BF24D /* PixelKit in Frameworks */,
 				02A15D982C88D79D001A4237 /* Persistence in Frameworks */,
+				37E307A92D072A1E00599500 /* Common in Frameworks */,
 				7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */,
 				02A15D962C88D797001A4237 /* Configuration in Frameworks */,
 				BDADBDCB2BD2BC2800421B9B /* Lottie in Frameworks */,
@@ -5797,7 +5804,6 @@
 		376718FE28E58504003A2A15 /* YoutubePlayer */ = {
 			isa = PBXGroup;
 			children = (
-				D6E0ACB32CE36FA8005D3486 /* DuckPlayerOverlayPixelsTests.swift */,
 				3199AF812C80736B003AEBDC /* DuckPlayerOnboardingLocationValidatorTests.swift */,
 				3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */,
 				567DA94429E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift */,
@@ -9745,11 +9751,13 @@
 		CDE248A22C821FD500F9399D /* MaliciousSiteProtection */ = {
 			isa = PBXGroup;
 			children = (
-				CDE248A62C821FFE00F9399D /* phishingFilterSet.json */,
-				CDE248A32C821FFE00F9399D /* phishingHashPrefixes.json */,
 				CDE248A42C821FFE00F9399D /* MaliciousSiteProtectionManager.swift */,
 				CDE248A52C821FFE00F9399D /* MaliciousSiteProtectionPreferences.swift */,
 				CDE248A72C821FFE00F9399D /* MaliciousSiteProtectionState.swift */,
+				84C96E442CF9BB6400A80A01 /* malwareFilterSet.json */,
+				84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */,
+				CDE248A62C821FFE00F9399D /* phishingFilterSet.json */,
+				CDE248A32C821FFE00F9399D /* phishingHashPrefixes.json */,
 			);
 			path = MaliciousSiteProtection;
 			sourceTree = "<group>";
@@ -10111,6 +10119,7 @@
 				02A15D912C88D789001A4237 /* Configuration */,
 				02A15D932C88D78F001A4237 /* Persistence */,
 				7B8FDD1F2CDD88C500720907 /* FeatureFlags */,
+				37E307A62D072A1600599500 /* Common */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo VPN.app */;
@@ -10148,6 +10157,7 @@
 				02A15D952C88D797001A4237 /* Configuration */,
 				02A15D972C88D79D001A4237 /* Persistence */,
 				7B8FDD212CDD88CB00720907 /* FeatureFlags */,
+				37E307A82D072A1E00599500 /* Common */,
 			);
 			productName = DuckDuckGoAgentAppStore;
 			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */;
@@ -10658,6 +10668,8 @@
 				3706FCD0293F65D500E42796 /* BookmarksBarCollectionViewItem.xib in Resources */,
 				3706FCD2293F65D500E42796 /* shield.json in Resources */,
 				7B5A23762C46A4A8007213AC /* ExcludedDomains.storyboard in Resources */,
+				84C96E482CF9BB6400A80A01 /* malwareFilterSet.json in Resources */,
+				84C96E492CF9BB6400A80A01 /* malwareHashPrefixes.json in Resources */,
 				3706FCD6293F65D500E42796 /* httpsMobileV2FalsePositives.json in Resources */,
 				3706FCD8293F65D500E42796 /* BookmarksBar.storyboard in Resources */,
 				3706FCD9293F65D500E42796 /* trackers-1.json in Resources */,
@@ -10852,6 +10864,8 @@
 				4BE5336B286912D40019DBFD /* BookmarksBarCollectionViewItem.xib in Resources */,
 				AA34396C2754D4E300B241FA /* shield.json in Resources */,
 				7B5A23752C46A4A8007213AC /* ExcludedDomains.storyboard in Resources */,
+				84C96E462CF9BB6400A80A01 /* malwareFilterSet.json in Resources */,
+				84C96E472CF9BB6400A80A01 /* malwareHashPrefixes.json in Resources */,
 				4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */,
 				4BD18F05283F151F00058124 /* BookmarksBar.storyboard in Resources */,
 				AA3439792754D55100B241FA /* trackers-1.json in Resources */,
@@ -12314,7 +12328,6 @@
 				3706FE27293F661700E42796 /* AppPrivacyConfigurationTests.swift in Sources */,
 				B626A7652992506A00053070 /* SerpHeadersNavigationResponderTests.swift in Sources */,
 				9F6434712BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift in Sources */,
-				D6E0ACB52CE36FB0005D3486 /* DuckPlayerOverlayPixelsTests.swift in Sources */,
 				9F26060C2B85C20B00819292 /* AddEditBookmarkDialogViewModelTests.swift in Sources */,
 				567A23DF2C89980A0010F66C /* OnboardingNavigationDelegateTests.swift in Sources */,
 				562532A12BC069190034D316 /* ZoomPopoverViewModelTests.swift in Sources */,
@@ -13880,7 +13893,6 @@
 				B630E7FE29C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */,
 				370270C02C78EB13002E44E4 /* HomePageSettingsModelTests.swift in Sources */,
 				4B9292BB2667103100AD2C21 /* BookmarkNodeTests.swift in Sources */,
-				D6E0ACB42CE36FB0005D3486 /* DuckPlayerOverlayPixelsTests.swift in Sources */,
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				56CE77612C7DFCF800AC1ED2 /* OnboardingSuggestedSearchesProviderTests.swift in Sources */,
@@ -15233,7 +15245,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 218.0.2;
+				version = 221.0.1;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -15612,6 +15624,16 @@
 		37DF37062CF38B9F005ED34B /* PrivacyStats */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PrivacyStats;
+		};
+		37E307A62D072A1600599500 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
+		};
+		37E307A82D072A1E00599500 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
 		};
 		37EE81402D00DBC40068034A /* WebKitExtensions */ = {
 			isa = XCSwiftPackageProductDependency;

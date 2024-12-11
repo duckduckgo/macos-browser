@@ -222,8 +222,9 @@ final class SyncPreferencesTests: XCTestCase {
     func test_WhenSyncIsTurnedOff_ErrorHandlerSyncDidTurnOffCalled() async {
         let expectation = XCTestExpectation(description: "Sync Turned off")
 
-        Task {
+        Task { @MainActor in
             syncPreferences.turnOffSync()
+            await Task.yield()
             expectation.fulfill()
         }
 

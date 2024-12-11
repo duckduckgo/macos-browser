@@ -22,7 +22,7 @@ import BrowserServicesKit
 public enum FeatureFlag: String, CaseIterable {
     case debugMenu
     case sslCertificatesBypass
-    case maliciousSiteProtectionErrorPage
+    case maliciousSiteProtection
 
     /// Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
@@ -49,6 +49,8 @@ public enum FeatureFlag: String, CaseIterable {
 
     case isPrivacyProLaunchedROW
     case isPrivacyProLaunchedROWOverride
+
+    case autofillPartialFormSaves
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -57,7 +59,9 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .htmlNewTabPage,
              .isPrivacyProLaunchedROWOverride:
             return true
-        case .maliciousSiteProtectionErrorPage:
+        case .maliciousSiteProtection:
+            return true
+        case .autofillPartialFormSaves:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -85,8 +89,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
         case .freemiumDBP:
             return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
-        case .maliciousSiteProtectionErrorPage:
-            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.allowErrorPage))
+        case .maliciousSiteProtection:
+            return .remoteReleasable(.feature(.maliciousSiteProtection))
         case .contextualOnboarding:
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
@@ -101,6 +105,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROW))
         case .isPrivacyProLaunchedROWOverride:
             return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROWOverride))
+        case .autofillPartialFormSaves:
+            return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         }
     }
 }

@@ -25,7 +25,7 @@ protocol MaliciousSiteProtectionPreferencesPersistor {
 
 struct MaliciousSiteProtectionPreferencesUserDefaultsPersistor: MaliciousSiteProtectionPreferencesPersistor {
 
-    @UserDefaultsWrapper(key: .phishingDetectionEnabled, defaultValue: true)
+    @UserDefaultsWrapper(key: .maliciousSiteDetectionEnabled, defaultValue: true)
     var isEnabled: Bool
 }
 
