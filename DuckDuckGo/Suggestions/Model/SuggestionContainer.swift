@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Suggestions
+import Combine
 import Common
+import Foundation
 import History
-import PixelKit
 import os.log
+import PixelKit
+import Suggestions
 
 final class SuggestionContainer {
 
@@ -29,6 +30,8 @@ final class SuggestionContainer {
 
     @PublishedAfter var result: SuggestionResult?
 
+    typealias OpenTabsProvider = @MainActor () -> [any Suggestions.BrowserTab]
+    private let openTabsProvider: OpenTabsProvider
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
     private let startupPreferences: StartupPreferences
@@ -41,7 +44,8 @@ final class SuggestionContainer {
 
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
-    init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared) {
+    init(openTabsProvider: @escaping OpenTabsProvider, suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared) {
+        self.openTabsProvider = openTabsProvider
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.startupPreferences = startupPreferences
@@ -52,8 +56,16 @@ final class SuggestionContainer {
         let urlFactory = { urlString in
             return URL.makeURL(fromSuggestionPhrase: urlString)
         }
-
-        self.init(suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
+        let openTabsProvider: OpenTabsProvider = { @MainActor in
+            let selectedTab = WindowControllersManager.shared.selectedTab
+            return WindowControllersManager.shared.allTabViewModels.compactMap { model in
+                guard model.tab !== selectedTab, model.tab.content.isUrl else { return nil }
+                return model.tab.content.userEditableUrl.map { url in
+                    OpenTab(title: model.title, url: url)
+                }
+            }
+        }
+        self.init(openTabsProvider: openTabsProvider, suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
                   historyCoordinating: HistoryCoordinator.shared,
                   bookmarkManager: LocalBookmarkManager.shared)
     }
@@ -92,6 +104,13 @@ final class SuggestionContainer {
 
 }
 
+struct OpenTab: BrowserTab {
+
+    let title: String
+    let url: URL
+
+}
+
 extension SuggestionContainer: SuggestionLoadingDataSource {
 
     var platform: Platform {
@@ -123,8 +142,7 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
     }
 
     @MainActor func openTabs(for suggestionLoading: any Suggestions.SuggestionLoading) -> [any Suggestions.BrowserTab] {
-        // Support for this on macOS will come later.
-        []
+        openTabsProvider()
     }
 
     func suggestionLoading(_ suggestionLoading: SuggestionLoading,

@@ -192,6 +192,12 @@ extension WindowControllersManager {
             // If there is any non-popup window available, open the URL in it
             ?? nonPopupMainWindowControllers.first {
 
+            // Switch to already open tab if present
+            if [.appOpenUrl, .switchToOpenTab].contains(source),
+               let url, switchToOpenTab(with: url, preferring: windowController) == true {
+                return
+            }
+
             show(url: url, in: windowController, source: source, newTab: newTab)
             return
         }
@@ -202,6 +208,21 @@ extension WindowControllersManager {
         } else {
             WindowsManager.openNewWindow(burnerMode: .regular)
         }
+    }
+
+    private func switchToOpenTab(with url: URL, preferring mainWindowController: MainWindowController) -> Bool {
+        for (windowIdx, windowController) in ([mainWindowController] + mainWindowControllers).enumerated() {
+            // prefer current main window
+            guard windowIdx == 0 || windowController !== mainWindowController else { continue }
+            let tabCollectionViewModel = windowController.mainViewController.tabCollectionViewModel
+            guard let index = tabCollectionViewModel.indexInAllTabs(where: { $0.content.urlForWebView == url }) else { continue }
+
+            windowController.window?.makeKeyAndOrderFront(self)
+            tabCollectionViewModel.select(at: index)
+
+            return true
+        }
+        return false
     }
 
     private func show(url: URL?, in windowController: MainWindowController, source: Tab.TabContent.URLSource, newTab: Bool) {

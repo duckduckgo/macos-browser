@@ -370,7 +370,9 @@ final class AddressBarTextField: NSTextField {
             PixelKit.fire(autocompletePixel)
         }
 
-        if NSApp.isCommandPressed {
+        if case .openTab(let title, url: let url) = suggestion {
+            switchTo(OpenTab(title: title, url: url))
+        } else if NSApp.isCommandPressed {
             openNew(NSApp.isOptionPressed ? .window : .tab, selected: NSApp.isShiftPressed, suggestion: suggestion)
         } else {
             hideSuggestionWindow()
@@ -484,6 +486,21 @@ final class AddressBarTextField: NSTextField {
                 WindowsManager.openNewWindow(with: tab, showWindow: selected, popUp: false)
             }
         }
+    }
+
+    private func switchTo(_ tab: OpenTab) {
+        if let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+           let selectionIndex = tabCollectionViewModel.selectionIndex,
+           case .newtab = selectedTabViewModel.tab.content {
+            // close tab with "new tab" page open
+            tabCollectionViewModel.remove(at: selectionIndex)
+
+            // close the window if no more non-pinned tabs are open
+            if tabCollectionViewModel.tabs.isEmpty, let window, window.isVisible {
+                window.performClose(self)
+            }
+        }
+        WindowControllersManager.shared.show(url: tab.url, source: .switchToOpenTab, newTab: false)
     }
 
     private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, String, Bool) -> Void) {
@@ -1037,14 +1054,14 @@ extension AddressBarTextField: NSTextFieldDelegate {
                 return true
 
             case #selector(NSResponder.deleteBackward(_:)),
-                #selector(NSResponder.deleteForward(_:)),
-                #selector(NSResponder.deleteToMark(_:)),
-                #selector(NSResponder.deleteWordForward(_:)),
-                #selector(NSResponder.deleteWordBackward(_:)),
-                #selector(NSResponder.deleteToEndOfLine(_:)),
-                #selector(NSResponder.deleteToEndOfParagraph(_:)),
-                #selector(NSResponder.deleteToBeginningOfLine(_:)),
-                #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
+                 #selector(NSResponder.deleteForward(_:)),
+                 #selector(NSResponder.deleteToMark(_:)),
+                 #selector(NSResponder.deleteWordForward(_:)),
+                 #selector(NSResponder.deleteWordBackward(_:)),
+                 #selector(NSResponder.deleteToEndOfLine(_:)),
+                 #selector(NSResponder.deleteToEndOfParagraph(_:)),
+                 #selector(NSResponder.deleteToBeginningOfLine(_:)),
+                 #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
 
                 suggestionContainerViewModel?.clearSelection()
                 return false

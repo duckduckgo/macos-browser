@@ -95,7 +95,8 @@ struct SuggestionViewModel: Equatable {
                 return title ?? url.toString(forUserInput: userStringValue)
             }
         case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _),
-                .internalPage(title: let title, url: _), .openTab(title: let title, url: _):
+             .internalPage(title: let title, url: _),
+             .openTab(title: let title, url: _):
             return title
         case .unknown(value: let value):
             return value
@@ -115,7 +116,8 @@ struct SuggestionViewModel: Equatable {
                 return title
             }
         case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _),
-                .internalPage(title: let title, url: _), .openTab(title: let title, url: _):
+             .internalPage(title: let title, url: _),
+             .openTab(title: let title, url: _):
             return title
         }
     }
@@ -187,8 +189,7 @@ struct SuggestionViewModel: Equatable {
             guard url == URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else { return nil }
             return .home16
         case .openTab:
-            assertionFailure("specify an icon")
-            return nil
+            return .openTabSuggestion
         }
     }
 

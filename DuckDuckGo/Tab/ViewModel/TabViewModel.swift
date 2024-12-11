@@ -171,6 +171,7 @@ final class TabViewModel {
                      .url(_, _, source: .bookmark),
                      .url(_, _, source: .ui),
                      .url(_, _, source: .appOpenUrl),
+                     .url(_, _, source: .switchToOpenTab),
                      .url(_, _, source: .reload),
                      .newtab,
                      .settings,
