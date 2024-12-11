@@ -81,6 +81,7 @@ final class NewTabPagePrivacyStatsModelTests: XCTestCase {
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: nil,
             settingsPersistor: settingsPersistor
         )
     }
@@ -106,6 +107,7 @@ final class NewTabPagePrivacyStatsModelTests: XCTestCase {
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: nil,
             settingsPersistor: settingsPersistor
         )
 
@@ -135,6 +137,7 @@ final class NewTabPagePrivacyStatsModelTests: XCTestCase {
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: nil,
             settingsPersistor: settingsPersistor
         )
 

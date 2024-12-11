@@ -1,5 +1,5 @@
 //
-//  NewTabPageNextStepsCardsProviding.swift
+//  NewTabPagePrivacyStatsEventHandler.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,23 +17,23 @@
 //
 
 import Common
-import Combine
 import PixelKit
-import UserScript
+import NewTabPage
 
-public protocol NewTabPageNextStepsCardsProviding: AnyObject {
-    var isViewExpanded: Bool { get set }
-    var isViewExpandedPublisher: AnyPublisher<Bool, Never> { get }
+final class NewTabPagePrivacyStatsEventHandler: EventMapping<NewTabPagePrivacyStatsEvent> {
 
-    var cards: [NewTabPageNextStepsCardsClient.CardID] { get }
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> { get }
+    init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .showLess:
+                PixelKit.fire(NewTabPagePixel.blockedTrackingAttemptsShowLess, frequency: .dailyAndCount)
+            case .showMore:
+                PixelKit.fire(NewTabPagePixel.blockedTrackingAttemptsShowMore, frequency: .dailyAndCount)
+            }
+        }
+    }
 
-    @MainActor
-    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID)
-
-    @MainActor
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID)
-
-    @MainActor
-    func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID])
+    override init(mapping: @escaping EventMapping<NewTabPagePrivacyStatsEvent>.Mapping) {
+        fatalError("Use init()")
+    }
 }
