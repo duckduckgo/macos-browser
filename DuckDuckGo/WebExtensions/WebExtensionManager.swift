@@ -114,7 +114,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }()
 
     typealias ApplicationId = String
-    var messagePorts = [ApplicationId: _WKWebExtension.MessagePort]()
+    var messagePorts = [_WKWebExtension.MessagePort]()
 
     func setUpWebExtensionController(for configuration: WKWebViewConfiguration) {
         configuration._webExtensionController = extensionController
@@ -352,13 +352,7 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, sendMessage message: Any, to applicationIdentifier: String?, for extensionContext: _WKWebExtensionContext) async throws -> Any? {
-        guard let applicationIdentifier,
-              let port = messagePorts[applicationIdentifier] else {
-            assertionFailure("No application id")
-            return nil
-        }
-
-        try await port.sendMessage(message)
+        //TODO: Handle browser.runtime.sendNativeMessage()
         return nil
     }
 
@@ -372,10 +366,18 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
             if let error {
                 Logger.webExtensions.log(("Message port disconnected: \(error)"))
             }
-            self?.messagePorts[applicationId] = nil
+            self?.messagePorts.removeAll { $0 === port }
         }
 
-        messagePorts[applicationId] = port
+        port.messageHandler = { [weak self] (message, error) in
+            if let error {
+                Logger.webExtensions.log(("Message handler error: \(error)"))
+            }
+
+            Logger.webExtensions.log(("Received message"))
+        }
+
+        messagePorts.append(port)
     }
 
 }
