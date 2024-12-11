@@ -1,5 +1,5 @@
 //
-//  ContinueSetUpModel+NewTabPage.swift
+//  NewTabPageNextStepsCardsProvider.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -22,26 +22,34 @@ import NewTabPage
 import PixelKit
 import UserScript
 
-extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding {
+final class NewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsProviding {
+    let continueSetUpModel: HomePage.Models.ContinueSetUpModel
+    let appearancePreferences: AppearancePreferences
+
+    init(continueSetUpModel: HomePage.Models.ContinueSetUpModel, appearancePreferences: AppearancePreferences = .shared) {
+        self.continueSetUpModel = continueSetUpModel
+        self.appearancePreferences = appearancePreferences
+    }
+
     var isViewExpanded: Bool {
         get {
-            shouldShowAllFeatures
+            continueSetUpModel.shouldShowAllFeatures
         }
         set {
-            shouldShowAllFeatures = newValue
+            continueSetUpModel.shouldShowAllFeatures = newValue
         }
     }
 
     var isViewExpandedPublisher: AnyPublisher<Bool, Never> {
-        shouldShowAllFeaturesPublisher.eraseToAnyPublisher()
+        continueSetUpModel.shouldShowAllFeaturesPublisher.eraseToAnyPublisher()
     }
 
     var cards: [NewTabPageNextStepsCardsClient.CardID] {
-        featuresMatrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
+        continueSetUpModel.featuresMatrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
     }
 
     var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> {
-        $featuresMatrix.dropFirst().removeDuplicates()
+        continueSetUpModel.$featuresMatrix.dropFirst().removeDuplicates()
             .map { matrix in
                 matrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
             }
@@ -50,19 +58,24 @@ extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding 
 
     @MainActor
     func handleAction(for card: NewTabPageNextStepsCardsClient.CardID) {
-        performAction(for: .init(card))
+        continueSetUpModel.performAction(for: .init(card))
     }
 
     @MainActor
     func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID) {
-        removeItem(for: .init(card))
+        continueSetUpModel.removeItem(for: .init(card))
     }
 
+    @MainActor
     func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID]) {
+        appearancePreferences.continueSetUpCardsViewDidAppear()
+        fireAddToDockPixelIfNeeded(cards)
+    }
+
+    private func fireAddToDockPixelIfNeeded(_ cards: [NewTabPageNextStepsCardsClient.CardID]) {
         guard cards.contains(.addAppToDockMac) else {
             return
         }
-        continueSetUpCardsViewDidAppear()
         PixelKit.fire(GeneralPixel.addToDockNewTabPageCardPresented,
                       frequency: .uniqueByName,
                       includeAppVersionParameter: false)
