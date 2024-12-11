@@ -87,6 +87,8 @@ declare -a unwanted_paths=(
     "NetworkProtectionAppExtension/InfoPlist.xcstrings"
     "VPNProxyExtension/InfoPlist.xcstrings"
     "DuckDuckGo/Suggestions/View/Base.lproj/Suggestion.storyboard"
+    "sandbox-test-tool/Info.plist"
+    "sandbox-test-tool/InfoPlist.xcstrings"
 )
 
 # Loop through each unwanted path and remove the corresponding <file> elements
