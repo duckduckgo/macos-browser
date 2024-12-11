@@ -17607,6 +17607,78 @@
         }
       }
     },
+    "dbp.errorpage.bad.path.cta" : {
+      "comment" : "Call to action for moving the app to the Applications folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Move App for Me..."
+          }
+        }
+      }
+    },
+    "dbp.errorpage.bad.path.message" : {
+      "comment" : "Message for Personal Information Removal bad path error screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. You can move the app yourself and restart the browser, or we can do it for you."
+          }
+        }
+      }
+    },
+    "dbp.errorpage.bad.path.title" : {
+      "comment" : "Title for Personal Information Removal bad path error screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Move DuckDuckGo App to Applications"
+          }
+        }
+      }
+    },
+    "dbp.errorpage.no.permission.cta" : {
+      "comment" : "Call to action for opening system settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open System Settings..."
+          }
+        }
+      }
+    },
+    "dbp.errorpage.no.permission.message" : {
+      "comment" : "Message for error screen when there is no permission",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open System Settings and allow DuckDuckGo Personal Information Removal to run in the background."
+          }
+        }
+      }
+    },
+    "dbp.errorpage.no.permission.title" : {
+      "comment" : "Title for error screen when there is no permission",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change System Setting"
+          }
+        }
+      }
+    },
     "default.browser.prompt.button" : {
       "comment" : "represents a prompt message asking the user to make DuckDuckGo their default browser.",
       "extractionState" : "extracted_with_value",
