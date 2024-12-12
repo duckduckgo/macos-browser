@@ -39,18 +39,18 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
     // MARK: - action
 
     func testThatActionCallsHandleAction() async throws {
-        try await handleMessageExpectingNilResponse(named: .action, parameters: NewTabPageNextStepsCardsClient.Card(id: .defaultApp))
-        try await handleMessageExpectingNilResponse(named: .action, parameters: NewTabPageNextStepsCardsClient.Card(id: .duckplayer))
-        try await handleMessageExpectingNilResponse(named: .action, parameters: NewTabPageNextStepsCardsClient.Card(id: .bringStuff))
+        try await handleMessageExpectingNilResponse(named: .action, parameters: NewTabPageDataModel.Card(id: .defaultApp))
+        try await handleMessageExpectingNilResponse(named: .action, parameters: NewTabPageDataModel.Card(id: .duckplayer))
+        try await handleMessageExpectingNilResponse(named: .action, parameters: NewTabPageDataModel.Card(id: .bringStuff))
         XCTAssertEqual(model.handleActionCalls, [.defaultApp, .duckplayer, .bringStuff])
     }
 
     // MARK: - dismiss
 
     func testThatDismissCallsDismissHandler() async throws {
-        try await handleMessageExpectingNilResponse(named: .dismiss, parameters: NewTabPageNextStepsCardsClient.Card(id: .defaultApp))
-        try await handleMessageExpectingNilResponse(named: .dismiss, parameters: NewTabPageNextStepsCardsClient.Card(id: .duckplayer))
-        try await handleMessageExpectingNilResponse(named: .dismiss, parameters: NewTabPageNextStepsCardsClient.Card(id: .bringStuff))
+        try await handleMessageExpectingNilResponse(named: .dismiss, parameters: NewTabPageDataModel.Card(id: .defaultApp))
+        try await handleMessageExpectingNilResponse(named: .dismiss, parameters: NewTabPageDataModel.Card(id: .duckplayer))
+        try await handleMessageExpectingNilResponse(named: .dismiss, parameters: NewTabPageDataModel.Card(id: .bringStuff))
         XCTAssertEqual(model.dismissCalls, [.defaultApp, .duckplayer, .bringStuff])
     }
 
@@ -94,7 +94,7 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
             .duckplayer,
             .bringStuff
         ]
-        let data: NewTabPageNextStepsCardsClient.NextStepsData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.NextStepsData = try await handleMessage(named: .getData)
         XCTAssertEqual(data, .init(content: [
             .init(id: .addAppToDockMac),
             .init(id: .duckplayer),
@@ -104,7 +104,7 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
 
     func testWhenCardsAreEmptyThenGetDataReturnsNilContent() async throws {
         model.cards = []
-        let data: NewTabPageNextStepsCardsClient.NextStepsData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.NextStepsData = try await handleMessage(named: .getData)
         XCTAssertEqual(data, .init(content: nil))
     }
 

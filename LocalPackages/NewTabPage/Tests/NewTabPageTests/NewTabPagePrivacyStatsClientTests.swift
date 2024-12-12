@@ -112,7 +112,7 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
         userScript = NewTabPageUserScript()
         client.registerMessageHandlers(for: userScript)
 
-        let data: NewTabPagePrivacyStatsClient.PrivacyStatsData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.PrivacyStatsData = try await handleMessage(named: .getData)
         XCTAssertEqual(data, .init(totalCount: 2510, trackerCompanies: [
             .init(count: 1, displayName: "A"),
             .init(count: 2, displayName: "B"),
@@ -123,7 +123,7 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
     }
 
     func testWhenPrivacyStatsAreEmptyThenGetDataReturnsEmptyArray() async throws {
-        let data: NewTabPagePrivacyStatsClient.PrivacyStatsData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.PrivacyStatsData = try await handleMessage(named: .getData)
         XCTAssertEqual(data, .init(totalCount: 0, trackerCompanies: []))
     }
 

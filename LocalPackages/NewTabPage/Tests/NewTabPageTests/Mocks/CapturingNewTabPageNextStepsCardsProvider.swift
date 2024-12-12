@@ -27,26 +27,26 @@ final class CapturingNewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsP
         $isViewExpanded.dropFirst().removeDuplicates().eraseToAnyPublisher()
     }
 
-    @Published var cards: [NewTabPageNextStepsCardsClient.CardID] = []
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> {
+    @Published var cards: [NewTabPageDataModel.CardID] = []
+    var cardsPublisher: AnyPublisher<[NewTabPageDataModel.CardID], Never> {
         $cards.dropFirst().removeDuplicates().eraseToAnyPublisher()
     }
 
-    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID) {
+    func handleAction(for card: NewTabPageDataModel.CardID) {
         handleActionCalls.append(card)
     }
 
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID) {
+    func dismiss(_ card: NewTabPageDataModel.CardID) {
         dismissCalls.append(card)
     }
 
-    func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID]) {
+    func willDisplayCards(_ cards: [NewTabPageDataModel.CardID]) {
         willDisplayCardsCalls.append(cards)
         willDisplayCardsImpl?(cards)
     }
 
-    var handleActionCalls: [NewTabPageNextStepsCardsClient.CardID] = []
-    var dismissCalls: [NewTabPageNextStepsCardsClient.CardID] = []
-    var willDisplayCardsCalls: [[NewTabPageNextStepsCardsClient.CardID]] = []
-    var willDisplayCardsImpl: (([NewTabPageNextStepsCardsClient.CardID]) -> Void)?
+    var handleActionCalls: [NewTabPageDataModel.CardID] = []
+    var dismissCalls: [NewTabPageDataModel.CardID] = []
+    var willDisplayCardsCalls: [[NewTabPageDataModel.CardID]] = []
+    var willDisplayCardsImpl: (([NewTabPageDataModel.CardID]) -> Void)?
 }

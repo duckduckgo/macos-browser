@@ -98,7 +98,7 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
             MockNewTabPageFavorite(id: "2", title: "D", url: "https://d.com"),
             MockNewTabPageFavorite(id: "3", title: "E", url: "https://e.com")
         ]
-        let data: NewTabPageFavoritesClientUnderTest.FavoritesData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.FavoritesData = try await handleMessage(named: .getData)
         XCTAssertEqual(data.favorites, [
             .init(id: "1", title: "A", url: "https://a.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//a.com")),
             .init(id: "10", title: "B", url: "https://b.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//b.com")),
@@ -110,20 +110,20 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testWhenFavoritesAreEmptyThenGetDataReturnsNoFavorites() async throws {
         favoritesModel.favorites = []
-        let data: NewTabPageFavoritesClientUnderTest.FavoritesData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.FavoritesData = try await handleMessage(named: .getData)
         XCTAssertEqual(data.favorites, [])
     }
 
     // MARK: - move
 
     func testThatMoveActionIsForwardedToTheModel() async throws {
-        let action = NewTabPageFavoritesClientUnderTest.FavoritesMoveAction(id: "abcd", fromIndex: 10, targetIndex: 4)
+        let action = NewTabPageDataModel.FavoritesMoveAction(id: "abcd", fromIndex: 10, targetIndex: 4)
         try await handleMessageExpectingNilResponse(named: .move, parameters: action)
         XCTAssertEqual(actionsHandler.moveCalls, [.init("abcd", 4)])
     }
 
     func testThatWhenFavoriteIsMovedToHigherIndexThenModelIncrementsIndex() async throws {
-        let action = NewTabPageFavoritesClientUnderTest.FavoritesMoveAction(id: "abcd", fromIndex: 1, targetIndex: 4)
+        let action = NewTabPageDataModel.FavoritesMoveAction(id: "abcd", fromIndex: 1, targetIndex: 4)
         try await handleMessageExpectingNilResponse(named: .move, parameters: action)
         XCTAssertEqual(actionsHandler.moveCalls, [.init("abcd", 5)])
     }
@@ -131,13 +131,13 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     // MARK: - open
 
     func testThatOpenActionIsForwardedToTheModel() async throws {
-        let action = NewTabPageFavoritesClientUnderTest.FavoritesOpenAction(id: "abcd", url: "https://example.com")
+        let action = NewTabPageDataModel.FavoritesOpenAction(id: "abcd", url: "https://example.com")
         try await handleMessageExpectingNilResponse(named: .open, parameters: action)
         XCTAssertEqual(actionsHandler.openCalls, [.init(URL(string: "https://example.com")!, .current)])
     }
 
     func testWhenURLIsInvalidThenOpenActionIsNotForwardedToTheModel() async throws {
-        let action = NewTabPageFavoritesClientUnderTest.FavoritesOpenAction(id: "abcd", url: "abcd")
+        let action = NewTabPageDataModel.FavoritesOpenAction(id: "abcd", url: "abcd")
         try await handleMessageExpectingNilResponse(named: .open, parameters: action)
         XCTAssertEqual(actionsHandler.openCalls, [])
     }
@@ -146,14 +146,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testThatOpenContextMenuActionForExistingFavoriteIsForwardedToTheModel() async throws {
         favoritesModel.favorites = [.init(id: "abcd", title: "A", url: "https://example.com")]
-        let action = NewTabPageFavoritesClientUnderTest.FavoritesContextMenuAction(id: "abcd")
+        let action = NewTabPageDataModel.FavoritesContextMenuAction(id: "abcd")
         try await handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 1)
     }
 
     func testThatOpenContextMenuActionForNotExistingFavoriteIsNotForwardedToTheModel() async throws {
         favoritesModel.favorites = []
-        let action = NewTabPageFavoritesClientUnderTest.FavoritesContextMenuAction(id: "abcd")
+        let action = NewTabPageDataModel.FavoritesContextMenuAction(id: "abcd")
         try await handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 0)
     }

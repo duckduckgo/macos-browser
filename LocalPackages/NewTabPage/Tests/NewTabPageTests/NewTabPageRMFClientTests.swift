@@ -35,7 +35,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     }
 
     func testWhenMessageIsNilThenGetDataReturnsNilMessage() async throws {
-        let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
+        let rmfData: NewTabPageDataModel.RMFData = try await sendMessage(named: .rmfGetData)
         XCTAssertNil(rmfData.content)
     }
 
@@ -43,21 +43,21 @@ final class NewTabPageRMFClientTests: XCTestCase {
 
     func testThatGetDataReturnsSmallMessageIfPresent() async throws {
         remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
-        let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
+        let rmfData: NewTabPageDataModel.RMFData = try await sendMessage(named: .rmfGetData)
         let message = try XCTUnwrap(rmfData.content)
         XCTAssertEqual(message, .small(.init(id: "sample_message", titleText: "title", descriptionText: "description")))
     }
 
     func testThatGetDataReturnsMediumMessageIfPresent() async throws {
         remoteMessageProvider.remoteMessage = .mockMedium(id: "sample_message")
-        let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
+        let rmfData: NewTabPageDataModel.RMFData = try await sendMessage(named: .rmfGetData)
         let message = try XCTUnwrap(rmfData.content)
         XCTAssertEqual(message, .medium(.init(id: "sample_message", titleText: "title", descriptionText: "description", icon: .criticalUpdate)))
     }
 
     func testThatGetDataReturnsBigSingleActionMessageIfPresent() async throws {
         remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .appStore)
-        let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
+        let rmfData: NewTabPageDataModel.RMFData = try await sendMessage(named: .rmfGetData)
         let message = try XCTUnwrap(rmfData.content)
         XCTAssertEqual(message, .bigSingleAction(
             .init(
@@ -72,7 +72,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
 
     func testThatGetDataReturnsBigTwoActionMessageIfPresent() async throws {
         remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .dismiss)
-        let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
+        let rmfData: NewTabPageDataModel.RMFData = try await sendMessage(named: .rmfGetData)
         let message = try XCTUnwrap(rmfData.content)
         XCTAssertEqual(message, .bigTwoAction(
             .init(
@@ -91,7 +91,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testThatDismissSendsDismissActionToProvider() async throws {
         remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfDismiss, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [.init(action: nil, button: .close)])
     }
@@ -99,7 +99,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenMessageIdDoesNotMatchThenDismissHasNoEffect() async throws {
         remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "different_sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "different_sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfDismiss, parameters: parameters)
         XCTAssertTrue(remoteMessageProvider.dismissCalls.isEmpty)
     }
@@ -109,7 +109,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenSingleActionMessageThenPrimaryActionSendsActionToProvider() async throws {
         remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .appStore)
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [.init(action: .appStore, button: .action)])
     }
@@ -117,7 +117,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenTwoActionMessageThenPrimaryActionSendsPrimaryActionToProvider() async throws {
         remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .dismiss)
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [.init(action: .appStore, button: .primaryAction)])
     }
@@ -125,7 +125,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenMessageHasNoButtonThenPrimaryActionHasNoEffect() async throws {
         remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
     }
@@ -133,7 +133,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenMessageIdDoesNotMatchThenPrimaryActionHasNoEffect() async throws {
         remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "different_sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "different_sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
     }
@@ -143,7 +143,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenTwoActionMessageThenSecondaryActionSendsSecondaryActionToProvider() async throws {
         remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .dismiss, secondaryAction: .appStore)
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [.init(action: .appStore, button: .secondaryAction)])
     }
@@ -151,7 +151,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenSingleActionMessageThenSecondaryActionHasNoEffect() async throws {
         remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .appStore)
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
     }
@@ -159,7 +159,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenMessageHasNoButtonThenSecondaryActionHasNoEffect() async throws {
         remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
     }
@@ -167,7 +167,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     func testWhenMessageIdDoesNotMatchThenSecondaryActionHasNoEffect() async throws {
         remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
 
-        let parameters = NewTabPageUserScript.RemoteMessageParams(id: "different_sample_message")
+        let parameters = NewTabPageDataModel.RemoteMessageParams(id: "different_sample_message")
         try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: parameters)
         XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
     }

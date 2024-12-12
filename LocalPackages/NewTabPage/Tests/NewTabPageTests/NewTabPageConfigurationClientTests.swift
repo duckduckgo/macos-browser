@@ -33,6 +33,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
         client = NewTabPageConfigurationClient(
             sectionsVisibilityProvider: sectionsVisibilityProvider,
+            customBackgroundProvider: CapturingNewTabPageCustomBackgroundProvider(),
             contextMenuPresenter: contextMenuPresenter
         )
 
@@ -47,7 +48,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         sectionsVisibilityProvider.isFavoritesVisible = true
         sectionsVisibilityProvider.isPrivacyStatsVisible = false
 
-        let parameters = NewTabPageUserScript.ContextMenuParams(visibilityMenuItems: [
+        let parameters = NewTabPageDataModel.ContextMenuParams(visibilityMenuItems: [
             .init(id: .favorites, title: "Favorites"),
             .init(id: .privacyStats, title: "Privacy Stats")
         ])
@@ -63,7 +64,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
     }
 
     func testWhenContextMenuParamsIsEmptyThenContextMenuDoesNotShow() async throws {
-        let parameters = NewTabPageUserScript.ContextMenuParams(visibilityMenuItems: [])
+        let parameters = NewTabPageDataModel.ContextMenuParams(visibilityMenuItems: [])
         try await sendMessageExpectingNilResponse(named: .contextMenu, parameters: parameters)
 
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 0)
@@ -72,7 +73,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
     // MARK: - initialSetup
 
     func testThatInitialSetupReturnsConfiguration() async throws {
-        let configuration: NewTabPageUserScript.NewTabPageConfiguration = try await sendMessage(named: .initialSetup)
+        let configuration: NewTabPageDataModel.NewTabPageConfiguration = try await sendMessage(named: .initialSetup)
         XCTAssertEqual(configuration.widgets, [
             .init(id: .rmf),
             .init(id: .nextSteps),
@@ -89,7 +90,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
     // MARK: - widgetsSetConfig
 
     func testWhenWidgetsSetConfigIsReceivedThenWidgetConfigsAreUpdated() async throws {
-        let configs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
+        let configs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
             .init(id: .favorites, isVisible: false),
             .init(id: .privacyStats, isVisible: true)
         ]
@@ -101,7 +102,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
     func testWhenWidgetsSetConfigIsReceivedWithPartialConfigThenOnlyIncludedWidgetsConfigsAreUpdated() async throws {
         let initialIsFavoritesVisible = sectionsVisibilityProvider.isFavoritesVisible
 
-        let configs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
+        let configs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
             .init(id: .privacyStats, isVisible: false)
         ]
         try await sendMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
