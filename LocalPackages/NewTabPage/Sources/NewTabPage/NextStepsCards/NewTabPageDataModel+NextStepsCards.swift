@@ -1,5 +1,5 @@
 //
-//  NewTabPageNextStepsCardsProviding.swift
+//  NewTabPageDataModel+NextStepsCards.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,24 +16,26 @@
 //  limitations under the License.
 //
 
-import Common
-import Combine
-import PixelKit
-import UserScript
+import Foundation
 
-public protocol NewTabPageNextStepsCardsProviding: AnyObject {
-    var isViewExpanded: Bool { get set }
-    var isViewExpandedPublisher: AnyPublisher<Bool, Never> { get }
+public extension NewTabPageDataModel {
 
-    var cards: [NewTabPageDataModel.CardID] { get }
-    var cardsPublisher: AnyPublisher<[NewTabPageDataModel.CardID], Never> { get }
+    enum CardID: String, Codable {
+        case bringStuff
+        case defaultApp
+        case emailProtection
+        case duckplayer
+        case addAppToDockMac
+    }
+}
 
-    @MainActor
-    func handleAction(for card: NewTabPageDataModel.CardID)
+extension NewTabPageDataModel {
 
-    @MainActor
-    func dismiss(_ card: NewTabPageDataModel.CardID)
+    struct Card: Codable, Equatable {
+        let id: CardID
+    }
 
-    @MainActor
-    func willDisplayCards(_ cards: [NewTabPageDataModel.CardID])
+    struct NextStepsData: Codable, Equatable {
+        public let content: [Card]?
+    }
 }
