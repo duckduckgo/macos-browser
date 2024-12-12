@@ -22,15 +22,15 @@ import UserScript
 import WebKit
 
 public protocol NewTabPageCustomBackgroundProviding: AnyObject {
-    var customizerData: NewTabPageUserScript.CustomizerData { get }
+    var customizerData: NewTabPageDataModel.CustomizerData { get }
 
-    var background: NewTabPageUserScript.Background { get set }
-    var backgroundPublisher: AnyPublisher<NewTabPageUserScript.Background, Never> { get }
+    var background: NewTabPageDataModel.Background { get set }
+    var backgroundPublisher: AnyPublisher<NewTabPageDataModel.Background, Never> { get }
 
-    var theme: NewTabPageUserScript.Theme? { get set }
-    var themePublisher: AnyPublisher<NewTabPageUserScript.Theme?, Never> { get }
+    var theme: NewTabPageDataModel.Theme? { get set }
+    var themePublisher: AnyPublisher<NewTabPageDataModel.Theme?, Never> { get }
 
-    var userImagesPublisher: AnyPublisher<[NewTabPageUserScript.UserImage], Never> { get }
+    var userImagesPublisher: AnyPublisher<[NewTabPageDataModel.UserImage], Never> { get }
 
     @MainActor func presentUploadDialog() async
     func deleteImage(with imageID: String) async
@@ -92,7 +92,7 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     func deleteImage(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let data: NewTabPageUserScript.DeleteImageData = DecodableHelper.decode(from: params) else {
+        guard let data: NewTabPageDataModel.DeleteImageData = DecodableHelper.decode(from: params) else {
             return nil
         }
         await model.deleteImage(with: data.id)
@@ -101,7 +101,7 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     private func setBackground(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let data: NewTabPageUserScript.BackgroundData = DecodableHelper.decode(from: params) else {
+        guard let data: NewTabPageDataModel.BackgroundData = DecodableHelper.decode(from: params) else {
             return nil
         }
         model.background = data.background
@@ -110,7 +110,7 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     private func setTheme(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let data: NewTabPageUserScript.ThemeData = DecodableHelper.decode(from: params) else {
+        guard let data: NewTabPageDataModel.ThemeData = DecodableHelper.decode(from: params) else {
             return nil
         }
         model.theme = data.theme
@@ -124,36 +124,17 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    private func notifyBackgroundUpdated(_ background: NewTabPageUserScript.Background) {
+    private func notifyBackgroundUpdated(_ background: NewTabPageDataModel.Background) {
         pushMessage(named: MessageName.onBackgroundUpdate.rawValue, params: background)
     }
 
     @MainActor
-    private func notifyThemeUpdated(_ theme: NewTabPageUserScript.Theme?) {
-        pushMessage(named: MessageName.onThemeUpdate.rawValue, params: NewTabPageUserScript.ThemeData(theme: theme))
+    private func notifyThemeUpdated(_ theme: NewTabPageDataModel.Theme?) {
+        pushMessage(named: MessageName.onThemeUpdate.rawValue, params: NewTabPageDataModel.ThemeData(theme: theme))
     }
 
     @MainActor
-    private func notifyImagesUpdated(_ images: [NewTabPageUserScript.UserImage]) {
-        pushMessage(named: MessageName.onImagesUpdate.rawValue, params: NewTabPageUserScript.UserImagesData(userImages: images))
-    }
-}
-
-extension NewTabPageCustomBackgroundClient {
-
-    public enum CardID: String, Codable {
-        case bringStuff
-        case defaultApp
-        case emailProtection
-        case duckplayer
-        case addAppToDockMac
-    }
-
-    struct Card: Codable, Equatable {
-        let id: CardID
-    }
-
-    struct NextStepsData: Codable, Equatable {
-        public let content: [Card]?
+    private func notifyImagesUpdated(_ images: [NewTabPageDataModel.UserImage]) {
+        pushMessage(named: MessageName.onImagesUpdate.rawValue, params: NewTabPageDataModel.UserImagesData(userImages: images))
     }
 }

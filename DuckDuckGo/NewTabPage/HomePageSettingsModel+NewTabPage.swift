@@ -29,15 +29,15 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
         self.appearancePreferences = appearancePreferences
     }
 
-    var customizerData: NewTabPageUserScript.CustomizerData {
+    var customizerData: NewTabPageDataModel.CustomizerData {
         .init(
             background: .init(homePageSettingsModel.customBackground),
             theme: .init(appearancePreferences.currentThemeName),
-            userImages: homePageSettingsModel.availableUserBackgroundImages.map(NewTabPageUserScript.UserImage.init)
+            userImages: homePageSettingsModel.availableUserBackgroundImages.map(NewTabPageDataModel.UserImage.init)
         )
     }
 
-    var background: NewTabPageUserScript.Background {
+    var background: NewTabPageDataModel.Background {
         get {
             .init(homePageSettingsModel.customBackground)
         }
@@ -46,13 +46,13 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
         }
     }
 
-    var backgroundPublisher: AnyPublisher<NewTabPageUserScript.Background, Never> {
+    var backgroundPublisher: AnyPublisher<NewTabPageDataModel.Background, Never> {
         homePageSettingsModel.$customBackground.dropFirst().removeDuplicates()
-            .map(NewTabPageUserScript.Background.init)
+            .map(NewTabPageDataModel.Background.init)
             .eraseToAnyPublisher()
     }
 
-    var theme: NewTabPageUserScript.Theme? {
+    var theme: NewTabPageDataModel.Theme? {
         get {
             .init(appearancePreferences.currentThemeName)
         }
@@ -61,15 +61,15 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
         }
     }
 
-    var themePublisher: AnyPublisher<NewTabPageUserScript.Theme?, Never> {
+    var themePublisher: AnyPublisher<NewTabPageDataModel.Theme?, Never> {
         appearancePreferences.$currentThemeName.dropFirst().removeDuplicates()
-            .map(NewTabPageUserScript.Theme.init)
+            .map(NewTabPageDataModel.Theme.init)
             .eraseToAnyPublisher()
     }
 
-    var userImagesPublisher: AnyPublisher<[NewTabPageUserScript.UserImage], Never> {
+    var userImagesPublisher: AnyPublisher<[NewTabPageDataModel.UserImage], Never> {
         homePageSettingsModel.$availableUserBackgroundImages.dropFirst().removeDuplicates()
-            .map { $0.map(NewTabPageUserScript.UserImage.init) }
+            .map { $0.map(NewTabPageDataModel.UserImage.init) }
             .eraseToAnyPublisher()
     }
 
@@ -86,7 +86,7 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
     }
 }
 
-extension NewTabPageUserScript.Background {
+extension NewTabPageDataModel.Background {
     init(_ customBackground: CustomBackground?) {
         switch customBackground {
         case .gradient(let gradient):
@@ -106,7 +106,7 @@ extension NewTabPageUserScript.Background {
 }
 
 extension CustomBackground {
-    init?(_ background: NewTabPageUserScript.Background) {
+    init?(_ background: NewTabPageDataModel.Background) {
         switch background {
         case .default:
             return nil
@@ -126,7 +126,7 @@ extension CustomBackground {
     }
 }
 
-extension NewTabPageUserScript.UserImage {
+extension NewTabPageDataModel.UserImage {
     init(_ userBackgroundImage: UserBackgroundImage) {
         self.init(
             colorScheme: .init(userBackgroundImage.colorScheme),
@@ -138,7 +138,7 @@ extension NewTabPageUserScript.UserImage {
 }
 
 extension ColorScheme {
-    init(_ theme: NewTabPageUserScript.Theme) {
+    init(_ theme: NewTabPageDataModel.Theme) {
         switch theme {
         case .dark:
             self = .dark
@@ -149,7 +149,7 @@ extension ColorScheme {
 }
 
 extension ThemeName {
-    init(_ theme: NewTabPageUserScript.Theme?) {
+    init(_ theme: NewTabPageDataModel.Theme?) {
         switch theme {
         case .dark:
             self = .dark
@@ -161,7 +161,7 @@ extension ThemeName {
     }
 }
 
-extension NewTabPageUserScript.Theme {
+extension NewTabPageDataModel.Theme {
     init(_ colorScheme: ColorScheme) {
         switch colorScheme {
         case .dark:
