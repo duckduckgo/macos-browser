@@ -17611,10 +17611,58 @@
       "comment" : "Call to action for moving the app to the Applications folder",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App für mich verschieben ..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Move App for Me..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover la aplicación..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer l'application pour moi…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta l'app per me..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App voor mij verplaatsen..."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenieś aplikację za mnie..."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a aplicação por mim..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенести приложение..."
           }
         }
       }
@@ -17623,10 +17671,58 @@
       "comment" : "Message for Personal Information Removal bad path error screen",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um die Funktion „Personal Information Removal“ nutzen zu können, muss sich die DuckDuckGo-App im Ordner „Programme“ auf deinem Mac befinden. Du kannst die App selbst verschieben und den Browser neu starten, oder wir können das für dich tun."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. You can move the app yourself and restart the browser, or we can do it for you."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para usar Personal Information Removal, la aplicación DuckDuckGo debe estar en la carpeta Aplicaciones de tu Mac. Puedes mover la aplicación y reiniciar el navegador, o podemos hacerlo por ti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour pouvoir utiliser Personal Information Removal, l'application DuckDuckGo doit se trouver dans le dossier Applications de votre Mac. Vous pouvez déplacer l'application vous-même et redémarrer le navigateur, ou nous pouvons le faire pour vous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per usare la funzione di Personal Information Removal, l'app DuckDuckGo deve essere nella cartella Applicazioni del tuo Mac. Puoi spostare l'app autonomamente e riavviare il browser, oppure possiamo farlo noi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om Personal Information Removal te gebruiken, moet de DuckDuckGo-app in de map 'Apps' op je Mac staan. Je kunt de app zelf verplaatsen en de browser opnieuw opstarten, of wij kunnen het voor je doen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby umożliwić korzystanie z funkcji Personal Information Removal, aplikacja DuckDuckGo musi się znajdować w folderze Aplikacje na Twoim Macu. Możesz przenieść aplikację samodzielnie i ponownie uruchomić przeglądarkę lub możemy to zrobić za Ciebie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para utilizar a Personal Information Removal, a aplicação DuckDuckGo precisa de estar na pasta Aplicações do teu Mac. Podes mover a aplicação tu mesmo e reiniciar o navegador, ou podemos fazê-lo por ti."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для использования функции удаления личной информации (Personal Information Removal) необходимо поместить приложение DuckDuckGo в папку «Программы» на Mac. Можно самостоятельно перенести приложение и перезапустить браузер либо поручить это действие нам."
           }
         }
       }
@@ -17635,10 +17731,58 @@
       "comment" : "Title for Personal Information Removal bad path error screen",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo-App in den Ordner „Programme“ verschieben"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Move DuckDuckGo App to Applications"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover la aplicación DuckDuckGo a Aplicaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer l'application DuckDuckGo vers Applications"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta l'app DuckDuckGo in Applicazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verplaats de DuckDuckGo-app naar Applicaties"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenieś aplikację DuckDuckGo do folderu Aplikacje"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a aplicação DuckDuckGo para a pasta de Aplicações"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенесите DuckDuckGo в «Программы»"
           }
         }
       }
@@ -17647,10 +17791,58 @@
       "comment" : "Call to action for opening system settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne die Systemeinstellungen ..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Open System Settings..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Configuración del Sistema..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres système..."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri le impostazioni di sistema..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systeeminstellingen openen ..."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ustawienia systemowe..."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Definições do sistema…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть системные настройки..."
           }
         }
       }
@@ -17659,10 +17851,58 @@
       "comment" : "Message for error screen when there is no permission",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne die Systemeinstellungen und erlaube DuckDuckGo Personal Information Removal, im Hintergrund zu laufen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Open System Settings and allow DuckDuckGo Personal Information Removal to run in the background."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la configuración del sistema y permite que DuckDuckGo Personal Information Removal se ejecute en segundo plano."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez les paramètres système et autorisez DuckDuckGo Personal Information Removal à s'exécuter en arrière-plan."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri le impostazioni di sistema e consenti a DuckDuckGo Personal Information Removal di funzionare in background."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open de systeeminstellingen en sta toe dat DuckDuckGo Personal Information Removal op de achtergrond draait."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ustawienia systemowe i zezwól funkcji DuckDuckGo Personal Information Removal na działanie w tle."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre as definições do sistema e permite que o Personal Information Removal do DuckDuckGo seja executada em segundo plano."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Откройте «Системные настройки» и разрешите функции Personal Information Removal от DuckDuckGo работать в фоновом режиме."
           }
         }
       }
@@ -17671,10 +17911,58 @@
       "comment" : "Title for error screen when there is no permission",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellung ändern"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Change System Setting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia la configuración del sistema"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le paramètre système"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia le impostazioni di sistema"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systeeminstelling wijzigen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmień ustawienie systemowe"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alterar as definições do sistema"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить системные настройки"
           }
         }
       }
