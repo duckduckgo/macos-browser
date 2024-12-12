@@ -38,7 +38,7 @@ protocol NativeMessagingCommunication {
 
 }
 
-final class NativeMessagingCommunicator: NativeMessagingCommunication {
+final class NativeMessagingCommunicator: NSObject, NativeMessagingCommunication {
 
     let appPath: String
     let arguments: [String]

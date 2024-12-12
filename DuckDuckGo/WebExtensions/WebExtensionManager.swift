@@ -113,8 +113,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         return controller
     }()
 
-    typealias ApplicationId = String
-    var messagePorts = [_WKWebExtension.MessagePort]()
+    let nativeMessagingHandler = NativeMessagingHandler()
 
     func setUpWebExtensionController(for configuration: WKWebViewConfiguration) {
         configuration._webExtensionController = extensionController
@@ -352,32 +351,16 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, sendMessage message: Any, to applicationIdentifier: String?, for extensionContext: _WKWebExtensionContext) async throws -> Any? {
-        //TODO: Handle browser.runtime.sendNativeMessage()
-        return nil
+        try await nativeMessagingHandler.webExtensionController(controller,
+                                                                sendMessage: message,
+                                                                to: applicationIdentifier,
+                                                                for: extensionContext)
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, connectUsingMessagePort port: _WKWebExtension.MessagePort, for extensionContext: _WKWebExtensionContext) async throws {
-        guard let applicationId = port.applicationIdentifier else {
-            assertionFailure("No application id")
-            return
-        }
-
-        port.disconnectHandler = { [weak self] error in
-            if let error {
-                Logger.webExtensions.log(("Message port disconnected: \(error)"))
-            }
-            self?.messagePorts.removeAll { $0 === port }
-        }
-
-        port.messageHandler = { [weak self] (message, error) in
-            if let error {
-                Logger.webExtensions.log(("Message handler error: \(error)"))
-            }
-
-            Logger.webExtensions.log(("Received message"))
-        }
-
-        messagePorts.append(port)
+        try await nativeMessagingHandler.webExtensionController(controller,
+                                                                connectUsingMessagePort: port,
+                                                                for: extensionContext)
     }
 
 }

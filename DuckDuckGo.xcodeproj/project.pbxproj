@@ -138,6 +138,10 @@
 		1D8C2FF12B70F751005E4BBD /* MockTabSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8C2FEF2B70F751005E4BBD /* MockTabSnapshotStore.swift */; };
 		1D9297BF2C1B062900A38521 /* ApplicationUpdateDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9297BE2C1B062900A38521 /* ApplicationUpdateDetector.swift */; };
 		1D9297C02C1B062900A38521 /* ApplicationUpdateDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9297BE2C1B062900A38521 /* ApplicationUpdateDetector.swift */; };
+		1D948CB72D09CDB30046A189 /* NativeMessagingConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D948CB62D09CDB30046A189 /* NativeMessagingConnection.swift */; };
+		1D948CB82D09CDB30046A189 /* NativeMessagingConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D948CB62D09CDB30046A189 /* NativeMessagingConnection.swift */; };
+		1D948CBA2D0AF2D60046A189 /* NativeMessagingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D948CB92D0AF2D60046A189 /* NativeMessagingHandler.swift */; };
+		1D948CBB2D0AF2D60046A189 /* NativeMessagingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D948CB92D0AF2D60046A189 /* NativeMessagingHandler.swift */; };
 		1D9A37672BD8EA8800EBC58D /* DockPositionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9A37662BD8EA8800EBC58D /* DockPositionProvider.swift */; };
 		1D9A37682BD8EA8800EBC58D /* DockPositionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9A37662BD8EA8800EBC58D /* DockPositionProvider.swift */; };
 		1D9A4E5A2B43213B00F449E2 /* TabSnapshotExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9A4E592B43213B00F449E2 /* TabSnapshotExtension.swift */; };
@@ -3481,6 +3485,8 @@
 		1D8C2FEC2B70F5D0005E4BBD /* MockViewSnapshotRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockViewSnapshotRenderer.swift; sourceTree = "<group>"; };
 		1D8C2FEF2B70F751005E4BBD /* MockTabSnapshotStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTabSnapshotStore.swift; sourceTree = "<group>"; };
 		1D9297BE2C1B062900A38521 /* ApplicationUpdateDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationUpdateDetector.swift; sourceTree = "<group>"; };
+		1D948CB62D09CDB30046A189 /* NativeMessagingConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeMessagingConnection.swift; sourceTree = "<group>"; };
+		1D948CB92D0AF2D60046A189 /* NativeMessagingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeMessagingHandler.swift; sourceTree = "<group>"; };
 		1D9A37662BD8EA8800EBC58D /* DockPositionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockPositionProvider.swift; sourceTree = "<group>"; };
 		1D9A4E592B43213B00F449E2 /* TabSnapshotExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSnapshotExtension.swift; sourceTree = "<group>"; };
 		1D9FDEB62B9B5D150040B78C /* SearchPreferencesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchPreferencesTests.swift; sourceTree = "<group>"; };
@@ -5374,6 +5380,8 @@
 				1D5C1B102D01B9660073ED65 /* native-messaging */,
 				1D2DB9CA2CE26B9D00F73E96 /* Headers */,
 				1DF78E0A2CE5F58400AB898E /* WebExtensionManager.swift */,
+				1D948CB92D0AF2D60046A189 /* NativeMessagingHandler.swift */,
+				1D948CB62D09CDB30046A189 /* NativeMessagingConnection.swift */,
 				1DF78E0E2CE6197200AB898E /* WKWebExtensionTab.swift */,
 				1DF78E112CE61DB000AB898E /* WKWebExtensionWindow.swift */,
 				1D5C1AF02CFF58170073ED65 /* Logger+WebExtensions.swift */,
@@ -11887,6 +11895,7 @@
 				37197EAC294244D600394917 /* FutureExtension.swift in Sources */,
 				4B9DB0452A983B24000927DB /* WaitlistModalViewController.swift in Sources */,
 				B66CA41F2AD910B300447CF0 /* DataImportView.swift in Sources */,
+				1D948CB82D09CDB30046A189 /* NativeMessagingConnection.swift in Sources */,
 				3706FC0C293F65D500E42796 /* NSAttributedStringExtension.swift in Sources */,
 				C1DAF3B62B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */,
 				3706FC0D293F65D500E42796 /* AnimationView.swift in Sources */,
@@ -12096,6 +12105,7 @@
 				9D9AE86E2AA76D1F0026E7DC /* LoginItem+NetworkProtection.swift in Sources */,
 				3707C721294B5D2900682A9F /* WKMenuItemIdentifier.swift in Sources */,
 				3706FEBE293F6EFF00E42796 /* BWMessageIdGenerator.swift in Sources */,
+				1D948CBB2D0AF2D60046A189 /* NativeMessagingHandler.swift in Sources */,
 				C1E961F02B87AA29001760E1 /* AutofillActionBuilder.swift in Sources */,
 				B6F1B0232BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */,
 				3706FC85293F65D500E42796 /* ShadowView.swift in Sources */,
@@ -13657,6 +13667,7 @@
 				4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */,
 				14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */,
 				B65536A62685B82B00085A79 /* Permissions.swift in Sources */,
+				1D948CBA2D0AF2D60046A189 /* NativeMessagingHandler.swift in Sources */,
 				AAC82C60258B6CB5009B6B42 /* TabPreviewWindowController.swift in Sources */,
 				AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */,
 				37219B3A2CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift in Sources */,
@@ -13683,6 +13694,7 @@
 				4B4D60BF2A0C848A00BCD287 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
 				7B5A23682C468233007213AC /* ExcludedDomainsViewController.swift in Sources */,
 				BDA7647C2BC497BE00D0400C /* DefaultVPNLocationFormatter.swift in Sources */,
+				1D948CB72D09CDB30046A189 /* NativeMessagingConnection.swift in Sources */,
 				3158B1592B0BF76400AF130C /* DataBrokerProtectionFeatureDisabler.swift in Sources */,
 				B655124829A79465009BFE1C /* NavigationActionExtension.swift in Sources */,
 				9FA173EB2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift in Sources */,
