@@ -134,9 +134,6 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         let context = contexts[index]
         // Show dashboard - perform default action
         context.performAction(for: nil)
-
-        // Uncomment the line below to enable debugging of the background script
-        showBackgroundConsole(context: context)
     }
 
     @MainActor
@@ -163,23 +160,6 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
                 }
             }
         }
-    }
-
-    @MainActor
-    func showBackgroundConsole(context: _WKWebExtensionContext) {
-        guard let backgroundWebView = context._backgroundWebView else {
-            return
-        }
-        backgroundWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-
-        guard backgroundWebView.responds(to: NSSelectorFromString("_inspector")),
-              let inspector = backgroundWebView.value(forKey: "_inspector") as? NSObject,
-              inspector.responds(to: NSSelectorFromString("showConsole")) else {
-            assertionFailure("_WKInspector does not respond to show")
-            return
-        }
-
-        inspector.perform(NSSelectorFromString("showConsole"), with: nil)
     }
 
     // MARK: - Context
