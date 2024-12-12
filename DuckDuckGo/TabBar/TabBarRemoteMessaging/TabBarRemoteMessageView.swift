@@ -47,7 +47,7 @@ struct TabBarRemoteMessageView: View {
                 },
                 onHoverEnd: { presentPopup = false })
             )
-            .frame(width: 147, height: 24)
+            .frame(width: 147)
             .popover(isPresented: $presentPopup, arrowEdge: .bottom) {
                 HStack(alignment: .center) {
                     Image(.daxResponse)
