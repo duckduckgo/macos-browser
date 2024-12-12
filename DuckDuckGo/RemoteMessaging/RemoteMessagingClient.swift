@@ -49,7 +49,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
 #if DEBUG
             URL(string: "https://www.jsonblob.com/api/1316017217598578688")!
 #else
-            URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/macos-config.json")!
+            URL(string: "https://www.jsonblob.com/api/1316017217598578688")!
 #endif
         }()
     }
