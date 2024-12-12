@@ -16,7 +16,10 @@
 //  limitations under the License.
 //
 
+import Foundation
+
 public extension NewTabPageDataModel {
+
     struct CustomizerData: Encodable, Equatable {
         public let background: Background
         public let theme: Theme?

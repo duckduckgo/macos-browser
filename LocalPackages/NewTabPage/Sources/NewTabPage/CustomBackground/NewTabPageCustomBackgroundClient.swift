@@ -125,7 +125,7 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     @MainActor
     private func notifyBackgroundUpdated(_ background: NewTabPageDataModel.Background) {
-        pushMessage(named: MessageName.onBackgroundUpdate.rawValue, params: background)
+        pushMessage(named: MessageName.onBackgroundUpdate.rawValue, params: NewTabPageDataModel.BackgroundData(background: background))
     }
 
     @MainActor

@@ -77,7 +77,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     }
 
     private func notifyWidgetConfigsDidChange() {
-        let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
+        let widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
             .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
             .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible)
         ]
@@ -87,7 +87,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     @MainActor
     private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params: NewTabPageUserScript.ContextMenuParams = DecodableHelper.decode(from: params) else { return nil }
+        guard let params: NewTabPageDataModel.ContextMenuParams = DecodableHelper.decode(from: params) else { return nil }
 
         let menu = NSMenu()
 
@@ -118,7 +118,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     }
 
     @objc private func toggleVisibility(_ sender: NSMenuItem) {
-        switch sender.representedObject as? NewTabPageUserScript.WidgetId {
+        switch sender.representedObject as? NewTabPageDataModel.WidgetId {
         case .favorites:
             sectionsVisibilityProvider.isFavoritesVisible.toggle()
         case .privacyStats:
@@ -137,7 +137,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 #endif
 
         let customizerData = customBackgroundProvider.customizerData
-        let config = NewTabPageUserScript.NewTabPageConfiguration(
+        let config = NewTabPageDataModel.NewTabPageConfiguration(
             widgets: [
                 .init(id: .rmf),
                 .init(id: .nextSteps),
@@ -159,7 +159,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     @MainActor
     private func widgetsSetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = DecodableHelper.decode(from: params) else {
+        guard let widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = DecodableHelper.decode(from: params) else {
             return nil
         }
         for widgetConfig in widgetConfigs {
@@ -183,73 +183,3 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         return nil
     }
 }
-
-extension NewTabPageUserScript {
-
-    enum WidgetId: String, Codable {
-        case rmf, nextSteps, favorites, privacyStats
-    }
-
-    struct ContextMenuParams: Codable {
-        let visibilityMenuItems: [ContextMenuItem]
-
-        struct ContextMenuItem: Codable {
-            let id: WidgetId
-            let title: String
-        }
-    }
-
-    struct NewTabPageConfiguration: Encodable {
-        var widgets: [Widget]
-        var widgetConfigs: [WidgetConfig]
-        var env: String
-        var locale: String
-        var platform: Platform
-        var settings: Settings
-        var customizer: NewTabPageDataModel.CustomizerData
-
-        struct Widget: Encodable, Equatable {
-            public var id: WidgetId
-        }
-
-        struct WidgetConfig: Codable, Equatable {
-
-            enum WidgetVisibility: String, Codable {
-                case visible, hidden
-
-                var isVisible: Bool {
-                    self == .visible
-                }
-            }
-
-            init(id: WidgetId, isVisible: Bool) {
-                self.id = id
-                self.visibility = isVisible ? .visible : .hidden
-            }
-
-            var id: WidgetId
-            var visibility: WidgetVisibility
-        }
-
-        struct Platform: Encodable, Equatable {
-            var name: String
-        }
-
-        struct Settings: Encodable, Equatable {
-            let customizerDrawer: Setting
-        }
-
-        struct Setting: Encodable, Equatable {
-            let state: BooleanSetting
-        }
-
-        enum BooleanSetting: String, Encodable {
-            case enabled, disabled
-
-            var isEnabled: Bool {
-                self == .enabled
-            }
-        }
-    }
-}
-
