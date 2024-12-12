@@ -452,24 +452,15 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
-
         let formattedDate = dateFormatter.string(from: date)
-
-        let billingPeriod: String
-
-        switch period {
-        case .monthly: billingPeriod = UserText.monthlySubscriptionBillingPeriod.lowercased()
-        case .yearly: billingPeriod = UserText.yearlySubscriptionBillingPeriod.lowercased()
-        case .unknown: billingPeriod = ""
-        }
 
         switch status {
         case .autoRenewable:
-            self.subscriptionDetails = UserText.preferencesSubscriptionActiveRenewCaption(period: billingPeriod, formattedDate: formattedDate)
+            self.subscriptionDetails = UserText.preferencesSubscriptionRenewingCaption(billingPeriod: period, formattedDate: formattedDate)
         case .expired, .inactive:
             self.subscriptionDetails = UserText.preferencesSubscriptionExpiredCaption(formattedDate: formattedDate)
         default:
-            self.subscriptionDetails = UserText.preferencesSubscriptionActiveExpireCaption(period: billingPeriod, formattedDate: formattedDate)
+            self.subscriptionDetails = UserText.preferencesSubscriptionExpiringCaption(billingPeriod: period, formattedDate: formattedDate)
         }
     }
 

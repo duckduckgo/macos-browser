@@ -1353,31 +1353,23 @@ struct UserText {
         static let buttonTitle = NSLocalizedString("site.not.working.button.title", value: "Let Us Know", comment: "Button title that appears on a dialog asking users about possible breakage of a site")
     }
 
+    // MARK: - Privacy Pro
+    
     // Key: "subscription.menu.item"
     // Comment: "Title for Subscription item in the options menu"
     static let subscriptionOptionsMenuItem = "Privacy Pro"
 
     static let identityTheftRestorationOptionsMenuItem = "Identity Theft Restoration"
 
-    // Key: "subscription.settings.menu.item"
-    // Comment: "Title for Subscription Settings item in the options menu"
-    static let subscriptionSettingsOptionsMenuItem = "Subscription Settings"
+    static let subscriptionSettingsOptionsMenuItem = NSLocalizedString("subscription.settings.menu.item", value:"Subscription Settings", comment: "Title for Subscription Settings item in the options menu")
 
     // Key: "preferences.subscription"
     // Comment: "Show subscription preferences"
     static let subscription = "Privacy Pro"
 
-    // Key: "subscription.progress.view.purchasing.subscription"
-    // Comment: "Progress view title when starting the purchase"
-    static let purchasingSubscriptionTitle = "Purchase in progress..."
-
-    // Key: "subscription.progress.view.restoring.subscription"
-    // Comment: "Progress view title when restoring past subscription purchase"
-    static let restoringSubscriptionTitle = "Restoring subscription..."
-
-    // Key: "subscription.progress.view.completing.purchase"
-    // Comment: "Progress view title when completing the purchase"
-    static let completingPurchaseTitle = "Completing purchase..."
+    static let purchasingSubscriptionTitle = NSLocalizedString("subscription.progress.view.purchasing.subscription", value:"Purchase in progress...", comment: "Progress view title when starting the purchase")
+    static let restoringSubscriptionTitle = NSLocalizedString("subscription.progress.view.restoring.subscription", value:"Restoring subscription...", comment: "Progress view title when restoring past subscription purchase")
+    static let completingPurchaseTitle = NSLocalizedString("subscription.progress.view.completing.purchase", value:"Completing purchase...", comment: "Progress view title when completing the purchase")
 
     // Mark: Sync Promo
     static let syncPromoBookmarksTitle = NSLocalizedString("sync.promo.bookmarks.title", value:"Sync & Back Up Your Bookmarks", comment: "Title for the Sync Promotion banner")
