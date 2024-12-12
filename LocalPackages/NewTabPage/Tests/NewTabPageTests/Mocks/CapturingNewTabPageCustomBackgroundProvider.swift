@@ -44,9 +44,11 @@ final class CapturingNewTabPageCustomBackgroundProvider: NewTabPageCustomBackgro
     }
 
     func presentUploadDialog() async {
+        presentUploadDialogCallsCount += 1
     }
 
     func deleteImage(with imageID: String) async {
+        deleteImageCalls.append(imageID)
     }
 
     var presentUploadDialogCallsCount: Int = 0
