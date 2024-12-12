@@ -84,32 +84,36 @@ public extension NewTabPageDataModel {
             case value
         }
 
-        var kind: String {
+        enum Kind: String, Codable {
+            case `default`, color, hex, gradient, userImage
+        }
+
+        var kind: Kind {
             switch self {
             case .default:
-                return "default"
+                return .default
             case .solidColor:
-                return "color"
+                return .color
             case .hexColor:
-                return "hex"
+                return .hex
             case .gradient:
-                return "gradient"
+                return .gradient
             case .userImage:
-                return "userImage"
+                return .userImage
             }
         }
 
         public init(from decoder: any Decoder) throws {
             let container: KeyedDecodingContainer<CodingKeys> = try decoder.container(keyedBy: CodingKeys.self)
-            let kind = try container.decode(String.self, forKey: CodingKeys.kind)
+            let kind = try container.decode(Kind.self, forKey: CodingKeys.kind)
             switch kind {
-            case "color", "hex":
+            case .color, .hex:
                 let value = try container.decode(String.self, forKey: CodingKeys.value)
                 self = .solidColor(value)
-            case "gradient":
+            case .gradient:
                 let value = try container.decode(String.self, forKey: CodingKeys.value)
                 self = .gradient(value)
-            case "userImage":
+            case .userImage:
                 let value = try container.decode(UserImage.self, forKey: CodingKeys.value)
                 self = .userImage(value)
             default:
