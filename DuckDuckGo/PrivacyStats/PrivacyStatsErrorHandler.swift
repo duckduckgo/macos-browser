@@ -1,5 +1,5 @@
 //
-//  NewTabPageNextStepsCardsProviding.swift
+//  PrivacyStatsErrorHandler.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,23 +17,18 @@
 //
 
 import Common
-import Combine
 import PixelKit
-import UserScript
+import PrivacyStats
 
-public protocol NewTabPageNextStepsCardsProviding: AnyObject {
-    var isViewExpanded: Bool { get set }
-    var isViewExpandedPublisher: AnyPublisher<Bool, Never> { get }
+final class PrivacyStatsErrorHandler: EventMapping<PrivacyStatsError> {
 
-    var cards: [NewTabPageNextStepsCardsClient.CardID] { get }
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> { get }
+    init() {
+        super.init { event, _, _, _ in
+            PixelKit.fire(DebugEvent(NewTabPagePixel.privacyStatsDatabaseError, error: event), frequency: .dailyAndCount)
+        }
+    }
 
-    @MainActor
-    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID)
-
-    @MainActor
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID)
-
-    @MainActor
-    func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID])
+    override init(mapping: @escaping EventMapping<PrivacyStatsError>.Mapping) {
+        fatalError("Use init()")
+    }
 }

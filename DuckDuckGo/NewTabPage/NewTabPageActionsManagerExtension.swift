@@ -30,6 +30,7 @@ extension NewTabPageActionsManager {
         let privacyStatsModel = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared),
+            eventMapping: NewTabPagePrivacyStatsEventHandler(),
             getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
         )
 
@@ -46,7 +47,7 @@ extension NewTabPageActionsManager {
             NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences, customBackgroundProvider: customizationProvider),
             NewTabPageCustomBackgroundClient(model: customizationProvider),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel),
-            NewTabPageNextStepsCardsClient(model: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener())),
+            NewTabPageNextStepsCardsClient(model: NewTabPageNextStepsCardsProvider(continueSetUpModel: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener()))),
             NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: Int(Favicon.SizeCategory.medium.rawValue)),
             NewTabPagePrivacyStatsClient(model: privacyStatsModel)
         ])
