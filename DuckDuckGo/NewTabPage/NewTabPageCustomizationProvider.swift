@@ -1,5 +1,5 @@
 //
-//  HomePageSettingsModel+NewTabPage.swift
+//  NewTabPageCustomizationProvider.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //

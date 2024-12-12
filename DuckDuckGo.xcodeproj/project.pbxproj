@@ -1096,6 +1096,8 @@
 		371BBC5F2D00CA3E008FA0C7 /* NewTabPageWebViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371BBC5D2D00CA3E008FA0C7 /* NewTabPageWebViewModel.swift */; };
 		371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
 		371D00E129D8509400EC8598 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 371D00E029D8509400EC8598 /* OpenSSL */; };
+		371E1D672D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371E1D662D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift */; };
+		371E1D682D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371E1D662D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift */; };
 		37219B342CBFBBE800C9D7A8 /* NewTabPageSearchBoxExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B332CBFBBDB00C9D7A8 /* NewTabPageSearchBoxExperiment.swift */; };
 		37219B352CBFBBE800C9D7A8 /* NewTabPageSearchBoxExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B332CBFBBDB00C9D7A8 /* NewTabPageSearchBoxExperiment.swift */; };
 		37219B372CBFBC8200C9D7A8 /* NewTabSearchBoxExperimentPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B362CBFBC8200C9D7A8 /* NewTabSearchBoxExperimentPixel.swift */; };
@@ -1235,8 +1237,6 @@
 		37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */; };
 		37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */; };
 		37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */; };
-		37C33BD12D02154300252656 /* HomePageSettingsModel+NewTabPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C33BD02D02153E00252656 /* HomePageSettingsModel+NewTabPage.swift */; };
-		37C33BD22D02154300252656 /* HomePageSettingsModel+NewTabPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C33BD02D02153E00252656 /* HomePageSettingsModel+NewTabPage.swift */; };
 		37C9F78C2CF1C776004D73A1 /* PrivacyStatsTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C9F78B2CF1C770004D73A1 /* PrivacyStatsTabExtension.swift */; };
 		37C9F78D2CF1C776004D73A1 /* PrivacyStatsTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C9F78B2CF1C770004D73A1 /* PrivacyStatsTabExtension.swift */; };
 		37CBCA9A2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */; };
@@ -3643,6 +3643,7 @@
 		371BBC5A2D00C911008FA0C7 /* NewTabPageActionsManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageActionsManagerExtension.swift; sourceTree = "<group>"; };
 		371BBC5D2D00CA3E008FA0C7 /* NewTabPageWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageWebViewModel.swift; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
+		371E1D662D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageCustomizationProvider.swift; sourceTree = "<group>"; };
 		3720B7F82D00DA4500D20F23 /* WebKitExtensions */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = WebKitExtensions; sourceTree = "<group>"; };
 		37219B332CBFBBDB00C9D7A8 /* NewTabPageSearchBoxExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageSearchBoxExperiment.swift; sourceTree = "<group>"; };
 		37219B362CBFBC8200C9D7A8 /* NewTabSearchBoxExperimentPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabSearchBoxExperimentPixel.swift; sourceTree = "<group>"; };
@@ -3739,7 +3740,6 @@
 		37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsViewModel.swift; sourceTree = "<group>"; };
 		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
 		37C33BCF2D01E92B00252656 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../content-scope-scripts"; sourceTree = SOURCE_ROOT; };
-		37C33BD02D02153E00252656 /* HomePageSettingsModel+NewTabPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomePageSettingsModel+NewTabPage.swift"; sourceTree = "<group>"; };
 		37C9F78B2CF1C770004D73A1 /* PrivacyStatsTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyStatsTabExtension.swift; sourceTree = "<group>"; };
 		37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSettingsAdapter.swift; sourceTree = "<group>"; };
 		37CC53EB27E8A4D10028713D /* PreferencesDataClearingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDataClearingView.swift; sourceTree = "<group>"; };
@@ -5837,6 +5837,7 @@
 		376788092CECCAD900F59D83 /* NewTabPage */ = {
 			isa = PBXGroup;
 			children = (
+				371E1D662D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift */,
 				37BE08792D09C0EA00C77B8E /* NewTabPageNextStepsCardsProvider.swift */,
 				37E307B12D075B5E00599500 /* NewTabPagePrivacyStatsEventHandler.swift */,
 				374EFDF22D01C99700B30939 /* ActiveRemoteMessageModel+NewTabPage.swift */,
@@ -11287,6 +11288,7 @@
 				3706FA91293F65D500E42796 /* PasswordManagementLoginItemView.swift in Sources */,
 				3706FA92293F65D500E42796 /* UserText.swift in Sources */,
 				3706FA93293F65D500E42796 /* WKWebView+Download.swift in Sources */,
+				371E1D672D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift in Sources */,
 				3706FA94293F65D500E42796 /* TabShadowConfig.swift in Sources */,
 				3706FA97293F65D500E42796 /* WindowDraggingView.swift in Sources */,
 				BB7B5F992C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */,
@@ -12033,7 +12035,6 @@
 				B6685E4329A61C470043D2EE /* DownloadsTabExtension.swift in Sources */,
 				1DA84D332C119AE70011C80F /* UpdateMenuItemFactory.swift in Sources */,
 				4BCBE4562BA7E16900FC75A1 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */,
-				37C33BD12D02154300252656 /* HomePageSettingsModel+NewTabPage.swift in Sources */,
 				3706FC44293F65D500E42796 /* BookmarkList.swift in Sources */,
 				3706FC45293F65D500E42796 /* BookmarkTableRowView.swift in Sources */,
 				7BEC20462B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift in Sources */,
@@ -13050,7 +13051,6 @@
 				1DDF076428F815AD00EDFBE3 /* BWManager.swift in Sources */,
 				9833912F27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift in Sources */,
 				B65211252B29A42C00B30633 /* BookmarkStoreMock.swift in Sources */,
-				37C33BD22D02154300252656 /* HomePageSettingsModel+NewTabPage.swift in Sources */,
 				7BDBAD182CBFF633000379B7 /* TipKitAppEventHandling.swift in Sources */,
 				7BDBAD192CBFF633000379B7 /* TipKitController+ConvenienceInitializers.swift in Sources */,
 				7BDBAD1A2CBFF633000379B7 /* TipKitDebugOptionsUIActionHandling.swift in Sources */,
@@ -13617,6 +13617,7 @@
 				CD33012C2C89B588009AA127 /* ErrorPageHTMLFactory.swift in Sources */,
 				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
+				371E1D682D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift in Sources */,
 				4B37EE5F2B4CFC3C00A89A61 /* HomePageRemoteMessagingStorage.swift in Sources */,
 				31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */,
 				B6ABD0CA2BC03F610000EB69 /* SecurityScopedFileURLController.swift in Sources */,
@@ -15276,7 +15277,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 221.1.0;
+				version = 221.2.0;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
