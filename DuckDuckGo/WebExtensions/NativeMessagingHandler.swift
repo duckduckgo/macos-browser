@@ -22,22 +22,28 @@ import os.log
 @available(macOS 14.4, *)
 final class NativeMessagingHandler {
 
-    // MARK: - Native Messaging
+    static var applicationPathsAndArgs = [String: (String, [String])]()
 
     var nativeMessagingConnections = [NativeMessagingConnection]()
 
     private func connection(for port: _WKWebExtension.MessagePort) -> NativeMessagingConnection? {
-        //TODO: -
-        return nil
+        return nativeMessagingConnections.first(where: { $0.port === port })
     }
 
     private func connection(for communicator: NativeMessagingCommunicator) -> NativeMessagingConnection? {
-        //TODO: -
-        return nil
+        return nativeMessagingConnections.first(where: {communicator === $0.communicator})
     }
 
-    private func cancelConnection() {
-        //TODO: -
+    private func cancelConnection(_ connection: NativeMessagingConnection) {
+        nativeMessagingConnections.removeAll {$0 === connection}
+    }
+
+    private func cancelConnection(with port: _WKWebExtension.MessagePort) {
+        nativeMessagingConnections.removeAll { $0.port === port }
+    }
+
+    private func cancelConnection(with communicator: NativeMessagingCommunicator) {
+        nativeMessagingConnections.removeAll {$0.communicator === communicator}
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, sendMessage message: Any, to applicationIdentifier: String?, for extensionContext: _WKWebExtensionContext) async throws -> Any? {
@@ -55,7 +61,7 @@ final class NativeMessagingHandler {
             if let error {
                 Logger.webExtensions.log(("Message port disconnected: \(error)"))
             }
-            self?.nativeMessagingConnections.removeAll { $0.port === port }
+            self?.cancelConnection(with: port)
         }
 
         port.messageHandler = { [weak self] (message, error) in
@@ -70,7 +76,7 @@ final class NativeMessagingHandler {
 
             Logger.webExtensions.log(("Received message from web extension: \(message)"))
 
-            guard let connection = self?.nativeMessagingConnections.first(where: { $0.port === port }) else {
+            guard let connection = self?.connection(for: port) else {
                 assertionFailure("Connection not found")
                 return
             }
@@ -87,7 +93,7 @@ final class NativeMessagingHandler {
             connection.communicator.send(messageData: jsonData)
         }
 
-        //TODO: app paths and arguments
+        //TODO: App path and arguments for Safari extensions
         let communicator = NativeMessagingCommunicator(appPath: "/Users/tom19911991/Developer/macos/macos-browser/DuckDuckGo/WebExtensions/native-messaging/app/ping_pong.py", arguments: [])
         communicator.delegate = self
         let connection = NativeMessagingConnection(port: port,
@@ -95,7 +101,6 @@ final class NativeMessagingHandler {
         nativeMessagingConnections.append(connection)
     }
 }
-
 
 @available(macOS 14.4, *)
 @MainActor
@@ -111,7 +116,7 @@ extension NativeMessagingHandler: @preconcurrency NativeMessagingCommunicatorDel
     }
 
     private func handleReceivedMessageData(_ messageData: Data, communicator: NativeMessagingCommunicator) {
-        guard let connection = nativeMessagingConnections.first(where: {communicator === $0.communicator}) else {
+        guard let connection = connection(for: communicator) else {
             assertionFailure("Connection not found")
             return
         }
@@ -122,7 +127,7 @@ extension NativeMessagingHandler: @preconcurrency NativeMessagingCommunicatorDel
             connection.port.sendMessage(decodedMessage)
         } catch {
             assertionFailure("Failed to decode message")
-            Logger.webExtensions.log(("Failed to decode the message: \(String(data:messageData, encoding: .utf8) ?? "")"))
+            Logger.webExtensions.log(("Failed to decode the message: \(String(data: messageData, encoding: .utf8) ?? "")"))
         }
     }
 
@@ -134,7 +139,7 @@ extension NativeMessagingHandler: @preconcurrency NativeMessagingCommunicatorDel
             return
         }
 
-        nativeMessagingConnections.removeAll {$0.communicator === nativeMessagingCommunicator}
+        cancelConnection(with: nativeMessagingCommunicator)
     }
 
 }
@@ -144,7 +149,7 @@ extension NativeMessagingHandler: @preconcurrency NativeMessagingCommunicatorDel
 extension NativeMessagingHandler: @preconcurrency NativeMessagingConnectionDelegate {
 
     func nativeMessagingConnectionProcessDidFail(_ nativeMessagingConnection: NativeMessagingConnection) {
-        nativeMessagingConnections.removeAll {$0 === nativeMessagingConnection}
+        cancelConnection(nativeMessagingConnection)
     }
 
 }
