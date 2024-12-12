@@ -450,8 +450,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
                                                                              baseURL: subscriptionEnvironment.serviceEnvironment.url)
-//        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
-//                                                                                     userDefaults: defaults)
         let pixelHandler: SubscriptionManager.PixelHandler = { type in
             switch type {
             case .deadToken:
@@ -461,7 +459,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         let subscriptionManager = DefaultSubscriptionManager(oAuthClient: authClient,
                                                              subscriptionEndpointService: subscriptionEndpointService,
-//                                                             subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                                                              subscriptionEnvironment: subscriptionEnvironment,
                                                              subscriptionFeatureFlagger: nil,
                                                              pixelHandler: pixelHandler)
@@ -469,11 +466,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         // MARK: -
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-//            Logger.networkProtection.log("Entitlements check...")
-//            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
-//            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled", privacy: .public)")
-//            return .success(isNetworkProtectionEnabled)
-            return .success(true)
+            Logger.networkProtection.log("Entitlements check...")
+            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
+            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled", privacy: .public)")
+            return .success(isNetworkProtectionEnabled)
         }
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
