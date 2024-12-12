@@ -42,6 +42,16 @@ struct ClickAction: Action {
     struct Default: Codable {
         let elements: [PageElement]?
     }
+    
+    init(id: String, actionType: ActionType, elements: [PageElement]? = nil, dataSource: DataSource? = nil, choices: [Choice]? = nil, `default`: Default? = nil, hasDefault: Bool = false) {
+       self.id = id
+       self.actionType = actionType
+       self.elements = elements
+       self.dataSource = dataSource
+       self.choices = choices
+       self.default = `default`
+       self.hasDefault = `default` != nil
+   }
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
