@@ -271,6 +271,16 @@
                ReferencedContainer = "container:LocalPackages/AppKitExtensions">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NewTabPageTests"
+               BuildableName = "NewTabPageTests"
+               BlueprintName = "NewTabPageTests"
+               ReferencedContainer = "container:LocalPackages/NewTabPage">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

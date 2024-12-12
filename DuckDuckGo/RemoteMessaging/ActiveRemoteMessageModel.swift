@@ -47,10 +47,16 @@ final class ActiveRemoteMessageModel: ObservableObject {
      */
     let store: () -> RemoteMessagingStoring?
 
-    convenience init(remoteMessagingClient: RemoteMessagingClient) {
+    /**
+     * Handler for opening URLs for Remote Messages displayed on HTML New Tab Page
+     */
+    let openURLHandler: (URL) async -> Void
+
+    convenience init(remoteMessagingClient: RemoteMessagingClient, openURLHandler: @escaping (URL) async -> Void) {
         self.init(
             remoteMessagingStore: remoteMessagingClient.store,
-            remoteMessagingAvailabilityProvider: remoteMessagingClient.remoteMessagingAvailabilityProvider
+            remoteMessagingAvailabilityProvider: remoteMessagingClient.remoteMessagingAvailabilityProvider,
+            openURLHandler: openURLHandler
         )
     }
 
@@ -59,9 +65,11 @@ final class ActiveRemoteMessageModel: ObservableObject {
      */
     init(
         remoteMessagingStore: @escaping @autoclosure () -> RemoteMessagingStoring?,
-        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding?
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding?,
+        openURLHandler: @escaping (URL) async -> Void
     ) {
         self.store = remoteMessagingStore
+        self.openURLHandler = openURLHandler
 
         let messagesDidChangePublisher = NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
             .asVoid()

@@ -162,8 +162,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         do {
             _ = try await subscriptionManager.exchange(tokenV1: subscriptionValues.token)
             Logger.subscription.log("v1 token exchanged for v2")
+            // forcing subscription refresh
+            try await subscriptionManager.getSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
+            Logger.subscription.log("Subscription retrieved")
         } catch {
-            Logger.subscription.error("Failed to exchange v1 token for v2")
+            Logger.subscription.error("Failed to exchange v1 token for v2 \(error, privacy: .public)")
         }
         return nil
     }

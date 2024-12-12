@@ -43,7 +43,7 @@ performUpdate() {
 
     # Compare the fetched revision with the local new_revision variable
     if [ "$revision" != "$new_revision" ]; then
-        echo "❌ Revision mismatch! Expected $new_revision but got $revision."
+        echo "❌ Revision mismatch! Expected '$new_revision', got '$revision' – ${temp_filename}"
         exit 1
     fi
     printf "writing to %s\n" "${data_path}"

@@ -65,12 +65,16 @@ public final class DebugPurchaseViewController: NSViewController {
             await manager.updateAvailableProducts()
         }
         manager.$availableProducts.combineLatest(manager.$purchasedProductIDs, manager.$purchaseQueue).receive(on: RunLoop.main).sink { [weak self] availableProducts, purchasedProductIDs, purchaseQueue in
+
+            // swiftlint:disable:next force_cast
+            let products = availableProducts as! [Product]
+
             print(" -- got combineLatest -")
             print(" -- got combineLatest - availableProducts: \(availableProducts.map { $0.id }.joined(separator: ","))")
             print(" -- got combineLatest - purchasedProducts: \(purchasedProductIDs.joined(separator: ","))")
             print(" -- got combineLatest -     purchaseQueue: \(purchaseQueue.joined(separator: ","))")
 
-            let sortedProducts = availableProducts.sorted(by: { $0.price > $1.price })
+            let sortedProducts = products.sorted(by: { $0.price > $1.price })
 
             self?.model.subscriptions = sortedProducts.map { SubscriptionRowModel(product: $0,
                                                                                   isPurchased: purchasedProductIDs.contains($0.id),

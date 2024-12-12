@@ -34,14 +34,14 @@ class ErrorPageHTMLFactoryTests: XCTestCase {
         XCTAssertTrue(html.contains("Phishing")) // Check if the HTML contains "Phishing"
     }
 
-    // func testMalwareErrorTemplate() {
-    //     let url = URL(string: "https://example.com")!
-    //     let error = MaliciousSiteError(code: .malware, failingUrl: url)
-    //     let html = ErrorPageHTMLFactory.html(for: WKError(_nsError: error as NSError), featureFlagger: MockFeatureFlagger())
+    func testMalwareErrorTemplate() {
+        let url = URL(string: "https://example.com")!
+        let error = MaliciousSiteError(code: .malware, failingUrl: url)
+        let html = ErrorPageHTMLFactory.html(for: WKError(_nsError: error as NSError), featureFlagger: MockFeatureFlagger())
 
-    //     XCTAssertNotNil(html)
-    //     XCTAssertTrue(html.contains("Malware")) // Check if the HTML contains "Phishing"
-    // }
+        XCTAssertNotNil(html)
+        XCTAssertTrue(html.contains("Malware")) // Check if the HTML contains "Malware"
+    }
 
     func testDefaultErrorTemplate() {
         let url = URL(string: "https://example.com")!

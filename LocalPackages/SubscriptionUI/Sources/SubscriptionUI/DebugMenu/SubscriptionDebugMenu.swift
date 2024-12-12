@@ -208,8 +208,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func showAccountDetails() {
         Task {
             let title = subscriptionManager.isUserAuthenticated ? "Authenticated" : "Not Authenticated"
-            let token = try? await subscriptionManager.getTokenContainer(policy: .local).accessToken
-            let message = subscriptionManager.isUserAuthenticated ? ["AccessToken: \(token ?? "")",
+            let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: .local)
+            let message = subscriptionManager.isUserAuthenticated ? ["External ID: \(tokenContainer?.decodedAccessToken.externalID ?? "")",
+                                                                     "\(tokenContainer!.debugDescription)",
                                                                      "Email: \(subscriptionManager.userEmail ?? "")"].joined(separator: "\n") : nil
             showAlert(title: title, message: message)
         }
