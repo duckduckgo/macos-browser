@@ -64,9 +64,6 @@ extension DefaultSubscriptionManager {
 
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
                                                                              baseURL: environment.serviceEnvironment.url)
-//        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)! // main app
-//        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
-//                                                                                     userDefaults: userDefaults)
         let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
             guard let featureFlagger else {
                 // With no featureFlagger provided there is no gating of features
@@ -100,14 +97,12 @@ extension DefaultSubscriptionManager {
                                                                         subscriptionFeatureFlagger: subscriptionFeatureFlagger),
                       oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
-//                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                       subscriptionEnvironment: environment,
                       subscriptionFeatureFlagger: subscriptionFeatureFlagger,
                       pixelHandler: pixelHandler)
         } else {
             self.init(oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
-//                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                       subscriptionEnvironment: environment,
                       subscriptionFeatureFlagger: subscriptionFeatureFlagger,
                       pixelHandler: pixelHandler)
