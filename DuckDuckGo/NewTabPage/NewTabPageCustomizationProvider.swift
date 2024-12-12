@@ -33,6 +33,7 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
         .init(
             background: .init(homePageSettingsModel.customBackground),
             theme: .init(appearancePreferences.currentThemeName),
+            userColor: homePageSettingsModel.lastPickedCustomColor,
             userImages: homePageSettingsModel.availableUserBackgroundImages.map(NewTabPageDataModel.UserImage.init)
         )
     }

@@ -244,8 +244,13 @@ extension HomePage.Models {
         @Published var customBackground: CustomBackground? {
             didSet {
                 appearancePreferences.homePageCustomBackground = customBackground
-                if case .userImage(let userBackgroundImage) = customBackground {
+                switch customBackground {
+                case .solidColor(let solidColorBackground) where solidColorBackground.predefinedColorName == nil:
+                    lastPickedCustomColor = solidColorBackground.color
+                case .userImage(let userBackgroundImage):
                     customImagesManager?.updateSelectedTimestamp(for: userBackgroundImage)
+                default:
+                    break
                 }
                 if let customBackground {
                     Logger.homePageSettings.debug("Home page background updated: \(customBackground), color scheme: \(customBackground.colorScheme)")
@@ -298,9 +303,6 @@ extension HomePage.Models {
             provider.showColorPanel(with: lastPickedCustomColorHexValue.flatMap(NSColor.init(hex:)) ?? Const.defaultColorPickerColor)
 
             userColorCancellable = provider.colorPublisher
-                .handleEvents(receiveOutput: { [weak self] color in
-                    self?.lastPickedCustomColor = color
-                })
                 .map { CustomBackground.solidColor(.init(color: $0)) }
                 .assign(to: \.customBackground, onWeaklyHeld: self)
         }

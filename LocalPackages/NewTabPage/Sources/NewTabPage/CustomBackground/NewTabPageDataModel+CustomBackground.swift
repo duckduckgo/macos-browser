@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKitExtensions
 import Foundation
 
 public extension NewTabPageDataModel {
@@ -23,12 +24,18 @@ public extension NewTabPageDataModel {
     struct CustomizerData: Encodable, Equatable {
         public let background: Background
         public let theme: Theme?
+        public let userColor: Background?
         public let userImages: [UserImage]
 
-        public init(background: Background, theme: Theme?, userImages: [UserImage]) {
+        public init(background: Background, theme: Theme?, userColor: NSColor?, userImages: [UserImage]) {
             self.background = background
             self.theme = theme
             self.userImages = userImages
+            if let hex = userColor?.hex() {
+                self.userColor = Background.hexColor(hex)
+            } else {
+                self.userColor = nil
+            }
         }
 
         enum CodingKeys: CodingKey {
