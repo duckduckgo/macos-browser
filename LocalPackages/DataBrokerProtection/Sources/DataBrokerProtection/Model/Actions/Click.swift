@@ -42,7 +42,7 @@ struct ClickAction: Action {
     struct Default: Codable {
         let elements: [PageElement]?
     }
-    
+
     init(id: String, actionType: ActionType, elements: [PageElement]? = nil, dataSource: DataSource? = nil, choices: [Choice]? = nil, `default`: Default? = nil, hasDefault: Bool = false) {
        self.id = id
        self.actionType = actionType
