@@ -201,9 +201,8 @@ private extension DuckURLSchemeHandler {
         }
 
         /**
-         * Favicon URL has the format of `duck://favicon/<url_percent_encoded_favicon_url>`.
-         * Calling `requestURL.path` drops leading `duck://favicon` and automatically
-         * handles percent-encoding. We only need to drop the leading forward slash to get the favicon URL.
+         * Custom Background image has the format of `duck://new-tab/background/images/<file_name>`.
+         * Custom Background image thumbnail has the format of `duck://new-tab/background/thumbnails/<file_name>`.
          */
         let fileName = requestURL.lastPathComponent
 
