@@ -30,9 +30,12 @@ final class AutofillTabExtension: TabExtension {
         return emailManager
     }
 
+    static var featureFlagger = NSApp.delegateTyped.featureFlagger
+
     static var vaultManagerProvider: (SecureVaultManagerDelegate) -> AutofillSecureVaultDelegate = { delegate in
         let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
                                          includePartialAccountMatches: true,
+                                         shouldAllowPartialFormSaves: featureFlagger.isFeatureOn(.autofillPartialFormSaves),
                                          tld: ContentBlocking.shared.tld)
         manager.delegate = delegate
         return manager
@@ -209,6 +212,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
         return ContentScopeProperties(gpcEnabled: WebTrackingProtectionPreferences.shared.isGPCEnabled,
                                       sessionKey: autofillScript?.sessionKey ?? "",
+                                      messageSecret: autofillScript?.messageSecret ?? "",
                                       featureToggles: supportedFeatures)
     }
 }

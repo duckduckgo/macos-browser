@@ -69,7 +69,7 @@ final class SyncCredentialsAdapter {
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
                     self?.syncErrorHandler.syncCredentialsSucceded()
-                }
+                }, syncDidFinish: { _ in }
             )
 
             syncErrorCancellable = provider.syncErrorPublisher

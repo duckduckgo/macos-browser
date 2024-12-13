@@ -61,6 +61,7 @@ struct OperationPreferredDateCalculator {
                                 historyEvents: [HistoryEvent],
                                 extractedProfileID: Int64?,
                                 schedulingConfig: DataBrokerScheduleConfig,
+                                attemptCount: Int64?,
                                 date: DateProtocol = SystemDate()) throws -> Date? {
         guard let lastEvent = historyEvents.last else {
             throw DataBrokerProtectionError.cantCalculatePreferredRunDate
@@ -70,7 +71,8 @@ struct OperationPreferredDateCalculator {
         case .matchesFound, .reAppearence:
             if let extractedProfileID = extractedProfileID, shouldScheduleNewOptOut(events: historyEvents,
                                                                                     extractedProfileId: extractedProfileID,
-                                                                                    schedulingConfig: schedulingConfig) {
+                                                                                    schedulingConfig: schedulingConfig,
+                                                                                    attemptCount: attemptCount) {
                 return date.now
             } else {
                 return currentPreferredRunDate
@@ -84,10 +86,18 @@ struct OperationPreferredDateCalculator {
         }
     }
 
-    // If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
+    // If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired),
+    // and the number of attempts is still fewer than the configurable limit,
+    // we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
     private func shouldScheduleNewOptOut(events: [HistoryEvent],
                                          extractedProfileId: Int64,
-                                         schedulingConfig: DataBrokerScheduleConfig) -> Bool {
+                                         schedulingConfig: DataBrokerScheduleConfig,
+                                         attemptCount: Int64?) -> Bool {
+        let currentAttempt = attemptCount ?? 0
+        if schedulingConfig.maxAttempts != -1, currentAttempt >= schedulingConfig.maxAttempts {
+            return false
+        }
+
         guard let lastRemovalEvent = events.last(where: { $0.type == .optOutRequested && $0.extractedProfileId == extractedProfileId }) else {
             return false
         }

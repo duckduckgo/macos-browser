@@ -171,7 +171,7 @@ final class HomePageViewController: NSViewController {
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dockCustomizer: DockCustomizer(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
-            tabCollectionViewModel: tabCollectionViewModel,
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: tabCollectionViewModel),
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
         )
     }

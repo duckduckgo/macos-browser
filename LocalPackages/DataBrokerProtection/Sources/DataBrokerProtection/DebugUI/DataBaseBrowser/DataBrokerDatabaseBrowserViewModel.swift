@@ -48,7 +48,8 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         guard let dataManager = self.dataManager else { return }
 
         Task {
-            guard let data = try? dataManager.fetchBrokerProfileQueryData(ignoresCache: true) else {
+            guard let data = try? dataManager.fetchBrokerProfileQueryData(ignoresCache: true),
+                  let attempts = try? dataManager.fetchAllOptOutAttempts() else {
                 assertionFailure("DataManager error during DataBrokerDatavaseBrowserViewModel.updateTables")
                 return
             }
@@ -68,9 +69,10 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
             let optOutsTable = createTable(using: optOutJobs, tableName: "OptOutOperation")
             let extractedProfilesTable = createTable(using: extractedProfiles, tableName: "ExtractedProfile")
             let eventsTable = createTable(using: events.sorted(by: { $0.date < $1.date }), tableName: "Events")
+            let attemptsTable = createTable(using: attempts.sorted(by: <), tableName: "OptOutAttempts")
 
             DispatchQueue.main.async {
-                self.tables = [brokersTable, profileQueriesTable, scansTable, optOutsTable, extractedProfilesTable, eventsTable]
+                self.tables = [brokersTable, profileQueriesTable, scansTable, optOutsTable, extractedProfilesTable, eventsTable, attemptsTable]
             }
         }
  }
@@ -135,4 +137,26 @@ struct DataBrokerDatabaseBrowserData {
         }
     }
 
+}
+
+extension DataBrokerProtectionDataManager {
+    func fetchAllOptOutAttempts() throws -> [AttemptInformation] {
+        try database.fetchAllAttempts()
+    }
+}
+
+extension AttemptInformation: Comparable {
+    public static func < (lhs: AttemptInformation, rhs: AttemptInformation) -> Bool {
+        if lhs.extractedProfileId != rhs.extractedProfileId {
+            return lhs.extractedProfileId < rhs.extractedProfileId
+        } else if lhs.dataBroker != rhs.dataBroker {
+            return lhs.dataBroker < rhs.dataBroker
+        } else {
+            return lhs.startDate < rhs.startDate
+        }
+    }
+
+    public static func == (lhs: AttemptInformation, rhs: AttemptInformation) -> Bool {
+        lhs.attemptId == rhs.attemptId
+    }
 }

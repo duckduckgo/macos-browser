@@ -49,6 +49,9 @@ final class DuckPlayerTabExtension {
         didSet {
             youtubeOverlayScript?.webView = webView
             youtubePlayerScript?.webView = webView
+            if duckPlayerOverlayUsagePixels.webView == nil {
+                duckPlayerOverlayUsagePixels.webView = webView
+            }
         }
     }
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
@@ -56,6 +59,7 @@ final class DuckPlayerTabExtension {
     private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldSelectNextNewTab: Bool?
     private var duckPlayerOverlayUsagePixels: DuckPlayerOverlayPixelFiring
+    private var duckPlayerModeCancellable: AnyCancellable?
 
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
@@ -69,6 +73,7 @@ final class DuckPlayerTabExtension {
         self.preferences = preferences
         self.onboardingDecider = onboardingDecider
         self.duckPlayerOverlayUsagePixels = duckPlayerOverlayPixels
+
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
@@ -84,6 +89,15 @@ final class DuckPlayerTabExtension {
                 self?.setUpYoutubeScriptsIfNeeded(for: self?.webView?.url)
             }
         }.store(in: &cancellables)
+
+        // Add a DuckPlayerMode observer
+        setupPlayerModeObserver()
+
+    }
+
+    deinit {
+        duckPlayerModeCancellable?.cancel()
+        duckPlayerModeCancellable = nil
     }
 
     @MainActor
@@ -152,6 +166,14 @@ final class DuckPlayerTabExtension {
         Debounce.lastFireTime = now
         PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
     }
+
+    private func setupPlayerModeObserver() {
+        duckPlayerModeCancellable = preferences.$duckPlayerMode
+            .sink { [weak self] mode in
+                self?.duckPlayerOverlayUsagePixels.duckPlayerMode = mode
+        }
+    }
+
 }
 
 extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
@@ -238,16 +260,9 @@ extension DuckPlayerTabExtension: NavigationResponder {
             }
         }
 
-        // Fire DuckPlayer Temporary Pixels on Reload
+        // Duck Player Overlay Reload Pixel
         if case .reload = navigationAction.navigationType {
-            if let url = navigationAction.request.url {
-                duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
-            }
-        }
-
-        // Fire DuckPlayer temporary pixels on navigating outside Youtube
-        if let url = navigationAction.request.url, !url.isYoutube {
-            duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
+            duckPlayerOverlayUsagePixels.fireReloadPixelIfNeeded(url: navigationAction.url)
         }
 
         // when in Private Player, don't directly reload current URL when it‘s a Private Player target URL
@@ -320,10 +335,6 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // Fire Overlay Shown Pixels
         fireOverlayShownPixelIfNeeded(url: navigation.url)
 
-        // Fire DuckPlayer Overlay Temporary Pixels
-        if let url = navigation.request.url {
-            duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
-        }
     }
 
     @MainActor

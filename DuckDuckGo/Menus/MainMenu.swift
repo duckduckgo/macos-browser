@@ -631,6 +631,11 @@ final class MainMenu: NSMenu {
                     NSMenuItem(title: "100 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 100)
                     NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
                 }
+                NSMenuItem(title: "New Tab") {
+                    NSMenuItem(title: "Reset Continue Setup", action: #selector(MainViewController.debugResetContinueSetup))
+                    NSMenuItem(title: "Shift New Tab daily impression", action: #selector(MainViewController.debugShiftNewTabOpeningDate))
+                    NSMenuItem(title: "Shift \(AppearancePreferences.Constants.dismissNextStepsCardsAfterDays) days", action: #selector(MainViewController.debugShiftNewTabOpeningDateNtimes))
+                }
             }
             NSMenuItem(title: "Skip Onboarding", action: #selector(MainViewController.skipOnboarding))
             NSMenuItem(title: "Reset Data") {
@@ -721,7 +726,13 @@ final class MainMenu: NSMenu {
                                   updatePurchasingPlatform: updatePurchasingPlatform,
                                   currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
                                   openSubscriptionTab: { WindowControllersManager.shared.showTab(with: .subscription($0)) },
-                                  subscriptionManager: Application.appDelegate.subscriptionManager)
+                                  subscriptionManager: Application.appDelegate.subscriptionManager,
+                                  subscriptionUserDefaults: subscriptionUserDefaults)
+
+            NSMenuItem(title: "TipKit") {
+                NSMenuItem(title: "Reset", action: #selector(MainViewController.resetTipKit))
+                NSMenuItem(title: "⚠️ App restart required.", action: nil, target: nil)
+            }
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())

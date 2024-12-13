@@ -32,6 +32,7 @@ protocol DataBrokerProtectionDatabaseMigrationsProvider {
     static var v2Migrations: (inout DatabaseMigrator) throws -> Void { get }
     static var v3Migrations: (inout DatabaseMigrator) throws -> Void { get }
     static var v4Migrations: (inout DatabaseMigrator) throws -> Void { get }
+    static var v5Migrations: (inout DatabaseMigrator) throws -> Void { get }
 }
 
 final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
@@ -52,6 +53,14 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
         migrator.registerMigration("v2", migrate: migrateV2(database:))
         migrator.registerMigration("v3", migrate: migrateV3(database:))
         migrator.registerMigration("v4", migrate: migrateV4(database:))
+    }
+
+    static var v5Migrations: (inout DatabaseMigrator) throws -> Void = { migrator in
+        migrator.registerMigration("v1", migrate: migrateV1(database:))
+        migrator.registerMigration("v2", migrate: migrateV2(database:))
+        migrator.registerMigration("v3", migrate: migrateV3(database:))
+        migrator.registerMigration("v4", migrate: migrateV4(database:))
+        migrator.registerMigration("v5", migrate: migrateV5(database:))
     }
 
     static func migrateV1(database: Database) throws {
@@ -269,6 +278,16 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
             $0.add(column: OptOutDB.Columns.fourteenDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
             $0.add(column: OptOutDB.Columns.twentyOneDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
         }
+    }
+
+    static func migrateV5(database: Database) throws {
+        try database.alter(table: OptOutDB.databaseTableName) {
+            // Keep track of opt-out request attempts
+            $0.add(column: OptOutDB.Columns.attemptCount.name, .integer).notNull().defaults(to: 0)
+        }
+        try database.execute(sql: """
+                UPDATE \(OptOutDB.databaseTableName) SET \(OptOutDB.Columns.attemptCount.name) = 0
+        """)
     }
 
     private static func deleteOrphanedRecords(database: Database) throws {

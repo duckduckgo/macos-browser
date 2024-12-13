@@ -18,6 +18,7 @@
 
 import AppKit
 import BrowserServicesKit
+import Combine
 import Common
 import Foundation
 import PixelKit
@@ -25,6 +26,20 @@ import Subscription
 
 import NetworkProtection
 import NetworkProtectionUI
+
+protocol ContinueSetUpModelTabOpening {
+    @MainActor
+    func openTab(_ tab: Tab)
+}
+
+struct TabCollectionViewModelTabOpener: ContinueSetUpModelTabOpening {
+    let tabCollectionViewModel: TabCollectionViewModel
+
+    @MainActor
+    func openTab(_ tab: Tab) {
+        tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
+    }
+}
 
 extension HomePage.Models {
 
@@ -49,7 +64,7 @@ extension HomePage.Models {
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dockCustomizer: DockCustomization
         private let dataImportProvider: DataImportStatusProviding
-        private let tabCollectionViewModel: TabCollectionViewModel
+        private let tabOpener: ContinueSetUpModelTabOpening
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
         private let subscriptionManager: SubscriptionManager
@@ -58,26 +73,43 @@ extension HomePage.Models {
         var shouldShowAllFeatures: Bool {
             didSet {
                 updateVisibleMatrix()
+                shouldShowAllFeaturesSubject.send(shouldShowAllFeatures)
             }
         }
 
-        @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
-        private var shouldShowMakeDefaultSetting: Bool
+        let shouldShowAllFeaturesPublisher: AnyPublisher<Bool, Never>
+        private let shouldShowAllFeaturesSubject = PassthroughSubject<Bool, Never>()
 
-        @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
-        private var shouldShowAddToDockSetting: Bool
+        struct Settings {
+            @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
+            var shouldShowMakeDefaultSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
-        private var shouldShowImportSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
+            var shouldShowAddToDockSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
-        private var shouldShowDuckPlayerSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
+            var shouldShowImportSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
-        private var shouldShowEmailProtectionSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
+            var shouldShowDuckPlayerSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
-        private var isFirstSession: Bool
+            @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
+            var shouldShowEmailProtectionSetting: Bool
+
+            @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
+            var isFirstSession: Bool
+
+            func clear() {
+                _shouldShowMakeDefaultSetting.clear()
+                _shouldShowAddToDockSetting.clear()
+                _shouldShowImportSetting.clear()
+                _shouldShowDuckPlayerSetting.clear()
+                _shouldShowEmailProtectionSetting.clear()
+                _isFirstSession.clear()
+            }
+        }
+
+        private let settings: Settings
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
@@ -87,9 +119,9 @@ extension HomePage.Models {
             return !featuresMatrix.isEmpty
         }
 
-        lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
+        lazy var listOfFeatures = settings.isFirstSession ? firstRunFeatures : randomisedFeatures
 
-        private var featuresMatrix: [[FeatureType]] = [[]] {
+        @Published var featuresMatrix: [[FeatureType]] = [[]] {
             didSet {
                 updateVisibleMatrix()
             }
@@ -97,27 +129,38 @@ extension HomePage.Models {
 
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-        init(defaultBrowserProvider: DefaultBrowserProvider,
-             dockCustomizer: DockCustomization,
-             dataImportProvider: DataImportStatusProviding,
-             tabCollectionViewModel: TabCollectionViewModel,
+        init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider(),
+             dockCustomizer: DockCustomization = DockCustomizer(),
+             dataImportProvider: DataImportStatusProviding = BookmarksAndPasswordsImportStatusProvider(),
+             tabOpener: ContinueSetUpModelTabOpening,
              emailManager: EmailManager = EmailManager(),
-             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
              subscriptionManager: SubscriptionManager = Application.appDelegate.subscriptionManager) {
+
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dockCustomizer = dockCustomizer
             self.dataImportProvider = dataImportProvider
-            self.tabCollectionViewModel = tabCollectionViewModel
+            self.tabOpener = tabOpener
             self.emailManager = emailManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.privacyConfigurationManager = privacyConfigurationManager
             self.subscriptionManager = subscriptionManager
+            self.settings = .init()
+
+            shouldShowAllFeaturesPublisher = shouldShowAllFeaturesSubject.removeDuplicates().eraseToAnyPublisher()
 
             refreshFeaturesMatrix()
 
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
+
+            // HTML NTP doesn't refresh on appear so we have to connect to the appear signal
+            // (the notification in this case) to trigger a refresh.
+            NotificationCenter.default.addObserver(self, selector: #selector(refreshFeaturesForHTMLNewTabPage(_:)), name: .newTabPageWebViewDidAppear, object: nil)
+
+            // This is just temporarily here to run an A/A test to check the new experiment framework works as expected
+            _ = Application.appDelegate.featureFlagger.getCohortIfEnabled(for: CredentialsSavingFlag())
         }
 
         @MainActor func performAction(for featureType: FeatureType) {
@@ -152,14 +195,14 @@ extension HomePage.Models {
         private func performDuckPlayerAction() {
             if let videoUrl = URL(string: duckPlayerURL) {
                 let tab = Tab(content: .url(videoUrl, source: .link), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
+                tabOpener.openTab(tab)
             }
         }
 
         @MainActor
         private func performEmailProtectionAction() {
             let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
-            tabCollectionViewModel.append(tab: tab)
+            tabOpener.openTab(tab)
         }
 
         func performDockAction() {
@@ -171,15 +214,15 @@ extension HomePage.Models {
         func removeItem(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
-                shouldShowMakeDefaultSetting = false
+                settings.shouldShowMakeDefaultSetting = false
             case .dock:
-                shouldShowAddToDockSetting = false
+                settings.shouldShowAddToDockSetting = false
             case .importBookmarksAndPasswords:
-                shouldShowImportSetting = false
+                settings.shouldShowImportSetting = false
             case .duckplayer:
-                shouldShowDuckPlayerSetting = false
+                settings.shouldShowDuckPlayerSetting = false
             case .emailProtection:
-                shouldShowEmailProtectionSetting = false
+                settings.shouldShowEmailProtectionSetting = false
             }
             refreshFeaturesMatrix()
         }
@@ -187,6 +230,9 @@ extension HomePage.Models {
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
             appendFeatureCards(&features)
+            if features.isEmpty {
+                AppearancePreferences.shared.continueSetUpCardsClosed = true
+            }
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
 
@@ -212,20 +258,28 @@ extension HomePage.Models {
         }
 
         // Helper Functions
-        @MainActor(unsafe)
+        @MainActor
         @objc private func newTabOpenNotification(_ notification: Notification) {
-            if !isFirstSession {
+            if !settings.isFirstSession {
                 listOfFeatures = randomisedFeatures
             }
 #if DEBUG
-            isFirstSession = false
+            settings.isFirstSession = false
 #endif
             if OnboardingViewModel.isOnboardingFinished {
-                isFirstSession = false
+                settings.isFirstSession = false
             }
         }
 
         @objc private func windowDidBecomeKey(_ notification: Notification) {
+            // Async dispatch allows default browser setting to propagate
+            // after being changed in the system dialog
+            DispatchQueue.main.async {
+                self.refreshFeaturesMatrix()
+            }
+        }
+
+        @objc private func refreshFeaturesForHTMLNewTabPage(_ notification: Notification) {
             refreshFeaturesMatrix()
         }
 
@@ -252,33 +306,27 @@ extension HomePage.Models {
         }
 
         private var shouldMakeDefaultCardBeVisible: Bool {
-            shouldShowMakeDefaultSetting &&
-            !defaultBrowserProvider.isDefault
+            settings.shouldShowMakeDefaultSetting && !defaultBrowserProvider.isDefault
         }
 
         private var shouldDockCardBeVisible: Bool {
 #if !APPSTORE
-            shouldShowAddToDockSetting &&
-            !dockCustomizer.isAddedToDock
+            settings.shouldShowAddToDockSetting && !dockCustomizer.isAddedToDock
 #else
             return false
 #endif
         }
 
         private var shouldImportCardBeVisible: Bool {
-            shouldShowImportSetting &&
-            !dataImportProvider.didImport
+            settings.shouldShowImportSetting && !dataImportProvider.didImport
         }
 
         private var shouldDuckPlayerCardBeVisible: Bool {
-            shouldShowDuckPlayerSetting &&
-            duckPlayerPreferences.duckPlayerModeBool == nil &&
-            !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
+            settings.shouldShowDuckPlayerSetting && duckPlayerPreferences.duckPlayerModeBool == nil && !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
         }
 
         private var shouldEmailProtectionCardBeVisible: Bool {
-            shouldShowEmailProtectionSetting &&
-            !emailManager.isSignedIn
+            settings.shouldShowEmailProtectionSetting && !emailManager.isSignedIn
         }
 
     }
@@ -398,5 +446,21 @@ extension AppVersion {
             return majorVersionNumber
         }
         return "\(components[0]).\(components[1])"
+    }
+}
+
+// This is just temporarily here to run an A/A test to check the new experiment framework works as expected
+public struct CredentialsSavingFlag: FeatureFlagExperimentDescribing {
+    public init() {}
+
+    public typealias CohortType = Cohort
+
+    public var rawValue = "credentialSaving"
+
+    public var source: FeatureFlagSource = .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
+
+    public enum Cohort: String, FlagCohort {
+        case control
+        case blue
     }
 }

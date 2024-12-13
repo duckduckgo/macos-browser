@@ -39,7 +39,8 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         store.scheduledRemoteMessage = nil
         model = ActiveRemoteMessageModel(
             remoteMessagingStore: self.store,
-            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider(),
+            openURLHandler: { _ in }
         )
 
         XCTAssertNil(model.remoteMessage)
@@ -49,7 +50,8 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         store.scheduledRemoteMessage = message
         model = ActiveRemoteMessageModel(
             remoteMessagingStore: self.store,
-            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider(),
+            openURLHandler: { _ in }
         )
 
         XCTAssertEqual(model.remoteMessage, message)
@@ -59,7 +61,8 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         store.scheduledRemoteMessage = message
         model = ActiveRemoteMessageModel(
             remoteMessagingStore: self.store,
-            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider(),
+            openURLHandler: { _ in }
         )
         await model.dismissRemoteMessage(with: .close)
 
@@ -70,7 +73,8 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         store.scheduledRemoteMessage = message
         model = ActiveRemoteMessageModel(
             remoteMessagingStore: self.store,
-            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider(),
+            openURLHandler: { _ in }
         )
 
         XCTAssertFalse(store.hasShownRemoteMessage(withID: message.id))

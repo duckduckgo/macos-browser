@@ -177,6 +177,7 @@ final class NavigationBarViewController: NSViewController {
         bookmarkListButton.delegate = self
         bookmarkListButton.setAccessibilityIdentifier("NavigationBarViewController.bookmarkListButton")
         downloadsButton.sendAction(on: .leftMouseDown)
+        downloadsButton.setAccessibilityIdentifier("NavigationBarViewController.downloadsButton")
         networkProtectionButton.sendAction(on: .leftMouseDown)
         passwordManagementButton.sendAction(on: .leftMouseDown)
         aiChatButton.sendAction(on: .leftMouseDown)

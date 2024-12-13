@@ -232,21 +232,22 @@ extension HomePage.Views.BackgroundCategoryView {
     fileprivate typealias BackgroundThumbnailView = HomePage.Views.BackgroundThumbnailView
 }
 
-#Preview {
+#if DEBUG
+#Preview("including continue set up cards") {
     @State var isSettingsVisible: Bool = true
 
-    let model = HomePage.Models.SettingsModel()
-    model.customBackground = .solidColor(.color10)
+    let settingsModel = HomePage.Models.SettingsModel()
+    settingsModel.customBackground = .solidColor(.color10)
 
     return HomePage.Views.SettingsView(includingContinueSetUpCards: true, isSettingsVisible: $isSettingsVisible)
         .frame(width: 236, height: 600)
-        .environmentObject(model)
+        .environmentObject(settingsModel)
         .environmentObject(AppearancePreferences.shared)
         .environmentObject(HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dockCustomizer: DockCustomizer(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
-            tabCollectionViewModel: TabCollectionViewModel(),
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: TabCollectionViewModel()),
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
         ))
         .environmentObject(HomePage.Models.FavoritesModel(
@@ -258,4 +259,35 @@ extension HomePage.Views.BackgroundCategoryView {
             moveFavorite: { _, _ in },
             onFaviconMissing: {}
         ))
+        .environmentObject(HomePage.Models.AddressBarModel(tabCollectionViewModel: TabCollectionViewModel(), privacyConfigurationManager: MockPrivacyConfigurationManager()))
 }
+
+#Preview("no continue set up cards") {
+    @State var isSettingsVisible: Bool = true
+
+    let settingsModel = HomePage.Models.SettingsModel()
+    settingsModel.customBackground = .solidColor(.color10)
+
+    return HomePage.Views.SettingsView(includingContinueSetUpCards: false, isSettingsVisible: $isSettingsVisible)
+        .frame(width: 236, height: 600)
+        .environmentObject(settingsModel)
+        .environmentObject(AppearancePreferences.shared)
+        .environmentObject(HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dockCustomizer: DockCustomizer(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: TabCollectionViewModel()),
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
+        ))
+        .environmentObject(HomePage.Models.FavoritesModel(
+            open: { _, _ in },
+            removeFavorite: { _ in },
+            deleteBookmark: { _ in },
+            add: {},
+            edit: { _ in },
+            moveFavorite: { _, _ in },
+            onFaviconMissing: {}
+        ))
+        .environmentObject(HomePage.Models.AddressBarModel(tabCollectionViewModel: TabCollectionViewModel(), privacyConfigurationManager: MockPrivacyConfigurationManager()))
+}
+#endif

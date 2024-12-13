@@ -1,7 +1,7 @@
 {
   "name": "mylife",
   "url": "mylife.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "addedDatetime": 1715797497496,
   "optOutUrl": "https://www.mylife.com/ccpa/index.pubview",
   "steps": [
@@ -137,6 +137,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }

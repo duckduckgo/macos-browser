@@ -101,7 +101,6 @@ extension HomePage.Models {
         func setUpExperimentIfNeeded() {
             if isExperimentActive {
                 let ntpExperiment = NewTabPageSearchBoxExperiment()
-                ntpExperiment.assignUserToCohort()
                 shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
             }
         }
@@ -121,9 +120,11 @@ extension HomePage.Models {
             isExperimentActive = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .newTabSearchField)
             setUpExperimentIfNeeded()
 
-            privacyConfigCancellable = privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
-                self?.isExperimentActive = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
-            }
+            privacyConfigCancellable = privacyConfigurationManager.updatesPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self, weak privacyConfigurationManager] in
+                    self?.isExperimentActive = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
+                }
         }
 
         private lazy var addressBarViewController: AddressBarViewController? = createAddressBarViewController()

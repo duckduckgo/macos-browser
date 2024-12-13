@@ -30,6 +30,7 @@ protocol ScriptSourceProviding {
     var privacyConfigurationManager: PrivacyConfigurationManaging { get }
     var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
+    var messageSecret: String? { get }
     var onboardingActionsManager: OnboardingActionsManaging? { get }
     func buildAutofillSource() -> AutofillUserScriptSourceProvider
 
@@ -47,6 +48,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     private(set) var onboardingActionsManager: OnboardingActionsManaging?
     private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
+    private(set) var messageSecret: String?
 
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManaging
@@ -73,6 +75,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         self.surrogatesConfig = buildSurrogatesConfig()
         self.sessionKey = generateSessionKey()
+        self.messageSecret = generateSessionKey()
         self.autofillSourceProvider = buildAutofillSource()
         self.onboardingActionsManager = buildOnboardingActionsManager()
     }
@@ -86,6 +89,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         return DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
                                                      properties: ContentScopeProperties(gpcEnabled: webTrakcingProtectionPreferences.isGPCEnabled,
                                                                                         sessionKey: self.sessionKey ?? "",
+                                                                                        messageSecret: self.messageSecret ?? "",
                                                                                         featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig)),
                                                      isDebug: AutofillPreferences().debugScriptEnabled)
                 .withJSLoading()

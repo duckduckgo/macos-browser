@@ -167,25 +167,27 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard subscriptionFeatureAvailability.isSubscriptionPurchaseAllowed else { return SubscriptionOptions.empty }
+        var subscriptionOptions = SubscriptionOptions.empty
 
         switch subscriptionPlatform {
         case .appStore:
             if #available(macOS 12.0, *) {
-                if let subscriptionOptions = await subscriptionManager.storePurchaseManager().subscriptionOptions() {
-                    return subscriptionOptions
+                if let appStoreSubscriptionOptions = await subscriptionManager.storePurchaseManager().subscriptionOptions() {
+                    subscriptionOptions = appStoreSubscriptionOptions
                 }
             }
         case .stripe:
             switch await stripePurchaseFlow.subscriptionOptions() {
-            case .success(let subscriptionOptions):
-                return subscriptionOptions
+            case .success(let stripeSubscriptionOptions):
+                subscriptionOptions = stripeSubscriptionOptions
             case .failure:
                 break
             }
         }
 
-        return SubscriptionOptions.empty
+        guard subscriptionFeatureAvailability.isSubscriptionPurchaseAllowed else { return subscriptionOptions.withoutPurchaseOptions() }
+
+        return subscriptionOptions
     }
 
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -276,7 +278,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .legacyDailyAndCount)
                     sendFreemiumSubscriptionPixelIfFreemiumActivated()
                     saveSubscriptionUpgradeTimestampIfFreemiumActivated()
-                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
+                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .uniqueByName)
                     subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
                     sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated()
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
@@ -342,7 +344,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func featureSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct FeatureSelection: Codable {
-            let feature: String
+            let productFeature: Entitlement.ProductName
         }
 
         guard let featureSelection: FeatureSelection = DecodableHelper.decode(from: params) else {
@@ -350,31 +352,20 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             return nil
         }
 
-        guard let subscriptionFeatureName = SubscriptionFeatureName(rawValue: featureSelection.feature) else {
-            assertionFailure("SubscriptionPagesUserScript: feature name does not matches mapping")
-            return nil
-        }
-
-        switch subscriptionFeatureName {
-        case .privateBrowsing:
-            notificationCenter.post(name: .openPrivateBrowsing, object: self, userInfo: nil)
-        case .privateSearch:
-            notificationCenter.post(name: .openPrivateSearch, object: self, userInfo: nil)
-        case .emailProtection:
-            notificationCenter.post(name: .openEmailProtection, object: self, userInfo: nil)
-        case .appTrackingProtection:
-            notificationCenter.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
-        case .vpn:
-            PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .unique)
+        switch featureSelection.productFeature {
+        case .networkProtection:
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .uniqueByName)
             notificationCenter.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
-        case .personalInformationRemoval:
-            PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
+        case .dataBrokerProtection:
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .uniqueByName)
             notificationCenter.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await uiHandler.showTab(with: .dataBrokerProtection)
-        case .identityTheftRestoration:
-            PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
+        case .identityTheftRestoration, .identityTheftRestorationGlobal:
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .uniqueByName)
             let url = subscriptionManager.url(for: .identityTheftRestoration)
             await uiHandler.showTab(with: .identityTheftRestoration(url))
+        case .unknown:
+            break
         }
 
         return nil
@@ -411,12 +402,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func subscriptionsAddEmailSuccess(params: Any, original: WKScriptMessage) async -> Encodable? {
-        PixelKit.fire(PrivacyProPixel.privacyProAddEmailSuccess, frequency: .unique)
+        PixelKit.fire(PrivacyProPixel.privacyProAddEmailSuccess, frequency: .uniqueByName)
         return nil
     }
 
     func subscriptionsWelcomeFaqClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
-        PixelKit.fire(PrivacyProPixel.privacyProWelcomeFAQClick, frequency: .unique)
+        PixelKit.fire(PrivacyProPixel.privacyProWelcomeFAQClick, frequency: .uniqueByName)
         return nil
     }
 

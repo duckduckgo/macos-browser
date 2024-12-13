@@ -38,6 +38,8 @@ public protocol DataBrokerProtectionRepository {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -62,6 +64,7 @@ public protocol DataBrokerProtectionRepository {
     func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [HistoryEvent]
     func hasMatches() throws -> Bool
 
+    func fetchAllAttempts() throws -> [AttemptInformation]
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation?
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws
 }
@@ -238,6 +241,37 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+            try vault.updateAttemptCount(
+                count,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
+        } catch {
+            Logger.dataBrokerProtection.error("Database error: updateAttemptCount, error: \(error.localizedDescription, privacy: .public)")
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateAttemptCount"))
+            throw error
+        }
+    }
+
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+            try vault.incrementAttemptCount(
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
+        } catch {
+            Logger.dataBrokerProtection.error("Database error: incrementAttemptCount, error: \(error.localizedDescription, privacy: .public)")
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.incrementAttemptCount"))
+            throw error
+        }
+    }
+
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -388,6 +422,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                            createdDate: optOut.createdDate,
                            lastRunDate: optOut.lastRunDate,
                            preferredRunDate: optOut.preferredRunDate,
+                           attemptCount: optOut.attemptCount,
                            submittedSuccessfullyDate: optOut.submittedSuccessfullyDate,
                            sevenDaysConfirmationPixelFired: optOut.sevenDaysConfirmationPixelFired,
                            fourteenDaysConfirmationPixelFired: optOut.fourteenDaysConfirmationPixelFired,
@@ -449,6 +484,17 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             Logger.dataBrokerProtection.error("Database error: fetchHistoryEvents, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchOptOutHistoryEvents brokerId profileQueryId extractedProfileId"))
+            throw error
+        }
+    }
+
+    func fetchAllAttempts() throws -> [AttemptInformation] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+            return try vault.fetchAllAttempts()
+        } catch {
+            Logger.dataBrokerProtection.error("Database error: fetchAllAttempts, error: \(error.localizedDescription, privacy: .public)")
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchAllAttempts"))
             throw error
         }
     }

@@ -154,6 +154,11 @@ extension URL {
     var isSettingsURL: Bool {
         isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
     }
+
+    var isErrorURL: Bool {
+        return navigationalScheme == .duck && host == URL.error.host
+    }
+
 #endif
 
     enum Invalid {
@@ -390,6 +395,8 @@ extension URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/")!
     }
 
+    static var maliciousSiteProtectionLearnMore = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/")!
+
     static var searchSettings: URL {
         return URL(string: "https://duckduckgo.com/settings/")!
     }
@@ -595,6 +602,12 @@ extension URL {
         } else {
             return false
         }
+    }
+
+    // MARK: - Other
+
+    static var appStore: URL {
+        URL(string: "https://apps.apple.com/app/duckduckgo-privacy-browser/id663592361")!
     }
 
 }

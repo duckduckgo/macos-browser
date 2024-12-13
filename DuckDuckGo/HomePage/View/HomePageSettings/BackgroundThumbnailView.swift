@@ -98,19 +98,22 @@ extension HomePage.Views {
 
         var body: some View {
             ZStack {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(.clear)
-                    .background(thumbnailContent)
-                    .cornerRadius(4)
-                RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.homeSettingsBackgroundPreviewStroke)
-                    .frame(height: SettingsView.Const.gridItemHeight)
-                    .background(selectionBackground)
+                Group {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(.clear)
+                        .background(thumbnailContent)
+                        .cornerRadius(4)
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(Color.homeSettingsBackgroundPreviewStroke)
+                        .background(selectionBackground)
+                }
+                .frame(height: SettingsView.Const.gridItemHeight)
+
                 if displayMode.allowsDeletingCustomBackgrounds, case .userImage(let image) = customBackground {
                     HStack {
                         Spacer()
                         VStack {
-                            CloseButton(icon: .close, size: 16) {
+                            CloseButton(icon: .close, size: 16, backgroundColor: .homeFavoritesBackground) {
                                 model.customImagesManager?.deleteImage(image)
                             }
                             .colorScheme(image.colorScheme)

@@ -20,9 +20,9 @@ import BrowserServicesKit
 import Combine
 import ContentBlocking
 import Foundation
-import PrivacyDashboard
 import History
-import PhishingDetection
+import MaliciousSiteProtection
+import PrivacyDashboard
 
 /**
  Tab Extensions should conform to TabExtension protocol
@@ -73,8 +73,7 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
-    var phishingDetector: PhishingSiteDetecting { get }
-    var phishingStateManager: PhishingTabStateManaging { get }
+    var maliciousSiteDetector: MaliciousSiteDetecting { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -84,6 +83,7 @@ typealias TabExtensionsBuilderArguments = (
     isTabBurner: Bool,
     contentPublisher: AnyPublisher<Tab.TabContent, Never>,
     setContent: (Tab.TabContent) -> Void,
+    closeTab: () -> Void,
     titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
@@ -124,6 +124,13 @@ extension TabExtensionsBuilder {
                                         surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript))
         }
 
+        let specialErrorPageTabExtension = add {
+            SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
+                                         scriptsPublisher: userScripts.compactMap { $0 },
+                                         closeTab: args.closeTab,
+                                         maliciousSiteDetector: dependencies.maliciousSiteDetector)
+        }
+
         add {
             PrivacyDashboardTabExtension(contentBlocking: dependencies.privacyFeatures.contentBlocking,
                                          certificateTrustEvaluator: dependencies.certificateTrustEvaluator,
@@ -131,7 +138,7 @@ extension TabExtensionsBuilder {
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
                                          trackersPublisher: contentBlocking.trackersPublisher,
                                          webViewPublisher: args.webViewFuture,
-                                         phishingStateManager: dependencies.phishingStateManager)
+                                         maliciousSiteProtectionStateProvider: { specialErrorPageTabExtension.state })
         }
 
         add {
@@ -186,6 +193,9 @@ extension TabExtensionsBuilder {
                                 titlePublisher: args.titlePublisher)
         }
         add {
+            PrivacyStatsTabExtension(trackersPublisher: contentBlocking.trackersPublisher)
+        }
+        add {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
         }
         add {
@@ -207,12 +217,6 @@ extension TabExtensionsBuilder {
                                          remoteSettings: AIChatRemoteSettings())
         }
 
-        add {
-            SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
-                                  scriptsPublisher: userScripts.compactMap { $0 },
-                                  phishingDetector: dependencies.phishingDetector,
-                                  phishingStateManager: dependencies.phishingStateManager)
-        }
 #if SPARKLE
         add {
             ReleaseNotesTabExtension(scriptsPublisher: userScripts.compactMap { $0 }, webViewPublisher: args.webViewFuture)
@@ -222,10 +226,6 @@ extension TabExtensionsBuilder {
             ReleaseNotesTabExtension()
         }
 #endif
-
-        add {
-            OnboardingTabExtension()
-        }
 
         if let tunnelController = dependencies.tunnelController {
             add {

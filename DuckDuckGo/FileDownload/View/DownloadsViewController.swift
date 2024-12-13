@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import SwiftUI
 
 protocol DownloadsViewControllerDelegate: AnyObject {
     func clearDownloadsActionTriggered()
@@ -34,13 +35,18 @@ final class DownloadsViewController: NSViewController {
 
     private lazy var scrollView = NSScrollView()
     private lazy var tableView = NSTableView()
+    private var hostingViewConstraints: [NSLayoutConstraint] = []
     private var tableViewHeightConstraint: NSLayoutConstraint!
+    private var errorBannerTopAnchorConstraint: NSLayoutConstraint!
     private var cellIndexToUnselect: Int?
 
     weak var delegate: DownloadsViewControllerDelegate?
 
+    private let separator = NSBox()
     private let viewModel: DownloadListViewModel
     private var downloadsCancellable: AnyCancellable?
+    private var errorBannerCancellable: AnyCancellable?
+    private var errorBannerHostingView: NSHostingView<DownloadsErrorBannerView>?
 
     init(viewModel: DownloadListViewModel) {
         self.viewModel = viewModel
@@ -89,6 +95,7 @@ final class DownloadsViewController: NSViewController {
         clearDownloadsButton.imagePosition = .imageOnly
         clearDownloadsButton.imageScaling = .scaleProportionallyDown
         clearDownloadsButton.toolTip = UserText.clearDownloadHistoryTooltip
+        clearDownloadsButton.setAccessibilityIdentifier("DownloadsViewController.clearDownloadsButton")
         clearDownloadsButton.cornerRadius = 4
         clearDownloadsButton.backgroundInset = CGPoint(x: 2, y: 2)
         clearDownloadsButton.normalTintColor = .button
@@ -127,16 +134,31 @@ final class DownloadsViewController: NSViewController {
 
         scrollView.contentView = clipView
 
-        let separator = NSBox()
         separator.boxType = .separator
         separator.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(separator)
 
-        setupLayout(separator: separator)
+        let swiftUIView = DownloadsErrorBannerView(dismiss: { self.dismiss() },
+                                                   errorType: NSApp.isSandboxed ? .openHelpURL : .openSystemSettings)
+        let hostingView = NSHostingView(rootView: swiftUIView)
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        hostingView.isHidden = true
+        view.addSubview(hostingView)
+        errorBannerHostingView = hostingView
+
+        setupLayout(separator: separator, hostingView: hostingView)
     }
 
-    private func setupLayout(separator: NSBox) {
+    private func setupLayout(separator: NSBox, hostingView: NSHostingView<DownloadsErrorBannerView>) {
         tableViewHeightConstraint = scrollView.heightAnchor.constraint(equalToConstant: 440)
+        errorBannerTopAnchorConstraint = scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: 12)
+
+        hostingViewConstraints = [
+            hostingView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
+            hostingView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
+            hostingView.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: 12),
+            scrollView.topAnchor.constraint(equalTo: hostingView.bottomAnchor, constant: 12)
+        ]
 
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
@@ -153,17 +175,31 @@ final class DownloadsViewController: NSViewController {
             view.trailingAnchor.constraint(equalTo: clearDownloadsButton.trailingAnchor, constant: 11),
             clearDownloadsButton.centerYAnchor.constraint(equalTo: openDownloadsFolderButton.centerYAnchor),
 
-            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 44),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-
             separator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             separator.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -2),
             separator.topAnchor.constraint(equalTo: view.topAnchor, constant: 43),
 
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 12),
+
+            errorBannerTopAnchorConstraint,
             tableViewHeightConstraint
         ])
+    }
+
+    private func showErrorBanner() {
+        errorBannerHostingView?.isHidden = false
+        NSLayoutConstraint.deactivate([errorBannerTopAnchorConstraint])
+        NSLayoutConstraint.activate(hostingViewConstraints)
+        view.layoutSubtreeIfNeeded()
+    }
+
+    private func hideErrorBanner() {
+        errorBannerHostingView?.isHidden = true
+        NSLayoutConstraint.deactivate(hostingViewConstraints)
+        NSLayoutConstraint.activate([errorBannerTopAnchorConstraint])
+        view.layoutSubtreeIfNeeded()
     }
 
     override func viewDidLoad() {
@@ -204,6 +240,17 @@ final class DownloadsViewController: NSViewController {
                 }
             }
 
+        errorBannerCancellable = viewModel.$shouldShowErrorBanner
+            .sink { [weak self] shouldShowErrorBanner in
+                guard let self = self else { return }
+
+                if shouldShowErrorBanner {
+                    self.showErrorBanner()
+                } else {
+                    self.hideErrorBanner()
+                }
+            }
+
         for item in viewModel.items {
             item.didAppear() // initial table appearance should have no progress animations
         }
@@ -213,6 +260,7 @@ final class DownloadsViewController: NSViewController {
 
     override func viewWillDisappear() {
         downloadsCancellable = nil
+        errorBannerCancellable = nil
     }
 
     private func setUpContextMenu() -> NSMenu {
@@ -384,7 +432,7 @@ extension DownloadsViewController: NSMenuDelegate {
         for menuItem in menu.items {
             switch menuItem.action {
             case #selector(openDownloadAction(_:)),
-                 #selector(revealDownloadAction(_:)):
+                #selector(revealDownloadAction(_:)):
                 if case .complete(.some(let url)) = item.state,
                    FileManager.default.fileExists(atPath: url.path) {
                     menuItem.isHidden = false
@@ -477,6 +525,55 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
         return false
     }
 
+}
+
+enum DownloadsErrorViewType {
+    case openHelpURL
+    case openSystemSettings
+
+    var errorMessage: String {
+        return UserText.downloadsErrorMessage
+    }
+
+    var title: String {
+        switch self {
+        case .openHelpURL: return UserText.downloadsErrorSandboxCallToAction
+        case .openSystemSettings: return UserText.downloadsErrorNonSandboxCallToAction
+        }
+    }
+
+    @MainActor func onAction() {
+        switch self {
+        case .openHelpURL:
+            let updateHelpURL = URL(string: "https://support.apple.com/guide/mac-help/get-macos-updates-and-apps-mh35618/mac")!
+            WindowControllersManager.shared.show(url: updateHelpURL, source: .ui, newTab: true)
+        case .openSystemSettings:
+            let softwareUpdateURL = URL(string: "x-apple.systempreferences:com.apple.Software-Update-Settings.extension")!
+            NSWorkspace.shared.open(softwareUpdateURL)
+        }
+    }
+}
+
+struct DownloadsErrorBannerView: View {
+    var dismiss: () -> Void
+    let errorType: DownloadsErrorViewType
+
+    var body: some View {
+        HStack {
+            Image("Clear-Recolorable-16")
+            Text(errorType.errorMessage)
+                .font(.body)
+            Button(errorType.title) {
+                errorType.onAction()
+                dismiss()
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(8)
+        .frame(width: 420)
+        .frame(minHeight: 84.0)
+    }
 }
 
 #if DEBUG

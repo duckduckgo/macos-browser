@@ -431,7 +431,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         } else {
             privacyProItem.submenu = SubscriptionSubMenu(targeting: self,
                                                          subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability(),
-                                                         accountManager: accountManager)
+                                                         subscriptionManager: subscriptionManager)
             addItem(privacyProItem)
         }
     }
@@ -878,7 +878,7 @@ final class HelpSubMenu: NSMenu {
 final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     var subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-    var accountManager: AccountManager
+    var subscriptionManager: SubscriptionManager
 
     var networkProtectionItem: NSMenuItem!
     var dataBrokerProtectionItem: NSMenuItem!
@@ -887,10 +887,10 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     init(targeting target: AnyObject,
          subscriptionFeatureAvailability: SubscriptionFeatureAvailability,
-         accountManager: AccountManager) {
+         subscriptionManager: SubscriptionManager) {
 
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
-        self.accountManager = accountManager
+        self.subscriptionManager = subscriptionManager
 
         super.init(title: "")
 
@@ -901,17 +901,27 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
         delegate = self
 
-        addMenuItems()
+        Task {
+            await addMenuItems()
+        }
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func addMenuItems() {
-        addItem(networkProtectionItem)
-        addItem(dataBrokerProtectionItem)
-        addItem(identityTheftRestorationItem)
+    private func addMenuItems() async {
+        let features = await subscriptionManager.currentSubscriptionFeatures()
+
+        if features.contains(.networkProtection) {
+            addItem(networkProtectionItem)
+        }
+        if features.contains(.dataBrokerProtection) {
+            addItem(dataBrokerProtectionItem)
+        }
+        if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
+            addItem(identityTheftRestorationItem)
+        }
         addItem(NSMenuItem.separator())
         addItem(subscriptionSettingsItem)
     }
@@ -948,10 +958,10 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func refreshAvailabilityBasedOnEntitlements() {
-        guard subscriptionFeatureAvailability.isFeatureAvailable, accountManager.isUserAuthenticated else { return }
+        guard subscriptionFeatureAvailability.isFeatureAvailable, subscriptionManager.accountManager.isUserAuthenticated else { return }
 
         @Sendable func hasEntitlement(for productName: Entitlement.ProductName) async -> Bool {
-            switch await self.accountManager.hasEntitlement(forProductName: productName) {
+            switch await self.subscriptionManager.accountManager.hasEntitlement(forProductName: productName) {
             case let .success(result):
                 return result
             case .failure:
@@ -964,7 +974,10 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
             let isNetworkProtectionItemEnabled = await hasEntitlement(for: .networkProtection)
             let isDataBrokerProtectionItemEnabled = await hasEntitlement(for: .dataBrokerProtection)
-            let isIdentityTheftRestorationItemEnabled = await hasEntitlement(for: .identityTheftRestoration)
+
+            let hasIdentityTheftRestoration = await hasEntitlement(for: .identityTheftRestoration)
+            let hasIdentityTheftRestorationGlobal = await hasEntitlement(for: .identityTheftRestorationGlobal)
+            let isIdentityTheftRestorationItemEnabled = hasIdentityTheftRestoration || hasIdentityTheftRestorationGlobal
 
             Task { @MainActor in
                 self.networkProtectionItem.isEnabled = isNetworkProtectionItemEnabled

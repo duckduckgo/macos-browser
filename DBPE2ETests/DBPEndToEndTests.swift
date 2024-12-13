@@ -215,7 +215,7 @@ final class DBPEndToEndTests: XCTestCase {
                                whenCondition: {
             let queries = try! database.fetchAllBrokerProfileQueryData()
             let optOutJobs = queries.flatMap { $0.optOutJobData }
-            return optOutJobs[0].lastRunDate != nil
+            return optOutJobs.first?.lastRunDate != nil
         })
         print("Stage 5.1 passed: We start running the opt out jobs")
 
@@ -506,6 +506,18 @@ private extension DBPEndToEndTests {
 
         func isSubfeatureEnabled(_ subfeature: any BrowserServicesKit.PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> Bool {
             false
+        }
+
+        func stateFor(subfeatureID: SubfeatureID, parentFeatureID: ParentFeatureID, versionProvider: AppVersionProvider, randomizer: (Range<Double>) -> Double) -> PrivacyConfigurationFeatureState {
+            .disabled(.disabledInConfig)
+        }
+
+        func cohorts(for subfeature: any PrivacySubfeature) -> [PrivacyConfigurationData.Cohort]? {
+            return nil
+        }
+
+        func cohorts(subfeatureID: SubfeatureID, parentFeatureID: ParentFeatureID) -> [PrivacyConfigurationData.Cohort]? {
+            return nil
         }
     }
 }

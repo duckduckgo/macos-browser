@@ -73,7 +73,7 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
             return
         }
 
-        guard webView.url?.isReleaseNotesScheme ?? false else {
+        guard webView.url == .releaseNotes else {
             return
         }
 
@@ -113,7 +113,7 @@ extension ReleaseNotesUserScript {
     @MainActor
     private func retryUpdate(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         DispatchQueue.main.async { [weak self] in
-            self?.updateController.checkForUpdateIfNeeded()
+            self?.updateController.checkForUpdateSkippingRollout()
         }
         return nil
     }

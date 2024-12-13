@@ -39,9 +39,12 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         return emailManager
     }()
 
+    lazy var featureFlagger = NSApp.delegateTyped.featureFlagger
+
     lazy var vaultManager: SecureVaultManager = {
         let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
                                          includePartialAccountMatches: true,
+                                         shouldAllowPartialFormSaves: featureFlagger.isFeatureOn(.autofillPartialFormSaves),
                                          tld: ContentBlocking.shared.tld)
         manager.delegate = self
         return manager
@@ -366,6 +369,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let properties = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                                 sessionKey: topAutofillUserScript?.sessionKey ?? "",
+                                                messageSecret: topAutofillUserScript?.messageSecret ?? "",
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig))
 
         let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,

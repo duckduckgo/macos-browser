@@ -20,16 +20,16 @@ import BrowserServicesKit
 import Combine
 import Common
 import Foundation
+import History
+import MaliciousSiteProtection
 import Navigation
+import Onboarding
+import os.log
+import PageRefreshMonitor
+import PixelKit
+import SpecialErrorPages
 import UserScript
 import WebKit
-import History
-import PixelKit
-import PhishingDetection
-import SpecialErrorPages
-import os.log
-import Onboarding
-import PageRefreshMonitor
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -55,8 +55,7 @@ protocol NewWindowPolicyDecisionMaker {
         var downloadManager: FileDownloadManagerProtocol
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
-        var phishingDetector: PhishingSiteDetecting
-        var phishingStateManager: PhishingTabStateManaging
+        var maliciousSiteDetector: MaliciousSiteDetecting
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -70,10 +69,10 @@ protocol NewWindowPolicyDecisionMaker {
     private let onboardingPixelReporter: OnboardingAddressBarReporting
     private let internalUserDecider: InternalUserDecider?
     private let pageRefreshMonitor: PageRefreshMonitoring
+    private let featureFlagger: FeatureFlagger
     let pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
-    private let phishingState: PhishingTabStateManaging
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
@@ -105,6 +104,7 @@ protocol NewWindowPolicyDecisionMaker {
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
+                     featureFlagger: FeatureFlagger? = nil,
                      title: String? = nil,
                      favicon: NSImage? = nil,
                      interactionStateData: Data? = nil,
@@ -118,8 +118,7 @@ protocol NewWindowPolicyDecisionMaker {
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
-                     phishingDetector: PhishingSiteDetecting = PhishingDetection.shared,
-                     phishingState: PhishingTabStateManaging = PhishingTabStateManager(),
+                     maliciousSiteDetector: MaliciousSiteDetecting = MaliciousSiteProtectionManager.shared,
                      tabsPreferences: TabsPreferences = TabsPreferences.shared,
                      onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter(),
                      pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern,
@@ -150,6 +149,7 @@ protocol NewWindowPolicyDecisionMaker {
                   permissionManager: permissionManager,
                   geolocationService: geolocationService,
                   extensionsBuilder: extensionsBuilder,
+                  featureFlagger: featureFlagger ?? NSApp.delegateTyped.featureFlagger,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
                   internalUserDecider: internalUserDecider,
@@ -166,8 +166,7 @@ protocol NewWindowPolicyDecisionMaker {
                   startupPreferences: startupPreferences,
                   certificateTrustEvaluator: certificateTrustEvaluator,
                   tunnelController: tunnelController,
-                  phishingDetector: phishingDetector,
-                  phishingState: phishingState,
+                  maliciousSiteDetector: maliciousSiteDetector,
                   tabsPreferences: tabsPreferences,
                   onboardingPixelReporter: onboardingPixelReporter,
                   pageRefreshMonitor: pageRefreshMonitor)
@@ -187,6 +186,7 @@ protocol NewWindowPolicyDecisionMaker {
          permissionManager: PermissionManagerProtocol,
          geolocationService: GeolocationServiceProtocol,
          extensionsBuilder: TabExtensionsBuilderProtocol,
+         featureFlagger: FeatureFlagger,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
          internalUserDecider: InternalUserDecider?,
@@ -203,8 +203,7 @@ protocol NewWindowPolicyDecisionMaker {
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
          tunnelController: NetworkProtectionIPCTunnelController?,
-         phishingDetector: PhishingSiteDetecting,
-         phishingState: PhishingTabStateManaging,
+         maliciousSiteDetector: MaliciousSiteDetecting,
          tabsPreferences: TabsPreferences,
          onboardingPixelReporter: OnboardingAddressBarReporting,
          pageRefreshMonitor: PageRefreshMonitoring
@@ -213,6 +212,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.content = content
         self.faviconManagement = faviconManagement
         self.pinnedTabsManager = pinnedTabsManager
+        self.featureFlagger = featureFlagger
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
         self.title = title
@@ -225,7 +225,6 @@ protocol NewWindowPolicyDecisionMaker {
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
         self.tabsPreferences = tabsPreferences
-        self.phishingState = phishingState
 
         self.specialPagesUserScript = SpecialPagesUserScript()
         specialPagesUserScript?
@@ -263,6 +262,10 @@ protocol NewWindowPolicyDecisionMaker {
                           isTabBurner: burnerMode.isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           setContent: { tabGetter()?.setContent($0) },
+                          closeTab: {
+                guard let tab = tabGetter() else { return }
+                tab.delegate?.closeTab(tab)
+            },
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
@@ -278,8 +281,7 @@ protocol NewWindowPolicyDecisionMaker {
                                                        downloadManager: downloadManager,
                                                        certificateTrustEvaluator: certificateTrustEvaluator,
                                                        tunnelController: tunnelController,
-                                                       phishingDetector: phishingDetector,
-                                                       phishingStateManager: phishingState))
+                                                       maliciousSiteDetector: maliciousSiteDetector))
 
         super.init()
         tabGetter = { [weak self] in self }
@@ -802,7 +804,6 @@ protocol NewWindowPolicyDecisionMaker {
 #endif
 
         if PixelExperiment.cohort == .newOnboarding {
-            Application.appDelegate.onboardingStateMachine.state = .notStarted
             setContent(.onboarding)
         } else {
             setContent(.onboardingDeprecated)
@@ -1171,7 +1172,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // allow local file navigations
-        if navigationAction.url.isFileURL { return .allow }
+        if navigationAction.url.isFileURL || navigationAction.url == .blankPage { return .allow }
 
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if let mainFrame = navigationAction.mainFrameTarget,
@@ -1262,18 +1263,22 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         guard navigation.isCurrent else { return }
         invalidateInteractionStateData()
 
-        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
-                   // don‘t show an error page if the error was already handled
-                   // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ 
-            || error.errorCode == PhishingDetectionError.detected.errorCode {
-            self.error = error
-            // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
-            if error.errorCode != NSURLErrorServerCertificateUntrusted {
-                let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
-                loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
-            }
-        }
+        guard !error.isNavigationCancelled, /* user stopped loading */
+              !error.isFrameLoadInterrupted /* navigation cancelled by a Navigation Responder */ else { return }
+
+        // don‘t show an error page if the error was already handled
+        // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
+        guard self.content.urlForWebView == url
+                || self.content == .none /* when navigation fails instantly we may have no content set yet */
+                // navigation failure with MaliciousSiteError is achieved by redirecting to a special token-protected
+                // duck://error?.. URL performed in SpecialErrorPageTabExtension.swift
+                || error as NSError is MaliciousSiteError else { return }
+
+        self.error = error
+
+        // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
+        let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
+        loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
     }
 
     @MainActor
@@ -1304,7 +1309,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        let html = ErrorPageHTMLFactory.html(for: error, url: url, header: header)
+        let html = ErrorPageHTMLFactory.html(for: error, featureFlagger: featureFlagger, header: header)
         if alternate {
             webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         } else {
@@ -1361,23 +1366,4 @@ extension Tab {
         }
     }
 
-}
-
-extension Tab: OnboardingNavigationDelegate {
-    func searchFor(_ query: String) {
-        // We check if the provided string is already a search query.
-        // During onboarding, there's a specific case where we want to search for images,
-        // and this allows us to handle that scenario.
-        if let url = URL(string: query), url.isDuckDuckGoSearch {
-            navigateTo(url: url)
-        } else {
-            guard let url = URL.makeSearchUrl(from: query) else { return }
-            navigateTo(url: url)
-        }
-    }
-
-    func navigateTo(url: URL) {
-        let request = URLRequest(url: url)
-        self.webView.load(request)
-    }
 }

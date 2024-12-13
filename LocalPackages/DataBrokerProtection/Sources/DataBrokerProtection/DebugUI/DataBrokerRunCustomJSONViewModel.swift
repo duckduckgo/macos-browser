@@ -168,9 +168,11 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                   unknownUsernameCategorization: false)
 
         let sessionKey = UUID().uuidString
+        let messageSecret = UUID().uuidString
         self.authenticationManager = authenticationManager
         let contentScopeProperties = ContentScopeProperties(gpcEnabled: false,
                                                             sessionKey: sessionKey,
+                                                            messageSecret: messageSecret,
                                                             featureToggles: features)
 
         self.runnerProvider = DataBrokerJobRunnerProvider(

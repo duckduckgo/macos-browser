@@ -176,6 +176,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                           createdDate: Date(),
                                                           preferredRunDate: preferredRunOperation,
                                                           historyEvents: [HistoryEvent](),
+                                                          attemptCount: 0,
                                                           submittedSuccessfullyDate: nil,
                                                           extractedProfile: extractedProfile,
                                                           sevenDaysConfirmationPixelFired: false,
@@ -352,11 +353,17 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                         profileQueryId: profileQueryId)
 
             try database.addAttempt(extractedProfileId: extractedProfileId,
-                                attemptUUID: stageDurationCalculator.attemptId,
-                                dataBroker: stageDurationCalculator.dataBroker,
-                                lastStageDate: stageDurationCalculator.lastStateTime,
-                                startTime: stageDurationCalculator.startTime)
+                                    attemptUUID: stageDurationCalculator.attemptId,
+                                    dataBroker: stageDurationCalculator.dataBroker,
+                                    lastStageDate: stageDurationCalculator.lastStateTime,
+                                    startTime: stageDurationCalculator.startTime)
             try database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
+            try incrementAttemptCountIfNeeded(
+                database: database,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
         } catch {
             let tries = try? retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             stageDurationCalculator.fireOptOutFailure(tries: tries ?? -1)
@@ -388,6 +395,18 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                      extractedProfileId: extractedProfileId,
                                                      schedulingConfig: schedulingConfig)
         }
+
+    private func incrementAttemptCountIfNeeded(database: DataBrokerProtectionRepository,
+                                               brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws {
+        guard let events = try? database.fetchOptOutHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId),
+              events.max(by: { $0.date < $1.date })?.type == .optOutRequested else {
+            return
+        }
+
+        try database.incrementAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    }
 
     private func handleOperationError(origin: OperationPreferredDateUpdaterOrigin,
                                       brokerId: Int64,
