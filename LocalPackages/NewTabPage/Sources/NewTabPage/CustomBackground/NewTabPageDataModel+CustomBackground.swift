@@ -41,6 +41,7 @@ public extension NewTabPageDataModel {
         enum CodingKeys: CodingKey {
             case background
             case theme
+            case userColor
             case userImages
         }
 
@@ -48,6 +49,7 @@ public extension NewTabPageDataModel {
             var container: KeyedEncodingContainer<CodingKeys> = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(self.background, forKey: CodingKeys.background)
             try container.encode(self.theme?.rawValue ?? "system", forKey: CodingKeys.theme)
+            try container.encode(self.userColor, forKey: CodingKeys.userColor)
             try container.encode(self.userImages, forKey: CodingKeys.userImages)
         }
     }
