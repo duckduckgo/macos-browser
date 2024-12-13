@@ -24,7 +24,7 @@ import PixelKit
 final class CrashReporter {
 
     private let reader = CrashReportReader()
-    private lazy var sender = CrashReportSender(platform: .macOS)
+    private lazy var sender = CrashReportSender(platform: .macOS, pixelEvents: CrashReportSender.pixelEvents)
     private lazy var crcidManager = CRCIDManager()
     private lazy var promptPresenter = CrashReportPromptPresenter()
 
