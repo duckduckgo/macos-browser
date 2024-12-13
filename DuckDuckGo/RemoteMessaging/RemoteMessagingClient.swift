@@ -47,7 +47,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 30
         static let endpoint: URL = {
 #if DEBUG
-            URL(string: "https://raw.githubusercontent.com/duckduckgo/macos-browser/b5cd437bd1bfbfa014deca7a070dc376f22d3024/tab-bar-remote-json-endpoint.json")!
+            URL(string: "https://www.jsonblob.com/api/1316017217598578688")!
 #else
             URL(string: "https://raw.githubusercontent.com/duckduckgo/macos-browser/b5cd437bd1bfbfa014deca7a070dc376f22d3024/tab-bar-remote-json-endpoint.json")!
 #endif

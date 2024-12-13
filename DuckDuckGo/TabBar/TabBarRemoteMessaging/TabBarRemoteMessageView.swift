@@ -20,6 +20,7 @@ import SwiftUI
 
 struct TabBarRemoteMessageView: View {
     @State private var presentPopup: Bool = false
+    @State private var hoverTimer: Timer?
 
     let model: TabBarRemoteMessage
     let onClose: () -> Void
@@ -35,45 +36,55 @@ struct TabBarRemoteMessageView: View {
                 enabled: true,
                 onClose: { onClose() },
                 onHoverStart: {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        presentPopup = true
-
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            presentPopup = false
-                        }
-                    }
-
+                    startHoverTimer()
                     onHover()
                 },
-                onHoverEnd: { presentPopup = false })
+                onHoverEnd: {
+                    cancelHoverTimer()
+                })
             )
             .frame(width: 147)
             .popover(isPresented: $presentPopup, arrowEdge: .bottom) {
-                HStack(alignment: .center) {
-                    Image(.daxResponse)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 72, height: 72)
-                        .padding(.leading, 12)
-
-                    VStack(alignment: .leading) {
-                        Text(model.popupTitle)
-                            .font(.body)
-                            .fontWeight(.bold)
-                            .frame(alignment: .leading)
-                            .padding(.bottom, 12)
-
-                        Text(model.popupSubtitle)
-                            .font(.body)
-                            .fontWeight(.medium)
-                            .frame(alignment: .leading)
-
-                    }
-                    .frame(maxWidth: 360, minHeight: 90)
-                    .padding(.trailing, 24)
-                    .padding(.leading, 4)
-                }
+                PopoverContent(model: model)
             }
+        }
+    }
+
+    private func startHoverTimer() {
+        hoverTimer?.invalidate()
+        hoverTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+            presentPopup = true
+        }
+    }
+
+    private func cancelHoverTimer() {
+        hoverTimer?.invalidate()
+        presentPopup = false
+    }
+}
+
+struct PopoverContent: View {
+    let model: TabBarRemoteMessage
+
+    var body: some View {
+        HStack(alignment: .center) {
+            Image(.daxResponse)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 72, height: 72)
+                .padding(.leading, 12)
+
+            VStack(alignment: .leading) {
+                Text(model.popupTitle)
+                    .font(.system(size: 13, weight: .bold))
+                    .padding(.bottom, 8)
+
+                Text(model.popupSubtitle)
+                    .font(.system(size: 13, weight: .regular))
+            }
+            .frame(width: 360, height: 92)
+            .padding(.trailing, 24)
+            .padding(.leading, 4)
         }
     }
 }
@@ -133,15 +144,11 @@ private struct DefaultActionButtonStyle: ButtonStyle {
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Button(action: {
-                    onClose()
-                }) {
+                Button(action: { onClose() }) {
                     Image(.close)
-                        .resizable()
-                        .frame(width: 12, height: 12)
-                        .foregroundColor(enabled ? Color.white : Color.primary.opacity(0.3))
                 }
-                .buttonStyle(PlainButtonStyle()) // Avoids additional styling
+                .frame(width: 16, height: 16)
+                .buttonStyle(PlainButtonStyle())
             }
             .frame(minWidth: 44)
             .padding(.top, 2.5)

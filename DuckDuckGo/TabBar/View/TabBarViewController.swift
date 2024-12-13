@@ -256,7 +256,6 @@ final class TabBarViewController: NSViewController {
         rightSideStackView.insertArrangedSubview(feedbackBarButtonHostingController.view, at: index)
 
         NSLayoutConstraint.activate([
-            feedbackBarButtonHostingController.view.heightAnchor.constraint(equalToConstant: 24),
             feedbackBarButtonHostingController.view.centerYAnchor.constraint(equalTo: rightSideStackView.centerYAnchor)
         ])
     }

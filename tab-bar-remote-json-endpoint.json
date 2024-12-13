@@ -1,4 +1,4 @@
-{
+i{
   "version": 9,
   "messages": [
     {
@@ -6,9 +6,9 @@
       "content": {
         "messageType": "big_single_action",
         "titleText": "Help Us Improve",
-        "descriptionText": "Take our short survey and help us build the best browser.",
+        "descriptionText": "We really want to know which features would make our browser better.",
         "placeholder": "Announce",
-        "primaryActionText": "Share Your Thoughts",
+        "primaryActionText": "Tell Us What You Think",
         "primaryAction": {
           "type": "survey",
           "value": "https://selfserve.decipherinc.com/survey/selfserve/32ab/241004?list=2",
