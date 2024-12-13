@@ -35,10 +35,68 @@ final class FeatureFlagOverridesMenu: NSMenu {
         super.init(title: "")
 
         buildItems {
-            setInternalUserStateItem
+            // Internal user state item
+            internalUserStateMenuItem()
+
+            // Separator
             NSMenuItem.separator()
 
-            FeatureFlag.allCases.filter(\.supportsLocalOverriding).map { flag in
+            // Feature flag items
+            featureFlagMenuItems()
+
+            // Separator
+            NSMenuItem.separator()
+
+            // Experiment feature items
+            experimentFeatureMenuItems()
+
+            // Separator
+            NSMenuItem.separator()
+
+            // Reset all overrides
+            resetAllOverridesMenuItem()
+        }
+    }
+
+    private func internalUserStateMenuItem() -> NSMenuItem {
+        return setInternalUserStateItem
+    }
+
+    private func experimentFeatureMenuItems() -> [NSMenuItem] {
+        var items: [NSMenuItem] = []
+        for feature in ExperimentFeature.allCases {
+            // Create main experiment menu item
+            let experimentMenuItem = NSMenuItem(
+                title: "Experiment \(feature.rawValue): \(featureFlagger.localOverrides!.override(for: feature.flag) ?? "Not Overridden")",
+                action: nil,
+                keyEquivalent: ""
+            )
+
+            // Retrieve the cohorts (check if this is valid)
+            let cohorts = getCohorts(for: feature.flag)
+
+            // Create submenu for cohorts
+            let experimentSubMenu = NSMenu()
+            for cohort in cohorts {
+                let cohortMenuItem = NSMenuItem(
+                    title: "Cohort: \(cohort)",
+                    action: #selector(toggleExperimentFeatureFlag(_:)),
+                    target: self
+                )
+                cohortMenuItem.representedObject = (feature.flag, cohort.rawValue)
+                experimentSubMenu.addItem(cohortMenuItem)
+            }
+
+            experimentMenuItem.submenu = experimentSubMenu
+            items.append(experimentMenuItem)
+        }
+        return items
+    }
+
+    private func featureFlagMenuItems() -> [NSMenuItem] {
+        return FeatureFlag.allCases
+            .filter(\.supportsLocalOverriding)
+            .map { flag in
                 NSMenuItem(
                     title: "\(flag.rawValue) (default: \(featureFlagger.isFeatureOn(for: flag, allowOverride: false) ? "on" : "off"))",
                     action: #selector(toggleFeatureFlag(_:)),
@@ -46,10 +104,18 @@ final class FeatureFlagOverridesMenu: NSMenu {
                     representedObject: flag
                 )
             }
+    }
 
-            NSMenuItem.separator()
-            NSMenuItem(title: "Remove All Overrides", action: #selector(resetAllOverrides(_:))).targetting(self)
-        }
+    private func resetAllOverridesMenuItem() -> NSMenuItem {
+        return NSMenuItem(
+            title: "Remove All Overrides",
+            action: #selector(resetAllOverrides(_:)),
+            target: self
+        )
+    }
+
+    private func getCohorts<Flag: FeatureFlagExperimentDescribing>(for featureFlag: Flag) -> [any FlagCohort] {
+        return Array(Flag.CohortType.allCases)
     }
 
     required init(coder: NSCoder) {
@@ -60,26 +126,43 @@ final class FeatureFlagOverridesMenu: NSMenu {
         super.update()
 
         items.forEach { item in
-            guard let flag = item.representedObject as? FeatureFlag else {
-                return
-            }
-            item.isHidden = !featureFlagger.internalUserDecider.isInternalUser
-            item.title = "\(flag.rawValue) (default: \(defaultValue(for: flag)), override: \(overrideValue(for: flag)))"
-            let override = featureFlagger.localOverrides?.override(for: flag)
-            item.state = override == true ? .on : .off
+            if let flag = item.representedObject as? FeatureFlag {
+                item.isHidden = !featureFlagger.internalUserDecider.isInternalUser
+                item.title = "\(flag.rawValue) (default: \(defaultValue(for: flag)), override: \(overrideValue(for: flag)))"
+                let override = featureFlagger.localOverrides?.override(for: flag)
+                item.state = override == true ? .on : .off
 
-            if override != nil {
-                item.submenu = NSMenu(items: [
-                    NSMenuItem(
-                        title: "Remove Override",
-                        action: #selector(resetOverride(_:)),
-                        target: self,
-                        representedObject: flag
-                    )
-                ])
-            } else {
-                item.submenu = nil
+                if override != nil {
+                    item.submenu = NSMenu(items: [
+                        NSMenuItem(
+                            title: "Remove Override",
+                            action: #selector(resetOverride(_:)),
+                            target: self,
+                            representedObject: flag
+                        )
+                    ])
+                } else {
+                    item.submenu = nil
+                }
             }
+//            if let flag = item.representedObject as? ExperimentFeature {
+//                item.isHidden = !featureFlagger.internalUserDecider.isInternalUser
+//                item.title = "Experiment \(flag.rawValue) override: \(overrideValue(for: flag)))"
+
+
+//                if override != nil {
+//                    item.submenu = NSMenu(items: [
+//                        NSMenuItem(
+//                            title: "Remove Override",
+//                            action: #selector(resetOverride(_:)),
+//                            target: self,
+//                            representedObject: flag
+//                        )
+//                    ])
+//                } else {
+//                    item.submenu = nil
+//                }
+//            }
         }
 
         setInternalUserStateItem.isHidden = featureFlagger.internalUserDecider.isInternalUser
@@ -96,9 +179,22 @@ final class FeatureFlagOverridesMenu: NSMenu {
         return override ? "on" : "off"
     }
 
+    private func overrideValue(for flag: ExperimentFeature) -> String {
+        guard let override = featureFlagger.localOverrides?.override(for: flag.flag) else {
+            return "none"
+        }
+        return override
+    }
+
     @objc func toggleFeatureFlag(_ sender: NSMenuItem) {
         guard let featureFlag = sender.representedObject as? FeatureFlag else { return }
         featureFlagger.localOverrides?.toggleOverride(for: featureFlag)
+    }
+
+    @objc func toggleExperimentFeatureFlag(_ sender: NSMenuItem) {
+        guard let representedObject = sender.representedObject as? (any FeatureFlagExperimentDescribing, String) else { return }
+        let (experimentFeature, cohort) = representedObject
+        featureFlagger.localOverrides?.toggleExperimentCohort(for: experimentFeature, cohort: cohort)
     }
 
     @objc func resetOverride(_ sender: NSMenuItem) {

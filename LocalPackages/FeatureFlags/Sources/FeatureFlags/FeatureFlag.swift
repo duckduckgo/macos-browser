@@ -111,3 +111,31 @@ public extension FeatureFlagger {
         isFeatureOn(for: featureFlag)
     }
 }
+
+public enum ExperimentFeature: String, CaseIterable {
+    case credentialSaving
+
+    public var flag: any FeatureFlagExperimentDescribing {
+        switch self {
+        case .credentialSaving:
+            return CredentialsSavingFlag()
+        }
+    }
+}
+
+public struct CredentialsSavingFlag: FeatureFlagExperimentDescribing {
+    public var supportsLocalOverriding: Bool = true
+
+    public init() {}
+
+    public typealias CohortType = Cohort
+
+    public var rawValue = "credentialSaving"
+
+    public var source: FeatureFlagSource = .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
+
+    public enum Cohort: String, FlagCohort {
+        case control
+        case blue
+    }
+}

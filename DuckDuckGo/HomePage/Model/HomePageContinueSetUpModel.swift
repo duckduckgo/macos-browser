@@ -160,7 +160,7 @@ extension HomePage.Models {
             NotificationCenter.default.addObserver(self, selector: #selector(refreshFeaturesForHTMLNewTabPage(_:)), name: .newTabPageWebViewDidAppear, object: nil)
 
             // This is just temporarily here to run an A/A test to check the new experiment framework works as expected
-            _ = Application.appDelegate.featureFlagger.getCohortIfEnabled(for: CredentialsSavingFlag())
+            _ = Application.appDelegate.featureFlagger.getCohortIfEnabled(for: CredentialsSavingFlag(), allowOverride: true)
         }
 
         @MainActor func performAction(for featureType: FeatureType) {
@@ -451,6 +451,8 @@ extension AppVersion {
 
 // This is just temporarily here to run an A/A test to check the new experiment framework works as expected
 public struct CredentialsSavingFlag: FeatureFlagExperimentDescribing {
+    public var supportsLocalOverriding: Bool = true
+
     public init() {}
 
     public typealias CohortType = Cohort
