@@ -112,38 +112,51 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
 
     func testThatWillDisplayCardsPublisherIsSentAfterGetDataAndGetConfigAreCalled() async throws {
         model.cards = [.addAppToDockMac, .duckplayer]
-        try await handleMessageIgnoringResponse(named: .getData)
-        try await handleMessageIgnoringResponse(named: .getConfig)
+
+        try await performAndWaitForWillDisplayCards {
+            try await handleMessageIgnoringResponse(named: .getData)
+            try await handleMessageIgnoringResponse(named: .getConfig)
+        }
 
         XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
     }
 
     func testThatWillDisplayCardsPublisherIsNotSentBeforeGetConfigIsCalled() async throws {
         model.cards = [.addAppToDockMac, .duckplayer]
-        try await handleMessageIgnoringResponse(named: .getData)
-        try await handleMessageIgnoringResponse(named: .getData)
-        try await handleMessageIgnoringResponse(named: .getData)
-        try await handleMessageIgnoringResponse(named: .getData)
-        try await handleMessageIgnoringResponse(named: .getData)
+
+        try await performAndWaitForWillDisplayCards(count: 0, timeout: 0.1) {
+            try await handleMessageIgnoringResponse(named: .getData)
+            try await handleMessageIgnoringResponse(named: .getData)
+            try await handleMessageIgnoringResponse(named: .getData)
+            try await handleMessageIgnoringResponse(named: .getData)
+            try await handleMessageIgnoringResponse(named: .getData)
+        }
 
         XCTAssertEqual(model.willDisplayCardsCalls, [])
 
-        try await handleMessageIgnoringResponse(named: .getConfig)
+        try await performAndWaitForWillDisplayCards {
+            try await handleMessageIgnoringResponse(named: .getConfig)
+        }
 
         XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
     }
 
     func testThatWillDisplayCardsPublisherIsNotSentBeforeGetDataIsCalled() async throws {
         model.cards = [.addAppToDockMac, .duckplayer]
-        try await handleMessageIgnoringResponse(named: .getConfig)
-        try await handleMessageIgnoringResponse(named: .getConfig)
-        try await handleMessageIgnoringResponse(named: .getConfig)
-        try await handleMessageIgnoringResponse(named: .getConfig)
-        try await handleMessageIgnoringResponse(named: .getConfig)
+
+        try await performAndWaitForWillDisplayCards(count: 0, timeout: 0.1) {
+            try await handleMessageIgnoringResponse(named: .getConfig)
+            try await handleMessageIgnoringResponse(named: .getConfig)
+            try await handleMessageIgnoringResponse(named: .getConfig)
+            try await handleMessageIgnoringResponse(named: .getConfig)
+            try await handleMessageIgnoringResponse(named: .getConfig)
+        }
 
         XCTAssertEqual(model.willDisplayCardsCalls, [])
 
-        try await handleMessageIgnoringResponse(named: .getData)
+        try await performAndWaitForWillDisplayCards {
+            try await handleMessageIgnoringResponse(named: .getData)
+        }
 
         XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
     }
@@ -153,11 +166,10 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
         model.isViewExpanded = true
         try await triggerInitialCardsEventAndResetMockState()
 
-        let expectation = self.expectation(description: "willDisplayCards")
-        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+        try await performAndWaitForWillDisplayCards {
+            model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
+        }
 
-        model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
-        await fulfillment(of: [expectation], timeout: 0.1)
         XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer, .bringStuff]])
     }
 
@@ -166,14 +178,12 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
         model.isViewExpanded = false
         try await triggerInitialCardsEventAndResetMockState()
 
-        let expectation = self.expectation(description: "willDisplayCards")
-        expectation.expectedFulfillmentCount = 3
-        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+        try await performAndWaitForWillDisplayCards(count: 3) {
+            model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
+            model.cards = [.duckplayer, .addAppToDockMac, .bringStuff]
+            model.cards = [.addAppToDockMac, .emailProtection, .duckplayer]
+        }
 
-        model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
-        model.cards = [.duckplayer, .addAppToDockMac, .bringStuff]
-        model.cards = [.addAppToDockMac, .emailProtection, .duckplayer]
-        await fulfillment(of: [expectation], timeout: 0.1)
         XCTAssertEqual(model.willDisplayCardsCalls, [
             [.addAppToDockMac, .duckplayer],
             [.duckplayer, .addAppToDockMac],
@@ -186,14 +196,12 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
         model.isViewExpanded = false
         try await triggerInitialCardsEventAndResetMockState()
 
-        let expectation = self.expectation(description: "willDisplayCards")
-        expectation.expectedFulfillmentCount = 2
-        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+        try await performAndWaitForWillDisplayCards(count: 2) {
+            model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
+            model.cards = []
+            model.cards = [.addAppToDockMac, .emailProtection, .duckplayer]
+        }
 
-        model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
-        model.cards = []
-        model.cards = [.addAppToDockMac, .emailProtection, .duckplayer]
-        await fulfillment(of: [expectation], timeout: 0.1)
         XCTAssertEqual(model.willDisplayCardsCalls, [
             [.addAppToDockMac, .duckplayer],
             [.addAppToDockMac, .emailProtection]
@@ -205,11 +213,10 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
         model.isViewExpanded = false
         try await triggerInitialCardsEventAndResetMockState()
 
-        let expectation = self.expectation(description: "willDisplayCards")
-        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+        try await performAndWaitForWillDisplayCards {
+            model.isViewExpanded = true
+        }
 
-        model.isViewExpanded = true
-        await fulfillment(of: [expectation], timeout: 0.1)
         XCTAssertEqual(model.willDisplayCardsCalls, [[.emailProtection, .bringStuff, .defaultApp]])
     }
 
@@ -218,12 +225,10 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
         model.isViewExpanded = false
         try await triggerInitialCardsEventAndResetMockState()
 
-        let expectation = self.expectation(description: "willDisplayCards")
-        expectation.isInverted = true
-        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+        try await performAndWaitForWillDisplayCards(count: 0, timeout: 0.5) {
+            model.isViewExpanded = true
+        }
 
-        model.isViewExpanded = true
-        await fulfillment(of: [expectation], timeout: 0.1)
         XCTAssertEqual(model.willDisplayCardsCalls, [])
     }
 
@@ -232,21 +237,39 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
         model.isViewExpanded = true
         try await triggerInitialCardsEventAndResetMockState()
 
-        let expectation = self.expectation(description: "willDisplayCards")
-        expectation.isInverted = true
-        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+        try await performAndWaitForWillDisplayCards(count: 0, timeout: 0.5) {
+            model.isViewExpanded = false
+        }
 
-        model.isViewExpanded = false
-        await fulfillment(of: [expectation], timeout: 0.1)
         XCTAssertEqual(model.willDisplayCardsCalls, [])
     }
 
     // MARK: - Helper functions
 
     func triggerInitialCardsEventAndResetMockState() async throws {
-        try await handleMessageIgnoringResponse(named: .getConfig)
-        try await handleMessageIgnoringResponse(named: .getData)
+        try await performAndWaitForWillDisplayCards {
+            try await handleMessageIgnoringResponse(named: .getConfig)
+            try await handleMessageIgnoringResponse(named: .getData)
+        }
         model.willDisplayCardsCalls = []
+    }
+
+    func performAndWaitForWillDisplayCards(count expectedCount: Int = 1, timeout: TimeInterval = 0.1, _ block: () async throws -> Void) async throws {
+        let originalImpl = model.willDisplayCardsImpl
+
+        let expectation = self.expectation(description: "willDisplayCards_waitForWillDisplayCards")
+        if expectedCount == 0 {
+            expectation.isInverted = true
+        } else {
+            expectation.expectedFulfillmentCount = expectedCount
+        }
+        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+
+        try await block()
+
+        await fulfillment(of: [expectation], timeout: timeout)
+
+        model.willDisplayCardsImpl = originalImpl
     }
 
     func handleMessage<Response: Encodable>(named methodName: NewTabPageNextStepsCardsClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {

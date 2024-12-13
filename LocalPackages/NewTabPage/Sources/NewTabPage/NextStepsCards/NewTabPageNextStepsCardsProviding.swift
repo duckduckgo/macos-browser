@@ -34,5 +34,6 @@ public protocol NewTabPageNextStepsCardsProviding: AnyObject {
     @MainActor
     func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID)
 
+    @MainActor
     func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID])
 }

@@ -32,4 +32,3 @@ final class PrivacyStatsErrorHandler: EventMapping<PrivacyStatsError> {
         fatalError("Use init()")
     }
 }
-

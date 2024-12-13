@@ -57,7 +57,9 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
         willDisplayCardsPublisher
             .sink { cards in
-                model.willDisplayCards(cards)
+                Task { @MainActor in
+                    model.willDisplayCards(cards)
+                }
             }
             .store(in: &cancellables)
     }
