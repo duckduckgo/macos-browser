@@ -54,7 +54,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
         let subscriptionUserDefaults = UserDefaults(suiteName: appGroup)!
         let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
 
-        self.subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(appGroup)),
+        subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(appGroup)),
                                                               environment: subscriptionEnvironment,
                                                               userDefaults: subscriptionUserDefaults)
         _delegate = DuckDuckGoVPNAppDelegate(subscriptionManager: subscriptionManager)
@@ -126,6 +126,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private let appLauncher = AppLauncher()
     private let subscriptionManager: any SubscriptionManager
+    private let tokenRefresher: SubscriptionTokenContainerRefresher
 
     private let configurationStore = ConfigurationStore()
     private let configurationManager: ConfigurationManager
@@ -138,9 +139,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     public init(subscriptionManager: any SubscriptionManager) {
         self.subscriptionManager = subscriptionManager
-        self.tunnelSettings = VPNSettings(defaults: .netP)
-        self.tunnelSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
-        self.configurationManager = ConfigurationManager(privacyConfigManager: privacyConfigurationManager, store: configurationStore)
+        tunnelSettings = VPNSettings(defaults: .netP)
+        tunnelSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
+        configurationManager = ConfigurationManager(privacyConfigManager: privacyConfigurationManager, store: configurationStore)
+        tokenRefresher = SubscriptionTokenContainerRefresher(subscriptionManager: subscriptionManager)
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -397,10 +399,19 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+
+        Task {
+            await tokenRefresher.refreshIfNeeded()
+        }
     }
 
     @MainActor
     private func setupMenuVisibility() {
+
+        Task {
+            await tokenRefresher.refreshIfNeeded()
+        }
+
         if tunnelSettings.showInMenuBar {
             networkProtectionMenu.show()
         } else {
@@ -452,11 +463,3 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     }
 
 }
-
-// extension DuckDuckGoVPNAppDelegate: AccountManagerKeychainAccessDelegate {
-//
-//    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
-//        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
-//                      frequency: .legacyDailyAndCount)
-//    }
-// }

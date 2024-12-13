@@ -3256,6 +3256,8 @@
 		F1FDC93B2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
 		F1FDC93C2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
 		F1FDC93D2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
+		F1FEB7A72D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FEB7A62D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift */; };
+		F1FEB7A82D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FEB7A62D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 		F4A6198C283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */; };
@@ -5005,6 +5007,8 @@
 		F1F861142C1B25D4005DB446 /* SubscriptionUIHandlerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUIHandlerMock.swift; sourceTree = "<group>"; };
 		F1FD5B662C2B0AAA0040FA0D /* SubscriptionPagesUseSubscriptionFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPagesUseSubscriptionFeature.swift; sourceTree = "<group>"; };
 		F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VPNSettings+Environment.swift"; sourceTree = "<group>"; };
+		F1FEB7A62D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTokenContainerRefresher.swift; sourceTree = "<group>"; };
+		F1FEB7A92D0C377500BE2E39 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = SOURCE_ROOT; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 		F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentScopeFeatureFlagging.swift; sourceTree = "<group>"; };
@@ -7189,6 +7193,7 @@
 				02FDA6612C765D0F0024CD8B /* VPNAgentConfigurationURLProvider.swift */,
 				7B60AFF92C511B65008E32A3 /* VPNUIActionHandler.swift */,
 				7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */,
+				F1FEB7A62D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift */,
 				7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */,
 				7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */,
 				7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */,
@@ -7878,6 +7883,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				F1FEB7A92D0C377500BE2E39 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -12699,6 +12705,7 @@
 				F1DA51982BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */,
 				F1C70D802BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
 				7BA7CC402AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
+				F1FEB7A82D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift in Sources */,
 				02FDA65B2C764C200024CD8B /* ConfigurationStore.swift in Sources */,
 				7BDBAD202CBFF977000379B7 /* TipKitAppEventHandling.swift in Sources */,
 				7B0694982B6E980F00FA4DBA /* VPNProxyLauncher.swift in Sources */,
@@ -12749,6 +12756,7 @@
 				7BA7CC5C2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */,
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				BDA764852BC49E4000D0400C /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
+				F1FEB7A72D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift in Sources */,
 				02FDA65D2C764CB30024CD8B /* ConfigurationStore.swift in Sources */,
 				7BDBAD212CBFF977000379B7 /* TipKitAppEventHandling.swift in Sources */,
 				7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
