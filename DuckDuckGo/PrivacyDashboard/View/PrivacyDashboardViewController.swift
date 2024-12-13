@@ -34,7 +34,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
         static let initialContentHeight: CGFloat = 489.0
-        static let reportBrokenSiteInitialContentHeight = 587c.0 + 28.0
+        static let reportBrokenSiteInitialContentHeight = 372.0 + 28.0
         static let initialContentWidth: CGFloat = 360.0
     }
 
@@ -127,6 +127,7 @@ final class PrivacyDashboardViewController: NSViewController {
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
+
         self.webView = webView
         view.addAndLayout(webView)
 
