@@ -49,7 +49,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
 #if DEBUG
             URL(string: "https://www.jsonblob.com/api/1316017217598578688")!
 #else
-            URL(string: "https://raw.githubusercontent.com/duckduckgo/macos-browser/b5cd437bd1bfbfa014deca7a070dc376f22d3024/tab-bar-remote-json-endpoint.json")!
+            URL(string: "https://raw.githubusercontent.com/duckduckgo/macos-browser/refs/heads/juan/poc-new-user-feedfack-point-of-action/tab-bar-remote-json-endpoint.json")!
 #endif
         }()
     }
