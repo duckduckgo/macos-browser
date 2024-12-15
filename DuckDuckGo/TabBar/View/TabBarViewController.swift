@@ -72,7 +72,8 @@ final class TabBarViewController: NSViewController {
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
     private let tabBarRemoteMessageViewModel: TabBarRemoteMessageViewModel
-    private let feedbackPopoverViewController: PopoverMessageViewController
+    private var tabBarRemoteMessagePopover: NSPopover?
+    private var tabBarRemoteMessagePopoverHoverTimer: Timer?
     private var feedbackBarButtonHostingController: NSHostingController<TabBarRemoteMessageView>?
 
     private var selectionIndexCancellable: AnyCancellable?
@@ -114,15 +115,6 @@ final class TabBarViewController: NSViewController {
             self.pinnedTabsView = nil
             self.pinnedTabsHostingView = nil
         }
-
-        feedbackPopoverViewController = PopoverMessageViewController(
-            title: "Tell Us What You Think",
-            message: "Take our short survey and help us build the best browser.",
-            image: .daxResponse,
-            shouldShowCloseButton: false,
-            presentMultiline: true,
-            autoDismissDuration: nil
-        )
 
         super.init(coder: coder)
     }
@@ -243,7 +235,11 @@ final class TabBarViewController: NSViewController {
                 self.removeFeedbackButton()
             },
             onHover: {
+                self.startTabBarRemotMessageTimer(message: tabBarRemotMessage)
                 self.tabBarRemoteMessageViewModel.onUserHovered()
+            },
+            onHoverEnd: {
+                self.dismissTabBarRemoteMessagePopover()
             }
         )
         feedbackBarButtonHostingController = NSHostingController(rootView: feedbackButtonView)
@@ -258,6 +254,44 @@ final class TabBarViewController: NSViewController {
         NSLayoutConstraint.activate([
             feedbackBarButtonHostingController.view.centerYAnchor.constraint(equalTo: rightSideStackView.centerYAnchor)
         ])
+    }
+
+    private func startTabBarRemotMessageTimer(message: TabBarRemoteMessage) {
+        tabBarRemoteMessagePopoverHoverTimer?.invalidate()
+        tabBarRemoteMessagePopoverHoverTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+            self.showTabBarRemotePopup(message)
+        }
+    }
+
+    private func dismissTabBarRemoteMessagePopover() {
+        tabBarRemoteMessagePopoverHoverTimer?.invalidate()
+        tabBarRemoteMessagePopover?.close()
+    }
+
+    private func showTabBarRemotePopup(_ message: TabBarRemoteMessage) {
+        if let popover = tabBarRemoteMessagePopover {
+            guard let tabBarButtonRemoteMessageView = feedbackBarButtonHostingController?.view else {
+                return
+            }
+
+            popover.show(positionedBelow: tabBarButtonRemoteMessageView.bounds, in: tabBarButtonRemoteMessageView)
+        } else {
+            tabBarRemoteMessagePopover = NSPopover()
+            tabBarRemoteMessagePopover?.animates = true
+            tabBarRemoteMessagePopover?.behavior = .semitransient
+            tabBarRemoteMessagePopover?.contentSize = NSSize(width: TabBarRemoteMessagePopoverContent.Constants.width,
+                                                             height: TabBarRemoteMessagePopoverContent.Constants.height)
+
+            let controller = NSViewController()
+            controller.view = NSHostingView(rootView: TabBarRemoteMessagePopoverContent(model: message))
+            tabBarRemoteMessagePopover?.contentViewController = controller
+
+            guard let tabBarButtonRemoteMessageView = feedbackBarButtonHostingController?.view else {
+                return
+            }
+
+            tabBarRemoteMessagePopover?.show(positionedBelow: tabBarButtonRemoteMessageView.bounds, in: tabBarButtonRemoteMessageView)
+        }
     }
 
     private func removeFeedbackButton() {

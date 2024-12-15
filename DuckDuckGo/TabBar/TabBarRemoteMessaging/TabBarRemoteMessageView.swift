@@ -20,12 +20,12 @@ import SwiftUI
 
 struct TabBarRemoteMessageView: View {
     @State private var presentPopup: Bool = false
-    @State private var hoverTimer: Timer?
 
     let model: TabBarRemoteMessage
     let onClose: () -> Void
     let onTap: (URL) -> Void
     let onHover: () -> Void
+    let onHoverEnd: () -> Void
 
     var body: some View {
         HStack {
@@ -36,56 +36,46 @@ struct TabBarRemoteMessageView: View {
                 enabled: true,
                 onClose: { onClose() },
                 onHoverStart: {
-                    startHoverTimer()
                     onHover()
                 },
                 onHoverEnd: {
-                    cancelHoverTimer()
+                    onHoverEnd()
                 })
             )
             .frame(width: 147)
-            .popover(isPresented: $presentPopup, arrowEdge: .bottom) {
-                PopoverContent(model: model)
-            }
         }
-    }
-
-    private func startHoverTimer() {
-        hoverTimer?.invalidate()
-        hoverTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
-            presentPopup = true
-        }
-    }
-
-    private func cancelHoverTimer() {
-        hoverTimer?.invalidate()
-        presentPopup = false
     }
 }
 
-struct PopoverContent: View {
+struct TabBarRemoteMessagePopoverContent: View {
+    enum Constants {
+        static let height: CGFloat = 92
+        static let width: CGFloat = 360
+    }
+
     let model: TabBarRemoteMessage
 
     var body: some View {
-        HStack(alignment: .center) {
+        HStack(alignment: .center, spacing: 0) {
             Image(.daxResponse)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 72, height: 72)
-                .padding(.leading, 12)
+                .padding(.leading, 8)
+                .padding(.trailing, 16)
 
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(model.popupTitle)
                     .font(.system(size: 13, weight: .bold))
                     .padding(.bottom, 8)
 
                 Text(model.popupSubtitle)
-                    .font(.system(size: 13, weight: .regular))
+                    .font(.system(size: 13, weight: .medium))
             }
-            .frame(width: 360, height: 92)
-            .padding(.trailing, 24)
-            .padding(.leading, 4)
+            .padding(.trailing, 12)
+            .padding([.bottom, .top], 10)
         }
+        .frame(width: Constants.width, height: Constants.height)
     }
 }
 
