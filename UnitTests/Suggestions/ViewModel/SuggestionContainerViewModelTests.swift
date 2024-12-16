@@ -34,7 +34,8 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         SearchPreferences.shared.showAutocompleteSuggestions = true
         suggestionLoadingMock = SuggestionLoadingMock()
         historyCoordinatingMock = HistoryCoordinatingMock()
-        suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+        suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
+                                                  suggestionLoading: suggestionLoadingMock,
                                                   historyCoordinating: historyCoordinatingMock,
                                                   bookmarkManager: LocalBookmarkManager.shared)
         suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
@@ -59,7 +60,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
     // MARK: - Tests
 
     func testWhenSelectionIndexIsNilThenSelectedSuggestionViewModelIsNil() {
-        let suggestionContainer = SuggestionContainer()
+        let suggestionContainer = SuggestionContainer(burnerMode: .regular)
         let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         XCTAssertNil(suggestionContainerViewModel.selectionIndex)
@@ -87,7 +88,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
     }
 
     func testWhenSelectCalledWithIndexOutOfBoundsThenSelectedSuggestionViewModelIsNil() {
-        let suggestionContainer = SuggestionContainer()
+        let suggestionContainer = SuggestionContainer(burnerMode: .regular)
         let suggestionListViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         suggestionListViewModel.select(at: 0)

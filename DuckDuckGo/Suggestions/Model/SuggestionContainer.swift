@@ -52,20 +52,12 @@ final class SuggestionContainer {
         self.loading = suggestionLoading
     }
 
-    convenience init () {
+    convenience init (burnerMode: BurnerMode) {
         let urlFactory = { urlString in
             return URL.makeURL(fromSuggestionPhrase: urlString)
         }
-        let openTabsProvider: OpenTabsProvider = { @MainActor in
-            let selectedTab = WindowControllersManager.shared.selectedTab
-            return WindowControllersManager.shared.allTabViewModels.compactMap { model in
-                guard model.tab !== selectedTab, model.tab.content.isUrl else { return nil }
-                return model.tab.content.userEditableUrl.map { url in
-                    OpenTab(title: model.title, url: url)
-                }
-            }
-        }
-        self.init(openTabsProvider: openTabsProvider, suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
+        self.init(openTabsProvider: Self.defaultOpenTabsProvider(burnerMode: burnerMode),
+                  suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
                   historyCoordinating: HistoryCoordinator.shared,
                   bookmarkManager: LocalBookmarkManager.shared)
     }
@@ -100,6 +92,19 @@ final class SuggestionContainer {
 
     func stopGettingSuggestions() {
         latestQuery = nil
+    }
+
+    private static func defaultOpenTabsProvider(burnerMode: BurnerMode) -> OpenTabsProvider {
+        { @MainActor in
+            let selectedTab = WindowControllersManager.shared.selectedTab
+            let openTabViewModels = WindowControllersManager.shared.allTabViewModels(for: burnerMode)
+            return openTabViewModels.compactMap { model in
+                guard model.tab !== selectedTab, model.tab.content.isUrl else { return nil }
+                return model.tab.content.userEditableUrl.map { url in
+                    OpenTab(title: model.title, url: url)
+                }
+            }
+        }
     }
 
 }

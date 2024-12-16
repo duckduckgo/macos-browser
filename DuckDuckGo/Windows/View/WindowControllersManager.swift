@@ -356,8 +356,18 @@ extension WindowControllersManager {
 
     var allTabViewModels: [TabViewModel] {
         return allTabCollectionViewModels.flatMap {
-            Array($0.tabViewModels.values)
+            $0.tabViewModels.values
         }
+    }
+
+    func allTabViewModels(for burnerMode: BurnerMode) -> [TabViewModel] {
+        allTabCollectionViewModels
+            .filter { tabCollectionViewModel in
+                tabCollectionViewModel.burnerMode == burnerMode
+            }
+            .flatMap {
+                $0.tabViewModels.values
+            }
     }
 
     func windowController(for tabCollectionViewModel: TabCollectionViewModel) -> MainWindowController? {

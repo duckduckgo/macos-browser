@@ -146,7 +146,7 @@ extension HomePage.Models {
                     return AddressBarViewController(
                         coder: coder,
                         tabCollectionViewModel: tabCollectionViewModel,
-                        isBurner: tabCollectionViewModel.isBurner,
+                        burnerMode: tabCollectionViewModel.burnerMode,
                         popovers: nil,
                         isSearchBox: true
                     )

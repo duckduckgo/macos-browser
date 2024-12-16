@@ -25,7 +25,8 @@ final class SuggestionContainerTests: XCTestCase {
     func testWhenGetSuggestionsIsCalled_ThenContainerAsksAndHoldsSuggestionsFromLoader() {
         let suggestionLoadingMock = SuggestionLoadingMock()
         let historyCoordinatingMock = HistoryCoordinatingMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+        let suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
+                                                      suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
                                                       bookmarkManager: LocalBookmarkManager.shared)
 
@@ -50,7 +51,8 @@ final class SuggestionContainerTests: XCTestCase {
     func testWhenStopGettingSuggestionsIsCalled_ThenNoSuggestionsArePublished() {
         let suggestionLoadingMock = SuggestionLoadingMock()
         let historyCoordinatingMock = HistoryCoordinatingMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+        let suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
+                                                      suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
                                               bookmarkManager: LocalBookmarkManager.shared)
 
@@ -65,7 +67,8 @@ final class SuggestionContainerTests: XCTestCase {
     func testSuggestionLoadingCacheClearing() {
         let suggestionLoadingMock = SuggestionLoadingMock()
         let historyCoordinatingMock = HistoryCoordinatingMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+        let suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
+                                                      suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
                                                       bookmarkManager: LocalBookmarkManager.shared)
 

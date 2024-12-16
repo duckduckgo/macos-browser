@@ -88,7 +88,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
-          isBurner: Bool,
+          burnerMode: BurnerMode,
           popovers: NavigationBarPopovers?,
           isSearchBox: Bool = false,
           onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter()) {
@@ -96,9 +96,9 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         self.popovers = popovers
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
             isHomePage: tabViewModel?.tab.content == .newtab,
-            isBurner: isBurner,
-            suggestionContainer: SuggestionContainer())
-        self.isBurner = isBurner
+            isBurner: burnerMode.isBurner,
+            suggestionContainer: SuggestionContainer(burnerMode: burnerMode))
+        self.isBurner = burnerMode.isBurner
         self.onboardingPixelReporter = onboardingPixelReporter
         self.isSearchBox = isSearchBox
 
