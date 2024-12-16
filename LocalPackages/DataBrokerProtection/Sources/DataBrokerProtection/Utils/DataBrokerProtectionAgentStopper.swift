@@ -75,7 +75,8 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
                 return
             }
 
-            let hasValidEntitlement = try await authenticationManager.hasValidEntitlement()
+            let hasValidEntitlement = await authenticationManager.hasValidEntitlement()
+            Logger.dataBrokerProtection.debug("Entitlements are \(hasValidEntitlement ? "valid" : "invalid")")
             stopAgentBasedOnEntitlementCheckResult(hasValidEntitlement ? .enabled : .disabled)
 
         } catch {

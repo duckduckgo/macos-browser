@@ -37,7 +37,7 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
     }
 
     public func accessToken() async -> String? {
-        try? await subscriptionManager.getTokenContainer(policy: .localForceRefresh).accessToken
+        try? await subscriptionManager.getTokenContainer(policy: .localValid).accessToken
     }
 
     public init(redeemUseCase: any DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
@@ -47,7 +47,9 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
     }
 
     public func hasValidEntitlement() async -> Bool {
-        await subscriptionManager.isFeatureActive(.dataBrokerProtection)
+//        await subscriptionManager.isFeatureActive(.dataBrokerProtection)
+        let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: .localValid)
+        return tokenContainer?.decodedAccessToken.subscriptionEntitlements.contains(.dataBrokerProtection) ?? false
     }
 
     public func getAuthHeader() async -> String? {

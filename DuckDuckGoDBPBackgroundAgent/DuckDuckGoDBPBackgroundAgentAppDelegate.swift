@@ -33,7 +33,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let subscriptionManager: SubscriptionManager
 
     override init() {
-        Logger.dbpBackgroundAgent.info("🟢 Starting: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
+        Logger.dbpBackgroundAgent.debug("🟢 Starting: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
 
         let dryRun: Bool
 #if DEBUG
@@ -80,6 +80,8 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+
+        Logger.dbpBackgroundAgent.debug("🟢 Started")
     }
 
     required init?(coder: NSCoder) {
@@ -92,29 +94,28 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     private let settings = DataBrokerProtectionSettings()
     private var cancellables = Set<AnyCancellable>()
     private var statusBarMenu: StatusBarMenu?
-    private let subscriptionManager: SubscriptionManager
+    private let subscriptionManager: any SubscriptionManager
     private var manager: DataBrokerProtectionAgentManager?
 
     init(subscriptionManager: SubscriptionManager) {
         self.subscriptionManager = subscriptionManager
-    }
 
-    @MainActor
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        Logger.dbpBackgroundAgent.log("DuckDuckGoAgent started")
-
+        // Aligning the environment with the Subscription one
+        settings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
         let redeemUseCase = RedeemUseCase(authenticationService: AuthenticationService(),
                                           authenticationRepository: KeychainAuthenticationData())
         let authenticationManager = DataBrokerProtectionAuthenticationManager(
             redeemUseCase: redeemUseCase,
             subscriptionManager: subscriptionManager)
-        manager = DataBrokerProtectionAgentManagerProvider.agentManager(authenticationManager: authenticationManager)
+        self.manager = DataBrokerProtectionAgentManagerProvider.agentManager(authenticationManager: authenticationManager)
+    }
+
+    @MainActor
+    func applicationDidFinishLaunching(_ aNotification: Notification) {
+        Logger.dbpBackgroundAgent.debug("DuckDuckGo DBP Agent launched")
+        subscriptionManager.loadInitialData()
         manager?.agentFinishedLaunching()
-
         setupStatusBarMenu()
-
-        // Aligning the environment with the Subscription one
-        settings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
     }
 
     @MainActor
