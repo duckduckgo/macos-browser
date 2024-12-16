@@ -108,7 +108,11 @@ extension HomePage.Views {
 
         private var button: some View {
             Group {
-                Button(action: viewModel.proceedAction) {
+                Button {
+                    Task { @MainActor in
+                        await viewModel.proceedAction()
+                    }
+                } label: {
                     Text(verbatim: viewModel.proceedButtonText)
                 }
                 .controlSize(.large)

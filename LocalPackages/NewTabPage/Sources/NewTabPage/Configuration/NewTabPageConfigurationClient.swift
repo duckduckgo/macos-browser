@@ -140,6 +140,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         let config = NewTabPageDataModel.NewTabPageConfiguration(
             widgets: [
                 .init(id: .rmf),
+                .init(id: .freemiumPIRBanner),
                 .init(id: .nextSteps),
                 .init(id: .favorites),
                 .init(id: .privacyStats)
