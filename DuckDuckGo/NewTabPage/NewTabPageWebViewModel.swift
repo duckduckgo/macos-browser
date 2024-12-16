@@ -37,7 +37,12 @@ final class NewTabPageWebViewModel: NSObject {
     let webView: WebView
     private var windowCancellable: AnyCancellable?
 
-    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging, activeRemoteMessageModel: ActiveRemoteMessageModel) {
+    init(
+        featureFlagger: FeatureFlagger,
+        actionsManager: NewTabPageActionsManaging,
+        activeRemoteMessageModel: ActiveRemoteMessageModel,
+        freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
+    ) {
         newTabPageUserScript = NewTabPageUserScript()
         actionsManager.registerUserScript(newTabPageUserScript)
 
@@ -53,8 +58,10 @@ final class NewTabPageWebViewModel: NSObject {
 
         windowCancellable = webView.publisher(for: \.window)
             .map { $0 != nil }
-            .sink { [weak activeRemoteMessageModel] isOnScreen in
+            .sink { [weak activeRemoteMessageModel, weak freemiumDBPPromotionViewCoordinator] isOnScreen in
                 activeRemoteMessageModel?.isViewOnScreen = isOnScreen
+                freemiumDBPPromotionViewCoordinator?.isHostingViewOnScreen = isOnScreen
+
                 if isOnScreen {
                     NotificationCenter.default.post(name: .newTabPageWebViewDidAppear, object: nil)
                 }

@@ -1159,6 +1159,8 @@
 		37534CA3281132CB002621E7 /* TabLazyLoaderDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA2281132CB002621E7 /* TabLazyLoaderDataSource.swift */; };
 		37534CA52811987D002621E7 /* AdjacentItemEnumeratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA42811987D002621E7 /* AdjacentItemEnumeratorTests.swift */; };
 		37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */; };
+		3758A38C2D108233001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3758A38B2D108229001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift */; };
+		3758A38D2D108233001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3758A38B2D108229001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift */; };
 		376113CC2B29CD5B00E794BB /* CriticalPathsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565E46DF2B2725DD0013AC2A /* CriticalPathsTests.swift */; };
 		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
 		376731822C7E226A00EB097B /* HomePageViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731812C7E226A00EB097B /* HomePageViewBackground.swift */; };
@@ -3698,6 +3700,7 @@
 		37534CA2281132CB002621E7 /* TabLazyLoaderDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoaderDataSource.swift; sourceTree = "<group>"; };
 		37534CA42811987D002621E7 /* AdjacentItemEnumeratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjacentItemEnumeratorTests.swift; sourceTree = "<group>"; };
 		37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjacentItemEnumerator.swift; sourceTree = "<group>"; };
+		3758A38B2D108229001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFreemiumDBPBannerProvider.swift; sourceTree = "<group>"; };
 		376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITests.xcconfig; sourceTree = "<group>"; };
 		376113D42B29CD5B00E794BB /* SyncE2EUITests App Store.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SyncE2EUITests App Store.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITestsAppStore.xcconfig; sourceTree = "<group>"; };
@@ -5876,6 +5879,7 @@
 			isa = PBXGroup;
 			children = (
 				37F9AEB02D1316FE007FD19B /* DefaultHomePageSettingsModelNavigator+NewTabPageLinkOpening.swift */,
+				3758A38B2D108229001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift */,
 				371E1D662D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift */,
 				37BE08792D09C0EA00C77B8E /* NewTabPageNextStepsCardsProvider.swift */,
 				37E307B12D075B5E00599500 /* NewTabPagePrivacyStatsEventHandler.swift */,
@@ -12266,6 +12270,7 @@
 				372A0FED2B2379310033BF7F /* SyncMetricsEventsHandler.swift in Sources */,
 				3706FCA4293F65D500E42796 /* RecentlyClosedMenu.swift in Sources */,
 				8400DC4C2C6E26AE006509D2 /* ItemCachingCollectionView.swift in Sources */,
+				3758A38C2D108233001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift in Sources */,
 				4B9DB02D2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */,
 				C181945D2C7CDCC700381092 /* PromotionView.swift in Sources */,
 			);
@@ -13857,6 +13862,7 @@
 				B6ABD0CE2BC042CE0000EB69 /* NSURL+sandboxExtensionRetainCount.m in Sources */,
 				4B4D60DF2A0C875F00BCD287 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
+				3758A38D2D108233001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift in Sources */,
 				B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */,
 				B6C00ECB292F839D009C73A6 /* AutofillTabExtension.swift in Sources */,
 				B6E319382953446000DD3BCF /* Assertions.swift in Sources */,
