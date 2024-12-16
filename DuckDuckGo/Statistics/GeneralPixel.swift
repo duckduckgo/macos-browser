@@ -26,8 +26,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case crash
     case crashOnCrashHandlersSetUp
-    case crashReportingSubmissionFailed // crashreporting_submission-failed
-    case crashReportCRCIDMissing // crashreporting_crcid-missing
+    case crashReportingSubmissionFailed
+    case crashReportCRCIDMissing
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
     case launch(isDefault: Bool)
