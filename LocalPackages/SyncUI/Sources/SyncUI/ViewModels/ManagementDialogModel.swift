@@ -33,6 +33,7 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func enterRecoveryCodePressed()
     func copyCode()
     func openSystemPasswordSettings()
+    func switchSync(recoveryCode: String)
 }
 
 public final class ManagementDialogModel: ObservableObject {
@@ -42,6 +43,9 @@ public final class ManagementDialogModel: ObservableObject {
 
     @Published public var shouldShowErrorMessage: Bool = false
     @Published public var syncErrorMessage: SyncErrorMessage?
+    @Published public var shouldShowSwitchAccountsMessage: Bool = false
+
+    private(set) public var codeToSwitchTo: String?
 
     public weak var delegate: ManagementDialogModelDelegate?
 
@@ -58,6 +62,12 @@ public final class ManagementDialogModel: ObservableObject {
         syncErrorMessage?.type.onButtonPressed(delegate: delegate)
         syncErrorMessage = nil
         currentDialog = nil
+    }
+
+    public func switchSyncAccounts(recoveryCode: String) {
+        shouldShowSwitchAccountsMessage = false
+        delegate?.switchSync(recoveryCode: recoveryCode)
+        endFlow()
     }
 
     private var shouldShowErrorMessageCancellable: AnyCancellable?

@@ -70,6 +70,18 @@ public struct ManagementDialog: View {
                     }
                 )
             }
+            .alert(isPresented: $model.shouldShowSwitchAccountsMessage) {
+                Alert(
+                    title: Text(UserText.syncAlertSwitchAccountTitle),
+                    message: Text(UserText.syncAlertSwitchAccountMessage),
+                    primaryButton: .default(Text(UserText.syncAlertSwitchAccountButton)) {
+                        model.switchSyncAccounts(recoveryCode: recoveryCodeModel.recoveryCode)
+                    },
+                    secondaryButton: .cancel {
+                        model.endFlow()
+                    }
+                )
+            }
     }
 
     @ViewBuilder var content: some View {

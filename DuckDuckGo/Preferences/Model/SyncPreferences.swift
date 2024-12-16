@@ -577,8 +577,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 do {
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)
                 } catch {
-                    managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToMergeTwoAccounts, description: "")
-                    PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
+                    if case SyncError.accountAlreadyExists = error {
+                        managementDialogModel.shouldShowSwitchAccountsMessage = true
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
+                    } else {
+                        managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToSyncToOtherDevice)
+                    }
                 }
             } else if let connectKey = syncCode.connect {
                 do {
@@ -755,4 +759,28 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool) {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
     }
+
+    func switchSync(recoveryCode: String) {
+        guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
+            return
+        }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await syncService.disconnect()
+            } catch {
+                // TODO: Send sync_user_switched_logout_error pixel
+            }
+
+            do {
+                let device = deviceInfo()
+                let registeredDevices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
+                await mapDevices(registeredDevices)
+            } catch {
+                // TODO: Send sync_user_switched_login_error pixel
+            }
+            // TODO: Send sync_user_switched_account_pixel
+        }
+    }
+
 }

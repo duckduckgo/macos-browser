@@ -299,6 +299,30 @@
         }
       }
     },
+    "alert.sync-switch-account-button" : {
+      "comment" : "Switch account button in alert\nSwitch account title in alert",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Switch Account"
+          }
+        }
+      }
+    },
+    "alert.sync-switch-account-message" : {
+      "comment" : "Description for switching sync accounts when there's two",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This device is already synced, are you sure you want to sync it with a different back up or device? Switching won't remove any data already synced to this."
+          }
+        }
+      }
+    },
     "alert.unable-to-authenticate-device" : {
       "comment" : "Description for  unable to authenticate error",
       "extractionState" : "extracted_with_value",
