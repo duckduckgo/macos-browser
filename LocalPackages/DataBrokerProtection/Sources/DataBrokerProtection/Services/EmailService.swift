@@ -80,7 +80,7 @@ struct EmailService: EmailServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        guard let authHeader = authenticationManager.getAuthHeader() else {
+        guard let authHeader = await authenticationManager.getAuthHeader() else {
             servicePixel.fireEmptyAccessToken(callSite: .getEmail)
             throw AuthenticationError.noAuthToken
         }
@@ -163,7 +163,7 @@ struct EmailService: EmailServiceProtocol {
 
         var request = URLRequest(url: url)
 
-        guard let authHeader = authenticationManager.getAuthHeader() else {
+        guard let authHeader = await authenticationManager.getAuthHeader() else {
             servicePixel.fireEmptyAccessToken(callSite: .extractEmailLink)
             throw AuthenticationError.noAuthToken
         }

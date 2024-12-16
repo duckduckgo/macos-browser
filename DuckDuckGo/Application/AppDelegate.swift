@@ -106,7 +106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let remoteMessagingClient: RemoteMessagingClient!
     let onboardingStateMachine: ContextualOnboardingStateMachine & ContextualOnboardingStateUpdater
 
-    public let subscriptionManager: SubscriptionManager
+    public let subscriptionManager: any SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
     private let subscriptionCookieManager: SubscriptionCookieManaging
     private var subscriptionCookieManagerFeatureFlagCancellable: AnyCancellable?
@@ -132,9 +132,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - DBP
 
     private lazy var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler = {
-        let authManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: subscriptionManager)
+        let authenticationManager = DataBrokerProtectionAuthenticationManager(
+            subscriptionManager: subscriptionManager)
         return DataBrokerProtectionSubscriptionEventHandler(featureDisabler: DataBrokerProtectionFeatureDisabler(),
-                                                            authenticationManager: authManager,
+                                                            authenticationManager: authenticationManager,
                                                             pixelHandler: DataBrokerProtectionPixelsHandler())
     }()
 

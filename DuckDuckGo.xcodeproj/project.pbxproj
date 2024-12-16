@@ -336,10 +336,6 @@
 		31E3FD732CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E3FD702CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift */; };
 		31ECDA0E2BED317300AE679F /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
 		31ECDA0F2BED317300AE679F /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
-		31ECDA112BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */; };
-		31ECDA122BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */; };
-		31ECDA132BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */; };
-		31ECDA142BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */; };
 		31EF1E802B63FFA800E6DB17 /* DBPHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */; };
 		31EF1E812B63FFB800E6DB17 /* DataBrokerProtectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */; };
 		31EF1E832B63FFCA00E6DB17 /* LoginItem+DataBrokerProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */; };
@@ -3614,7 +3610,6 @@
 		31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReferenceTestHelper.swift; sourceTree = "<group>"; };
 		31E163BF293A581900963C10 /* privacy-reference-tests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "privacy-reference-tests"; path = "Submodules/privacy-reference-tests"; sourceTree = SOURCE_ROOT; };
 		31E3FD702CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatDebugURLSettingsRepresentable.swift; sourceTree = "<group>"; };
-		31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerAuthenticationManagerBuilder.swift; sourceTree = "<group>"; };
 		31F25EFE2CC3CA00002F9084 /* AIChatMenuConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatMenuConfigurationTests.swift; sourceTree = "<group>"; };
 		31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubePlayerUserScript.swift; sourceTree = "<group>"; };
 		31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubeOverlayUserScript.swift; sourceTree = "<group>"; };
@@ -4981,6 +4976,7 @@
 		F118EA842BEACC7000F77634 /* NonStandardPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonStandardPixel.swift; sourceTree = "<group>"; };
 		F11B3CA72D03287800879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift"; sourceTree = "<group>"; };
 		F1476FBF2C1359FB00EAE46A /* SubscriptionUIHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUIHandler.swift; sourceTree = "<group>"; };
+		F152A8C62D1062DD006AC5DE /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = SOURCE_ROOT; };
 		F17114812C7C98FB009836C1 /* Logger+Favicons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Favicons.swift"; sourceTree = "<group>"; };
 		F17114842C7C9D28009836C1 /* Logger+Fire.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Fire.swift"; sourceTree = "<group>"; };
 		F17E7DDB2C7C7F8100907A84 /* Logger+DBPBackgroundAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+DBPBackgroundAgent.swift"; sourceTree = "<group>"; };
@@ -7664,7 +7660,6 @@
 				9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */,
 				F17E7DDB2C7C7F8100907A84 /* Logger+DBPBackgroundAgent.swift */,
 				9D9AE9172AAA3B450026E7DC /* UserText.swift */,
-				31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */,
 				9D9AE9162AAA3B450026E7DC /* Assets.xcassets */,
 				9D9AE91A2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent.entitlements */,
 				9D9AE9192AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.entitlements */,
@@ -7882,6 +7877,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				F152A8C62D1062DD006AC5DE /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -12191,7 +12187,6 @@
 				B602E8172A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				3706FCA1293F65D500E42796 /* AdjacentItemEnumerator.swift in Sources */,
 				9F9C49FA2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */,
-				31ECDA122BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
 				3706FCA2293F65D500E42796 /* ChromiumKeychainPrompt.swift in Sources */,
 				3707C71E294B5D2900682A9F /* URLRequestExtension.swift in Sources */,
 				3706FCA3293F65D500E42796 /* WKProcessPool+GeolocationProvider.swift in Sources */,
@@ -12901,7 +12896,6 @@
 				1EFA1A072C7C7F0E0099F508 /* PrivacyProPixel.swift in Sources */,
 				9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */,
-				31ECDA132BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
 				F1D0429F2BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				31ECDA0E2BED317300AE679F /* BundleExtension.swift in Sources */,
 				F11B3CAD2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
@@ -12920,7 +12914,6 @@
 				1EFA1A082C7C7F0F0099F508 /* PrivacyProPixel.swift in Sources */,
 				9D9AE91E2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */,
-				31ECDA142BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
 				F1D042A02BFBABA100A31506 /* DefaultSubscriptionManager+StandardConfiguration.swift in Sources */,
 				31ECDA0F2BED317300AE679F /* BundleExtension.swift in Sources */,
 				F11B3CAE2D032A3000879E51 /* DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift in Sources */,
@@ -13286,7 +13279,6 @@
 				B60293E62BA19ECD0033186B /* NetPPopoverManagerMock.swift in Sources */,
 				B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */,
 				B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */,
-				31ECDA112BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
 				4B4D60E02A0C875F00BCD287 /* Bundle+VPN.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
 				3199AF732C80734A003AEBDC /* DuckPlayerOnboardingModalManager.swift in Sources */,

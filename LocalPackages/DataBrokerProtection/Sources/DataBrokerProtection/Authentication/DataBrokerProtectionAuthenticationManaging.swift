@@ -21,11 +21,11 @@ import Subscription
 
 public protocol DataBrokerProtectionAuthenticationManaging {
     var isUserAuthenticated: Bool { get }
-    var accessToken: String? { get }
+    func accessToken() async -> String?
     func hasValidEntitlement() async -> Bool
     func shouldAskForInviteCode() -> Bool
     func redeem(inviteCode: String) async throws
-    func getAuthHeader() -> String?
+    func getAuthHeader() async -> String?
 }
 
 public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtectionAuthenticationManaging {
@@ -36,11 +36,11 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
         subscriptionManager.isUserAuthenticated
     }
 
-    public var accessToken: String? {
-        subscriptionManager.getTokenContainerSynchronously(policy: .localValid)?.accessToken
+    public func accessToken() async -> String? {
+        try? await subscriptionManager.getTokenContainer(policy: .localForceRefresh).accessToken
     }
 
-    public init(redeemUseCase: any DataBrokerProtectionRedeemUseCase,
+    public init(redeemUseCase: any DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
                 subscriptionManager: any SubscriptionManager) {
         self.redeemUseCase = redeemUseCase
         self.subscriptionManager = subscriptionManager
@@ -50,8 +50,9 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
         await subscriptionManager.isFeatureActive(.dataBrokerProtection)
     }
 
-    public func getAuthHeader() -> String? {
-        ServicesAuthHeaderBuilder().getAuthHeader(accessToken)
+    public func getAuthHeader() async -> String? {
+        guard let token = await accessToken() else { return nil }
+        return ServicesAuthHeaderBuilder().getAuthHeader(token)
     }
 
     // MARK: - Redeem code flow

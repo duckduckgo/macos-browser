@@ -187,7 +187,7 @@ struct CaptchaService: CaptchaServiceProtocol {
         Logger.service.debug("Submitting captcha request ...")
         var request = URLRequest(url: url)
 
-        guard let authHeader = authenticationManager.getAuthHeader() else {
+        guard let authHeader = await authenticationManager.getAuthHeader() else {
             servicePixel.fireEmptyAccessToken(callSite: .submitCaptchaInformationRequest)
             throw AuthenticationError.noAuthToken
         }
@@ -273,7 +273,7 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        guard let authHeader = authenticationManager.getAuthHeader() else {
+        guard let authHeader = await authenticationManager.getAuthHeader() else {
             servicePixel.fireEmptyAccessToken(callSite: .submitCaptchaToBeResolvedRequest)
             throw AuthenticationError.noAuthToken
         }
