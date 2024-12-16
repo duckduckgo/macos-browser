@@ -71,7 +71,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let fileStore: FileStore
 
 #if APPSTORE
-    private let crashCollection = CrashCollection(CrashReportSender(platform: .macOSAppStore))
+    private let crashCollection = CrashCollection(crashReportSender: CrashReportSender(platform: .macOSAppStore,
+                                                                                       pixelEvents: CrashReportSender.pixelEvents))
 #else
     private let crashReporter = CrashReporter()
 #endif
@@ -446,6 +447,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         applyPreferredTheme()
 
 #if APPSTORE
+        // TODO: This path still needs testing
         crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
             pixelParameters.forEach { parameters in
                 PixelKit.fire(GeneralPixel.crash, withAdditionalParameters: parameters, includeAppVersionParameter: false)
