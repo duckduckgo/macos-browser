@@ -578,7 +578,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)
                 } catch {
                     if case SyncError.accountAlreadyExists = error {
-                        managementDialogModel.shouldShowSwitchAccountsMessage = true
+                        if devices.count > 1 {
+                            managementDialogModel.shouldShowSwitchAccountsMessage = true
+                        } else {
+                            switchAccounts(recoveryKey: recoveryKey)
+                            managementDialogModel.endFlow()
+                        }
                         PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
                     } else {
                         managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToSyncToOtherDevice)
@@ -760,10 +765,14 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
     }
 
-    func switchSync(recoveryCode: String) {
+    func switchAccounts(recoveryCode: String) {
         guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
             return
         }
+        switchAccounts(recoveryKey: recoveryKey)
+    }
+
+    func switchAccounts(recoveryKey: SyncCode.RecoveryKey) {
         Task { [weak self] in
             guard let self else { return }
             do {
@@ -782,5 +791,4 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             // TODO: Send sync_user_switched_account_pixel
         }
     }
-
 }

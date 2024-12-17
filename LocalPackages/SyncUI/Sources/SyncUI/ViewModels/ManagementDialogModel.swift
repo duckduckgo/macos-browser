@@ -33,7 +33,7 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func enterRecoveryCodePressed()
     func copyCode()
     func openSystemPasswordSettings()
-    func switchSync(recoveryCode: String)
+    func switchAccounts(recoveryCode: String)
 }
 
 public final class ManagementDialogModel: ObservableObject {
@@ -64,9 +64,9 @@ public final class ManagementDialogModel: ObservableObject {
         currentDialog = nil
     }
 
-    public func switchSyncAccounts(recoveryCode: String) {
+    public func switchAccounts(recoveryCode: String) {
         shouldShowSwitchAccountsMessage = false
-        delegate?.switchSync(recoveryCode: recoveryCode)
+        delegate?.switchAccounts(recoveryCode: recoveryCode)
         endFlow()
     }
 
