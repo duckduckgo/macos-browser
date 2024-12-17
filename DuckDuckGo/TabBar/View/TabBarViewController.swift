@@ -79,6 +79,7 @@ final class TabBarViewController: NSViewController {
     private var selectionIndexCancellable: AnyCancellable?
     private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
+    private var tabBarRemoteMessageCancellable: AnyCancellable?
 
     @IBOutlet weak var shadowView: TabShadowView!
 
@@ -132,7 +133,6 @@ final class TabBarViewController: NSViewController {
         subscribeToTabModeChanges()
         setupAddTabButton()
         setupAsBurnerWindowIfNeeded()
-        addTabBarRemoteMessageListener()
     }
 
     override func viewWillAppear() {
@@ -145,12 +145,14 @@ final class TabBarViewController: NSViewController {
         // Detect if tabs are clicked when the window is not in focus
         // https://app.asana.com/0/1177771139624306/1202033879471339
         addMouseMonitors()
+        addTabBarRemoteMessageListener()
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
         mouseDownCancellable = nil
+        tabBarRemoteMessageCancellable = nil
     }
 
     override func viewDidLayout() {
@@ -210,18 +212,18 @@ final class TabBarViewController: NSViewController {
     }
 
     private func addTabBarRemoteMessageListener() {
-        tabBarRemoteMessageViewModel.$remoteMessage.sink(receiveValue: { tabBarRemoteMessage in
-            if let tabBarRemoteMessage = tabBarRemoteMessage {
-                if self.feedbackBarButtonHostingController == nil {
-                    self.showTabBarRemoteMessage(tabBarRemoteMessage)
+        tabBarRemoteMessageCancellable = tabBarRemoteMessageViewModel.$remoteMessage
+            .sink(receiveValue: { tabBarRemoteMessage in
+                if let tabBarRemoteMessage = tabBarRemoteMessage {
+                    if self.feedbackBarButtonHostingController == nil {
+                        self.showTabBarRemoteMessage(tabBarRemoteMessage)
+                    }
+                } else {
+                    if self.feedbackBarButtonHostingController != nil {
+                        self.removeFeedbackButton()
+                    }
                 }
-            } else {
-                if self.feedbackBarButtonHostingController != nil {
-                    self.removeFeedbackButton()
-                }
-            }
-        })
-        .store(in: &cancellables)
+            })
     }
 
     private func showTabBarRemoteMessage(_ tabBarRemotMessage: TabBarRemoteMessage) {
