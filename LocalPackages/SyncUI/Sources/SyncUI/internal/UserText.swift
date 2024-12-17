@@ -204,7 +204,7 @@ enum UserText {
     static let unableCreateRecoveryPdfDescription = NSLocalizedString("alert.unable-to-create-recovery-pdf-description", bundle: Bundle.module, value: "Unable to create the recovery PDF.", comment: "Description for unable to create recovery pdf error")
 
     public static let syncAlertSwitchAccountTitle = NSLocalizedString("alert.sync-switch-account-button", value: "Switch to a different Sync?", comment: "Switch account title in alert")
-    public static let syncAlertSwitchAccountMessage = NSLocalizedString("alert.sync-switch-account-message", value: "This device is already synced, are you sure you want to sync it with a different back up or device? Switching won't remove any data already synced to this.", comment: "Description for switching sync accounts when there's two")
+    public static let syncAlertSwitchAccountMessage = NSLocalizedString("alert.sync-switch-account-message", value: "This device is already synced, are you sure you want to sync it with a different back up or device? Switching won't remove any data already synced to this device.", comment: "Description for switching sync accounts when there's two")
     public static let syncAlertSwitchAccountButton = NSLocalizedString("alert.sync-switch-account-button", value: "Switch Account", comment: "Switch account button in alert")
 
     static let fetchFaviconsOnboardingTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-title", bundle: Bundle.module, value: "Download Missing Icons?", comment: "Title for fetch favicons onboarding dialog")

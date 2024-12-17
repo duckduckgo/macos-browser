@@ -318,7 +318,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "This device is already synced, are you sure you want to sync it with a different back up or device? Switching won't remove any data already synced to this."
+            "value" : "This device is already synced, are you sure you want to sync it with a different back up or device? Switching won't remove any data already synced to this device."
           }
         }
       }
