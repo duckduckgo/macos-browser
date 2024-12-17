@@ -25,7 +25,7 @@ import WebKit
 import os.log
 import RemoteMessaging
 
-final class TabBarViewController: NSViewController {
+final class TabBarViewController: NSViewController, TabBarRemoteMessagePresenting {
 
     enum HorizontalSpace: CGFloat {
         case pinnedTabsScrollViewPadding = 76
@@ -71,15 +71,16 @@ final class TabBarViewController: NSViewController {
     private let pinnedTabsViewModel: PinnedTabsViewModel?
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
-    private let tabBarRemoteMessageViewModel: TabBarRemoteMessageViewModel
-    private var tabBarRemoteMessagePopover: NSPopover?
-    private var tabBarRemoteMessagePopoverHoverTimer: Timer?
-    private var feedbackBarButtonHostingController: NSHostingController<TabBarRemoteMessageView>?
-
     private var selectionIndexCancellable: AnyCancellable?
     private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
-    private var tabBarRemoteMessageCancellable: AnyCancellable?
+
+    // TabBarRemoteMessagePresentable
+    var tabBarRemoteMessageViewModel: TabBarRemoteMessageViewModel
+    var tabBarRemoteMessagePopover: NSPopover?
+    var tabBarRemoteMessagePopoverHoverTimer: Timer?
+    var feedbackBarButtonHostingController: NSHostingController<TabBarRemoteMessageView>?
+    var tabBarRemoteMessageCancellable: AnyCancellable?
 
     @IBOutlet weak var shadowView: TabShadowView!
 
@@ -209,106 +210,6 @@ final class TabBarViewController: NSViewController {
             fireButton.mouseDownTintColor = NSColor.white
             fireButton.mouseOverTintColor = NSColor.white
         }
-    }
-
-    private func addTabBarRemoteMessageListener() {
-        tabBarRemoteMessageCancellable = tabBarRemoteMessageViewModel.$remoteMessage
-            .sink(receiveValue: { tabBarRemoteMessage in
-                if let tabBarRemoteMessage = tabBarRemoteMessage {
-                    if self.feedbackBarButtonHostingController == nil {
-                        self.showTabBarRemoteMessage(tabBarRemoteMessage)
-                    }
-                } else {
-                    if self.feedbackBarButtonHostingController != nil {
-                        self.removeFeedbackButton()
-                    }
-                }
-            })
-    }
-
-    private func showTabBarRemoteMessage(_ tabBarRemotMessage: TabBarRemoteMessage) {
-        let feedbackButtonView = TabBarRemoteMessageView(
-            model: tabBarRemotMessage,
-            onClose: {
-                self.tabBarRemoteMessageViewModel.onMessageDismissed()
-                self.removeFeedbackButton()
-            },
-            onTap: { surveyURL in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(surveyURL, source: .appOpenUrl))
-                self.tabBarRemoteMessageViewModel.onSurveyOpened()
-                self.removeFeedbackButton()
-            },
-            onHover: {
-                self.startTabBarRemotMessageTimer(message: tabBarRemotMessage)
-            },
-            onHoverEnd: {
-                self.dismissTabBarRemoteMessagePopover()
-            },
-            onAppear: {
-                self.tabBarRemoteMessageViewModel.markTabBarRemoteMessageAsShown()
-            }
-        )
-        feedbackBarButtonHostingController = NSHostingController(rootView: feedbackButtonView)
-        guard let feedbackBarButtonHostingController else { return }
-
-        feedbackBarButtonHostingController.view.translatesAutoresizingMaskIntoConstraints = false
-
-        // Insert the hosting controller's view into the stack view just before the fire button
-        let index = max(0, rightSideStackView.arrangedSubviews.count - 1)
-        rightSideStackView.insertArrangedSubview(feedbackBarButtonHostingController.view, at: index)
-
-        NSLayoutConstraint.activate([
-            feedbackBarButtonHostingController.view.centerYAnchor.constraint(equalTo: rightSideStackView.centerYAnchor)
-        ])
-    }
-
-    private func startTabBarRemotMessageTimer(message: TabBarRemoteMessage) {
-        tabBarRemoteMessagePopoverHoverTimer?.invalidate()
-        tabBarRemoteMessagePopoverHoverTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
-            self.showTabBarRemotePopup(message)
-        }
-    }
-
-    private func dismissTabBarRemoteMessagePopover() {
-        tabBarRemoteMessagePopoverHoverTimer?.invalidate()
-        tabBarRemoteMessagePopover?.close()
-    }
-
-    private func showTabBarRemotePopup(_ message: TabBarRemoteMessage) {
-        guard let tabBarButtonRemoteMessageView = feedbackBarButtonHostingController?.view else {
-            return
-        }
-
-        if let popover = tabBarRemoteMessagePopover {
-            popover.show(positionedBelow: tabBarButtonRemoteMessageView.bounds, in: tabBarButtonRemoteMessageView)
-        } else {
-            tabBarRemoteMessagePopover = NSPopover()
-            configurePopover(with: message)
-
-            tabBarRemoteMessagePopover?.show(positionedBelow: tabBarButtonRemoteMessageView.bounds, in: tabBarButtonRemoteMessageView)
-        }
-    }
-
-    private func configurePopover(with message: TabBarRemoteMessage) {
-        guard let popover = tabBarRemoteMessagePopover else { return }
-
-        popover.animates = true
-        popover.behavior = .semitransient
-        popover.contentSize = NSSize(width: TabBarRemoteMessagePopoverContent.Constants.width,
-                                     height: TabBarRemoteMessagePopoverContent.Constants.height)
-
-        let controller = NSViewController()
-        controller.view = NSHostingView(rootView: TabBarRemoteMessagePopoverContent(model: message))
-        popover.contentViewController = controller
-    }
-
-    private func removeFeedbackButton() {
-        guard let hostingController = feedbackBarButtonHostingController else { return }
-
-        rightSideStackView.removeArrangedSubview(hostingController.view)
-        hostingController.view.removeFromSuperview()
-        hostingController.removeFromParent()
-        feedbackBarButtonHostingController = nil
     }
 
     private func setupPinnedTabsView() {
