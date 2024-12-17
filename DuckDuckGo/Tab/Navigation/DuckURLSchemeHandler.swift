@@ -324,9 +324,9 @@ private extension DuckURLSchemeHandler {
     }
 }
 
-private extension URL {
+extension URL {
 
-    enum URLType {
+    fileprivate enum URLType {
         case newTab
         case favicon
         case customBackgroundImage
@@ -337,7 +337,7 @@ private extension URL {
         case error
     }
 
-    var type: URLType? {
+    fileprivate var type: URLType? {
         if self.isDuckPlayer {
             return .duckPlayer
         } else if self.isOnboarding {

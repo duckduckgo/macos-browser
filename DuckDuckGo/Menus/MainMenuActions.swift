@@ -1161,7 +1161,7 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
-            return activeTabViewModel?.canReload == true || (featureFlagger.isFeatureOn(.htmlNewTabPage) && activeTabViewModel?.tab.content == .newtab)
+            return activeTabViewModel?.canReload == true || (featureFlagger.isFeatureOn(.htmlNewTabPage) && activeTabViewModel?.tab.content.urlForWebView?.isNewTabPage == true)
 
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown

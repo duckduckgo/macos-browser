@@ -555,7 +555,11 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
+            let isNewTabPage = tabViewModel.tab.content.urlForWebView?.isNewTabPage == true
+            let newWebView = isNewTabPage ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
+            if isNewTabPage, let url = tabViewModel.tab.content.urlForWebView {
+                newWebView.load(.init(url: url))
+            }
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
