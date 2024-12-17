@@ -1,0 +1,231 @@
+{
+  "version": 9,
+  "messages": [
+    {
+      "id": "macos_permanent_survey_tab_bar",
+      "content": {
+        "messageType": "big_single_action",
+        "titleText": "Help Us Improve",
+        "descriptionText": "We really want to know which features would make our browser better.",
+        "placeholder": "Announce",
+        "primaryActionText": "Tell Us What You Think",
+        "primaryAction": {
+          "type": "survey",
+          "value": "https://selfserve.decipherinc.com/survey/selfserve/32ab/241004?list=2",
+          "additionalParameters": {
+            "queryParams": "delta;var;osv;ddgv"
+          }
+        }
+      },
+      "matchingRules": []
+    }
+  ],
+  "rules": [
+    {
+      "id": 1,
+      "attributes": {
+        "pproSubscriber": {
+          "value": true
+        },
+        "pproPurchasePlatform": {
+          "value": [
+            "apple"
+          ]
+        },
+        "pproSubscriptionStatus": {
+          "value": [
+            "expiring"
+          ]
+        },
+        "pproDaysUntilExpiryOrRenewal": {
+          "max": 10
+        },
+        "appVersion": {
+          "min": "1.101.0"
+        },
+        "installedMacAppStore": {
+          "value": true
+        }
+      }
+    },
+    {
+      "id": 2,
+      "attributes": {
+        "pproSubscriber": {
+          "value": true
+        },
+        "pproPurchasePlatform": {
+          "value": [
+            "stripe"
+          ]
+        },
+        "pproSubscriptionStatus": {
+          "value": [
+            "expiring"
+          ]
+        },
+        "pproDaysUntilExpiryOrRenewal": {
+          "max": 10
+        },
+        "appVersion": {
+          "min": "1.101.0"
+        },
+        "installedMacAppStore": {
+          "value": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "attributes": {
+        "pproSubscriber": {
+          "value": true
+        },
+        "pproDaysSinceSubscribed": {
+          "min": 14
+        },
+        "pproPurchasePlatform": {
+          "value": [
+            "apple",
+            "stripe"
+          ]
+        },
+        "pproSubscriptionStatus": {
+          "value": [
+            "active"
+          ]
+        },
+        "appVersion": {
+          "min": "1.101.0"
+        },
+        "installedMacAppStore": {
+          "value": true
+        }
+      }
+    },
+    {
+      "id": 4,
+      "attributes": {
+        "pproSubscriber": {
+          "value": true
+        },
+        "pproDaysSinceSubscribed": {
+          "min": 14
+        },
+        "pproPurchasePlatform": {
+          "value": [
+            "apple",
+            "stripe"
+          ]
+        },
+        "pproSubscriptionStatus": {
+          "value": [
+            "active"
+          ]
+        },
+        "appVersion": {
+          "min": "1.101.0"
+        },
+        "installedMacAppStore": {
+          "value": false
+        }
+      }
+    },
+    {
+      "id": 5,
+      "attributes": {
+        "interactedWithMessage": {
+          "value": [
+            "macos_privacy_pro_exit_survey_1",
+            "macos_privacy_pro_sparkle_exit_survey_1",
+            "macos_privacy_pro_app_store_exit_survey_1"
+          ]
+        }
+      }
+    },
+    {
+      "id": 6,
+      "attributes": {
+        "interactedWithMessage": {
+          "value": [
+            "macos_privacy_pro_subscriber_survey_1"
+          ]
+        }
+      }
+    },
+    {
+      "id": 7,
+      "attributes": {
+        "interactedWithDeprecatedMacRemoteMessage": {
+          "value": [
+            "privacy_pro_exit_survey_1"
+          ]
+        }
+      }
+    },
+    {
+      "id": 8,
+      "attributes": {
+        "interactedWithDeprecatedMacRemoteMessage": {
+          "value": [
+            "privacy_pro_survey_1"
+          ]
+        }
+      }
+    },
+    {
+      "id": 9,
+      "attributes": {
+        "appVersion": {
+          "min": "1.106.0"
+        },
+        "daysSinceInstalled": {
+          "min": 14,
+          "max": 21
+        },
+        "locale": {
+          "value": [
+            "en-US",
+            "en-CA",
+            "en-GB",
+            "en-AU"
+          ]
+        }
+      }
+    },
+    {
+      "id": 10,
+      "attributes": {
+        "appVersion": {
+          "min": "1.99.0",
+          "max": "1.102.0"
+        },
+        "installedMacAppStore": {
+          "value": false
+        }
+      }
+    },
+    {
+      "id": 11,
+      "attributes": {
+        "appVersion": {
+          "min": "1.116.0.0",
+          "max": "1.116.0.999999"
+        },
+        "locale": {
+          "value": [
+            "en-US"
+          ]
+        },
+        "pproSubscriber": {
+          "value": true
+        },
+        "pproSubscriptionStatus": {
+          "value": [
+            "active"
+          ]
+        }
+      }
+    }
+  ]
+}
