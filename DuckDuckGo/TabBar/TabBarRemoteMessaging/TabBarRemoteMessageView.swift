@@ -26,6 +26,7 @@ struct TabBarRemoteMessageView: View {
     let onTap: (URL) -> Void
     let onHover: () -> Void
     let onHoverEnd: () -> Void
+    let onAppear: () -> Void
 
     var body: some View {
         HStack {
@@ -42,6 +43,7 @@ struct TabBarRemoteMessageView: View {
                     onHoverEnd()
                 })
             )
+            .onAppear(perform: { onAppear() })
             .frame(width: 147)
         }
     }

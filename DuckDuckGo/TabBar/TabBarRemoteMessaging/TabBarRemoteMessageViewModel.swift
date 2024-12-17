@@ -19,27 +19,20 @@
 import Combine
 import RemoteMessaging
 
-struct TabBarRemoteMessage {
-    static let tabBarPermanentSurveyRemoteMessageId = "macos_permanent_survey_tab_bar"
-
-    let buttonTitle: String
-    let popupTitle: String
-    let popupSubtitle: String
-    let surveyURL: URL
-}
-
 final class TabBarRemoteMessageViewModel: ObservableObject {
 
-    private let activeRemoteMessageModel: ActiveRemoteMessageModel
+    private let tabBarRemoteActiveMessage: TabBarRemoteMessageProviding
     private var cancellable: AnyCancellable?
 
     @Published var remoteMessage: TabBarRemoteMessage?
 
-    init(activeRemoteMessageModel: ActiveRemoteMessageModel) {
-        self.activeRemoteMessageModel = activeRemoteMessageModel
+    init(activeRemoteMessageModel: TabBarRemoteMessageProviding, isFireWindow: Bool) {
+        self.tabBarRemoteActiveMessage = activeRemoteMessageModel
 
-        cancellable = activeRemoteMessageModel.$remoteMessage
+        cancellable = tabBarRemoteActiveMessage.remoteMessagePublisher
             .sink(receiveValue: { model in
+                guard !isFireWindow else { return }
+
                 guard let model = model else {
                     self.remoteMessage = nil
                     return
@@ -51,18 +44,16 @@ final class TabBarRemoteMessageViewModel: ObservableObject {
         })
     }
 
-    func onDismiss() {
-        Task { await activeRemoteMessageModel.dismissRemoteMessage(with: .close) }
+    func onSurveyOpened() {
+        Task { await tabBarRemoteActiveMessage.onSurveyOpened() }
     }
 
-    /// When the user hovers the Tab Bar Remote Message and we show the popup, there is where when we mark
-    /// that the user really saw the message.
-    func onUserHovered() {
-        Task { await activeRemoteMessageModel.markRemoteMessageAsShown() }
+    func onMessageDismissed() {
+        Task { await tabBarRemoteActiveMessage.onMessageDismissed() }
     }
 
-    func onOpenSurvey() {
-        Task { await activeRemoteMessageModel.dismissRemoteMessage(with: .primaryAction) }
+    func markTabBarRemoteMessageAsShown() {
+        Task { await tabBarRemoteActiveMessage.markRemoteMessageAsShown() }
     }
 }
 
