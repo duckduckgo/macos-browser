@@ -34,7 +34,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
         static let initialContentHeight: CGFloat = 489.0
-        static let reportBrokenSiteInitialContentHeight = 372.0 + 28.0
+        static let reportBrokenSiteInitialContentHeight = 406.0 + 28.0
         static let initialContentWidth: CGFloat = 360.0
     }
 
@@ -102,7 +102,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 489))
+        view = ColorView(frame: NSRect(x: 0, y: 0, width: 360, height: 489), backgroundColor: NSColor(named: "PopoverBackgroundColor"))
         initWebView()
     }
 
@@ -127,7 +127,7 @@ final class PrivacyDashboardViewController: NSViewController {
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
-
+        webView.setValue(false, forKey: "drawsBackground")
         self.webView = webView
         view.addAndLayout(webView)
 
