@@ -5793,6 +5793,8 @@
 		3712091F2C232E2B003ADF3D /* RemoteMessaging */ = {
 			isa = PBXGroup;
 			children = (
+				BB3229042D08643700DA92E9 /* TabBarRemoteMessageView.swift */,
+				BB9BA2282D10C0A3009229F3 /* TabBarActiveRemoteMessage.swift */,
 				371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */,
 				3768D8432C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift */,
 				3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */,
@@ -8327,7 +8329,6 @@
 		AA86491124D8318F001BABEE /* TabBar */ = {
 			isa = PBXGroup;
 			children = (
-				BB68B6542D0B1E9200CEC812 /* TabBarRemoteMessaging */,
 				AA86491224D831A1001BABEE /* View */,
 				AA8EDF1F2491FCC10071C2E8 /* ViewModel */,
 				AA9FF95724A1ECE20039E328 /* Model */,
@@ -8475,6 +8476,7 @@
 		AA8EDF1F2491FCC10071C2E8 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				BB9BDD482D09BA9D0069E9EF /* TabBarRemoteMessageViewModel.swift */,
 				37D23779287EB8CA00BCE03B /* TabIndex.swift */,
 				AA9FF95E24A1FB680039E328 /* TabCollectionViewModel.swift */,
 			);
@@ -8576,7 +8578,6 @@
 		AA9FF95724A1ECE20039E328 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				BB9BA2282D10C0A3009229F3 /* TabBarActiveRemoteMessage.swift */,
 				BB9BA2252D10C089009229F3 /* TabBarRemoteMessage.swift */,
 				AA9FF95C24A1FA1C0039E328 /* TabCollection.swift */,
 			);
@@ -9530,15 +9531,6 @@
 				B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */,
 			);
 			path = View;
-			sourceTree = "<group>";
-		};
-		BB68B6542D0B1E9200CEC812 /* TabBarRemoteMessaging */ = {
-			isa = PBXGroup;
-			children = (
-				BB3229042D08643700DA92E9 /* TabBarRemoteMessageView.swift */,
-				BB9BDD482D09BA9D0069E9EF /* TabBarRemoteMessageViewModel.swift */,
-			);
-			path = TabBarRemoteMessaging;
 			sourceTree = "<group>";
 		};
 		BD7090D42C540C0D009EED82 /* MetadataCollectors */ = {
