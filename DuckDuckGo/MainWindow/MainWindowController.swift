@@ -26,7 +26,6 @@ final class MainWindowController: NSWindowController {
     private var fireViewModel: FireViewModel
     private static var knownFullScreenMouseDetectionWindows = Set<NSValue>()
     let fireWindowSession: FireWindowSession?
-    private let appearancePreferences: AppearancePreferencesUserDefaultsPersistor
 
     var mainViewController: MainViewController {
         // swiftlint:disable force_cast
@@ -52,7 +51,6 @@ final class MainWindowController: NSWindowController {
         assert(!mainViewController.isBurner || fireWindowSession != nil)
         self.fireWindowSession = fireWindowSession
         fireWindowSession?.addWindow(window)
-        appearancePreferences = AppearancePreferencesUserDefaultsPersistor()
 
         super.init(window: window)
 
@@ -230,17 +228,13 @@ extension MainWindowController: NSWindowDelegate {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
         mainViewController.windowWillEnterFullScreen()
 
-        if appearancePreferences.hideToolbarsOnFullScreen {
-            onEnterFullScreenWhenFullScreenModeIsEnabled()
-        }
+        onEnterFullScreenWhenFullScreenModeIsEnabled()
     }
 
     func windowWillExitFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = false
 
-        if appearancePreferences.hideToolbarsOnFullScreen {
-            onExitFullScreenWhenFullScreenModeIsEnabled()
-        }
+        onExitFullScreenWhenFullScreenModeIsEnabled()
     }
 
     private func onEnterFullScreenWhenFullScreenModeIsEnabled() {

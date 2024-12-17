@@ -99,9 +99,6 @@ extension Preferences {
                 // SECTION 2: Address Bar
                 PreferencePaneSection(UserText.addressBar) {
                     ToggleMenuItem(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-
-                    ToggleMenuItem(UserText.hideToolbarsOnFullScreen, isOn: $model.hideToolbarsOnFullScreen)
-                        .accessibilityIdentifier("Preferences.AppearanceView.hideToolbarsOnFullScreen")
                 }
 
                 // SECTION 3: New Tab Page
