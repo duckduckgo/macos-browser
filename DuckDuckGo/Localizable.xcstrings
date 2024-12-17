@@ -31111,6 +31111,18 @@
         }
       }
     },
+    "import.csv.instructions.safari.macos15-2" : {
+      "comment" : "Instructions to import Passwords as CSV from Safari zip file on >= macOS 15.2.\n%N$d - step number\n%5$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **Safari**\n%2$d Open the **File menu → Export Browsing Data to File...**\n%3$d Select **passwords** and save the file someplace you can find it (e.g., Desktop)\n%4$d Double click the .zip file to unzip it\n%5$d %6$@"
+          }
+        }
+      }
+    },
     "import.csv.instructions.vivaldi" : {
       "comment" : "Instructions to import Passwords exported as CSV from Vivaldi browser.\n%N$d - step number\n%2$s - browser name (Vivaldi)\n%5$@ - menu button icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
