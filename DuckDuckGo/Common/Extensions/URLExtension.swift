@@ -371,10 +371,6 @@ extension URL {
         return URL(string: "https://duckduckgo.com/updates")!
     }
 
-    static var survey: URL {
-        return URL(string: "https://selfserve.decipherinc.com/survey/selfserve/32ab/241004?list=2")!
-    }
-
     static var webTrackingProtection: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/")!
     }
