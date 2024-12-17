@@ -305,7 +305,7 @@ final class BrowserTabViewController: NSViewController {
                 guard let self, let tabViewModel else {
                     return
                 }
-                if tabViewModel.tab.content == .newtab {
+                if tabViewModel.tab.content.isNewTab {
                     showTabContent(of: tabViewModel)
                 }
             }
@@ -555,7 +555,7 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let isNewTabPage = tabViewModel.tab.content.urlForWebView?.isNewTabPage == true
+            let isNewTabPage = tabViewModel.tab.content.isNewTab
             let newWebView = isNewTabPage ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
             if isNewTabPage, let url = tabViewModel.tab.content.urlForWebView {
                 newWebView.load(.init(url: url))
@@ -861,7 +861,7 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
+        let newWebView = tabViewModel.tab.content.isNewTab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
 
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true

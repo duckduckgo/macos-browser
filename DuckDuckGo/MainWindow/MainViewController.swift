@@ -198,15 +198,15 @@ final class MainViewController: NSViewController {
             mainView.navigationBarContainerView.wantsLayer = true
             mainView.navigationBarContainerView.layer?.masksToBounds = false
 
-            if tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
+            if tabCollectionViewModel.selectedTabViewModel?.tab.content.isNewTab == true,
                browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == false {
-                resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
+                resizeNavigationBar(isHomePage: true, animated: !lastTabContent.isNewTab)
             } else {
                 resizeNavigationBar(isHomePage: false, animated: false)
             }
         }
 
-        updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
+        updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content.isNewTab == true)
     }
 
     override func viewDidLayout() {
@@ -282,7 +282,7 @@ final class MainViewController: NSViewController {
         mainView.layoutSubtreeIfNeeded()
         mainView.updateTrackingAreas()
 
-        updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
+        updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content.isNewTab == true)
     }
 
     private func updateDividerColor(isShowingHomePage isHomePage: Bool) {
@@ -358,12 +358,12 @@ final class MainViewController: NSViewController {
                 guard let self, let selectedTabViewModel else { return }
                 defer { lastTabContent = content }
 
-                if content == .newtab {
+                if content.isNewTab {
                     if browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == true {
                         subscribeToNTPAddressBarVisibility(of: selectedTabViewModel)
                     } else {
                         ntpAddressBarVisibilityCancellable?.cancel()
-                        resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
+                        resizeNavigationBar(isHomePage: true, animated: !lastTabContent.isNewTab)
                     }
                 } else {
                     ntpAddressBarVisibilityCancellable?.cancel()
@@ -382,7 +382,7 @@ final class MainViewController: NSViewController {
             .sink { [weak self] isAddressBarVisible in
                 guard let self else { return }
                 resizeNavigationBar(isHomePage: !isAddressBarVisible, animated: true)
-                adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: .newtab)
+                adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: .newtab(path: nil))
             }
     }
 

@@ -67,7 +67,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private var isHomePage: Bool {
-        tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
+        tabCollectionViewModel.selectedTabViewModel?.tab.content.isNewTab == true
     }
 
     private var isBurner: Bool {
@@ -150,7 +150,7 @@ final class AddressBarTextField: NSTextField {
     private func subscribeToContentType(selectedTabViewModel: TabViewModel) {
         contentTypeCancellable = selectedTabViewModel.tab.$content
             .sink { [weak self] contentType in
-                self?.font = .systemFont(ofSize: contentType == .newtab ? 15 : 13)
+                self?.font = .systemFont(ofSize: contentType.isNewTab ? 15 : 13)
             }
     }
 
@@ -331,7 +331,7 @@ final class AddressBarTextField: NSTextField {
             guard ntpExperiment.isActive else {
                 return nil
             }
-            let isNewTab = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
+            let isNewTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.isNewTab == true
             guard isNewTab else {
                 return .addressBar
             }

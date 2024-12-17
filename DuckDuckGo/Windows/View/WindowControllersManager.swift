@@ -136,7 +136,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             (
                 mainWindowControllers.count == 1 &&
                 mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.count == 1 &&
-                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .newtab &&
+                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .newtab(path: nil) &&
                 pinnedTabsManager.tabCollection.tabs.isEmpty
             )
         }
@@ -215,12 +215,12 @@ extension WindowControllersManager {
            let firstTab = tabCollection.tabs.first,
            case .newtab = firstTab.content,
            !newTab {
-            firstTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
+            firstTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab(path: nil))
         } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-            tab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
+            tab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab(path: nil))
         } else {
-            let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
-            newTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
+            let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab(path: nil), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+            newTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab(path: nil))
             tabCollectionViewModel.insertOrAppend(tab: newTab, selected: true)
         }
     }

@@ -331,7 +331,7 @@ extension MainWindowController: NSWindowDelegate {
             } else if self.mainViewController.tabCollectionViewModel.tabs.isEmpty {
                 // reopen last closed tab if the window stays open
                 DispatchQueue.main.async {
-                    self.mainViewController.browserTabViewController.openNewTab(with: .newtab)
+                    self.mainViewController.browserTabViewController.openNewTab(with: .newtab(path: nil))
                 }
             }
         }

@@ -101,7 +101,7 @@ private extension Tab.TabContent {
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
         switch type {
         case .newtab:
-            self = .newtab
+            self = .newtab(path: nil)
         case .url:
             guard let url = url else { return nil }
             self = .url(url, source: .pendingStateRestoration)

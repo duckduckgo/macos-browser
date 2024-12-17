@@ -178,7 +178,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         var lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         if lastKeyMainWindowController == nil {
             // Create a new window if none exists
-            WindowsManager.openNewWindow(with: Tab(content: .newtab, shouldLoadInBackground: true))
+            WindowsManager.openNewWindow(with: Tab(content: .newtab(path: nil), shouldLoadInBackground: true))
             lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         }
 
@@ -235,7 +235,7 @@ private extension RecentlyClosedTab {
 extension Tab.TabContent {
 
     var isEmpty: Bool {
-        self == .none || self == .newtab
+        self == .none || self.isNewTab
     }
 
     func loadedFromCache() -> Self {

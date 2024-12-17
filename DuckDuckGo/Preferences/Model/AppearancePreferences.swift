@@ -112,9 +112,7 @@ protocol HomePageNavigator {
 final class DefaultHomePageNavigator: HomePageNavigator {
     func openNewTabPageBackgroundCustomizationSettings() {
         Task { @MainActor in
-            WindowControllersManager.shared.showTab(with: .url("duck://newtab#/customizer".url!, credential: nil, source: .ui))
-
-//            WindowControllersManager.shared.showTab(with: .newtab)
+            WindowControllersManager.shared.showTab(with: .newtab(path: "#/customizer"))
             try? await Task.sleep(interval: 0.2)
             if let window = WindowControllersManager.shared.lastKeyMainWindowController {
                 let homePageViewController = window.mainViewController.browserTabViewController.homePageViewController

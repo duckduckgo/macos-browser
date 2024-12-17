@@ -781,7 +781,7 @@ protocol NewWindowPolicyDecisionMaker {
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
             setContent(.contentFromURL(customURL, source: .ui))
         } else {
-            setContent(.newtab)
+            setContent(.newtab(path: nil))
         }
     }
 

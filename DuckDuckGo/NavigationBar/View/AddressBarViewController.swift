@@ -95,7 +95,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.popovers = popovers
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
-            isHomePage: tabViewModel?.tab.content == .newtab,
+            isHomePage: tabViewModel?.tab.content.isNewTab == true,
             isBurner: isBurner,
             suggestionContainer: SuggestionContainer())
         self.isBurner = isBurner
@@ -230,7 +230,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
 
     private func subscribeToTabContent() {
         tabViewModel?.tab.$content
-            .map { $0 == .newtab }
+            .map(\.isNewTab)
             .assign(to: \.isHomePage, onWeaklyHeld: self)
             .store(in: &tabViewModelCancellables)
     }
@@ -357,7 +357,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.8)
         }
 
-        addressBarTextField.placeholderString = tabViewModel?.tab.content == .newtab ? UserText.addressBarPlaceholder : ""
+        addressBarTextField.placeholderString = tabViewModel?.tab.content == .newtab(path: nil) ? UserText.addressBarPlaceholder : ""
     }
 
     private func updateShadowViewPresence(_ isFirstResponder: Bool) {

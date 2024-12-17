@@ -23,7 +23,7 @@ import Subscription
 extension Tab {
 
     enum Content: Equatable {
-        case newtab
+        case newtab(path: String?)
         case url(URL, credential: URLCredential? = nil, source: URLSource)
         case settings(pane: PreferencePaneIdentifier?)
         case bookmarks
@@ -112,7 +112,7 @@ extension TabContent {
     static func contentFromURL(_ url: URL?, source: URLSource) -> TabContent {
         switch url {
         case URL.newtab, URL.Invalid.aboutNewtab, URL.Invalid.duckHome:
-            return .newtab
+            return .newtab(path: nil)
         case URL.welcome, URL.Invalid.aboutWelcome:
             return .onboardingDeprecated
         case URL.onboarding:
@@ -127,10 +127,16 @@ extension TabContent {
             return .releaseNotes
         case URL.Invalid.aboutHome:
             guard let customURL = URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else {
-                return .newtab
+                return .newtab(path: nil)
             }
             return .url(customURL, source: source)
-        default: break
+        case let x where x?.isNewTabPage == true:
+            guard let path = x?.absoluteString.dropping(prefix: "duck://newtab") else {
+                break
+            }
+            return .newtab(path: path)
+        default:
+            break
         }
 
         if let url {
@@ -234,8 +240,11 @@ extension TabContent {
         switch self {
         case .url(let url, credential: _, source: _):
             return url
-        case .newtab:
-            return .newtab
+        case .newtab(let path):
+            guard let path else {
+                return .newtab
+            }
+            return .newtab.absoluteString.appending(path).url
         case .settings(pane: .some(let pane)):
             return .settingsPane(pane)
         case .settings(pane: .none):
@@ -274,6 +283,13 @@ extension TabContent {
         default:
             return false
         }
+    }
+
+    var isNewTab: Bool {
+        guard case .newtab = self else {
+            return false
+        }
+        return true
     }
 
     var userEnteredValue: String? {

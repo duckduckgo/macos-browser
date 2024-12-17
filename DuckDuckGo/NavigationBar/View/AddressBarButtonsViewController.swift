@@ -761,7 +761,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel else { return }
 
         let url = tabViewModel.tab.content.userEditableUrl
-        let isNewTabOrOnboarding = [.newtab, .onboardingDeprecated, .onboarding].contains(tabViewModel.tab.content)
+        let isNewTabOrOnboarding = [.onboardingDeprecated, .onboarding].contains(tabViewModel.tab.content) || tabViewModel.tab.content.isNewTab
         let isHypertextUrl = url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
