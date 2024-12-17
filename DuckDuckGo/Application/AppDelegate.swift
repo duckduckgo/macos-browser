@@ -447,7 +447,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         applyPreferredTheme()
 
 #if APPSTORE
-        // TODO: This path still needs testing
         crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
             pixelParameters.forEach { parameters in
                 PixelKit.fire(GeneralPixel.crash, withAdditionalParameters: parameters, includeAppVersionParameter: false)
