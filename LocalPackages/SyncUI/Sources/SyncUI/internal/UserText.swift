@@ -205,7 +205,7 @@ enum UserText {
 
     public static let syncAlertSwitchAccountTitle = NSLocalizedString("alert.sync-switch-account-button", value: "Switch to a different Sync?", comment: "Switch account title in alert")
     public static let syncAlertSwitchAccountMessage = NSLocalizedString("alert.sync-switch-account-message", value: "This device is already synced, are you sure you want to sync it with a different back up or device? Switching won't remove any data already synced to this device.", comment: "Description for switching sync accounts when there's two")
-    public static let syncAlertSwitchAccountButton = NSLocalizedString("alert.sync-switch-account-button", value: "Switch Account", comment: "Switch account button in alert")
+    public static let syncAlertSwitchAccountButton = NSLocalizedString("alert.sync-switch-sync-button", value: "Switch Sync", comment: "Switch account button in alert")
 
     static let fetchFaviconsOnboardingTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-title", bundle: Bundle.module, value: "Download Missing Icons?", comment: "Title for fetch favicons onboarding dialog")
     static let fetchFaviconsOnboardingMessage = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-message", bundle: Bundle.module, value: "Do you want this device to automatically download icons for any new bookmarks synced from your other devices? This will expose the download to your network any time a bookmark is synced.", comment: "Text for fetch favicons onboarding dialog")
