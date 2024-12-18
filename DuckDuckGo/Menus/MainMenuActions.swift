@@ -803,7 +803,11 @@ extension MainViewController {
     }
 
     @objc func crashOnException(_ sender: Any?) {
-        DispatchQueue.main.async {
+        /*DispatchQueue.main.async {
+            self.navigationBarViewController.addressBarViewController?.addressBarTextField.suggestionViewController.tableView.view(atColumn: 1, row: .max, makeIfNecessary: false)
+        }*/
+        let myQueue = DispatchQueue(label: "review.ddg.crashtestqueue", attributes: .concurrent)
+        myQueue.async {
             self.navigationBarViewController.addressBarViewController?.addressBarTextField.suggestionViewController.tableView.view(atColumn: 1, row: .max, makeIfNecessary: false)
         }
     }
