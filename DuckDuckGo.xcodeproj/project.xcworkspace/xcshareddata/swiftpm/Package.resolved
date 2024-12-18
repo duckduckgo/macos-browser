@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "b71ed70ce9b0ef3ce51d4f96da0193ab70493944",
-        "version" : "221.3.0"
+        "branch" : "alex/malware-protection-pixels",
+        "revision" : "723dbb9db3ca6852c2ebc92408c9893fe1c338de"
       }
     },
     {
