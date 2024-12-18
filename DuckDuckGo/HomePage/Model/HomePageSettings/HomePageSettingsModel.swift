@@ -59,7 +59,7 @@ extension HomePage.Models {
     final class SettingsModel: ObservableObject {
 
         enum Const {
-            static let maximumNumberOfUserImages = 4
+            static let maximumNumberOfUserImages = 8
             static let defaultColorPickerColor = NSColor.white
         }
 
