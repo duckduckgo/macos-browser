@@ -22,6 +22,7 @@ import UserScript
 import WebKit
 
 public protocol NewTabPageCustomBackgroundProviding: AnyObject {
+    var customizerOpener: NewTabPageCustomizerOpener { get }
     var customizerData: NewTabPageDataModel.CustomizerData { get }
 
     var background: NewTabPageDataModel.Background { get set }
@@ -69,9 +70,18 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
                 }
             }
             .store(in: &cancellables)
+
+        model.customizerOpener.openSettingsPublisher
+            .sink { [weak self] webView in
+                Task { @MainActor in
+                    self?.openSettings(in: webView)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     enum MessageName: String, CaseIterable {
+        case autoOpen = "customizer_autoOpen"
         case deleteImage = "customizer_deleteImage"
         case onBackgroundUpdate = "customizer_onBackgroundUpdate"
         case onImagesUpdate = "customizer_onImagesUpdate"
@@ -136,5 +146,10 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
     @MainActor
     private func notifyImagesUpdated(_ images: [NewTabPageDataModel.UserImage]) {
         pushMessage(named: MessageName.onImagesUpdate.rawValue, params: NewTabPageDataModel.UserImagesData(userImages: images))
+    }
+
+    @MainActor
+    private func openSettings(in webView: WKWebView) {
+        pushMessage(named: MessageName.autoOpen.rawValue, params: nil, to: webView)
     }
 }

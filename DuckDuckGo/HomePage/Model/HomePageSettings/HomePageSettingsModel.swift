@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import NewTabPage
 import os.log
 import PixelKit
 import SwiftUI
@@ -88,6 +89,7 @@ extension HomePage.Models {
         let userColorProvider: () -> UserColorProviding
         let showAddImageFailedAlert: () -> Void
         let navigator: HomePageSettingsModelNavigator
+        let customizerOpener = NewTabPageCustomizerOpener()
 
         @Published var settingsButtonWidth: CGFloat = .infinity
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []

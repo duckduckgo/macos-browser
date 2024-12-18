@@ -29,6 +29,10 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
         self.appearancePreferences = appearancePreferences
     }
 
+    var customizerOpener: NewTabPageCustomizerOpener {
+        homePageSettingsModel.customizerOpener
+    }
+
     var customizerData: NewTabPageDataModel.CustomizerData {
         .init(
             background: .init(homePageSettingsModel.customBackground),
