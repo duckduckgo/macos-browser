@@ -215,10 +215,17 @@ extension WindowControllersManager {
             // prefer current main window
             guard windowIdx == 0 || windowController !== mainWindowController else { continue }
             let tabCollectionViewModel = windowController.mainViewController.tabCollectionViewModel
-            guard let index = tabCollectionViewModel.indexInAllTabs(where: { $0.content.urlForWebView == url }) else { continue }
+            guard let index = tabCollectionViewModel.indexInAllTabs(where: {
+                $0.content.urlForWebView == url || (url.isSettingsURL && $0.content.urlForWebView?.isSettingsURL == true)
+            }) else { continue }
 
             windowController.window?.makeKeyAndOrderFront(self)
             tabCollectionViewModel.select(at: index)
+            if let tab = tabCollectionViewModel.tabViewModel(at: index)?.tab,
+               tab.content.urlForWebView != url {
+                // navigate to another settings pane
+                tab.setContent(.contentFromURL(url, source: .switchToOpenTab))
+            }
 
             return true
         }

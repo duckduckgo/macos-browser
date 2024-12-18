@@ -370,7 +370,11 @@ final class AddressBarTextField: NSTextField {
             PixelKit.fire(autocompletePixel)
         }
 
-        if case .openTab(let title, url: let url) = suggestion {
+        if case .internalPage(title: let title, url: let url) = suggestion,
+           url == .bookmarks || url.isSettingsURL {
+            // when choosing an internal page suggestion preffer already open matching tab
+            switchTo(OpenTab(title: title, url: url))
+        } else if case .openTab(let title, url: let url) = suggestion {
             switchTo(OpenTab(title: title, url: url))
         } else if NSApp.isCommandPressed {
             openNew(NSApp.isOptionPressed ? .window : .tab, selected: NSApp.isShiftPressed, suggestion: suggestion)
@@ -489,8 +493,12 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func switchTo(_ tab: OpenTab) {
-        if let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
-           let selectionIndex = tabCollectionViewModel.selectionIndex,
+        let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
+        let selectionIndex = tabCollectionViewModel.selectionIndex
+
+        WindowControllersManager.shared.show(url: tab.url, source: .switchToOpenTab, newTab: true /* in case not found */)
+
+        if let selectedTabViewModel, let selectionIndex,
            case .newtab = selectedTabViewModel.tab.content {
             // close tab with "new tab" page open
             tabCollectionViewModel.remove(at: selectionIndex)
@@ -500,7 +508,6 @@ final class AddressBarTextField: NSTextField {
                 window.performClose(self)
             }
         }
-        WindowControllersManager.shared.show(url: tab.url, source: .switchToOpenTab, newTab: false)
     }
 
     private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, String, Bool) -> Void) {

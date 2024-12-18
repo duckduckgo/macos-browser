@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Combine
 import Common
 import Foundation
@@ -35,6 +36,7 @@ final class SuggestionContainer {
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
     private let startupPreferences: StartupPreferences
+    private let featureFlagger: FeatureFlagger
     private let loading: SuggestionLoading
 
     // Used for presenting the same suggestions after the removal of the local suggestion
@@ -44,11 +46,12 @@ final class SuggestionContainer {
 
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
-    init(openTabsProvider: @escaping OpenTabsProvider, suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared) {
+    init(openTabsProvider: @escaping OpenTabsProvider, suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared, featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.openTabsProvider = openTabsProvider
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.startupPreferences = startupPreferences
+        self.featureFlagger = featureFlagger
         self.loading = suggestionLoading
     }
 
@@ -98,11 +101,17 @@ final class SuggestionContainer {
         { @MainActor in
             let selectedTab = WindowControllersManager.shared.selectedTab
             let openTabViewModels = WindowControllersManager.shared.allTabViewModels(for: burnerMode)
+            var usedUrls = Set<String>() // deduplicate
             return openTabViewModels.compactMap { model in
-                guard model.tab !== selectedTab, model.tab.content.isUrl else { return nil }
-                return model.tab.content.userEditableUrl.map { url in
-                    OpenTab(title: model.title, url: url)
-                }
+                guard model.tab !== selectedTab,
+                      model.tab.content.isUrl
+                        || model.tab.content.urlForWebView?.isSettingsURL == true
+                        || model.tab.content.urlForWebView == .bookmarks,
+                      let url = model.tab.content.userEditableUrl,
+                      url != selectedTab?.content.userEditableUrl, // doesn‘t match currently selected
+                      usedUrls.insert(url.absoluteString).inserted == true /* if did not contain */ else { return nil }
+
+                return OpenTab(title: model.title, url: url)
             }
         }
     }

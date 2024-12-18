@@ -181,9 +181,11 @@ struct SuggestionViewModel: Equatable {
             return .favoritedBookmarkSuggestion
         case .unknown:
             return .web
-        case .internalPage(title: _, url: let url) where url == .bookmarks:
+        case .internalPage(title: _, url: let url) where url == .bookmarks,
+             .openTab(title: _, url: let url) where url == .bookmarks:
             return .bookmarksFolder
-        case .internalPage(title: _, url: let url) where url.isSettingsURL:
+        case .internalPage(title: _, url: let url) where url.isSettingsURL,
+             .openTab(title: _, url: let url) where url.isSettingsURL:
             return .settingsMulticolor16
         case .internalPage(title: _, url: let url):
             guard url == URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else { return nil }
