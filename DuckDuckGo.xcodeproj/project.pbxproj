@@ -10626,7 +10626,6 @@
 				pl,
 				pt,
 				ru,
-				"en-US",
 			);
 			mainGroup = AA585D75248FD31100E9A3E2;
 			packageReferences = (
