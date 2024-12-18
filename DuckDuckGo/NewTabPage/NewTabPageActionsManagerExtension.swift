@@ -44,7 +44,11 @@ extension NewTabPageActionsManager {
         let customizationProvider = NewTabPageCustomizationProvider(homePageSettingsModel: NSApp.delegateTyped.homePageSettingsModel)
 
         self.init(scriptClients: [
-            NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences, customBackgroundProvider: customizationProvider),
+            NewTabPageConfigurationClient(
+                sectionsVisibilityProvider: appearancePreferences,
+                customBackgroundProvider: customizationProvider,
+                linkOpener: DefaultHomePageSettingsModelNavigator()
+            ),
             NewTabPageCustomBackgroundClient(model: customizationProvider),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel),
             NewTabPageNextStepsCardsClient(model: NewTabPageNextStepsCardsProvider(continueSetUpModel: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener()))),

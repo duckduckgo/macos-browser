@@ -31,6 +31,10 @@ public protocol NewTabPageSectionsVisibilityProviding: AnyObject {
     var isPrivacyStatsVisiblePublisher: AnyPublisher<Bool, Never> { get }
 }
 
+public protocol NewTabPageLinkOpening {
+    func openLink(_ target: NewTabPageDataModel.OpenAction.Target) async
+}
+
 public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     public weak var userScriptsSource: NewTabPageUserScriptsSource?
@@ -39,15 +43,18 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     private let sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding
     private let customBackgroundProvider: NewTabPageCustomBackgroundProviding
     private let contextMenuPresenter: NewTabPageContextMenuPresenting
+    private let linkOpener: NewTabPageLinkOpening
 
     public init(
         sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding,
         customBackgroundProvider: NewTabPageCustomBackgroundProviding,
-        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter()
+        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
+        linkOpener: NewTabPageLinkOpening
     ) {
         self.sectionsVisibilityProvider = sectionsVisibilityProvider
         self.customBackgroundProvider = customBackgroundProvider
         self.contextMenuPresenter = contextMenuPresenter
+        self.linkOpener = linkOpener
 
         Publishers.Merge(sectionsVisibilityProvider.isFavoritesVisiblePublisher, sectionsVisibilityProvider.isPrivacyStatsVisiblePublisher)
             .receive(on: DispatchQueue.main)
@@ -60,6 +67,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     enum MessageName: String, CaseIterable {
         case contextMenu
         case initialSetup
+        case open
         case reportInitException
         case reportPageException
         case widgetsSetConfig = "widgets_setConfig"
@@ -70,6 +78,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         userScript.registerMessageHandlers([
             MessageName.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
             MessageName.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
+            MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) },
             MessageName.reportInitException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
             MessageName.reportPageException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
             MessageName.widgetsSetConfig.rawValue: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
@@ -172,6 +181,14 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
                 break
             }
         }
+        return nil
+    }
+
+    private func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let openAction: NewTabPageDataModel.OpenAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        await linkOpener.openLink(openAction.target)
         return nil
     }
 

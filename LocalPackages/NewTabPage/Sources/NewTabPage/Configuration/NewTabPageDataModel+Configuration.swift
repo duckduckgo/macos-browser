@@ -18,6 +18,16 @@
 
 import Foundation
 
+public extension NewTabPageDataModel {
+    struct OpenAction: Codable {
+        let target: Target
+
+        public enum Target: String, Codable {
+            case settings
+        }
+    }
+}
+
 extension NewTabPageDataModel {
 
     enum WidgetId: String, Codable {
