@@ -51,6 +51,7 @@ public enum FeatureFlag: String, CaseIterable {
     case isPrivacyProLaunchedROWOverride
 
     case autofillPartialFormSaves
+    case autcompleteTabs
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -62,6 +63,8 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .maliciousSiteProtectionErrorPage:
             return true
         case .autofillPartialFormSaves:
+            return true
+        case .autcompleteTabs:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -107,6 +110,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROWOverride))
         case .autofillPartialFormSaves:
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
+        case .autcompleteTabs:
+            return .remoteReleasable(.feature(.autocompleteTabs))
         }
     }
 }
