@@ -19,9 +19,11 @@
 import SwiftUI
 
 struct TabBarRemoteMessageView: View {
-    @State private var presentPopup: Bool = false
+    @State private var isHovered: Bool = false
+    @State private var isButtonHovered: Bool = false
 
     let model: TabBarRemoteMessage
+
     let onClose: () -> Void
     let onTap: (URL) -> Void
     let onHover: () -> Void
@@ -30,21 +32,40 @@ struct TabBarRemoteMessageView: View {
 
     var body: some View {
         HStack {
-            Button(model.buttonTitle) {
-                onTap(model.surveyURL)
+            Text(model.buttonTitle)
+                .font(.system(size: 13))
+                .fixedSize(horizontal: true, vertical: false)
+                .foregroundColor(.white)
+
+            Button(action: { onClose() }) {
+                Image(.close)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
             }
-            .buttonStyle(DefaultActionButtonStyle(
-                enabled: true,
-                onClose: { onClose() },
-                onHoverStart: {
-                    onHover()
-                },
-                onHoverEnd: {
-                    onHoverEnd()
-                })
-            )
-            .onAppear(perform: { onAppear() })
-            .frame(width: 147)
+            .frame(width: 16, height: 16)
+            .buttonStyle(PlainButtonStyle())
+            .background(isButtonHovered
+                        ? Color("PrimaryButtonHover")
+                        : Color("PrimaryButtonRest"))
+            .cornerRadius(2)
+            .onHover { hovering in
+                isButtonHovered = hovering
+            }
+        }
+        .padding(8)
+        .background(Color("PrimaryButtonRest"))
+        .frame(height: 24)
+        .cornerRadius(8)
+        .onAppear(perform: { onAppear() })
+        .onHover { hovering in
+            isHovered = hovering
+
+            if hovering {
+                onHover()
+            } else {
+                onHoverEnd()
+            }
         }
     }
 }
@@ -77,86 +98,6 @@ struct TabBarRemoteMessagePopoverContent: View {
             .padding(.trailing, 12)
             .padding([.bottom, .top], 10)
         }
-        .frame(width: Constants.width, height: Constants.height)
-    }
-}
-
-private struct DefaultActionButtonStyle: ButtonStyle {
-
-    public let enabled: Bool
-    public let onClose: () -> Void
-    public let onHoverStart: () -> Void
-    public let onHoverEnd: () -> Void
-
-    public init(
-        enabled: Bool,
-        onClose: @escaping () -> Void,
-        onHoverStart: @escaping () -> Void = {},
-        onHoverEnd: @escaping () -> Void = {}
-    ) {
-        self.enabled = enabled
-        self.onClose = onClose
-        self.onHoverStart = onHoverStart
-        self.onHoverEnd = onHoverEnd
-    }
-
-    public func makeBody(configuration: Self.Configuration) -> some View {
-        ButtonContent(
-            configuration: configuration,
-            enabled: enabled,
-            onClose: onClose,
-            onHoverStart: onHoverStart,
-            onHoverEnd: onHoverEnd
-        )
-    }
-
-    struct ButtonContent: View {
-        let configuration: Configuration
-        let enabled: Bool
-        let onClose: () -> Void
-        let onHoverStart: () -> Void
-        let onHoverEnd: () -> Void
-
-        @State private var isHovered: Bool = false
-
-        var body: some View {
-            let enabledBackgroundColor = configuration.isPressed
-            ? Color("PrimaryButtonPressed")
-            : (isHovered
-               ? Color("PrimaryButtonHover")
-               : Color("PrimaryButtonRest"))
-
-            let disabledBackgroundColor = Color.gray.opacity(0.1)
-            let enabledLabelColor = configuration.isPressed ? Color.white.opacity(0.8) : Color.white
-            let disabledLabelColor = Color.primary.opacity(0.3)
-
-            HStack(spacing: 5) {
-                configuration.label
-                    .font(.system(size: 13))
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Button(action: { onClose() }) {
-                    Image(.close)
-                }
-                .frame(width: 16, height: 16)
-                .buttonStyle(PlainButtonStyle())
-            }
-            .frame(minWidth: 44)
-            .padding(.top, 2.5)
-            .padding(.bottom, 3)
-            .padding(.horizontal, 7.5)
-            .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
-            .foregroundColor(enabled ? enabledLabelColor : disabledLabelColor)
-            .cornerRadius(5)
-            .onHover { hovering in
-                isHovered = hovering
-                if hovering {
-                    onHoverStart()
-                } else {
-                    onHoverEnd()
-                }
-            }
-        }
+        .frame(minWidth: Constants.width, minHeight: Constants.height)
     }
 }
