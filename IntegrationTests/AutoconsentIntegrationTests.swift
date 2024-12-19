@@ -174,7 +174,7 @@ class AutoconsentIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func disabled_testFilterlistRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
+    func testFilterlistRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
         // enable the feature
         CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
         let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/filterlist.html")!
