@@ -31115,10 +31115,58 @@
       "comment" : "Instructions to import Passwords as CSV from Safari zip file on >= macOS 15.2.\n%N$d - step number\n%5$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Öffne **Safari**\n%2$d Öffne das Menü **Datei → Browserdaten in Datei exportieren ...**\n%3$d Wähle **Passwörter** und speichere die Datei an einem Ort, an dem du sie wiederfindest (z. B. Desktop)\n%4$d Doppelklicke auf die .zip-Datei, um sie zu entpacken\n%5$d %6$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$d Open **Safari**\n%2$d Open the **File menu → Export Browsing Data to File...**\n%3$d Select **passwords** and save the file someplace you can find it (e.g., Desktop)\n%4$d Double click the .zip file to unzip it\n%5$d %6$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Abre **Safari**\n%2$d Abre el menú **Archivo → Exportar datos de navegación a archivo...**\n%3$d Selecciona **contraseñas** y guarda el archivo en algún lugar donde puedas encontrarlo (por ejemplo, en el escritorio)\n%4$d Haz doble clic en el archivo .zip para descomprimirlo\n%5$d %6$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Ouvrez **Safari**\n%2$d Ouvrez le **menu Fichier → Exporter les données de navigation vers le fichier…**\n%3$d Sélectionnez **mots de passe** et enregistrez le fichier à un endroit où le trouver facilement (par exemple, sur le bureau)\n%4$d Double-cliquez sur le fichier .zip pour le décompresser\n%5$d %6$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Apri **Safari**\n%2$d Apri il menu **File → Esporta i dati di navigazione in un file...**\n%3$d Seleziona **password** e salva il file in una posizione che ti consenta di trovarlo (ad esempio, sul desktop)\n%4$d Fai doppio clic sul file .zip per decomprimerlo\n%5$d %6$@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Open **Safari**\n%2$d Open het menu **Bestand → Browsergegevens exporteren naar bestand...**\n%3$d Selecteer **wachtwoorden** en sla het bestand op een plek op waar je het kunt vinden (bijv. je bureaublad)\n%4$d Dubbelklik op het .zip-bestand om het uit te pakken\n%5$d %6$@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Otwórz **Safari**\n%2$d Otwórz menu **Plik → Eksportuj dane przeglądania do pliku...**\n%3$d Wybierz **hasła** i zapisz plik w łatwo dostępnym miejscu (np. na biurku)\n%4$d Kliknij dwukrotnie plik .zip w celu jego rozpakowania\n%5$d %6$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Abre o **Safari**\n%2$d Abre o menu **Ficheiro → Exportar dados de navegação para ficheiro...**\n%3$d Seleciona **palavras-passe** e guarda o ficheiro num local onde o possas encontrar (por exemplo, no ambiente de trabalho)\n%4$d Clica duas vezes no ficheiro .zip para o descomprimir\n%5$d %6$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Запустите **Safari**\n%2$d Откройте меню **Файл → Экспортировать данные просмотров в файл...**\n%3$d Выберите **пароли** и сохраните файл там, где вы легко его найдете (например, на рабочем столе)\n%4$d Дважды нажмите мышью файл .zip, чтобы распаковать его\n%5$d %6$@"
           }
         }
       }
