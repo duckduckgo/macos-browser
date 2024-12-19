@@ -578,13 +578,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)
                 } catch {
                     if case SyncError.accountAlreadyExists = error {
-                        if devices.count > 1 {
-                            managementDialogModel.shouldShowSwitchAccountsMessage = true
-                        } else {
-                            switchAccounts(recoveryKey: recoveryKey)
-                            managementDialogModel.endFlow()
-                        }
-                        PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
+                        handleAccountAlreadyExists(recoveryKey)
                     } else {
                         managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToSyncToOtherDevice)
                     }
@@ -765,6 +759,16 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
     }
 
+    private func handleAccountAlreadyExists(_ recoveryKey: SyncCode.RecoveryKey) {
+        if devices.count > 1 {
+            managementDialogModel.shouldShowSwitchAccountsMessage = true
+        } else {
+            switchAccounts(recoveryKey: recoveryKey)
+            managementDialogModel.endFlow()
+        }
+        PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: SyncError.accountAlreadyExists)))
+    }
+
     func switchAccounts(recoveryCode: String) {
         guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
             return
@@ -772,7 +776,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         switchAccounts(recoveryKey: recoveryKey)
     }
 
-    func switchAccounts(recoveryKey: SyncCode.RecoveryKey) {
+    private func switchAccounts(recoveryKey: SyncCode.RecoveryKey) {
         Task { [weak self] in
             guard let self else { return }
             do {
