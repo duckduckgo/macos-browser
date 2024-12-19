@@ -19,8 +19,8 @@
 import SwiftUI
 
 struct TabBarRemoteMessageView: View {
-    @State private var isHovered: Bool = false
-    @State private var isButtonHovered: Bool = false
+    @State private var wasViewHovered: Bool = false
+    @State private var wasCloseButtonHovered: Bool = false
 
     let model: TabBarRemoteMessage
 
@@ -45,21 +45,23 @@ struct TabBarRemoteMessageView: View {
             }
             .frame(width: 16, height: 16)
             .buttonStyle(PlainButtonStyle())
-            .background(isButtonHovered
+            .background(wasCloseButtonHovered && !wasViewHovered
                         ? Color("PrimaryButtonHover")
                         : Color("PrimaryButtonRest"))
             .cornerRadius(2)
             .onHover { hovering in
-                isButtonHovered = hovering
+                wasCloseButtonHovered = hovering
             }
         }
         .padding(8)
-        .background(Color("PrimaryButtonRest"))
+        .background(wasViewHovered
+                    ? Color("PrimaryButtonHover")
+                    : Color("PrimaryButtonRest"))
         .frame(height: 24)
         .cornerRadius(8)
         .onAppear(perform: { onAppear() })
         .onHover { hovering in
-            isHovered = hovering
+            wasViewHovered = hovering
 
             if hovering {
                 onHover()
@@ -71,33 +73,28 @@ struct TabBarRemoteMessageView: View {
 }
 
 struct TabBarRemoteMessagePopoverContent: View {
-    enum Constants {
-        static let height: CGFloat = 92
-        static let width: CGFloat = 360
-    }
-
     let model: TabBarRemoteMessage
 
     var body: some View {
-        HStack(alignment: .center, spacing: 0) {
+        HStack(alignment: .center, spacing: 12) {
             Image(.daxResponse)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 72, height: 72)
-                .padding(.leading, 8)
-                .padding(.trailing, 16)
 
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(model.popupTitle)
                     .font(.system(size: 13, weight: .bold))
-                    .padding(.bottom, 8)
+                    .padding(.top, 9)
 
                 Text(model.popupSubtitle)
                     .font(.system(size: 13, weight: .medium))
+                    .padding(.bottom, 9)
             }
-            .padding(.trailing, 12)
-            .padding([.bottom, .top], 10)
+            .frame(width: 236)
         }
-        .frame(minWidth: Constants.width, minHeight: Constants.height)
+        .padding([.top, .bottom], 10)
+        .padding(.leading, 12)
+        .padding(.trailing, 24)
     }
 }

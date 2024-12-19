@@ -158,13 +158,12 @@ extension TabBarRemoteMessagePresenting {
     private func configurePopover(with message: TabBarRemoteMessage) {
         guard let popover = tabBarRemoteMessagePopover else { return }
 
+        let contentView = TabBarRemoteMessagePopoverContent(model: message)
         popover.animates = true
         popover.behavior = .semitransient
-        popover.contentSize = NSSize(width: TabBarRemoteMessagePopoverContent.Constants.width,
-                                     height: TabBarRemoteMessagePopoverContent.Constants.height)
-
+        popover.contentSize = NSHostingView(rootView: contentView).fittingSize
         let controller = NSViewController()
-        controller.view = NSHostingView(rootView: TabBarRemoteMessagePopoverContent(model: message))
+        controller.view = NSHostingView(rootView: contentView)
         popover.contentViewController = controller
     }
 
