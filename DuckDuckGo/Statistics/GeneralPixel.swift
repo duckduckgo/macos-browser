@@ -476,10 +476,10 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_crash_on_handlers_setup"
 
         case .crashReportCRCIDMissing:
-            return "crashreporting_crcid-missing"
+            return "m_mac_crashreporting_crcid-missing"
 
         case .crashReportingSubmissionFailed:
-            return "crashreporting_submission-failed"
+            return "m_mac_crashreporting_submission-failed"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
