@@ -31,44 +31,55 @@ struct TabBarRemoteMessageView: View {
     let onAppear: () -> Void
 
     var body: some View {
-        HStack {
-            Text(model.buttonTitle)
-                .font(.system(size: 13))
-                .fixedSize(horizontal: true, vertical: false)
-                .foregroundColor(.white)
+        HStack(spacing: 0) {
+            HStack {
+                Text(model.buttonTitle)
+                    .font(.system(size: 13))
+                    .fixedSize(horizontal: true, vertical: false)
+                    .foregroundColor(.white)
+            }
+            .padding([.leading, .top, .bottom], 8)
+            .padding(.trailing, 4)
+            .cornerRadius(8)
+            .background(wasViewHovered
+                        ? Color("PrimaryButtonHover")
+                        : Color("PrimaryButtonRest"))
+            .onTapGesture { onTap(model.surveyURL) }
+            .onHover { hovering in
+                wasViewHovered = hovering
 
-            Button(action: { onClose() }) {
+                if hovering {
+                    onHover()
+                } else {
+                    onHoverEnd()
+                }
+            }
+
+            HStack {
                 Image(.close)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 16, height: 16)
             }
-            .frame(width: 16, height: 16)
-            .buttonStyle(PlainButtonStyle())
-            .background(wasCloseButtonHovered && !wasViewHovered
+            .padding([.top, .bottom, .trailing], 8)
+            .background(wasCloseButtonHovered
                         ? Color("PrimaryButtonHover")
                         : Color("PrimaryButtonRest"))
-            .cornerRadius(2)
+            .cornerRadius(8)
+            .onTapGesture {
+                onClose()
+            }
             .onHover { hovering in
                 wasCloseButtonHovered = hovering
             }
+            .frame(maxWidth: .infinity)
         }
-        .padding(8)
-        .background(wasViewHovered
+        .background(wasCloseButtonHovered || wasViewHovered
                     ? Color("PrimaryButtonHover")
                     : Color("PrimaryButtonRest"))
         .frame(height: 24)
         .cornerRadius(8)
         .onAppear(perform: { onAppear() })
-        .onHover { hovering in
-            wasViewHovered = hovering
-
-            if hovering {
-                onHover()
-            } else {
-                onHoverEnd()
-            }
-        }
     }
 }
 
