@@ -28,7 +28,7 @@ extension CrashReportSender {
             PixelKit.fire(GeneralPixel.crashReportCRCIDMissing)
 
         case CrashReportSenderError.submissionFailed(let error):
-            if let error {                
+            if let error {
                 PixelKit.fire(DebugEvent(GeneralPixel.crashReportingSubmissionFailed),
                               frequency: .standard,
                               withHeaders: [:],
