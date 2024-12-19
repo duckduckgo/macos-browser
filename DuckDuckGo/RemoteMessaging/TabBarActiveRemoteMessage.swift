@@ -31,7 +31,7 @@ final class TabBarActiveRemoteMessage: TabBarRemoteMessageProviding  {
     private let activeRemoteMessageModel: ActiveRemoteMessageModel
 
     var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
-        activeRemoteMessageModel.$remoteMessage.eraseToAnyPublisher()
+        activeRemoteMessageModel.$tabBarRemoteMessage.eraseToAnyPublisher()
     }
 
     init(activeRemoteMessageModel: ActiveRemoteMessageModel) {

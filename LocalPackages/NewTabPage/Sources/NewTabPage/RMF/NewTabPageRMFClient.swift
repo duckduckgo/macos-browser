@@ -62,7 +62,7 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
 
     @MainActor
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let remoteMessage = remoteMessageProvider.remoteMessage else {
+        guard let remoteMessage = remoteMessageProvider.newTabPageRemoteMessage else {
             return NewTabPageUserScript.RMFData(content: nil)
         }
 
@@ -71,7 +71,7 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
 
     private func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
-              remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
+              remoteMessageParams.id == remoteMessageProvider.newTabPageRemoteMessage?.id
         else {
             return nil
         }
@@ -82,12 +82,12 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
 
     private func primaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
-              remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
+              remoteMessageParams.id == remoteMessageProvider.newTabPageRemoteMessage?.id
         else {
             return nil
         }
 
-        switch remoteMessageProvider.remoteMessage?.content {
+        switch remoteMessageProvider.newTabPageRemoteMessage?.content {
         case let .bigSingleAction(_, _, _, _, primaryAction):
             await remoteMessageProvider.handleAction(primaryAction, andDismissUsing: .action)
         case let .bigTwoAction(_, _, _, _, primaryAction, _, _):
@@ -100,12 +100,12 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
 
     private func secondaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
-              remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
+              remoteMessageParams.id == remoteMessageProvider.newTabPageRemoteMessage?.id
         else {
             return nil
         }
 
-        switch remoteMessageProvider.remoteMessage?.content {
+        switch remoteMessageProvider.newTabPageRemoteMessage?.content {
         case let .bigTwoAction(_, _, _, _, _, _, secondaryAction):
             await remoteMessageProvider.handleAction(secondaryAction, andDismissUsing: .secondaryAction)
         default:

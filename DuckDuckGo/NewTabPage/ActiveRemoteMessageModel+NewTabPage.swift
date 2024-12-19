@@ -22,9 +22,8 @@ import RemoteMessaging
 
 extension ActiveRemoteMessageModel: NewTabPageActiveRemoteMessageProviding {
     var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
-        $remoteMessage
+        $newTabPageRemoteMessage
             .dropFirst()
-            .filter { $0?.isForTabBar == false }
             .eraseToAnyPublisher()
     }
 

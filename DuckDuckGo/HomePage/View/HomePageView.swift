@@ -183,7 +183,7 @@ extension HomePage.Views {
 
         @ViewBuilder
         func remoteMessage() -> some View {
-            if let remoteMessage = activeRemoteMessageModel.remoteMessage,
+            if let remoteMessage = activeRemoteMessageModel.newTabPageRemoteMessage,
                !remoteMessage.isForTabBar,
                let modelType = remoteMessage.content,
                modelType.isSupported {

@@ -20,7 +20,7 @@ import Combine
 import RemoteMessaging
 
 public protocol NewTabPageActiveRemoteMessageProviding {
-    var remoteMessage: RemoteMessageModel? { get set }
+    var newTabPageRemoteMessage: RemoteMessageModel? { get set }
     var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> { get }
 
     func isMessageSupported(_ message: RemoteMessageModel) -> Bool

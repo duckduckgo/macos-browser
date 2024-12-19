@@ -62,7 +62,7 @@ private extension RemoteMessageModel {
     var shouldShowTabBarRemoteMessage: Bool {
         guard let modelType = content else { return false }
 
-        return modelType.isSupported && isForTabBar
+        return modelType.isSupported
     }
 
     func mapToTabBarRemoteMessage() -> TabBarRemoteMessage? {

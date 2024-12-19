@@ -22,10 +22,10 @@ import XCTest
 import NewTabPage
 
 final class CapturingNewTabPageActiveRemoteMessageProvider: NewTabPageActiveRemoteMessageProviding {
-    @Published var remoteMessage: RemoteMessageModel?
+    @Published var newTabPageRemoteMessage: RemoteMessageModel?
 
     var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
-        $remoteMessage.dropFirst().eraseToAnyPublisher()
+        $newTabPageRemoteMessage.dropFirst().eraseToAnyPublisher()
     }
 
     func isMessageSupported(_ message: RemoteMessageModel) -> Bool {
