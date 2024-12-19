@@ -557,6 +557,12 @@
             "value" : "Reconnect"
           }
         },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnect"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
