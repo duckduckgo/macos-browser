@@ -606,12 +606,6 @@
             "value" : "DuckDuckGo"
           }
         },
-        "en-US" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo"
-          }
-        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",

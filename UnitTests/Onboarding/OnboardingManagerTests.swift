@@ -69,7 +69,7 @@ class OnboardingManagerTests: XCTestCase {
             exclude: [],
             order: "v3",
             env: "development",
-            locale: "en-US",
+            locale: "en",
             platform: .init(name: "macos")
         )
 
