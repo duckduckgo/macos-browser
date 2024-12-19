@@ -2265,6 +2265,18 @@
         }
       }
     },
+    "subscription.preferences.privacypolicy.button" : {
+      "comment" : "Title for the privacy policy button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Privacy Policy and Terms of Service"
+          }
+        }
+      }
+    },
     "subscription.preferences.purchase.button" : {
       "comment" : "Button to open a page where user can learn more and purchase the subscription",
       "extractionState" : "extracted_with_value",

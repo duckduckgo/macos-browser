@@ -312,7 +312,7 @@ public struct PreferencesSubscriptionView: View {
                     TextButton(UserText.preferencesSubscriptionFeedbackButton, weight: .semibold) { model.openUnifiedFeedbackForm() }
                 }
 
-                TextButton("Privacy Policy and Terms of Service", weight: .semibold) { model.openPrivacyPolicy() }
+                TextButton(UserText.preferencesPrivacyPolicyButton, weight: .semibold) { model.openPrivacyPolicy() }
             }
         }
     }
