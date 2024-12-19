@@ -39,7 +39,7 @@ struct TabBarRemoteMessageView: View {
                     .foregroundColor(.white)
             }
             .padding([.leading, .top, .bottom], 8)
-            .padding(.trailing, 4)
+            .padding(.trailing, 6)
             .cornerRadius(8)
             .background(wasViewHovered
                         ? Color("PrimaryButtonHover")
@@ -55,13 +55,20 @@ struct TabBarRemoteMessageView: View {
                 }
             }
 
+            Divider()
+                .background(Color.white.opacity(0.3))
+                .frame(width: 1)
+                .padding([.top, .bottom], 3)
+
             HStack {
                 Image(.close)
                     .resizable()
                     .scaledToFit()
+                    .foregroundColor(.white)
                     .frame(width: 16, height: 16)
             }
-            .padding([.top, .bottom, .trailing], 8)
+            .padding([.top, .bottom])
+            .padding([.leading, .trailing], 4)
             .background(wasCloseButtonHovered
                         ? Color("PrimaryButtonHover")
                         : Color("PrimaryButtonRest"))
@@ -102,8 +109,8 @@ struct TabBarRemoteMessagePopoverContent: View {
                     .font(.system(size: 13, weight: .medium))
                     .padding(.bottom, 9)
             }
-            .frame(width: 236)
         }
+        .frame(width: 360)
         .padding([.top, .bottom], 10)
         .padding(.leading, 12)
         .padding(.trailing, 24)
