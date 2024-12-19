@@ -72,24 +72,31 @@ extension TabBarRemoteMessagePresenting {
     private func showTabBarRemoteMessage(_ tabBarRemotMessage: TabBarRemoteMessage) {
         let feedbackButtonView = TabBarRemoteMessageView(
             model: tabBarRemotMessage,
-            onClose: {
+            onClose: { [weak self] in
+                guard let self = self else { return }
+
                 self.tabBarRemoteMessageViewModel.onMessageDismissed()
                 self.removeFeedbackButton()
             },
-            onTap: { surveyURL in
+            onTap: { [weak self] surveyURL in
+                guard let self = self else { return }
+
                 DispatchQueue.main.async {
                     WindowControllersManager.shared.showTab(with: .contentFromURL(surveyURL, source: .appOpenUrl))
                 }
                 self.tabBarRemoteMessageViewModel.onSurveyOpened()
                 self.removeFeedbackButton()
             },
-            onHover: {
+            onHover: { [weak self] in
+                guard let self = self else { return }
                 self.startTabBarRemotMessageTimer(message: tabBarRemotMessage)
             },
-            onHoverEnd: {
+            onHoverEnd: { [weak self] in
+                guard let self = self else { return }
                 self.dismissTabBarRemoteMessagePopover()
             },
-            onAppear: {
+            onAppear: { [weak self] in
+                guard let self = self else { return }
                 self.tabBarRemoteMessageViewModel.markTabBarRemoteMessageAsShown()
             }
         )
@@ -115,7 +122,8 @@ extension TabBarRemoteMessagePresenting {
     /// - Parameter message: The remote message associated with the popover
     private func startTabBarRemotMessageTimer(message: TabBarRemoteMessage) {
         tabBarRemoteMessagePopoverHoverTimer?.invalidate()
-        tabBarRemoteMessagePopoverHoverTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
+        tabBarRemoteMessagePopoverHoverTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { [weak self] _ in
+            guard let self = self else { return }
             self.showTabBarRemotePopup(message)
         }
     }
