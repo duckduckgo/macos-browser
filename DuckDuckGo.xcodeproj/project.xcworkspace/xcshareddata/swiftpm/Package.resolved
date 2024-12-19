@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "08c3dca42c5f943d45136823f264ba14bbcc0eb9",
-        "version" : "221.2.0"
+        "branch" : "michal/tmp-intpp-review",
+        "revision" : "cb81b08e1f1b4029a26db32e7fedf6bab5240393"
       }
     },
     {
