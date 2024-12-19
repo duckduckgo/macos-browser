@@ -762,6 +762,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     private func handleAccountAlreadyExists(_ recoveryKey: SyncCode.RecoveryKey) {
         if devices.count > 1 {
             managementDialogModel.shouldShowSwitchAccountsMessage = true
+            PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncAskUserToSwitchAccount.withoutMacPrefix)
         } else {
             switchAccounts(recoveryKey: recoveryKey)
             managementDialogModel.endFlow()
@@ -769,7 +770,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: SyncError.accountAlreadyExists)))
     }
 
-    func switchAccounts(recoveryCode: String) {
+    func userConfirmedSwitchAccounts(recoveryCode: String) {
+        PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserAcceptedSwitchingAccount.withoutMacPrefix)
         guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
             return
         }
@@ -782,7 +784,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 try await syncService.disconnect()
             } catch {
-                // TODO: Send sync_user_switched_logout_error pixel
+                PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedLogoutError.withoutMacPrefix)
             }
 
             do {
@@ -790,9 +792,13 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 let registeredDevices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
                 await mapDevices(registeredDevices)
             } catch {
-                // TODO: Send sync_user_switched_login_error pixel
+                PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedLoginError.withoutMacPrefix)
             }
-            // TODO: Send sync_user_switched_account_pixel
+            PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedAccount.withoutMacPrefix)
         }
+    }
+
+    func switchAccountsCancelled() {
+        PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserCancelledSwitchingAccount.withoutMacPrefix)
     }
 }

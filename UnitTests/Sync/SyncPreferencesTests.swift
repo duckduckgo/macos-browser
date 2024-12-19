@@ -356,7 +356,7 @@ final class SyncPreferencesTests: XCTestCase {
             return [RegisteredDevice(id: "1", name: "iPhone", type: "iPhone"), RegisteredDevice(id: "2", name: "Macbook Pro", type: "Macbook Pro")]
         }
 
-        syncPreferences.switchAccounts(recoveryCode: testRecoveryCode)
+        syncPreferences.userConfirmedSwitchAccounts(recoveryCode: testRecoveryCode)
 
         await fulfillment(of: [loginCalledExpectation], timeout: 5.0)
     }
@@ -368,7 +368,7 @@ final class SyncPreferencesTests: XCTestCase {
             return [RegisteredDevice(id: "1", name: "iPhone", type: "iPhone"), RegisteredDevice(id: "2", name: "Macbook Pro", type: "Macbook Pro")]
         }
 
-        syncPreferences.switchAccounts(recoveryCode: testRecoveryCode)
+        syncPreferences.userConfirmedSwitchAccounts(recoveryCode: testRecoveryCode)
         let deviceIDsPublisher = syncPreferences.$devices.map { $0.map { $0.id } }
         try await waitForPublisher(deviceIDsPublisher, toEmit: ["1", "2"])
     }

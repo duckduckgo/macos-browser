@@ -75,7 +75,7 @@ public struct ManagementDialog: View {
                     title: Text(UserText.syncAlertSwitchAccountTitle),
                     message: Text(UserText.syncAlertSwitchAccountMessage),
                     primaryButton: .default(Text(UserText.syncAlertSwitchAccountButton)) {
-                        model.switchAccounts(recoveryCode: recoveryCodeModel.recoveryCode)
+                        model.userConfirmedSwitchAccounts(recoveryCode: recoveryCodeModel.recoveryCode)
                     },
                     secondaryButton: .cancel {
                         model.endFlow()
