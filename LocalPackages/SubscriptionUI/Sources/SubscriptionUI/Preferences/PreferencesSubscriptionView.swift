@@ -487,6 +487,7 @@ private struct SubscriptionDialog<Buttons>: View where Buttons: View {
                 .fixMultilineScrollableText()
                 .foregroundColor(Color(.textPrimary))
         } buttons: {
+            Spacer()
             buttons()
         }
     }
