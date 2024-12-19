@@ -47,7 +47,7 @@ public struct DebugPurchaseView: View {
 
     private var loadingProductsView: some View {
         VStack {
-            Text("Loading subscriptions...")
+            Text(verbatim: "Loading subscriptions...")
                 .font(.largeTitle)
             ActivityIndicator(isAnimating: .constant(true), style: .spinning)
         }
@@ -56,7 +56,7 @@ public struct DebugPurchaseView: View {
 
     private var purchaseSubscriptionSection: some View {
         VStack {
-            Text("Purchase Subscription")
+            Text(verbatim: "Purchase Subscription")
                 .font(.largeTitle)
             Spacer(minLength: 16)
             VStack {
@@ -113,7 +113,7 @@ struct SubscriptionRow: View {
                     .font(.title)
                 Text(product.description)
                     .font(.body)
-                Text("Price: \(product.displayPrice)")
+                Text(verbatim: "Price: \(product.displayPrice)")
                     .font(.caption)
             }
 
@@ -129,7 +129,7 @@ struct SubscriptionRow: View {
                 } else if isBeingPurchased {
                     ActivityIndicator(isAnimating: .constant(true), style: .spinning)
                 } else {
-                    Text("Buy")
+                    Text(verbatim: "Buy")
                         .bold()
                         .foregroundColor(.white)
                 }

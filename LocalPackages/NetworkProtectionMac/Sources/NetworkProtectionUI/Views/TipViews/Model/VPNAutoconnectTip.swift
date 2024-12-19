@@ -46,11 +46,11 @@ extension VPNAutoconnectTip: Tip {
     }
 
     var title: Text {
-        Text("Connect Automatically")
+        Text(UserText.networkProtectionAutoconnectTipTitle)
     }
 
     var message: Text? {
-        Text("The VPN can connect on its own when you log in to your computer.")
+        Text(UserText.networkProtectionAutoconnectTipMessage)
     }
 
     var image: Image? {
@@ -59,7 +59,7 @@ extension VPNAutoconnectTip: Tip {
 
     var actions: [Action] {
         [Action(id: ActionIdentifiers.enable.rawValue) {
-            Text("Enable")
+            Text(UserText.networkProtectionAutoconnectTipEnableAction)
         }]
     }
 

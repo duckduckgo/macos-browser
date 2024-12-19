@@ -18,6 +18,7 @@
 
 import AppKit
 import SwiftUI
+import Utilities
 
 struct PopupButtonItem<SelectionValue: Equatable>: Equatable {
 
