@@ -31111,6 +31111,66 @@
         }
       }
     },
+    "import.csv.instructions.safari.macos15-2" : {
+      "comment" : "Instructions to import Passwords as CSV from Safari zip file on >= macOS 15.2.\n%N$d - step number\n%5$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Öffne **Safari**\n%2$d Öffne das Menü **Datei → Browserdaten in Datei exportieren ...**\n%3$d Wähle **Passwörter** und speichere die Datei an einem Ort, an dem du sie wiederfindest (z. B. Desktop)\n%4$d Doppelklicke auf die .zip-Datei, um sie zu entpacken\n%5$d %6$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **Safari**\n%2$d Open the **File menu → Export Browsing Data to File...**\n%3$d Select **passwords** and save the file someplace you can find it (e.g., Desktop)\n%4$d Double click the .zip file to unzip it\n%5$d %6$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Abre **Safari**\n%2$d Abre el menú **Archivo → Exportar datos de navegación a archivo...**\n%3$d Selecciona **contraseñas** y guarda el archivo en algún lugar donde puedas encontrarlo (por ejemplo, en el escritorio)\n%4$d Haz doble clic en el archivo .zip para descomprimirlo\n%5$d %6$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Ouvrez **Safari**\n%2$d Ouvrez le **menu Fichier → Exporter les données de navigation vers le fichier…**\n%3$d Sélectionnez **mots de passe** et enregistrez le fichier à un endroit où le trouver facilement (par exemple, sur le bureau)\n%4$d Double-cliquez sur le fichier .zip pour le décompresser\n%5$d %6$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Apri **Safari**\n%2$d Apri il menu **File → Esporta i dati di navigazione in un file...**\n%3$d Seleziona **password** e salva il file in una posizione che ti consenta di trovarlo (ad esempio, sul desktop)\n%4$d Fai doppio clic sul file .zip per decomprimerlo\n%5$d %6$@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Open **Safari**\n%2$d Open het menu **Bestand → Browsergegevens exporteren naar bestand...**\n%3$d Selecteer **wachtwoorden** en sla het bestand op een plek op waar je het kunt vinden (bijv. je bureaublad)\n%4$d Dubbelklik op het .zip-bestand om het uit te pakken\n%5$d %6$@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Otwórz **Safari**\n%2$d Otwórz menu **Plik → Eksportuj dane przeglądania do pliku...**\n%3$d Wybierz **hasła** i zapisz plik w łatwo dostępnym miejscu (np. na biurku)\n%4$d Kliknij dwukrotnie plik .zip w celu jego rozpakowania\n%5$d %6$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Abre o **Safari**\n%2$d Abre o menu **Ficheiro → Exportar dados de navegação para ficheiro...**\n%3$d Seleciona **palavras-passe** e guarda o ficheiro num local onde o possas encontrar (por exemplo, no ambiente de trabalho)\n%4$d Clica duas vezes no ficheiro .zip para o descomprimir\n%5$d %6$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Запустите **Safari**\n%2$d Откройте меню **Файл → Экспортировать данные просмотров в файл...**\n%3$d Выберите **пароли** и сохраните файл там, где вы легко его найдете (например, на рабочем столе)\n%4$d Дважды нажмите мышью файл .zip, чтобы распаковать его\n%5$d %6$@"
+          }
+        }
+      }
+    },
     "import.csv.instructions.vivaldi" : {
       "comment" : "Instructions to import Passwords exported as CSV from Vivaldi browser.\n%N$d - step number\n%2$s - browser name (Vivaldi)\n%5$@ - menu button icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
@@ -37013,10 +37073,58 @@
       "comment" : "Title shown in an error page tab that warn users of security risks on a website that has been flagged as Malware.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnung: Website ist möglicherweise bösartig"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Warning: Site May Be Malicious"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertencia: el sitio puede ser malicioso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement : le site est peut-être malveillant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attenzione: il sito potrebbe essere dannoso"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opgelet: Deze website kan schadelijk zijn"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzeżenie: witryna może być złośliwa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: o site pode ser malicioso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внимание! Потенциально вредоносный сайт"
           }
         }
       }
@@ -47104,8 +47212,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Erlaube DuckDuckGo, dich zu warnen, bevor eine Webseite geladen wird, die als bösartig oder betrügerisch gekennzeichnet wurde."
+            "state" : "translated",
+            "value" : "Warne mich auf Websites, die als Phishing- oder Malware-Websites gekennzeichnet sind."
           }
         },
         "en" : {
@@ -47116,44 +47224,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Permite que DuckDuckGo te avise antes de cargar una página web que se haya marcado como maliciosa o fraudulenta."
+            "state" : "translated",
+            "value" : "Avisarme sobre sitios marcados como phishing o malware."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Autorisez DuckDuckGo à vous avertir avant de charger une page Web signalée comme malveillante ou frauduleuse."
+            "state" : "translated",
+            "value" : "Mettez-moi en garde contre les sites signalés pour hameçonnage ou comme étant des logiciels malveillants."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Consenti a DuckDuckGo di avvisarti prima di caricare una pagina web contrassegnata come dannosa o fraudolenta."
+            "state" : "translated",
+            "value" : "Avvisami sui siti contrassegnati per phishing o malware."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Laat DuckDuckGo je waarschuwen voordat je een webpagina laadt die als kwaadaardig of frauduleus is gemarkeerd."
+            "state" : "translated",
+            "value" : "Waarschuw me op websites die zijn aangeduid als phishing of malware."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zezwól DuckDuckGo na ostrzeganie przed załadowaniem strony internetowej, która została oznaczona jako złośliwa lub jako oszustwo."
+            "state" : "translated",
+            "value" : "Ostrzegaj mnie przed witrynami oznaczonymi jako wyłudzanie informacji lub złośliwe oprogramowanie."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Permitir que o DuckDuckGo te avise antes de carregar uma página que foi sinalizada como maliciosa ou fraudulenta."
+            "state" : "translated",
+            "value" : "Avisar-me sobre sites sinalizados como phishing ou malware."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Разрешить DuckDuckGo предупреждать вас о потенциально вредоносных или мошеннических сайтах перед загрузкой страницы."
+            "state" : "translated",
+            "value" : "Предупреждать о вредоносных и фишинговых сайтах"
           }
         }
       }
@@ -47224,8 +47332,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Das Deaktivieren dieser Funktion kann deine persönlichen Daten gefährden. Wenn du dir über die damit verbundenen Risiken im Klaren bist, kannst du trotzdem fortfahren."
+            "state" : "translated",
+            "value" : "Das Deaktivieren dieser Funktion kann deine persönlichen Daten gefährden."
           }
         },
         "en" : {
@@ -47236,44 +47344,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Desactivar esta función puede poner en riesgo tu información personal. Hazlo solo si entiendes completamente el riesgo que implica."
+            "state" : "translated",
+            "value" : "Desactivar esta función puede poner en riesgo tu información personal."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "La désactivation de cette fonctionnalité peut mettre vos informations personnelles en danger. Faites-le uniquement si vous comprenez parfaitement les risques encourus."
+            "state" : "translated",
+            "value" : "La désactivation de cette fonctionnalité peut mettre vos informations personnelles en danger."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Disabilitando questa funzione, potresti mettere a rischio i tuoi dati personali. Fallo solo se comprendi appieno il rischio che comporta."
+            "state" : "translated",
+            "value" : "Disabilitando questa funzione, potresti mettere a rischio i tuoi dati personali."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Als je deze functie uitschakelt, kunnen je persoonlijke gegevens in gevaar komen. Doe dit alleen als je het risico volledig begrijpt."
+            "state" : "translated",
+            "value" : "Als je deze functie uitschakelt, kunnen je persoonlijke gegevens in gevaar komen."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wyłączenie tej funkcji może narazić Twoje dane osobowe na ryzyko. Rób to tylko wtedy, gdy rozumiesz związane z tym zagrożenie."
+            "state" : "translated",
+            "value" : "Wyłączenie tej funkcji może narazić Twoje dane osobowe na ryzyko."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Desativar esta funcionalidade pode pôr em risco as tuas informações pessoais. Não desatives a menos que compreendas os riscos."
+            "state" : "translated",
+            "value" : "Desativar esta funcionalidade pode pôr em risco as tuas informações pessoais."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "При отключении этой функции ваши личные данные могут оказаться под угрозой. Эту функцию следует деактивировать только в том случае, если вы осознаете связанные с этим риски."
+            "state" : "translated",
+            "value" : "При отключении этой функции ваши личные данные могут оказаться под угрозой."
           }
         }
       }

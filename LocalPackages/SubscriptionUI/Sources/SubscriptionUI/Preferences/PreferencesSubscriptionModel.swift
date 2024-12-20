@@ -316,6 +316,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
+    func openPrivacyPolicy() {
+        openURLHandler(URL(string: "https://duckduckgo.com/pro/privacy-terms")!)
+    }
+
+    @MainActor
     func refreshSubscriptionPendingState() {
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
