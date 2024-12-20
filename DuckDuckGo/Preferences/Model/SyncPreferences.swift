@@ -764,8 +764,10 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             managementDialogModel.shouldShowSwitchAccountsMessage = true
             PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncAskUserToSwitchAccount.withoutMacPrefix)
         } else {
-            switchAccounts(recoveryKey: recoveryKey)
-            managementDialogModel.endFlow()
+            Task { @MainActor in
+                await switchAccounts(recoveryKey: recoveryKey)
+                managementDialogModel.endFlow()
+            }
         }
         PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: SyncError.accountAlreadyExists)))
     }
@@ -775,27 +777,27 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
             return
         }
-        switchAccounts(recoveryKey: recoveryKey)
+        Task {
+            await switchAccounts(recoveryKey: recoveryKey)
+            managementDialogModel.endFlow()
+        }
     }
 
-    private func switchAccounts(recoveryKey: SyncCode.RecoveryKey) {
-        Task { [weak self] in
-            guard let self else { return }
-            do {
-                try await syncService.disconnect()
-            } catch {
-                PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedLogoutError.withoutMacPrefix)
-            }
-
-            do {
-                let device = deviceInfo()
-                let registeredDevices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
-                await mapDevices(registeredDevices)
-            } catch {
-                PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedLoginError.withoutMacPrefix)
-            }
-            PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedAccount.withoutMacPrefix)
+    private func switchAccounts(recoveryKey: SyncCode.RecoveryKey) async {
+        do {
+            try await syncService.disconnect()
+        } catch {
+            PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedLogoutError.withoutMacPrefix)
         }
+
+        do {
+            let device = deviceInfo()
+            let registeredDevices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
+            await mapDevices(registeredDevices)
+        } catch {
+            PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedLoginError.withoutMacPrefix)
+        }
+        PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedAccount.withoutMacPrefix)
     }
 
     func switchAccountsCancelled() {

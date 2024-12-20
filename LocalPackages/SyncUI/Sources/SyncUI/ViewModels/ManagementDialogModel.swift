@@ -68,7 +68,6 @@ public final class ManagementDialogModel: ObservableObject {
 
     public func userConfirmedSwitchAccounts(recoveryCode: String) {
         delegate?.userConfirmedSwitchAccounts(recoveryCode: recoveryCode)
-        doEndFlow()
     }
 
     private func doEndFlow() {
