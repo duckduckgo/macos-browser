@@ -134,7 +134,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 
     @MainActor
     private func redirectMaliciousIframeNavigationAction(_ navigationAction: NavigationAction, with threatKind: MaliciousSiteProtection.ThreatKind) -> NavigationActionPolicy? {
-        PixelKit.fire(MaliciousSiteProtection.Event.iframeLoaded)
+        PixelKit.fire(MaliciousSiteProtection.Event.iframeLoaded(category: threatKind))
 
         // Extract the URL of the source frame (the iframe) that initiated the navigation action
         let iframeTopUrl = navigationAction.sourceFrame.url
@@ -232,7 +232,7 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
         guard let errorData, let webView, let url = webView.url else { return }
         switch errorData {
         case .maliciousSite(kind: let threatKind, url: _):
-            PixelKit.fire(MaliciousSiteProtection.Event.visitSite)
+            PixelKit.fire(MaliciousSiteProtection.Event.visitSite(category: threatKind))
 
             exemptions[url] = threatKind
             state.bypassedMaliciousSiteThreatKind = threatKind
