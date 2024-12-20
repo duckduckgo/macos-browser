@@ -113,7 +113,7 @@ final class SuggestionContainer {
                         || model.tab.content.urlForWebView == .bookmarks,
                       let url = model.tab.content.userEditableUrl,
                       url != selectedTab?.content.userEditableUrl, // doesn‘t match currently selected
-                      usedUrls.insert(url.absoluteString).inserted == true /* if did not contain */ else { return nil }
+                      usedUrls.insert(url.nakedString ?? "").inserted == true /* if did not contain */ else { return nil }
 
                 return OpenTab(title: model.title, url: url)
             }
