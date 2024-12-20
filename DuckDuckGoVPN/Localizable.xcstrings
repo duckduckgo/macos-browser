@@ -557,6 +557,12 @@
             "value" : "DuckDuckGo VPN"
           }
         },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo VPN"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
