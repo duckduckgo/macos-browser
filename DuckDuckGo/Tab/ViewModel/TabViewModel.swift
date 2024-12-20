@@ -397,16 +397,16 @@ final class TabViewModel {
         var title: String
         switch tab.content {
             // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
-        case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
+        case _ where isShowingErrorPage && (tab.error?.isWebContentProcessTerminated != true || tab.title == nil):
             switch tab.error as NSError? {
-            case let error as URLError? where error?.code == .serverCertificateUntrusted:
+            case is URLError where tab.error?.isServerCertificateUntrusted == true:
                 title = UserText.sslErrorPageTabTitle
             case .some(let error as MaliciousSiteError):
                 switch error.code {
                 case .phishing:
                     title = UserText.phishingErrorPageTabTitle
-                // case .malware:
-                //     title = UserText.malwareErrorPageTabTitle
+                case .malware:
+                    title = UserText.malwareErrorPageTabTitle
                 }
             default:
                 title = UserText.tabErrorTitle
@@ -490,7 +490,7 @@ final class TabViewModel {
             return .redAlertCircle16
         case .some(let error as MaliciousSiteError):
             switch error.code {
-            case .phishing/*, .malware*/:
+            case .phishing, .malware:
                 return .redAlertCircle16
             }
         default:

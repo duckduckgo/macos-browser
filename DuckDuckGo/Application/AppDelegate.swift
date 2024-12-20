@@ -71,7 +71,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let fileStore: FileStore
 
 #if APPSTORE
-    private let crashCollection = CrashCollection(platform: .macOSAppStore)
+    private let crashCollection = CrashCollection(crashReportSender: CrashReportSender(platform: .macOSAppStore,
+                                                                                       pixelEvents: CrashReportSender.pixelEvents))
 #else
     private let crashReporter = CrashReporter()
 #endif
@@ -327,7 +328,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
         if NSApplication.runType.requiresEnvironment {
-            privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
+            privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase(), errorEvents: PrivacyStatsErrorHandler())
         } else {
             privacyStats = MockPrivacyStats()
         }

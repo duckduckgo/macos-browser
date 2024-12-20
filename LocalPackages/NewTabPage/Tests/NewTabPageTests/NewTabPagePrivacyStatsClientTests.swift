@@ -29,6 +29,7 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
 
     var privacyStats: CapturingPrivacyStats!
     var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
+    var eventMapping: CapturingNewTabPagePrivacyStatsEventHandler!
     var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
 
     var userScript: NewTabPageUserScript!
@@ -38,11 +39,13 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
 
         privacyStats = CapturingPrivacyStats()
         trackerDataProvider = MockPrivacyStatsTrackerDataProvider()
+        eventMapping = CapturingNewTabPagePrivacyStatsEventHandler()
         settingsPersistor = UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(MockKeyValueStore(), getLegacySetting: nil)
 
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: eventMapping,
             settingsPersistor: settingsPersistor
         )
 
@@ -99,6 +102,7 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: eventMapping,
             settingsPersistor: settingsPersistor
         )
         privacyStats.privacyStats = ["A": 1, "B": 2, "C": 3, "D": 4, "E": 1500, "F": 100, "G": 900]
@@ -121,6 +125,20 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
     func testWhenPrivacyStatsAreEmptyThenGetDataReturnsEmptyArray() async throws {
         let data: NewTabPagePrivacyStatsClient.PrivacyStatsData = try await handleMessage(named: .getData)
         XCTAssertEqual(data, .init(totalCount: 0, trackerCompanies: []))
+    }
+
+    // MARK: - showLess
+
+    func testThatShowLessIsPassedToTheModelAndToTheEventMapping() async throws {
+        try await handleMessageExpectingNilResponse(named: .showLess)
+        XCTAssertEqual(eventMapping.events, [.showLess])
+    }
+
+    // MARK: - showMore
+
+    func testThatShowMoreIsPassedToTheModelAndToTheEventMapping() async throws {
+        try await handleMessageExpectingNilResponse(named: .showMore)
+        XCTAssertEqual(eventMapping.events, [.showMore])
     }
 
     // MARK: - Helper functions

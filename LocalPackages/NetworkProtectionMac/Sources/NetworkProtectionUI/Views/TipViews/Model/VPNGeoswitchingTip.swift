@@ -37,11 +37,11 @@ extension VPNGeoswitchingTip: Tip {
     }
 
     var title: Text {
-        Text("Change Your Location")
+        Text(UserText.networkProtectionGeoswitchingTipTitle)
     }
 
     var message: Text? {
-        Text("Connect to any of our servers worldwide to customize the VPN location.")
+        Text(UserText.networkProtectionGeoswitchingTipMessage)
     }
 
     var image: Image? {

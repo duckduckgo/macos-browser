@@ -26,6 +26,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case crash
     case crashOnCrashHandlersSetUp
+    case crashReportingSubmissionFailed
+    case crashReportCRCIDMissing
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
     case launch(isDefault: Bool)
@@ -464,9 +466,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case siteNotWorkingShown
     case siteNotWorkingWebsiteIsBroken
 
-    // Privacy Stats
-    case privacyStatsCouldNotLoadDatabase
-
     var name: String {
         switch self {
 
@@ -475,6 +474,12 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .crashOnCrashHandlersSetUp:
             return "m_mac_crash_on_handlers_setup"
+
+        case .crashReportCRCIDMissing:
+            return "m_mac_crashreporting_crcid-missing"
+
+        case .crashReportingSubmissionFailed:
+            return "m_mac_crashreporting_submission-failed"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
@@ -1144,9 +1149,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
-
-            // Privacy Stats
-        case .privacyStatsCouldNotLoadDatabase: return "privacy_stats_could_not_load_database"
         }
     }
 
