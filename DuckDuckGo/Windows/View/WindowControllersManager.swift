@@ -192,9 +192,24 @@ extension WindowControllersManager {
             // If there is any non-popup window available, open the URL in it
             ?? nonPopupMainWindowControllers.first {
 
+            let tabCollectionViewModel = windowController.mainViewController.tabCollectionViewModel
+            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
+            let selectionIndex = tabCollectionViewModel.selectionIndex
+
             // Switch to already open tab if present
             if [.appOpenUrl, .switchToOpenTab].contains(source),
                let url, switchToOpenTab(with: url, preferring: windowController) == true {
+
+                if let selectedTabViewModel, let selectionIndex,
+                   case .newtab = selectedTabViewModel.tab.content {
+                    // close tab with "new tab" page open
+                    tabCollectionViewModel.remove(at: selectionIndex)
+
+                    // close the window if no more non-pinned tabs are open
+                    if tabCollectionViewModel.tabs.isEmpty, let window = windowController.window, window.isVisible {
+                        window.performClose(nil)
+                    }
+                }
                 return
             }
 

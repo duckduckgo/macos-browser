@@ -55,11 +55,15 @@ final class SuggestionContainer {
         self.loading = suggestionLoading
     }
 
-    convenience init (burnerMode: BurnerMode) {
+    @MainActor
+    convenience init (burnerMode: BurnerMode,
+                      windowControllersManager: WindowControllersManagerProtocol? = nil) {
         let urlFactory = { urlString in
             return URL.makeURL(fromSuggestionPhrase: urlString)
         }
-        self.init(openTabsProvider: Self.defaultOpenTabsProvider(burnerMode: burnerMode),
+        let windowControllersManager = windowControllersManager ?? WindowControllersManager.shared
+        self.init(openTabsProvider: Self.defaultOpenTabsProvider(burnerMode: burnerMode,
+                                                                 windowControllersManager: windowControllersManager),
                   suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
                   historyCoordinating: HistoryCoordinator.shared,
                   bookmarkManager: LocalBookmarkManager.shared)
@@ -97,10 +101,10 @@ final class SuggestionContainer {
         latestQuery = nil
     }
 
-    private static func defaultOpenTabsProvider(burnerMode: BurnerMode) -> OpenTabsProvider {
+    private static func defaultOpenTabsProvider(burnerMode: BurnerMode, windowControllersManager: WindowControllersManagerProtocol) -> OpenTabsProvider {
         { @MainActor in
-            let selectedTab = WindowControllersManager.shared.selectedTab
-            let openTabViewModels = WindowControllersManager.shared.allTabViewModels(for: burnerMode)
+            let selectedTab = windowControllersManager.selectedTab
+            let openTabViewModels = windowControllersManager.allTabViewModels(for: burnerMode)
             var usedUrls = Set<String>() // deduplicate
             return openTabViewModels.compactMap { model in
                 guard model.tab !== selectedTab,

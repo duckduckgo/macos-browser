@@ -493,21 +493,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func switchTo(_ tab: OpenTab) {
-        let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
-        let selectionIndex = tabCollectionViewModel.selectionIndex
-
         WindowControllersManager.shared.show(url: tab.url, source: .switchToOpenTab, newTab: true /* in case not found */)
-
-        if let selectedTabViewModel, let selectionIndex,
-           case .newtab = selectedTabViewModel.tab.content {
-            // close tab with "new tab" page open
-            tabCollectionViewModel.remove(at: selectionIndex)
-
-            // close the window if no more non-pinned tabs are open
-            if tabCollectionViewModel.tabs.isEmpty, let window, window.isVisible {
-                window.performClose(self)
-            }
-        }
     }
 
     private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, String, Bool) -> Void) {
