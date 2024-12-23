@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -114,7 +114,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="689" height="102"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="689" height="63"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -156,7 +156,7 @@
                                                                                             </textFieldCell>
                                                                                         </textField>
                                                                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
-                                                                                            <rect key="frame" x="149" y="33" width="514" height="15"/>
+                                                                                            <rect key="frame" x="149" y="33" width="483" height="15"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – Search with DuckDuckGo" id="UZv-CE-fbV">
                                                                                                 <font key="font" metaFont="cellTitle"/>
                                                                                                 <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
@@ -174,7 +174,7 @@
                                                                                             </connections>
                                                                                         </button>
                                                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="ofA-eI-PSe">
-                                                                                            <rect key="frame" x="649" y="30" width="20" height="20"/>
+                                                                                            <rect key="frame" x="638" y="30" width="20" height="20"/>
                                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Trash" imagePosition="only" alignment="center" inset="2" id="6YI-sN-iij">
                                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                                 <font key="font" metaFont="system"/>
@@ -185,6 +185,20 @@
                                                                                             </constraints>
                                                                                             <connections>
                                                                                                 <action selector="removeButtonAction:" target="JbS-WE-3yw" id="bQm-Zr-V5V"/>
+                                                                                            </connections>
+                                                                                        </button>
+                                                                                        <button ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kIa-sc-Xsq" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                                            <rect key="frame" x="324" y="30" width="104" height="20"/>
+                                                                                            <buttonCell key="cell" type="square" title="Switch to Tab" bezelStyle="shadowlessSquare" image="Forward" imagePosition="trailing" alignment="center" imageScaling="proportionallyDown" inset="2" id="mVg-K2-xSD">
+                                                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                                                <font key="font" metaFont="system"/>
+                                                                                            </buttonCell>
+                                                                                            <constraints>
+                                                                                                <constraint firstAttribute="height" constant="20" id="C9d-WX-Ovc"/>
+                                                                                                <constraint firstAttribute="width" constant="20" id="NBS-Ou-ojd"/>
+                                                                                            </constraints>
+                                                                                            <connections>
+                                                                                                <action selector="removeButtonAction:" target="JbS-WE-3yw" id="peP-OJ-LF5"/>
                                                                                             </connections>
                                                                                         </button>
                                                                                     </subviews>
@@ -257,7 +271,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="102" width="695" height="1"/>
+                                                <rect key="frame" x="1" y="76" width="615" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
@@ -318,6 +332,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Forward" width="16" height="16"/>
         <image name="Trash" width="16" height="16"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>

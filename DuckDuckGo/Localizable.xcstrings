@@ -1229,6 +1229,18 @@
         }
       }
     },
+    "address.bar.search.open.tab.suffix" : {
+      "comment" : "Suffix of DuckDuckGo Search open tab suggestion. Example: cats – DuckDuckGo Search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo Search"
+          }
+        }
+      }
+    },
     "address.bar.search.suffix" : {
       "comment" : "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo",
       "extractionState" : "extracted_with_value",

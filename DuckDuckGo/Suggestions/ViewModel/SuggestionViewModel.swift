@@ -150,6 +150,10 @@ struct SuggestionViewModel: Equatable {
 
         case .phrase, .unknown, .website:
             return ""
+        case .openTab(title: _, url: let url) where url.isDuckURLScheme:
+            return " – " + UserText.duckDuckGo
+        case .openTab(title: _, url: let url) where url.isDuckDuckGoSearch:
+            return " – " + UserText.duckDuckGoSearchSuffix
         case .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
              .openTab(title: _, url: let url):

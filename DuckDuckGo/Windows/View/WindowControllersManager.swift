@@ -25,6 +25,8 @@ import BrowserServicesKit
 @MainActor
 protocol WindowControllersManagerProtocol {
 
+    var mainWindowControllers: [MainWindowController] { get }
+
     var lastKeyMainWindowController: MainWindowController? { get }
     var pinnedTabsManager: PinnedTabsManager { get }
 
@@ -92,18 +94,6 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
                 didChangeKeyWindowController.send(lastKeyMainWindowController)
             }
         }
-    }
-
-    private var mainWindowController: MainWindowController? {
-        return mainWindowControllers.first(where: {
-            let isMain = $0.window?.isMainWindow ?? false
-            let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-            return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
-        })
-    }
-
-    var selectedTab: Tab? {
-        return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
     }
 
     let didChangeKeyWindowController = PassthroughSubject<MainWindowController?, Never>()
@@ -368,7 +358,19 @@ extension Tab {
 }
 
 // MARK: - Accessing all TabCollectionViewModels
-extension WindowControllersManager {
+extension WindowControllersManagerProtocol {
+
+    var mainWindowController: MainWindowController? {
+        return mainWindowControllers.first(where: {
+            let isMain = $0.window?.isMainWindow ?? false
+            let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
+            return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
+        })
+    }
+
+    var selectedTab: Tab? {
+        return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
+    }
 
     var allTabCollectionViewModels: [TabCollectionViewModel] {
         return mainWindowControllers.map {

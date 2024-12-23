@@ -900,8 +900,7 @@ extension AddressBarTextField {
 
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
                  .historyEntry(title: _, url: let url, allowedInTopHits: _),
-                 .internalPage(title: _, url: let url),
-                 .openTab(title: _, url: let url):
+                 .internalPage(title: _, url: let url):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
@@ -911,7 +910,8 @@ extension AddressBarTextField {
                 } else {
                     self = .url(url)
                 }
-
+            case .openTab(title: _, url: let url):
+                self = .openTab(url)
             case .unknown:
                 self = Suffix.search
             }
@@ -921,6 +921,7 @@ extension AddressBarTextField {
         case visit(host: String)
         case url(URL)
         case title(String)
+        case openTab(URL)
 
         func toAttributedString(size: CGFloat, isBurner: Bool) -> NSAttributedString {
             let suffixColor = isBurner ? NSColor.burnerAccent : NSColor.addressBarSuffix
@@ -932,6 +933,8 @@ extension AddressBarTextField {
         }
 
         static let searchSuffix = " – \(UserText.searchDuckDuckGoSuffix)"
+        static let searchOpenTabSuffix = " – \(UserText.duckDuckGoSearchSuffix)"
+        static let internalPageOpenTabSuffix = " – \(UserText.duckDuckGo)"
         static let visitSuffix = " – \(UserText.addressBarVisitSuffix)"
 
         var string: String {
@@ -940,14 +943,16 @@ extension AddressBarTextField {
                 return Self.searchSuffix
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
-            case .url(let url):
-                if url.isDuckDuckGoSearch {
-                    return Self.searchSuffix
-                } else {
-                    return " – " + url.toString(decodePunycode: false,
-                                                dropScheme: true,
-                                                dropTrailingSlash: false)
-                }
+            case .openTab(let url) where url.isDuckDuckGoSearch:
+                return Self.searchOpenTabSuffix
+            case .openTab(let url) where url.isDuckURLScheme:
+                return Self.internalPageOpenTabSuffix
+            case .url(let url) where url.isDuckDuckGoSearch:
+                return Self.searchSuffix
+            case .url(let url), .openTab(let url):
+                return " – " + url.toString(decodePunycode: false,
+                                            dropScheme: true,
+                                            dropTrailingSlash: false)
             case .title(let title):
                 return " – " + title
             }

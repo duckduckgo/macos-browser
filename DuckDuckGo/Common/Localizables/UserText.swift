@@ -253,6 +253,9 @@ struct UserText {
     static let searchDuckDuckGoSuffix = NSLocalizedString("address.bar.search.suffix",
                                                           value: "Search DuckDuckGo",
                                                           comment: "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo")
+    static let duckDuckGoSearchSuffix = NSLocalizedString("address.bar.search.open.tab.suffix",
+                                                          value: "DuckDuckGo Search",
+                                                          comment: "Suffix of DuckDuckGo Search open tab suggestion. Example: cats – DuckDuckGo Search")
     static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",
                                                          value: "Visit",
                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
