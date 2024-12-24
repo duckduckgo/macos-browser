@@ -20,12 +20,20 @@ import AppKit
 import Subscription
 import struct Combine.AnyPublisher
 import enum Combine.Publishers
+import FeatureFlags
+import BrowserServicesKit
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var subscriptionDetails: String?
     @Published var subscriptionStatus: Subscription.Status?
+
+    @Published var subscriptionStorefrontRegion: SubscriptionRegion = .usa
+
+    @Published var shouldShowVPN: Bool = false
+    @Published var shouldShowDBP: Bool = false
+    @Published var shouldShowITR: Bool = false
 
     @Published var hasAccessToVPN: Bool = false
     @Published var hasAccessToDBP: Bool = false
@@ -34,10 +42,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var email: String?
     var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
+    let featureFlagger: FeatureFlagger
+    var isROWLaunched: Bool = false
+
     private var subscriptionPlatform: Subscription.Platform?
 
     lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: sheetActionHandler,
-                                                      purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
+        purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
 
     private let subscriptionManager: SubscriptionManager
     private var accountManager: AccountManager {
@@ -95,17 +106,21 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManager) {
+                subscriptionManager: SubscriptionManager,
+                featureFlagger: FeatureFlagger) {
         self.subscriptionManager = subscriptionManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
+        self.featureFlagger = featureFlagger
+        self.subscriptionStorefrontRegion = currentStorefrontRegion()
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
         if accountManager.isUserAuthenticated {
             Task {
                 await self.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
+                await self.updateAvailableSubscriptionFeatures()
                 await self.loadCachedEntitlements()
             }
 
@@ -123,6 +138,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         subscriptionChangeObserver = NotificationCenter.default.addObserver(forName: .subscriptionDidChange, object: nil, queue: .main) { _ in
             Task { [weak self] in
                 await self?.updateSubscription(cachePolicy: .returnCacheDataDontLoad)
+                await self?.updateAvailableSubscriptionFeatures()
             }
         }
     }
@@ -139,6 +155,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if let subscriptionChangeObserver {
             NotificationCenter.default.removeObserver(subscriptionChangeObserver)
         }
+    }
+
+    @MainActor
+    func didAppear() {
+        if isUserAuthenticated {
+            userEventHandler(.activeSubscriptionSettingsClick)
+            fetchAndUpdateSubscriptionDetails()
+        } else {
+            self.subscriptionStorefrontRegion = currentStorefrontRegion()
+        }
+        isROWLaunched = featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW) || featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
     }
 
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
@@ -289,6 +316,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
+    func openPrivacyPolicy() {
+        openURLHandler(URL(string: "https://duckduckgo.com/pro/privacy-terms")!)
+    }
+
+    @MainActor
     func refreshSubscriptionPendingState() {
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
@@ -307,7 +339,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func fetchAndUpdateSubscriptionDetails() {
+    private func fetchAndUpdateSubscriptionDetails() {
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
         guard fetchSubscriptionDetailsTask == nil else { return }
@@ -319,6 +351,38 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             await self?.fetchEmailAndRemoteEntitlements()
             await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
+        }
+    }
+
+    private func currentStorefrontRegion() -> SubscriptionRegion {
+        var region: SubscriptionRegion?
+
+        switch subscriptionManager.currentEnvironment.purchasePlatform {
+        case .appStore:
+            if #available(macOS 12.0, *) {
+                region = subscriptionManager.storePurchaseManager().currentStorefrontRegion
+            }
+        case .stripe:
+            region = .usa
+        }
+
+        return region ?? .usa
+    }
+
+    @MainActor
+    private func updateAvailableSubscriptionFeatures() async {
+        let features = await currentSubscriptionFeatures()
+
+        shouldShowVPN = features.contains(.networkProtection)
+        shouldShowDBP = features.contains(.dataBrokerProtection)
+        shouldShowITR = features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal)
+    }
+
+    private func currentSubscriptionFeatures() async -> [Entitlement.ProductName] {
+        if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
+            return await subscriptionManager.currentSubscriptionFeatures()
+        } else {
+            return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
         }
     }
 
@@ -338,12 +402,23 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             hasAccessToDBP = false
         }
 
+        var hasITR = false
         switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: .returnCacheDataDontLoad) {
         case let .success(result):
-            hasAccessToITR = result
+            hasITR = result
         case .failure:
-            hasAccessToITR = false
+            hasITR = false
         }
+
+        var hasITRGlobal = false
+        switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestorationGlobal, cachePolicy: .returnCacheDataDontLoad) {
+        case let .success(result):
+            hasITRGlobal = result
+        case .failure:
+            hasITRGlobal = false
+        }
+
+        hasAccessToITR = hasITR || hasITRGlobal
     }
 
     @MainActor func fetchEmailAndRemoteEntitlements() async {
@@ -358,7 +433,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             let entitlements = response.account.entitlements.compactMap { $0.product }
             hasAccessToVPN = entitlements.contains(.networkProtection)
             hasAccessToDBP = entitlements.contains(.dataBrokerProtection)
-            hasAccessToITR = entitlements.contains(.identityTheftRestoration)
+            hasAccessToITR = entitlements.contains(.identityTheftRestoration) || entitlements.contains(.identityTheftRestorationGlobal)
             accountManager.updateCache(with: response.account.entitlements)
         }
     }
@@ -382,24 +457,15 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
-
         let formattedDate = dateFormatter.string(from: date)
-
-        let billingPeriod: String
-
-        switch period {
-        case .monthly: billingPeriod = UserText.monthlySubscriptionBillingPeriod.lowercased()
-        case .yearly: billingPeriod = UserText.yearlySubscriptionBillingPeriod.lowercased()
-        case .unknown: billingPeriod = ""
-        }
 
         switch status {
         case .autoRenewable:
-            self.subscriptionDetails = UserText.preferencesSubscriptionActiveRenewCaption(period: billingPeriod, formattedDate: formattedDate)
+            self.subscriptionDetails = UserText.preferencesSubscriptionRenewingCaption(billingPeriod: period, formattedDate: formattedDate)
         case .expired, .inactive:
             self.subscriptionDetails = UserText.preferencesSubscriptionExpiredCaption(formattedDate: formattedDate)
         default:
-            self.subscriptionDetails = UserText.preferencesSubscriptionActiveExpireCaption(period: billingPeriod, formattedDate: formattedDate)
+            self.subscriptionDetails = UserText.preferencesSubscriptionExpiringCaption(billingPeriod: period, formattedDate: formattedDate)
         }
     }
 

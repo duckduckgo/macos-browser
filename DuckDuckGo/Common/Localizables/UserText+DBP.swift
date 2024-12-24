@@ -21,11 +21,11 @@ import Common
 
 // MARK: - DBP Error pages
 extension UserText {
-    static let dbpErrorPageBadPathTitle = NotLocalizedString("dbp.errorpage.bad.path.title", value: "Move DuckDuckGo App to Applications", comment: "Title for Personal Information Removal bad path error screen")
-    static let dbpErrorPageBadPathMessage = NotLocalizedString("dbp.errorpage.bad.path.message", value: "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. You can move the app yourself and restart the browser, or we can do it for you.", comment: "Message for Personal Information Removal bad path error screen")
-    static let dbpErrorPageBadPathCTA = NotLocalizedString("dbp.errorpage.bad.path.cta", value: "Move App for Me...", comment: "Call to action for moving the app to the Applications folder")
+    static let dbpErrorPageBadPathTitle = NSLocalizedString("dbp.errorpage.bad.path.title", value: "Move DuckDuckGo App to Applications", comment: "Title for Personal Information Removal bad path error screen")
+    static let dbpErrorPageBadPathMessage = NSLocalizedString("dbp.errorpage.bad.path.message", value: "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. You can move the app yourself and restart the browser, or we can do it for you.", comment: "Message for Personal Information Removal bad path error screen")
+    static let dbpErrorPageBadPathCTA = NSLocalizedString("dbp.errorpage.bad.path.cta", value: "Move App for Me...", comment: "Call to action for moving the app to the Applications folder")
 
-    static let dbpErrorPageNoPermissionTitle = NotLocalizedString("dbp.errorpage.no.permission.title", value: "Change System Setting", comment: "Title for error screen when there is no permission")
-    static let dbpErrorPageNoPermissionMessage = NotLocalizedString("dbp.errorpage.no.permission.message", value: "Open System Settings and allow DuckDuckGo Personal Information Removal to run in the background.", comment: "Message for error screen when there is no permission")
-    static let dbpErrorPageNoPermissionCTA = NotLocalizedString("dbp.errorpage.no.permission.cta", value: "Open System Settings...", comment: "Call to action for opening system settings")
+    static let dbpErrorPageNoPermissionTitle = NSLocalizedString("dbp.errorpage.no.permission.title", value: "Change System Setting", comment: "Title for error screen when there is no permission")
+    static let dbpErrorPageNoPermissionMessage = NSLocalizedString("dbp.errorpage.no.permission.message", value: "Open System Settings and allow DuckDuckGo Personal Information Removal to run in the background.", comment: "Message for error screen when there is no permission")
+    static let dbpErrorPageNoPermissionCTA = NSLocalizedString("dbp.errorpage.no.permission.cta", value: "Open System Settings...", comment: "Call to action for opening system settings")
 }

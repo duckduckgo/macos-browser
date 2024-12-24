@@ -144,11 +144,6 @@ extension URL {
     // base url for Error Page Alternate HTML loaded into Web View
     static let error = URL(string: "duck://error")!
 
-    static func duckFavicon(for faviconURL: URL) -> URL? {
-        let encodedURL = faviconURL.absoluteString.percentEncoded(withAllowedCharacters: .urlPathAllowed)
-        return URL(string: "duck://favicon/\(encodedURL)")
-    }
-
     static let dataBrokerProtection = URL(string: "duck://personal-information-removal")!
 
 #if !SANDBOX_TEST_TOOL
@@ -159,6 +154,11 @@ extension URL {
     var isSettingsURL: Bool {
         isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
     }
+
+    var isErrorURL: Bool {
+        return navigationalScheme == .duck && host == URL.error.host
+    }
+
 #endif
 
     enum Invalid {
@@ -390,6 +390,8 @@ extension URL {
     static var passwordManagerLearnMore: URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/")!
     }
+
+    static var maliciousSiteProtectionLearnMore = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/")!
 
     static var searchSettings: URL {
         return URL(string: "https://duckduckgo.com/settings/")!

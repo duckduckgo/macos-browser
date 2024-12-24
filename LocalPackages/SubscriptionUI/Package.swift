@@ -1,10 +1,11 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "SubscriptionUI",
+    defaultLocalization: "en",
     platforms: [ .macOS("11.4") ],
     products: [
         .library(
@@ -12,8 +13,9 @@ let package = Package(
             targets: ["SubscriptionUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "212.0.0"),
-        .package(path: "../SwiftUIExtensions")
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "223.0.0"),
+        .package(path: "../SwiftUIExtensions"),
+        .package(path: "../FeatureFlags")
     ],
     targets: [
         .target(
@@ -23,6 +25,7 @@ let package = Package(
                 .product(name: "Subscription", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
+                .product(name: "FeatureFlags", package: "FeatureFlags")
             ],
             resources: [
                 .process("Resources")

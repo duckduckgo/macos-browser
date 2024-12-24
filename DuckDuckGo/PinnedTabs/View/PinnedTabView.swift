@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import MaliciousSiteProtection
 import SwiftUI
 import SwiftUIExtensions
 
@@ -269,9 +270,18 @@ struct PinnedTabInnerView: View {
         }
     }
 
+    private var faviconImage: NSImage? {
+        if let error = model.error, (error as NSError as? URLError)?.code == .serverCertificateUntrusted || (error as NSError as? MaliciousSiteError != nil) {
+            return .redAlertCircle16
+        } else if let favicon = model.favicon {
+            return favicon
+        }
+        return nil
+    }
+
     @ViewBuilder
     var favicon: some View {
-        if let favicon = model.favicon {
+        if let favicon = faviconImage {
             ZStack(alignment: .topTrailing) {
                 Image(nsImage: favicon)
                     .resizable()

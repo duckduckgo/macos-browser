@@ -16,17 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Navigation
-import WebKit
+import BrowserServicesKit
 import Combine
 import Common
 import ContentScopeScripts
-import BrowserServicesKit
-import PhishingDetection
+import Foundation
+import MaliciousSiteProtection
+import Navigation
+import os
 import PixelKit
 import SpecialErrorPages
-import os
+import WebKit
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
@@ -35,154 +35,156 @@ protocol SpecialErrorPageScriptProvider {
 extension UserScripts: SpecialErrorPageScriptProvider {}
 
 final class SpecialErrorPageTabExtension {
-    weak var webView: ErrorPageTabExtensionNavigationDelegate?
-    private weak var specialErrorPageUserScript: SpecialErrorPageUserScript?
-    private var shouldBypassSSLError = false
-    private var urlCredentialCreator: URLCredentialCreating
-    private var featureFlagger: FeatureFlagger
-    private var phishingDetector: PhishingSiteDetecting
-    private var phishingStateManager: PhishingTabStateManaging
-    private var errorPageType: SpecialErrorKind?
-    private var phishingURLExemptions: Set<URL> = []
+
+    private let urlCredentialCreator: URLCredentialCreating
+    private let featureFlagger: FeatureFlagger
+    private let detector: MaliciousSiteDetecting
     private let tld = TLD()
+
+    @MainActor private weak var webView: ErrorPageTabExtensionNavigationDelegate?
+    @MainActor private weak var specialErrorPageUserScript: SpecialErrorPageUserScript?
+    private let closeTab: () -> Void
+
+    @MainActor private var exemptions: [URL: MaliciousSiteProtection.ThreatKind] = [:]
+    @MainActor private var shouldBypassSSLError = false
+    @MainActor private(set) var state = MaliciousSiteProtectionState()
+    @MainActor private(set) var errorData: SpecialErrorData?
 
     private var cancellables = Set<AnyCancellable>()
 
-    var errorData: SpecialErrorData?
-    var failingURL: URL?
+    init(webViewPublisher: some Publisher<some ErrorPageTabExtensionNavigationDelegate, Never>,
+         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
+         closeTab: @escaping () -> Void,
+         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+         maliciousSiteDetector: some MaliciousSiteDetecting) {
 
-    init(
-        webViewPublisher: some Publisher<WKWebView, Never>,
-        scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
-        urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
-        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-        phishingDetector: some PhishingSiteDetecting,
-        phishingStateManager: PhishingTabStateManaging) {
-            self.featureFlagger = featureFlagger
-            self.urlCredentialCreator = urlCredentialCreator
-            self.phishingDetector = phishingDetector
-            self.phishingStateManager = phishingStateManager
-            webViewPublisher.sink { [weak self] webView in
+        self.featureFlagger = featureFlagger
+        self.urlCredentialCreator = urlCredentialCreator
+        self.detector = maliciousSiteDetector
+        self.closeTab = closeTab
+
+        webViewPublisher.sink { [weak self] webView in
+            MainActor.assumeIsolated {
                 self?.webView = webView
-            }.store(in: &cancellables)
-            scriptsPublisher.sink { [weak self] scripts in
+            }
+        }.store(in: &cancellables)
+        scriptsPublisher.sink { [weak self] scripts in
+            MainActor.assumeIsolated {
                 self?.specialErrorPageUserScript = scripts.specialErrorPageUserScript
                 self?.specialErrorPageUserScript?.delegate = self
-            }.store(in: &cancellables)
-        }
-
-    @MainActor private func loadSSLErrorHTML(url: URL, alternate: Bool) {
-        let html = SpecialErrorPageHTMLTemplate.htmlFromTemplate
-        loadHTML(html: html, url: url, alternate: alternate)
+            }
+        }.store(in: &cancellables)
     }
 
-    @MainActor
-    private func loadHTML(html: String, url: URL, alternate: Bool) {
-        if alternate {
-            webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
-        } else {
-            webView?.setDocumentHtml(html)
-        }
-    }
 }
 
 extension SpecialErrorPageTabExtension: NavigationResponder {
+
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let url = navigationAction.url
-        guard url != URL(string: "about:blank")! else { return .next }
 
-        handlePhishingExemptions(for: navigationAction, url: url)
+        // An edge case for if a site gets flagged as malicious, the user clicks through the warning,
+        // and then the malicious page redirects to a site that isn't flagged.
+        //
+        // We want to ensure the new site is still marked as dangerous in the privacy dashboard.
+        // So we basically flag all URLs in the redirect chain as malicious (and exempted) too.
+        //
+        // There may be cases where this is a bad idea, for example a malicious site that redirects to a socialnetwork.com -
+        // but if a flagged site sends you somewhere, you should still be cautious of that site so we want it to remain flagged.
+        if let threatKind = state.bypassedMaliciousSiteThreatKind, navigationAction.navigationType == .other {
+            exemptions[url] = threatKind
+        }
+        state.bypassedMaliciousSiteThreatKind = exemptions[url]
 
-        if shouldAllowNavigation(for: url) {
-            phishingStateManager.isShowingPhishingError = false
+        if state.bypassedMaliciousSiteThreatKind != .none || url.isDuckDuckGo || url.isDuckURLScheme {
+            state.currentMalicousSiteThreatKind = .none
             return .next
         }
 
-        return await checkForMaliciousContent(for: navigationAction, url: url)
-    }
-
-    private func handlePhishingExemptions(for navigationAction: NavigationAction, url: URL) {
-        if phishingStateManager.didBypassError && navigationAction.navigationType == .other {
-            phishingURLExemptions.insert(url)
+        guard let threatKind = await detector.evaluate(url) else {
+            state.currentMalicousSiteThreatKind = .none
+            return .next
         }
-        phishingStateManager.didBypassError = phishingURLExemptions.contains(url)
-    }
 
-    private func shouldAllowNavigation(for url: URL) -> Bool {
-        return phishingStateManager.didBypassError || url.isDuckDuckGo || url.isDuckURLScheme
-    }
+        state.currentMalicousSiteThreatKind = threatKind
 
-    private func checkForMaliciousContent(for navigationAction: NavigationAction, url: URL) async -> NavigationActionPolicy? {
-        let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
-        phishingStateManager.isShowingPhishingError = isMalicious
-
-        if isMalicious {
-            return await handleMaliciousURL(for: navigationAction, url: url)
-        }
-        return .next
+        return redirectMaliciousNavigationAction(navigationAction, with: threatKind)
     }
 
     @MainActor
-    private func handleMaliciousURL(for navigationAction: NavigationAction, url: URL) -> NavigationActionPolicy? {
-        let domain: String
-        errorPageType = .phishing
-        if let mainFrame = navigationAction.mainFrameTarget {
-            failingURL = url
-            domain = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-            errorData = SpecialErrorData(kind: .phishing, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
-            if let errorURL = generateErrorPageURL(url) {
-                return .redirect(mainFrame) { navigator in
-                    navigator.load(URLRequest(url: errorURL))
-                }
-            }
-        } else {
-            return handleMaliciousIframe(navigationAction: navigationAction)
+    private func redirectMaliciousNavigationAction(_ navigationAction: NavigationAction, with threatKind: MaliciousSiteProtection.ThreatKind) -> NavigationActionPolicy? {
+        // Check if the main frame target is available; if not, handle as an iframe navigation
+        guard let mainFrame = navigationAction.mainFrameTarget else {
+            return redirectMaliciousIframeNavigationAction(navigationAction, with: threatKind)
         }
 
-        return .next
+        let url = navigationAction.url
+
+        // Generate a custom duck://error page URL that will be handled by DuckURLSchemeHandler
+        // DuckURLSchemeHandler will decode the error and fail the custom URL scheme navigation task with the error,
+        // which will then navigate to a special error page (`Tab.swift: navigation(_:didFailWith:)`)
+        let errorUrl = URL.specialErrorPage(failingUrl: url, kind: threatKind.errorPageKind)
+
+        return .redirect(mainFrame) { navigator in
+            navigator.load(URLRequest(url: errorUrl))
+        }
     }
 
     @MainActor
-    private func handleMaliciousIframe(navigationAction: NavigationAction) -> NavigationActionPolicy? {
-        PixelKit.fire(PhishingDetectionEvents.iframeLoaded)
+    private func redirectMaliciousIframeNavigationAction(_ navigationAction: NavigationAction, with threatKind: MaliciousSiteProtection.ThreatKind) -> NavigationActionPolicy? {
+        PixelKit.fire(MaliciousSiteProtection.Event.iframeLoaded(category: threatKind))
+
+        // Extract the URL of the source frame (the iframe) that initiated the navigation action
         let iframeTopUrl = navigationAction.sourceFrame.url
-        failingURL = iframeTopUrl
-        let domain = iframeTopUrl.host ?? iframeTopUrl.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-        errorData = SpecialErrorData(kind: .phishing, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
 
-        if let errorURL = generateErrorPageURL(iframeTopUrl) {
-            _ = webView?.load(URLRequest(url: errorURL))
-            return .none
-        }
+        // Generate a custom duck://error page URL that will be handled by DuckURLSchemeHandler
+        // DuckURLSchemeHandler will decode the error and fail the custom URL scheme navigation task with the error,
+        // which will then navigate to a special error page (`Tab.swift: navigation(_:didFailWith:)`)
+        let errorUrl = URL.specialErrorPage(failingUrl: iframeTopUrl, kind: threatKind.errorPageKind)
 
-        return .next
+        // Load the error URL in the web view main frame to display the custom error page instead of currently loaded website
+        _ = webView?.load(URLRequest(url: errorUrl))
+
+        return .cancel
     }
 
-    @MainActor
-    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
-        let url = error.failingUrl ?? navigation.url
-        guard navigation.isCurrent else { return }
-        guard error.errorCode != NSURLErrorCannotFindHost else { return }
+    func willStart(_ navigation: Navigation) {
+        errorData = nil
+    }
 
-        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
-            guard let webView else { return }
-            let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
-            if featureFlagger.isFeatureOn(.sslCertificatesBypass),
-               error.errorCode == NSURLErrorServerCertificateUntrusted,
-               let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
-                    errorPageType = .ssl
-                    failingURL = url
-                    let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-                    errorData = SpecialErrorData(kind: .ssl, errorType: SSLErrorType.forErrorCode(errorCode).rawValue, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
-                    loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation)
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
+        guard navigation.isCurrent else { return }
+        guard let url = error.failingUrl else {
+            self.errorData = nil
+            return
+        }
+
+        switch error as NSError {
+        case let error as MaliciousSiteError:
+            // Set the error data that will be sent to the error page on load (`SpecialErrorPageUserScript.swift: initialSetup`)
+            errorData = .maliciousSite(kind: error.threatKind, url: url)
+
+        case is URLError where error.isServerCertificateUntrusted:
+            guard let errorType = error.sslErrorType else {
+                assertionFailure("Missing SSL error type")
+                errorData = nil
+                return
             }
+
+            let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+            errorData = .ssl(type: errorType, domain: domain, eTldPlus1: tld.eTLDplus1(domain))
+
+        default:
+            errorData = nil
         }
     }
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-        specialErrorPageUserScript?.isEnabled = navigation.url == failingURL
+        guard navigation.isCurrent else { return }
+        specialErrorPageUserScript?.isEnabled = (errorData != nil && navigation.navigationAction.navigationType == .alternateHtmlLoad)
     }
 
     @MainActor
@@ -196,49 +198,58 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         return .credential(credential)
     }
 
-    @MainActor
-    func generateErrorPageURL(_ url: URL) -> URL? {
-        guard let urlString = url.absoluteString.data(using: .utf8) else {
-            Logger.phishingDetection.error("Unable to convert error URL to string data.")
-            return nil
-        }
-        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString)
-        let token = URLTokenValidator.shared.generateToken(for: url)
-        let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
-        return URL(string: errorURLString)
-    }
 }
 
 extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
-    func leaveSite() {
-        guard webView?.canGoBack == true else {
-            webView?.close()
-            return
+
+    // Special error page "Leave site" button action
+    func leaveSiteAction() {
+        guard let errorData, let webView else { return }
+        switch errorData {
+        case .maliciousSite:
+            closeAndOpenNewTab()
+        case .ssl:
+            if webView.canGoBack {
+                _=webView.goBack()
+            } else {
+                closeAndOpenNewTab()
+            }
         }
-        _ = webView?.goBack()
     }
 
-    func visitSite() {
-        switch errorPageType {
-        case .phishing:
-            if let url = webView?.url {
-                 PixelKit.fire(PhishingDetectionEvents.visitSite)
-                phishingURLExemptions.insert(url)
-                self.phishingStateManager.didBypassError = true
-                self.phishingStateManager.isShowingPhishingError = false
-            }
+    private func closeAndOpenNewTab() {
+        Task { @MainActor in
+            await self.webView?.openNewTabFromErrorPage()
+            self.closeTab()
+        }
+    }
+
+    // Special error page "Visit site" button action
+    func visitSiteAction() {
+        defer {
+            webView?.reloadPageFromErrorPage()
+        }
+        guard let errorData, let webView, let url = webView.url else { return }
+        switch errorData {
+        case .maliciousSite(kind: let threatKind, url: _):
+            PixelKit.fire(MaliciousSiteProtection.Event.visitSite(category: threatKind))
+
+            exemptions[url] = threatKind
+            state.bypassedMaliciousSiteThreatKind = threatKind
+            state.currentMalicousSiteThreatKind = .none
+
         case .ssl:
             shouldBypassSSLError = true
-        default:
-            break
         }
-        _ = webView?.reloadPage()
     }
 
+    // Special error page "More info" expanded
     func advancedInfoPresented() {}
 }
 
-protocol SpecialErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
+protocol SpecialErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {
+    var state: MaliciousSiteProtectionState { get }
+}
 
 extension SpecialErrorPageTabExtension: TabExtension, SpecialErrorPageTabExtensionProtocol {
     typealias PublicProtocol = SpecialErrorPageTabExtensionProtocol
@@ -246,7 +257,7 @@ extension SpecialErrorPageTabExtension: TabExtension, SpecialErrorPageTabExtensi
 }
 
 extension TabExtensions {
-    var errorPage: SpecialErrorPageTabExtensionProtocol? {
+    var specialErrorPage: SpecialErrorPageTabExtensionProtocol? {
         resolve(SpecialErrorPageTabExtension.self)
     }
 }
@@ -254,21 +265,25 @@ extension TabExtensions {
 protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     var url: URL? { get }
     var canGoBack: Bool { get }
-    func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL)
-    func setDocumentHtml(_ html: String)
     func load(_ request: URLRequest) -> WKNavigation?
     func goBack() -> WKNavigation?
     func close()
-    func reloadPage() -> WKNavigation?
+    @MainActor func reloadPageFromErrorPage()
+    @MainActor func openNewTabFromErrorPage() async
 }
 
 extension ErrorPageTabExtensionNavigationDelegate {
-    func reloadPage() -> WKNavigation? {
-        guard let wevView = self as? WKWebView else { return nil }
-        if let item = wevView.backForwardList.currentItem {
-            return wevView.go(to: item)
-        }
-        return nil
+
+    @MainActor func reloadPageFromErrorPage() {
+        guard let webView = self as? WKWebView, let url = webView.url else { return }
+        // reloading creates an extra back history record;
+        // `webView.go(to: backForwardList.currentItem)` breaks downloads as we don‘t load “Back” requests (with `returnCacheElseLoad` cache policy)
+        webView.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: nil, in: .defaultClient)
+    }
+
+    @MainActor func openNewTabFromErrorPage() async {
+        guard let webView = self as? WKWebView else { return }
+        try? await webView.evaluateJavaScript("window.open('\(URL.newtab.absoluteString.escapedJavaScriptString())', '_blank')") as Void?
     }
 }
 

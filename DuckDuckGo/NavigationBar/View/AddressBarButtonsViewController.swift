@@ -535,11 +535,7 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.position = .right
             privacyEntryPointButton.position = .left
         }
-        let isFlaggedPhishing = tabViewModel?.tab.privacyInfo?.isPhishing ?? false
-        privacyEntryPointButton.isAnimationEnabled = !isFlaggedPhishing
-        privacyEntryPointButton.normalTintColor = isFlaggedPhishing ? .fireButtonRedPressed : .privacyEnabled
-        privacyEntryPointButton.mouseOverTintColor = isFlaggedPhishing ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
-        privacyEntryPointButton.mouseDownTintColor = isFlaggedPhishing ? .alertRedPressed : privacyEntryPointButton.mouseDownTintColor
+
         privacyEntryPointButton.sendAction(on: .leftMouseUp)
 
         imageButton.applyFaviconStyle()
@@ -772,6 +768,12 @@ final class AddressBarButtonsViewController: NSViewController {
         let isLocalUrl = url?.isLocalURL ?? false
 
         // Privacy entry point button
+        let isFlaggedAsMalicious = (tabViewModel.tab.privacyInfo?.malicousSiteThreatKind != .none)
+        privacyEntryPointButton.isAnimationEnabled = !isFlaggedAsMalicious
+        privacyEntryPointButton.normalTintColor = isFlaggedAsMalicious ? .fireButtonRedPressed : .privacyEnabled
+        privacyEntryPointButton.mouseOverTintColor = isFlaggedAsMalicious ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
+        privacyEntryPointButton.mouseDownTintColor = isFlaggedAsMalicious ? .alertRedPressed : privacyEntryPointButton.mouseDownTintColor
+
         privacyEntryPointButton.isShown = !isEditingMode
         && !isTextFieldEditorFirstResponder
         && isHypertextUrl
@@ -798,13 +800,13 @@ final class AddressBarButtonsViewController: NSViewController {
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
             let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
-            let isFlaggedPhishing = tabViewModel.tab.privacyInfo?.isPhishing ?? false
+            let isFlaggedAsMalicious = (tabViewModel.tab.privacyInfo?.malicousSiteThreatKind != .none)
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
             let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
-            if isFlaggedPhishing {
+            if isFlaggedAsMalicious {
                 privacyEntryPointButton.isAnimationEnabled = false
                 privacyEntryPointButton.image = .redAlertCircle16
                 privacyEntryPointButton.normalTintColor = .alertRed

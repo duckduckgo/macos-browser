@@ -183,7 +183,12 @@ public struct DataBroker: Codable, Sendable {
 
         version = try container.decode(String.self, forKey: .version)
         steps = try container.decode([Step].self, forKey: .steps)
-        schedulingConfig = try container.decode(DataBrokerScheduleConfig.self, forKey: .schedulingConfig)
+        // Hotfix for https://app.asana.com/0/1203581873609357/1208895331283089/f
+        do {
+            schedulingConfig = try container.decode(DataBrokerScheduleConfig.self, forKey: .schedulingConfig)
+        } catch {
+            schedulingConfig = .init(retryError: 48, confirmOptOutScan: 72, maintenanceScan: 120, maxAttempts: -1)
+        }
         parent = try? container.decode(String.self, forKey: .parent)
 
         do {

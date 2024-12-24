@@ -19,9 +19,11 @@
 import AppKit
 import Foundation
 import Combine
-import SwiftUI
-import NetworkProtection
+import Common
 import LoginItems
+import NetworkProtection
+import os.log
+import SwiftUI
 
 /// Abstraction of the the VPN status bar menu with a simple interface.
 ///
@@ -134,10 +136,30 @@ public final class StatusBarMenu: NSObject {
                 return
             }
 
+            let connectionStatusPublisher = CurrentValuePublisher(
+                initialValue: .disconnected,
+                publisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher())
+
+            let activeSitePublisher = CurrentValuePublisher(
+                initialValue: ActiveSiteInfo?(nil),
+                publisher: Just(nil).eraseToAnyPublisher())
+
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
-                connectionStatusPublisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher(),
-                siteTroubleshootingInfoPublisher: Just(SiteTroubleshootingInfo?(nil)).eraseToAnyPublisher(),
+                connectionStatusPublisher: connectionStatusPublisher,
+                activeSitePublisher: activeSitePublisher,
                 uiActionHandler: uiActionHandler)
+
+            // We don't use tips in the status menu app.
+            let tipsFeatureFlagPublisher = CurrentValuePublisher<Bool, Never>(
+                initialValue: false,
+                publisher: Just(false).eraseToAnyPublisher())
+
+            let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
+                                         statusObserver: statusReporter.statusObserver,
+                                         activeSitePublisher: activeSitePublisher,
+                                         forMenuApp: true,
+                                         vpnSettings: VPNSettings(defaults: userDefaults),
+                                         logger: Logger(subsystem: "DuckDuckGo", category: "TipKit"))
 
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)
 
@@ -157,6 +179,7 @@ public final class StatusBarMenu: NSObject {
                 statusViewModel: statusViewModel,
                 statusReporter: statusReporter,
                 siteTroubleshootingViewModel: siteTroubleshootingViewModel,
+                tipsModel: tipsModel,
                 debugInformationViewModel: debugInformationViewModel)
             popover?.behavior = .transient
 

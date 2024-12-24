@@ -68,14 +68,14 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         let expectation = self.expectation(description: "Wait for turnOffFeatureCalled to be called")
         dialogProvider.turnOffFeatureCalledExpectation = expectation
 
-        tab.navigateTo(url: URL(string: "some.url")!)
+        tab.navigateFromOnboarding(to: URL(string: "some.url")!)
 
         wait(for: [expectation], timeout: 3.0)
     }
 
     func testWhenNavigationCompletedAndNoDialogTypeThenOnlyWebViewVisible() throws {
         let expectation = self.expectation(description: "Wait for webViewDidFinishNavigationPublisher to emit")
-        tab.navigateTo(url: URL(string: "some.url")!)
+        tab.navigateFromOnboarding(to: URL(string: "some.url")!)
 
         tab.webViewDidFinishNavigationPublisher
             .sink {
@@ -89,7 +89,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 
     func testWhenNavigationCompletedAndHighFiveDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .highFive
-        tab.navigateTo(url: URL(string: "some.url")!)
+        tab.navigateFromOnboarding(to: URL(string: "some.url")!)
 
         wait(for: [expectation], timeout: 3.0)
         XCTAssertEqual(factory.capturedType, .highFive)
@@ -98,7 +98,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 
     func testWhenNavigationCompletedAndSearchDoneDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .searchDone(shouldFollowUp: true)
-        tab.navigateTo(url: URL(string: "some.url")!)
+        tab.navigateFromOnboarding(to: URL(string: "some.url")!)
 
         wait(for: [expectation], timeout: 3.0)
         XCTAssertEqual(factory.capturedType, .searchDone(shouldFollowUp: true))
@@ -107,7 +107,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 
     func testWhenNavigationCompletedAndTrackersDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .trackers(message: NSMutableAttributedString(string: ""), shouldFollowUp: true)
-        tab.navigateTo(url: URL(string: "some.url")!)
+        tab.navigateFromOnboarding(to: URL(string: "some.url")!)
 
         wait(for: [expectation], timeout: 3.0)
         XCTAssertEqual(factory.capturedType, .trackers(message: NSMutableAttributedString(string: ""), shouldFollowUp: true))
@@ -116,7 +116,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 
     func testWhenNavigationCompletedAndTryASearchDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .tryASearch
-        tab.navigateTo(url: URL(string: "some.url")!)
+        tab.navigateFromOnboarding(to: URL(string: "some.url")!)
 
         wait(for: [expectation], timeout: 3.0)
         XCTAssertEqual(factory.capturedType, .tryASearch)
@@ -125,7 +125,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 
     func testWhenNavigationCompletedAndTryASiteDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .tryASite
-        tab.navigateTo(url: URL(string: "some.url")!)
+        tab.navigateFromOnboarding(to: URL(string: "some.url")!)
 
         wait(for: [expectation], timeout: 3.0)
         XCTAssertEqual(factory.capturedType, .tryASite)
@@ -134,7 +134,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 
     func testWhenNavigationCompletedAndTryFireButtonDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .tryFireButton
-        tab.navigateTo(url: URL(string: "some.url")!)
+        tab.navigateFromOnboarding(to: URL(string: "some.url")!)
 
         wait(for: [expectation], timeout: 3.0)
         XCTAssertEqual(factory.capturedType, .tryFireButton)
@@ -151,7 +151,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         viewController.delegate = delegate
 
         // WHEN
-        tab.navigateTo(url: url)
+        tab.navigateFromOnboarding(to: url)
 
         // THEN
         wait(for: [expectation], timeout: 3.0)
@@ -168,7 +168,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertFalse(delegate.didCallHighlightFireButton)
 
         // WHEN
-        tab.navigateTo(url: url)
+        tab.navigateFromOnboarding(to: url)
 
         // THEN
         wait(for: [expectation], timeout: 3.0)
@@ -185,7 +185,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertFalse(delegate.didCallHighlightPrivacyShield)
 
         // WHEN
-        tab.navigateTo(url: url)
+        tab.navigateFromOnboarding(to: url)
 
         // THEN
         wait(for: [expectation], timeout: 3.0)
@@ -201,7 +201,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertFalse(delegate.didCallDismissViewHighlight)
 
         // WHEN
-        tab.navigateTo(url: url)
+        tab.navigateFromOnboarding(to: url)
 
         // THEN
         wait(for: [expectation], timeout: 3.0)
@@ -216,7 +216,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         dialogProvider.dialogTypeForTabExpectation = expectation
         dialogProvider.dialog = nil
         viewController.delegate = delegate
-        tab.navigateTo(url: url)
+        tab.navigateFromOnboarding(to: url)
         XCTAssertFalse(delegate.didCallDismissViewHighlight)
         wait(for: [expectation], timeout: 3.0)
 
@@ -235,7 +235,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         let delegate = BrowserTabViewControllerDelegateSpy()
         viewController.delegate = delegate
         XCTAssertFalse(delegate.didCallHighlightFireButton)
-        tab.navigateTo(url: url)
+        tab.navigateFromOnboarding(to: url)
         wait(for: [expectation], timeout: 3.0)
 
         // WHEN
@@ -252,7 +252,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         let delegate = BrowserTabViewControllerDelegateSpy()
         viewController.delegate = delegate
         XCTAssertFalse(delegate.didCallDismissViewHighlight)
-        tab.navigateTo(url: url)
+        tab.navigateFromOnboarding(to: url)
         wait(for: [expectation], timeout: 3.0)
 
         // WHEN
