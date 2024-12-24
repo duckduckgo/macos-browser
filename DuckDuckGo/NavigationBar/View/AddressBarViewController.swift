@@ -169,6 +169,13 @@ final class AddressBarViewController: NSViewController, ObservableObject {
                                                    selector: #selector(textFieldFirstReponderNotification(_:)),
                                                    name: .firstResponder,
                                                    object: nil)
+            NSApp.publisher(for: \.effectiveAppearance)
+                .dropFirst()
+                .sink { [weak self] _ in
+                    self?.refreshAddressBarAppearance(nil)
+                }
+                .store(in: &cancellables)
+
             addMouseMonitors()
         }
         subscribeToSelectedTabViewModel()
@@ -444,7 +451,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         }
     }
 
-    @objc private func refreshAddressBarAppearance(_ sender: Any) {
+    @objc private func refreshAddressBarAppearance(_ sender: Any?) {
         self.updateMode()
         self.addressBarButtonsViewController?.updateButtons()
 
