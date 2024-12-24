@@ -59,6 +59,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 
     // MARK: - Tests
 
+    @MainActor
     func testWhenSelectionIndexIsNilThenSelectedSuggestionViewModelIsNil() {
         let suggestionContainer = SuggestionContainer(burnerMode: .regular)
         let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
@@ -87,6 +88,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0, handler: nil)
     }
 
+    @MainActor
     func testWhenSelectCalledWithIndexOutOfBoundsThenSelectedSuggestionViewModelIsNil() {
         let suggestionContainer = SuggestionContainer(burnerMode: .regular)
         let suggestionListViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)

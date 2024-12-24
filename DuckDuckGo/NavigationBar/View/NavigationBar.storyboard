@@ -650,6 +650,7 @@
                         <outlet property="shadowView" destination="ktI-g4-Uk6" id="v81-tf-DGJ"/>
                         <outlet property="switchToTabBox" destination="JKb-5c-xaF" id="mhx-BL-hG3"/>
                         <outlet property="switchToTabBoxMinXConstraint" destination="9CH-r6-Spp" id="snN-dF-gMm"/>
+                        <outlet property="switchToTabLabel" destination="LBz-Pz-Fw5" id="4bU-BW-M67"/>
                         <outlet property="view" destination="wj6-L2-5rJ" id="bsr-e7-gS7"/>
                     </connections>
                 </viewController>

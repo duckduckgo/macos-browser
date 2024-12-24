@@ -34,6 +34,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
     @IBOutlet var buttonsContainerView: NSView!
     @IBOutlet var switchToTabBox: ColorView!
+    @IBOutlet var switchToTabLabel: NSTextField!
     @IBOutlet var switchToTabBoxMinXConstraint: NSLayoutConstraint!
     private static let defaultActiveTextFieldMinX: CGFloat = 40
 
@@ -129,6 +130,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         addressBarTextField.setAccessibilityIdentifier("AddressBarViewController.addressBarTextField")
 
         switchToTabBox.isHidden = true
+        switchToTabLabel.attributedStringValue = SuggestionTableCellView.switchToTabAttributedString
 
         updateView()
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts

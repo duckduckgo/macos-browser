@@ -63967,6 +63967,18 @@
         }
       }
     },
+    "switch.to.tab" : {
+      "comment" : "Suggestion to switch to an open tab button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Switch to Tab"
+          }
+        }
+      }
+    },
     "sync.promo.bookmarks.message" : {
       "comment" : "Message for the Sync Promotion banner when user has bookmarks that can be synced",
       "extractionState" : "extracted_with_value",
