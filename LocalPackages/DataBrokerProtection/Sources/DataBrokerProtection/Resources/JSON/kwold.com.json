@@ -219,5 +219,11 @@
           "id": "fcddc35b-6298-4f2b-a04c-08a2d6f7ceaa"
         }
       ]
+    },
+    "schedulingConfig": {
+        "retryError": 48,
+        "confirmOptOutScan": 72,
+        "maintenanceScan": 120,
+        "maxAttempts": -1
     }
 }
