@@ -222,8 +222,8 @@ extension Array where Element == BrokerJobData {
     /// - Jobs with a preferred run date on or before the priority date are included.
     ///
     /// Note: Opt-out jobs without a preferred run date may be:
-    /// 1. From child brokers (skipped during runOptOutOperation)
-    /// 2. From former child brokers now acting as parent brokers (processed if extractedProfile hasn't been removed)
+    /// 1. From child brokers (will be skipped during runOptOutOperation).
+    /// 2. From former child brokers now acting as parent brokers (will be processed if extractedProfile hasn't been removed).
     func filtered(using priorityDate: Date) -> [BrokerJobData] {
         filter { jobData in
             guard let preferredRunDate = jobData.preferredRunDate else {
