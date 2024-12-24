@@ -84,7 +84,7 @@ struct OperationPreferredDateCalculator {
         case .optOutConfirmed:
             return nil
         case .optOutRequested:
-            return date.now.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+            return date.now.addingTimeInterval(schedulingConfig.optOutReattempt.hoursToSeconds)
         }
     }
 
