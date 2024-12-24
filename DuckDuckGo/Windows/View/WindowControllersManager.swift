@@ -384,14 +384,18 @@ extension WindowControllersManagerProtocol {
         }
     }
 
-    func allTabViewModels(for burnerMode: BurnerMode) -> [TabViewModel] {
-        allTabCollectionViewModels
+    func allTabViewModels(for burnerMode: BurnerMode, includingPinnedTabs: Bool = false) -> [TabViewModel] {
+        var result = allTabCollectionViewModels
             .filter { tabCollectionViewModel in
                 tabCollectionViewModel.burnerMode == burnerMode
             }
             .flatMap {
                 $0.tabViewModels.values
             }
+        if includingPinnedTabs {
+            result += pinnedTabsManager.tabViewModels.values
+        }
+        return result
     }
 
     func windowController(for tabCollectionViewModel: TabCollectionViewModel) -> MainWindowController? {

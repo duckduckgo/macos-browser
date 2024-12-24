@@ -38,6 +38,8 @@ final class SuggestionContainer {
     private let startupPreferences: StartupPreferences
     private let featureFlagger: FeatureFlagger
     private let loading: SuggestionLoading
+    private let burnerMode: BurnerMode
+    private let windowControllersManager: WindowControllersManagerProtocol
 
     // Used for presenting the same suggestions after the removal of the local suggestion
     private(set) var suggestionDataCache: Data?
@@ -46,13 +48,16 @@ final class SuggestionContainer {
 
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
-    init(openTabsProvider: @escaping OpenTabsProvider, suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared, featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+    init(openTabsProvider: @escaping OpenTabsProvider, suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared, featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger, burnerMode: BurnerMode,
+         windowControllersManager: WindowControllersManagerProtocol? = nil) {
         self.openTabsProvider = openTabsProvider
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.startupPreferences = startupPreferences
         self.featureFlagger = featureFlagger
         self.loading = suggestionLoading
+        self.burnerMode = burnerMode
+        self.windowControllersManager = windowControllersManager ?? WindowControllersManager.shared
     }
 
     @MainActor
@@ -66,7 +71,9 @@ final class SuggestionContainer {
                                                                  windowControllersManager: windowControllersManager),
                   suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
                   historyCoordinating: HistoryCoordinator.shared,
-                  bookmarkManager: LocalBookmarkManager.shared)
+                  bookmarkManager: LocalBookmarkManager.shared,
+                  burnerMode: burnerMode,
+                  windowControllersManager: windowControllersManager)
     }
 
     func getSuggestions(for query: String, useCachedData: Bool = false) {
@@ -104,7 +111,7 @@ final class SuggestionContainer {
     private static func defaultOpenTabsProvider(burnerMode: BurnerMode, windowControllersManager: WindowControllersManagerProtocol) -> OpenTabsProvider {
         { @MainActor in
             let selectedTab = windowControllersManager.selectedTab
-            let openTabViewModels = windowControllersManager.allTabViewModels(for: burnerMode)
+            let openTabViewModels = windowControllersManager.allTabViewModels(for: burnerMode, includingPinnedTabs: true)
             var usedUrls = Set<String>() // deduplicate
             return openTabViewModels.compactMap { model in
                 guard model.tab !== selectedTab,
@@ -140,19 +147,36 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
     }
 
     @MainActor func internalPages(for suggestionLoading: Suggestions.SuggestionLoading) -> [Suggestions.InternalPage] {
-        [
-            // suggestions for Bookmarks&Settings
-            .init(title: UserText.bookmarks, url: .bookmarks),
-            .init(title: UserText.settings, url: .settings),
-        ] + PreferencePaneIdentifier.allCases.map {
+        var result = [Suggestions.InternalPage]()
+        let openTabs = windowControllersManager.allTabViewModels(for: burnerMode, includingPinnedTabs: true)
+        var isSettingsOpened = false
+        var isBookmarksOpened = false
+        // suggestions for Bookmarks&Settings if not Switch to Tab suggestions
+        for tab in openTabs {
+            if tab.tabContent == .bookmarks {
+                isBookmarksOpened = true
+            } else if case .settings = tab.tabContent {
+                isSettingsOpened = true
+            }
+            if isBookmarksOpened && isSettingsOpened { break }
+        }
+        if !isBookmarksOpened {
+            result.append(.init(title: UserText.bookmarks, url: .bookmarks))
+        }
+        if !isSettingsOpened {
+            result.append(.init(title: UserText.settings, url: .settings))
+        }
+        result += PreferencePaneIdentifier.allCases.map {
             // preference panes URLs
             .init(title: UserText.settings + " → " + $0.displayName, url: .settingsPane($0))
-        } + {
+        }
+        result += {
             guard startupPreferences.launchToCustomHomePage,
                   let homePage = URL(string: startupPreferences.formattedCustomHomePageURL) else { return [] }
             // home page suggestion
             return [.init(title: UserText.homePage, url: homePage)]
         }()
+        return result
     }
 
     @MainActor func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
