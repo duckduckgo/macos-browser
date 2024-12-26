@@ -332,8 +332,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         guard NSApp.runType != .uiTests,
               let updateController = Application.appDelegate.updateController,
               let update = updateController.latestUpdate,
-              !update.isInstalled,
-              updateController.updateProgress.isDone
+              updateController.hasPendingUpdate
         else {
             return
         }
