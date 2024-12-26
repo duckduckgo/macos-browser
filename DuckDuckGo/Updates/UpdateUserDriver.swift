@@ -109,6 +109,11 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         onResuming?()
     }
 
+    func configureResumeBlock(_ block: @escaping () -> Void) {
+        guard !isResumable else { return }
+        onResuming = block
+    }
+
     func cancelAndDismissCurrentUpdate() {
         onDismiss()
     }
