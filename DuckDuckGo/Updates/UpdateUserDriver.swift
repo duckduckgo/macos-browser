@@ -87,7 +87,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     private var checkpoint: Checkpoint
     private var onResuming: (() -> Void)?
-    private var onSkipping: () -> Void = {}
+    private var onDismiss: () -> Void = {}
 
     var isResumable: Bool {
         onResuming != nil
@@ -110,7 +110,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func cancelAndDismissCurrentUpdate() {
-        onSkipping()
+        onDismiss()
     }
 
     func show(_ request: SPUUpdatePermissionRequest) async -> SUUpdatePermissionResponse {
@@ -131,7 +131,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             reply(.dismiss)
         }
 
-        onSkipping = { reply(.skip) }
+        onDismiss = { reply(.dismiss) }
 
         if checkpoint == .download {
             onResuming = { reply(.install) }
@@ -184,7 +184,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
-        onSkipping = { reply(.skip) }
+        onDismiss = { reply(.dismiss) }
 
         if checkpoint == .restart {
             onResuming = { reply(.install) }
