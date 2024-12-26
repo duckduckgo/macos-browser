@@ -286,6 +286,12 @@ extension UpdateController: SPUUpdaterDelegate {
         Logger.updates.log("Updater will install update: \(item.displayVersionString)(\(item.versionString))")
     }
 
+    func updater(_ updater: SPUUpdater, willInstallUpdateOnQuit item: SUAppcastItem, immediateInstallationBlock immediateInstallHandler: @escaping () -> Void) -> Bool {
+        Logger.updates.log("Updater will install update on quit: \(item.displayVersionString)(\(item.versionString))")
+        userDriver?.configureResumeBlock(immediateInstallHandler)
+        return true
+    }
+
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         if error == nil {
             Logger.updates.log("Updater did finish update cycle")
