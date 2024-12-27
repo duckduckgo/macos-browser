@@ -255,6 +255,11 @@ final class MainViewController: NSViewController {
 
     func windowWillEnterFullScreen() {
         tabBarViewController.hideTabPreview()
+        tabBarViewController.disableTabPreviews = true
+    }
+
+    func windowWillExitFullScreen() {
+        tabBarViewController.disableTabPreviews = false
     }
 
     func toggleBookmarksBarVisibility() {

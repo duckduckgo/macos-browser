@@ -233,6 +233,7 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowWillExitFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = false
+        mainViewController.windowWillExitFullScreen()
 
         onExitFullScreenWhenFullScreenModeIsEnabled()
     }
