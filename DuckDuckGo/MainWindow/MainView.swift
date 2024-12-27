@@ -34,7 +34,6 @@ final class MainView: NSView {
     private(set) var webContainerTopConstraint: NSLayoutConstraint!
     private(set) var webContainerTopConstraintToNavigation: NSLayoutConstraint!
     private(set) var tabBarHeightConstraint: NSLayoutConstraint!
-    private(set) var constraint: NSLayoutConstraint!
 
     @Published var isMouseAboveWebView: Bool = false
 
@@ -66,7 +65,7 @@ final class MainView: NSView {
         tabBarHeightConstraint = tabBarContainerView.heightAnchor.constraint(equalToConstant: 38)
         navigationBarTopConstraint = navigationBarContainerView.topAnchor.constraint(equalTo: topAnchor, constant: 38)
         webContainerTopConstraint = webContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor)
-        webContainerTopConstraintToNavigation = webContainerView.topAnchor.constraint(equalTo: topAnchor)
+        webContainerTopConstraintToNavigation = webContainerView.topAnchor.constraint(equalTo: navigationBarContainerView.bottomAnchor)
 
         webContainerTopConstraint.priority = .defaultHigh
         webContainerTopConstraintToNavigation.priority = .defaultLow
@@ -217,14 +216,6 @@ final class MainView: NSView {
             self.mouseAboveWebViewTrackingArea = trackingArea
             addTrackingArea(trackingArea)
         }
-
-        // Adds tracking for all events. Used for full screen to know when to hide/show the toolbars.
-        let trackingArea = NSTrackingArea(rect: bounds,
-                                          options: [.mouseEnteredAndExited, .activeAlways, .mouseMoved],
-                                          owner: self,
-                                          userInfo: nil)
-        addTrackingArea(trackingArea)
-
         super.updateTrackingAreas()
     }
 

@@ -37,8 +37,6 @@ final class MainWindowController: NSWindowController {
         return window?.standardWindowButton(.closeButton)?.superview
     }
 
-    private var isOnFullScreen = false
-
     init(mainViewController: MainViewController, popUp: Bool, fireWindowSession: FireWindowSession? = nil, fireViewModel: FireViewModel? = nil) {
         let size = mainViewController.view.frame.size
         let moveToCenter = CGAffineTransform(translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
@@ -227,9 +225,9 @@ extension MainWindowController: NSWindowDelegate {
     }
 
     func windowWillEnterFullScreen(_ notification: Notification) {
-        isOnFullScreen = true
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
         mainViewController.windowWillEnterFullScreen()
+
         onEnterFullScreenWhenFullScreenModeIsEnabled()
     }
 
@@ -237,15 +235,12 @@ extension MainWindowController: NSWindowDelegate {
         mainViewController.tabBarViewController.draggingSpace.isHidden = false
 
         onExitFullScreenWhenFullScreenModeIsEnabled()
-
-        isOnFullScreen = false
     }
 
     private func onEnterFullScreenWhenFullScreenModeIsEnabled() {
         guard let toolbar = window?.toolbar else { return }
         toolbar.isVisible = false
 
-        mainViewController.mainView.setMouseAboveWebViewTrackingAreaEnabled(true)
         mainViewController.mainView.navigationBarTopConstraint.animator().constant = 0
         mainViewController.mainView.tabBarHeightConstraint.animator().constant = 0
         mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultHigh
@@ -263,32 +258,6 @@ extension MainWindowController: NSWindowDelegate {
             self?.mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultLow
             self?.mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultHigh
             self?.moveTabBarView(toTitlebarView: true)
-        }
-    }
-
-    override func mouseMoved(with event: NSEvent) {
-        guard isOnFullScreen else { return }
-
-        super.mouseMoved(with: event)
-
-        if let contentView = self.window?.contentView {
-            print("MainWindow controller event.locationInWindow.y \(event.locationInWindow.y)")
-            print("MainWindow controller contentView.bounds.height \(contentView.bounds.height)")
-            if event.locationInWindow.y >= contentView.bounds.height - 110 {
-                NSAnimationContext.runAnimationGroup({ context in
-                    context.duration = 2
-                    context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                    mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultHigh
-                    mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultLow
-                })
-            } else {
-                NSAnimationContext.runAnimationGroup({ context in
-                    context.duration = 2
-                    context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                    mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultLow
-                    mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultHigh
-                })
-            }
         }
     }
 
@@ -408,6 +377,7 @@ extension MainWindowController: NSWindowDelegate {
             window.close()
         }
     }
+
 }
 
 fileprivate extension MainMenu {
