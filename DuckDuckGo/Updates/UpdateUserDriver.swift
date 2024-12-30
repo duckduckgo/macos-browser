@@ -79,14 +79,18 @@ enum UpdateCycleProgress {
 
 final class UpdateUserDriver: NSObject, SPUUserDriver {
     enum Checkpoint: Equatable {
-        case download
-        case restart
+        case download // for manual updates, pause the process before downloading the update
+        case restart // for automatic updates, pause the process before attempting to restart
     }
 
     private var internalUserDecider: InternalUserDecider
 
     private var checkpoint: Checkpoint
+
+    // Resume the update process when the user explicitly chooses to do so
     private var onResuming: (() -> Void)?
+
+    // Dismiss the current update for the time being but keep the downloaded file around
     private var onDismiss: () -> Void = {}
 
     var isResumable: Bool {
@@ -98,6 +102,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     @Published var updateProgress = UpdateCycleProgress.default
     var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { $updateProgress }
+
+    private(set) var sparkleUpdateState: SPUUserUpdateState?
 
     init(internalUserDecider: InternalUserDecider,
          areAutomaticUpdatesEnabled: Bool) {
@@ -127,12 +133,16 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showUserInitiatedUpdateCheck(cancellation: @escaping () -> Void) {
-        Logger.updates.log("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
+        Logger.updates.log("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser, privacy: .public))")
         updateProgress = .updateCycleDidStart
     }
 
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState, reply: @escaping (SPUUserUpdateChoice) -> Void) {
+        Logger.updates.log("Updater showed update found: (userInitiated:  \(state.userInitiated, privacy: .public), stage: \(state.stage.rawValue, privacy: .public))")
+        sparkleUpdateState = state
+
         if appcastItem.isInformationOnlyUpdate {
+            Logger.updates.log("Updater dismissed due to information only update")
             reply(.dismiss)
         }
 
@@ -141,7 +151,9 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         if checkpoint == .download {
             onResuming = { reply(.install) }
             updateProgress = .updateCycleDone
+            Logger.updates.log("Updater paused at download checkpoint (manual update pending user decision)")
         } else {
+            Logger.updates.log("Updater proceeded to installation")
             reply(.install)
         }
     }
@@ -193,8 +205,10 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
         if checkpoint == .restart {
             onResuming = { reply(.install) }
+            Logger.updates.log("Updater paused at restart checkpoint (automatic update pending user decision)")
         } else {
             reply(.install)
+            Logger.updates.log("Updater proceeded to installation")
         }
 
         updateProgress = .updateCycleDone
