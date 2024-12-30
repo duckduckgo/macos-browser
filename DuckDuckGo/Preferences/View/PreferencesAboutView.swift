@@ -33,52 +33,37 @@ extension Preferences {
 
         var body: some View {
             PreferencePane {
-                GeometryReader { geometry in
-                    VStack(alignment: .leading) {
-                        TextMenuTitle(UserText.aboutDuckDuckGo)
+                VStack(alignment: .leading) {
+                    TextMenuTitle(UserText.aboutDuckDuckGo)
 
-                        if !model.isCurrentOsReceivingUpdates {
-                            UnsupportedDeviceInfoBox(wide: true)
-                                .padding(.top, 10)
-                                .padding(.leading, -20)
-                        }
+                    if !model.isCurrentOsReceivingUpdates {
+                        UnsupportedDeviceInfoBox(wide: true)
+                            .padding(.top, 10)
+                            .padding(.leading, -20)
+                    }
 
-                        AboutContentSection(geometry: geometry, model: model)
+                    AboutContentSection(model: model)
 
 #if SPARKLE
-                        UpdatesSection(areAutomaticUpdatesEnabled: $areAutomaticUpdatesEnabled, model: model)
+                    UpdatesSection(areAutomaticUpdatesEnabled: $areAutomaticUpdatesEnabled, model: model)
 #endif
-                    }
                 }
             }
         }
     }
 
     struct AboutContentSection: View {
-        var geometry: GeometryProxy
         @ObservedObject var model: AboutPreferences
 
         var body: some View {
             PreferencePaneSection {
-                if geometry.size.width > 400 {
-                    HStack(alignment: .top) {
-                        Image(.aboutPageLogo)
-                            .padding(.top, 2)
-                        VStack(alignment: .leading, spacing: 8) {
-                            rightColumnContent
-                        }
-                        .padding(.top, 10)
+                if #available(macOS 13.0, *) {
+                    ViewThatFits(in: .horizontal) {
+                        horizontalPageLogo
+                        verticalPageLogo
                     }
-                    .padding(.bottom, 8)
                 } else {
-                    VStack(alignment: .leading) {
-                        Image(.aboutPageLogo)
-                        VStack(alignment: .leading, spacing: 8) {
-                            rightColumnContent
-                        }
-                        .padding(.top, 10)
-                    }
-                    .padding(.bottom, 8)
+                    horizontalPageLogo
                 }
 
                 TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
@@ -137,6 +122,29 @@ extension Preferences {
                 updateButton
                 #endif
             }
+        }
+
+        private var horizontalPageLogo: some View {
+            HStack(alignment: .top) {
+                Image(.aboutPageLogo)
+                    .padding(.top, 2)
+                VStack(alignment: .leading, spacing: 8) {
+                    rightColumnContent
+                }
+                .padding(.top, 10)
+            }
+            .padding(.bottom, 8)
+        }
+
+        private var verticalPageLogo: some View {
+            VStack(alignment: .leading) {
+                Image(.aboutPageLogo)
+                VStack(alignment: .leading, spacing: 8) {
+                    rightColumnContent
+                }
+                .padding(.top, 10)
+            }
+            .padding(.bottom, 8)
         }
 
 #if SPARKLE
