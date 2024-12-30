@@ -202,6 +202,11 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
         updateProgress = .installationDidStart
+        
+        if !applicationTerminated {
+            Logger.updates.log("Updater re-sent a quit event")
+            retryTerminatingApplication()
+        }
     }
 
     func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void) {
