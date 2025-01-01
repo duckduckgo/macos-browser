@@ -295,10 +295,10 @@ extension UpdateController: SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         if error == nil {
             Logger.updates.log("Updater did finish update cycle with no error")
-            updateProgress = .updateCycleDone
+            updateProgress = .updateCycleDone(.finishedWithNoError)
         } else if let errorCode = (error as? NSError)?.code, errorCode == Int(Sparkle.SUError.noUpdateError.rawValue) {
             Logger.updates.log("Updater did finish update cycle with no update found")
-            updateProgress = .updateCycleDone
+            updateProgress = .updateCycleDone(.finishedWithNoUpdateFound)
         } else if let error {
             Logger.updates.log("Updater did finish update cycle with error: \(error.localizedDescription, privacy: .public)")
         }
@@ -306,6 +306,7 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func log() {
         Logger.updates.log("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled, privacy: .public)")
+        Logger.updates.log("updateProgress: \(self.updateProgress, privacy: .public)")
         if let cachedUpdateResult {
             Logger.updates.log("cachedUpdateResult: \(cachedUpdateResult.item.displayVersionString, privacy: .public)(\(cachedUpdateResult.item.versionString, privacy: .public))")
         }
