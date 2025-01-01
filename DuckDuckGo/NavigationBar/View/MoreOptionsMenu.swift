@@ -331,12 +331,14 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 #if SPARKLE
         guard NSApp.runType != .uiTests,
               let updateController = Application.appDelegate.updateController,
-              let update = updateController.latestUpdate,
-              !update.isInstalled,
-              updateController.updateProgress.isDone
-        else {
+              let update = updateController.latestUpdate else {
             return
         }
+
+        guard updateController.hasPendingUpdate else {
+            return
+        }
+
         addItem(UpdateMenuItemFactory.menuItem(for: update))
         addItem(NSMenuItem.separator())
 #endif
