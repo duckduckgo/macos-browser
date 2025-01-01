@@ -195,11 +195,11 @@ private extension Update {
 private extension UpdateCycleProgress {
     var toStatus: ReleaseNotesValues.Status {
         switch self {
-        case .updateCycleDidStart: return .loading
+        case .updateCycleNotStarted, .updateCycleDidStart: return .loading
         case .downloadDidStart, .downloading: return .updateDownloading
         case .extractionDidStart, .extracting, .readyToInstallAndRelaunch, .installationDidStart, .installing: return .updatePreparing
         case .updaterError: return .updateError
-        case .updateCycleNotStarted, .updateCycleDone: return .loaded
+        case .updateCycleDone: return .loaded
         }
     }
 
