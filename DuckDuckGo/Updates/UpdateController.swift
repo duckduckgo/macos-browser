@@ -239,7 +239,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
-        Logger.updates.error("Updater did abort with error: \(error.localizedDescription, privacy: .public)")
+        Logger.updates.error("Updater did abort with error: \(error.localizedDescription, privacy: .public) (\(error.pixelParameters, privacy: .public))")
         let errorCode = (error as NSError).code
         guard ![Int(Sparkle.SUError.noUpdateError.rawValue),
                 Int(Sparkle.SUError.installationCanceledError.rawValue),
@@ -261,7 +261,7 @@ extension UpdateController: SPUUpdaterDelegate {
         let nsError = error as NSError
         guard let item = nsError.userInfo[SPULatestAppcastItemFoundKey] as? SUAppcastItem else { return }
 
-        Logger.updates.log("Updater did not find update: \(String(describing: item.displayVersionString), privacy: .public)(\(String(describing: item.versionString), privacy: .public))")
+        Logger.updates.log("Updater did not find valid update: \(item.displayVersionString, privacy: .public)(\(item.versionString, privacy: .public))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
         // Edge case: User upgrades to latest version within their rollout group
@@ -300,7 +300,7 @@ extension UpdateController: SPUUpdaterDelegate {
             Logger.updates.log("Updater did finish update cycle with no update found")
             updateProgress = .updateCycleDone(.finishedWithNoUpdateFound)
         } else if let error {
-            Logger.updates.log("Updater did finish update cycle with error: \(error.localizedDescription, privacy: .public)")
+            Logger.updates.log("Updater did finish update cycle with error: \(error.localizedDescription, privacy: .public) (\(error.pixelParameters, privacy: .public))")
         }
     }
 

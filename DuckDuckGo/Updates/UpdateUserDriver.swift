@@ -97,7 +97,7 @@ enum UpdateCycleProgress: CustomStringConvertible {
         case .readyToInstallAndRelaunch: return "readyToInstallAndRelaunch"
         case .installationDidStart: return "installationDidStart"
         case .installing: return "installing"
-        case .updaterError(let error): return "updaterError(\(error.localizedDescription))"
+        case .updaterError(let error): return "updaterError(\(error.localizedDescription))(\(error.pixelParameters))"
         }
     }
 }
@@ -163,7 +163,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState, reply: @escaping (SPUUserUpdateChoice) -> Void) {
-        Logger.updates.log("Updater showed update found: (userInitiated:  \(state.userInitiated, privacy: .public), stage: \(state.stage.rawValue, privacy: .public))")
+        Logger.updates.log("Updater shown update found: (userInitiated:  \(state.userInitiated, privacy: .public), stage: \(state.stage.rawValue, privacy: .public))")
         sparkleUpdateState = state
 
         if appcastItem.isInformationOnlyUpdate {
@@ -178,7 +178,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             updateProgress = .updateCycleDone(.pausedAtDownloadCheckpoint)
             Logger.updates.log("Updater paused at download checkpoint (manual update pending user decision)")
         } else {
-            Logger.updates.log("Updater proceeded to installation")
+            Logger.updates.log("Updater proceeded to installation at download checkpoint")
             reply(.install)
         }
     }
@@ -196,11 +196,13 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showUpdaterError(_ error: any Error, acknowledgement: @escaping () -> Void) {
+        Logger.updates.error("Updater encountered an error: \(error.localizedDescription, privacy: .public) (\(error.pixelParameters, privacy: .public))")
         updateProgress = .updaterError(error)
         acknowledgement()
     }
 
     func showDownloadInitiated(cancellation: @escaping () -> Void) {
+        Logger.updates.log("Updater started downloading the update")
         updateProgress = .downloadDidStart
     }
 
@@ -218,6 +220,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showDownloadDidStartExtractingUpdate() {
+        Logger.updates.log("Updater started extracting the update")
         updateProgress = .extractionDidStart
     }
 
@@ -235,11 +238,12 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         } else {
             reply(.install)
             updateProgress = .updateCycleDone(.proceededToInstallationAtRestartCheckpoint)
-            Logger.updates.log("Updater proceeded to installation")
+            Logger.updates.log("Updater proceeded to installation at restart checkpoint")
         }
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
+        Logger.updates.info("Updater started the installation")
         updateProgress = .installationDidStart
 
         if !applicationTerminated {
