@@ -101,11 +101,6 @@ public struct PreferencesSubscriptionView: View {
 
             // Help section
             helpSection
-
-            // Feedback section
-            if subscriptionFeatureAvailability.usesUnifiedFeedbackForm, state == .subscriptionActive {
-                feedbackSection
-            }
         }
         .onAppear(perform: {
             model.didAppear()
@@ -303,24 +298,21 @@ public struct PreferencesSubscriptionView: View {
     private var helpSection: some View {
         PreferencePaneSection {
             TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle, bottomPadding: 0)
-            HStack(alignment: .top, spacing: 6) {
-                if !model.isROWLaunched {
-                    TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
-                } else {
-                    TextMenuItemCaption(UserText.preferencesSubscriptionHelpFooterCaption)
-                }
-                Button(UserText.viewFaqsButton) { model.openFAQ() }
+            if !model.isROWLaunched {
+                TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
+                    .padding(.bottom, 8)
+            } else {
+                TextMenuItemCaption(UserText.preferencesSubscriptionHelpFooterCaption)
+                    .padding(.bottom, 8)
             }
-        }
-    }
+            VStack(alignment: .leading, spacing: 16) {
+                TextButton(UserText.viewFaqsButton, weight: .semibold) { model.openFAQ() }
 
-    @ViewBuilder
-    private var feedbackSection: some View {
-        PreferencePaneSection {
-            TextMenuItemHeader(UserText.preferencesSubscriptionFeedbackTitle, bottomPadding: 0)
-            HStack(alignment: .top, spacing: 6) {
-                TextMenuItemCaption(UserText.preferencesSubscriptionFeedbackCaption)
-                Button(UserText.preferencesSubscriptionFeedbackButton) { model.openUnifiedFeedbackForm() }
+                if subscriptionFeatureAvailability.usesUnifiedFeedbackForm, state == .subscriptionActive {
+                    TextButton(UserText.preferencesSubscriptionFeedbackButton, weight: .semibold) { model.openUnifiedFeedbackForm() }
+                }
+
+                TextButton(UserText.preferencesPrivacyPolicyButton, weight: .semibold) { model.openPrivacyPolicy() }
             }
         }
     }
@@ -495,6 +487,7 @@ private struct SubscriptionDialog<Buttons>: View where Buttons: View {
                 .fixMultilineScrollableText()
                 .foregroundColor(Color(.textPrimary))
         } buttons: {
+            Spacer()
             buttons()
         }
     }

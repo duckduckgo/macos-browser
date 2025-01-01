@@ -275,18 +275,34 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         button(UserText.importBookmarksSelectHTMLFile)
 
     case (.safari, .passwords), (.safariTechnologyPreview, .passwords):
-        NSLocalizedString("import.csv.instructions.safari", value: """
-        %d Open **Safari**
-        %d Select **File → Export → Passwords**
-        %d Save the passwords file someplace you can find it (e.g., Desktop)
-        %d %@
-        """, comment: """
-        Instructions to import Passwords as CSV from Safari.
-        %N$d - step number
-        %5$@ - “Select Passwords CSV File” button
-        **bold text**; _italic text_
-        """)
-        button(UserText.importLoginsSelectCSVFile)
+        if #available(macOS 15.2, *) {
+            NSLocalizedString("import.csv.instructions.safari.macos15-2", value: """
+            %d Open **Safari**
+            %d Open the **File menu → Export Browsing Data to File...**
+            %d Select **passwords** and save the file someplace you can find it (e.g., Desktop)
+            %d Double click the .zip file to unzip it
+            %d %@
+            """, comment: """
+            Instructions to import Passwords as CSV from Safari zip file on >= macOS 15.2.
+            %N$d - step number
+            %5$@ - “Select Passwords CSV File” button
+            **bold text**; _italic text_
+            """)
+            button(UserText.importLoginsSelectCSVFile)
+        } else {
+            NSLocalizedString("import.csv.instructions.safari", value: """
+            %d Open **Safari**
+            %d Select **File → Export → Passwords**
+            %d Save the passwords file someplace you can find it (e.g., Desktop)
+            %d %@
+            """, comment: """
+            Instructions to import Passwords as CSV from Safari.
+            %N$d - step number
+            %5$@ - “Select Passwords CSV File” button
+            **bold text**; _italic text_
+            """)
+            button(UserText.importLoginsSelectCSVFile)
+        }
 
     case (.safari, .bookmarks), (.safariTechnologyPreview, .bookmarks):
         NSLocalizedString("import.html.instructions.safari", value: """

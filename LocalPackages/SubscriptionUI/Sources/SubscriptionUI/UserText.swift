@@ -54,6 +54,7 @@ enum UserText {
     static let preferencesSubscriptionFeedbackTitle = NSLocalizedString("subscription.preferences.feedback.title", bundle: Bundle.module, value: "Send Feedback", comment: "Title for the subscription feedback section")
     static let preferencesSubscriptionFeedbackCaption = NSLocalizedString("subscription.preferences.feedback.caption", bundle: Bundle.module, value: "Help improve Privacy Pro. Your feedback matters to us. Feel free to report any issues or provide general feedback.", comment: "Caption for the subscription feedback section")
     static let preferencesSubscriptionFeedbackButton = NSLocalizedString("subscription.preferences.feedback.button", bundle: Bundle.module, value: "Send Feedback", comment: "Title for the subscription feedback button")
+    static let preferencesPrivacyPolicyButton = NSLocalizedString("subscription.preferences.privacypolicy.button", bundle: Bundle.module, value: "Privacy Policy and Terms of Service", comment: "Title for the privacy policy button")
 
     static func preferencesSubscriptionRenewingCaption(billingPeriod: Subscription.BillingPeriod, formattedDate: String) -> String {
         let localized: String
