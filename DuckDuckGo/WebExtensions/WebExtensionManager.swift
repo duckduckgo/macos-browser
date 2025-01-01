@@ -63,7 +63,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         }
 
         // TODO: Grant only what the extension requests.
-        let permissions: [_WKWebExtension.Permission] = [.activeTab, .alarms, .clipboardWrite, .contextMenus, .cookies, .declarativeNetRequest, .declarativeNetRequestFeedback, .declarativeNetRequestWithHostAccess, .menus, .nativeMessaging, .scripting, .storage, .tabs, .unlimitedStorage, .webNavigation, .webRequest]
+        let permissions: [String] = ["activeTab", "alarms", "clipboardWrite", "contextMenus", "cookies", "declarativeNetRequest", "declarativeNetRequestFeedback", "declarativeNetRequestWithHostAccess", "menus", "nativeMessaging", "notifications", "scripting", "sidePanel", "storage", "tabs", "unlimitedStorage", "webNavigation", "webRequest"]
         for permission in permissions {
             context.setPermissionStatus(.grantedExplicitly, for: permission, expirationDate: nil)
         }
@@ -295,7 +295,7 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
         assertionFailure("not supported yet")
     }
 
-    func webExtensionController(_ controller: _WKWebExtensionController, promptForPermissions permissions: Set<_WKWebExtension.Permission>, in tab: (any _WKWebExtensionTab)?, for extensionContext: _WKWebExtensionContext) async -> (Set<_WKWebExtension.Permission>, Date?) {
+    private func webExtensionController(_ controller: _WKWebExtensionController, promptForPermissions permissions: Set<_WKWebExtensionPermission>, in tab: (any _WKWebExtensionTab)?, for extensionContext: _WKWebExtensionContext) async -> (Set<_WKWebExtensionPermission>, Date?) {
             return (permissions, nil)
     }
 

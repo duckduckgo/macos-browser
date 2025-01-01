@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
 API_AVAILABLE(macos(13.3), ios(16.4))
-typedef NSString * _WKWebExtensionPermission NS_TYPED_EXTENSIBLE_ENUM NS_SWIFT_NAME(_WKWebExtension.Permission);
+typedef NSString * _WKWebExtensionPermission;
 
 API_AVAILABLE(macos(13.3), ios(16.4))
 WK_EXTERN _WKWebExtensionPermission const _WKWebExtensionPermissionActiveTab;
