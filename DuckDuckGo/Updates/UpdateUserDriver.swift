@@ -40,10 +40,19 @@ enum UpdateState {
     }
 }
 
-enum UpdateCycleProgress {
+enum UpdateCycleProgress: CustomStringConvertible {
+    enum DoneReason: Int {
+        case finishedWithNoError = 100
+        case finishedWithNoUpdateFound = 101
+        case pausedAtDownloadCheckpoint = 102
+        case pausedAtRestartCheckpoint = 103
+        case proceededToInstallationAtRestartCheckpoint = 104
+        case dismissedWithNoError = 105
+    }
+
     case updateCycleNotStarted
     case updateCycleDidStart
-    case updateCycleDone
+    case updateCycleDone(DoneReason)
     case downloadDidStart
     case downloading(Double)
     case extractionDidStart
@@ -73,6 +82,22 @@ enum UpdateCycleProgress {
         switch self {
         case .updaterError: return true
         default: return false
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .updateCycleNotStarted: return "updateCycleNotStarted"
+        case .updateCycleDidStart: return "updateCycleDidStart"
+        case .updateCycleDone(let reason): return "updateCycleDone(\(reason.rawValue))"
+        case .downloadDidStart: return "downloadDidStart"
+        case .downloading(let percentage): return "downloading(\(percentage))"
+        case .extractionDidStart: return "extractionDidStart"
+        case .extracting(let percentage): return "extracting(\(percentage))"
+        case .readyToInstallAndRelaunch: return "readyToInstallAndRelaunch"
+        case .installationDidStart: return "installationDidStart"
+        case .installing: return "installing"
+        case .updaterError(let error): return "updaterError(\(error.localizedDescription))"
         }
     }
 }
@@ -150,7 +175,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
         if checkpoint == .download {
             onResuming = { reply(.install) }
-            updateProgress = .updateCycleDone
+            updateProgress = .updateCycleDone(.pausedAtDownloadCheckpoint)
             Logger.updates.log("Updater paused at download checkpoint (manual update pending user decision)")
         } else {
             Logger.updates.log("Updater proceeded to installation")
@@ -205,18 +230,18 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
         if checkpoint == .restart {
             onResuming = { reply(.install) }
+            updateProgress = .updateCycleDone(.pausedAtRestartCheckpoint)
             Logger.updates.log("Updater paused at restart checkpoint (automatic update pending user decision)")
         } else {
             reply(.install)
+            updateProgress = .updateCycleDone(.proceededToInstallationAtRestartCheckpoint)
             Logger.updates.log("Updater proceeded to installation")
         }
-
-        updateProgress = .updateCycleDone
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
         updateProgress = .installationDidStart
-        
+
         if !applicationTerminated {
             Logger.updates.log("Updater re-sent a quit event")
             retryTerminatingApplication()
@@ -234,7 +259,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func dismissUpdateInstallation() {
         guard !updateProgress.isFailed else { return }
-        updateProgress = .updateCycleDone
+        updateProgress = .updateCycleDone(.dismissedWithNoError)
     }
 }
 
