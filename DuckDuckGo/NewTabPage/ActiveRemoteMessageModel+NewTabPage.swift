@@ -21,7 +21,7 @@ import NewTabPage
 import RemoteMessaging
 
 extension ActiveRemoteMessageModel: NewTabPageActiveRemoteMessageProviding {
-    var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
+    var newTabPageRemoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
         $newTabPageRemoteMessage
             .dropFirst()
             .eraseToAnyPublisher()

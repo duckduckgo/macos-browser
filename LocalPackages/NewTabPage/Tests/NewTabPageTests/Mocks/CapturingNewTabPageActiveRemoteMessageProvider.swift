@@ -24,7 +24,7 @@ import NewTabPage
 final class CapturingNewTabPageActiveRemoteMessageProvider: NewTabPageActiveRemoteMessageProviding {
     @Published var newTabPageRemoteMessage: RemoteMessageModel?
 
-    var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
+    var newTabPageRemoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
         $newTabPageRemoteMessage.dropFirst().eraseToAnyPublisher()
     }
 

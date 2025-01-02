@@ -36,7 +36,7 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
     public init(remoteMessageProvider: NewTabPageActiveRemoteMessageProviding) {
         self.remoteMessageProvider = remoteMessageProvider
 
-        remoteMessageProvider.remoteMessagePublisher
+        remoteMessageProvider.newTabPageRemoteMessagePublisher
             .sink { [weak self] remoteMessage in
                 self?.notifyRemoteMessageDidChange(remoteMessage)
             }

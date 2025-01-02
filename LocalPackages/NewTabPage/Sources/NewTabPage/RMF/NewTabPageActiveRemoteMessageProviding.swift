@@ -21,7 +21,7 @@ import RemoteMessaging
 
 public protocol NewTabPageActiveRemoteMessageProviding {
     var newTabPageRemoteMessage: RemoteMessageModel? { get set }
-    var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> { get }
+    var newTabPageRemoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> { get }
 
     func isMessageSupported(_ message: RemoteMessageModel) -> Bool
 
