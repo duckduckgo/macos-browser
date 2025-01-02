@@ -105,7 +105,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
     var areAutomaticUpdatesEnabled: Bool {
         didSet {
-            Logger.updates.log("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
+            Logger.updates.log("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled, privacy: .public)")
             if oldValue != areAutomaticUpdatesEnabled {
                 userDriver?.cancelAndDismissCurrentUpdate()
                 try? configureUpdater()
@@ -239,7 +239,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
-        Logger.updates.error("Updater did abort with error: \(error.localizedDescription)")
+        Logger.updates.error("Updater did abort with error: \(error.localizedDescription, privacy: .public) (\(error.pixelParameters, privacy: .public))")
         let errorCode = (error as NSError).code
         guard ![Int(Sparkle.SUError.noUpdateError.rawValue),
                 Int(Sparkle.SUError.installationCanceledError.rawValue),
@@ -252,7 +252,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        Logger.updates.log("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.log("Updater did find valid update: \(item.displayVersionString, privacy: .public)(\(item.versionString, privacy: .public))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
         cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: false)
     }
@@ -261,7 +261,7 @@ extension UpdateController: SPUUpdaterDelegate {
         let nsError = error as NSError
         guard let item = nsError.userInfo[SPULatestAppcastItemFoundKey] as? SUAppcastItem else { return }
 
-        Logger.updates.log("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
+        Logger.updates.log("Updater did not find valid update: \(item.displayVersionString, privacy: .public)(\(item.versionString, privacy: .public))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
         // Edge case: User upgrades to latest version within their rollout group
@@ -274,30 +274,51 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        Logger.updates.log("Updater did download update: \(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.log("Updater did download update: \(item.displayVersionString, privacy: .public)(\(item.versionString, privacy: .public))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidDownloadUpdate))
     }
 
     func updater(_ updater: SPUUpdater, didExtractUpdate item: SUAppcastItem) {
-        Logger.updates.log("Updater did extract update: \(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.log("Updater did extract update: \(item.displayVersionString, privacy: .public)(\(item.versionString, privacy: .public))")
     }
 
     func updater(_ updater: SPUUpdater, willInstallUpdate item: SUAppcastItem) {
-        Logger.updates.log("Updater will install update: \(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.log("Updater will install update: \(item.displayVersionString, privacy: .public)(\(item.versionString, privacy: .public))")
+    }
+
+    func updater(_ updater: SPUUpdater, willInstallUpdateOnQuit item: SUAppcastItem, immediateInstallationBlock immediateInstallHandler: @escaping () -> Void) -> Bool {
+        Logger.updates.log("Updater will install update on quit: \(item.displayVersionString, privacy: .public)(\(item.versionString, privacy: .public))")
+        userDriver?.configureResumeBlock(immediateInstallHandler)
+        return true
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         if error == nil {
-            Logger.updates.log("Updater did finish update cycle")
-            updateProgress = .updateCycleDone
+            Logger.updates.log("Updater did finish update cycle with no error")
+            updateProgress = .updateCycleDone(.finishedWithNoError)
         } else if let errorCode = (error as? NSError)?.code, errorCode == Int(Sparkle.SUError.noUpdateError.rawValue) {
             Logger.updates.log("Updater did finish update cycle with no update found")
-            updateProgress = .updateCycleDone
-        } else {
-            Logger.updates.log("Updater did finish update cycle with error")
+            updateProgress = .updateCycleDone(.finishedWithNoUpdateFound)
+        } else if let error {
+            Logger.updates.log("Updater did finish update cycle with error: \(error.localizedDescription, privacy: .public) (\(error.pixelParameters, privacy: .public))")
         }
     }
 
+    func log() {
+        Logger.updates.log("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled, privacy: .public)")
+        Logger.updates.log("updateProgress: \(self.updateProgress, privacy: .public)")
+        if let cachedUpdateResult {
+            Logger.updates.log("cachedUpdateResult: \(cachedUpdateResult.item.displayVersionString, privacy: .public)(\(cachedUpdateResult.item.versionString, privacy: .public))")
+        }
+        if let state = userDriver?.sparkleUpdateState {
+            Logger.updates.log("Sparkle update state: (userInitiated:  \(state.userInitiated, privacy: .public), stage: \(state.stage.rawValue, privacy: .public))")
+        } else {
+            Logger.updates.log("Sparkle update state: Unknown")
+        }
+        if let userDriver {
+            Logger.updates.log("isResumable: \(userDriver.isResumable, privacy: .public)")
+        }
+    }
 }
 
 #endif
