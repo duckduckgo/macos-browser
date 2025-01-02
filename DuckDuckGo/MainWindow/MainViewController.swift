@@ -256,10 +256,13 @@ final class MainViewController: NSViewController {
 
     func windowWillEnterFullScreen() {
         tabBarViewController.hideTabPreview()
+    }
+
+    func disableTabPreviews() {
         tabBarViewController.disableTabPreviews = true
     }
 
-    func windowWillExitFullScreen() {
+    func enableTabPreviews() {
         tabBarViewController.disableTabPreviews = false
     }
 

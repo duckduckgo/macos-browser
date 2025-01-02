@@ -192,10 +192,12 @@ final class AppearancePreferences: ObservableObject {
         static let showBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
         static let bookmarksBarSettingAppearanceChanged = NSNotification.Name("BookmarksBarSettingAppearanceChanged")
         static let bookmarksBarAlignmentChanged = NSNotification.Name("BookmarksBarAlignmentChanged")
+        static let showTabsAndBookmarksBarOnFullScreenChanged = NSNotification.Name("ShowTabsAndBookmarksBarOnFullScreenChanged")
     }
 
     struct Constants {
         static let bookmarksBarAlignmentChangedIsCenterAlignedParameter = "isCenterAligned"
+        static let showTabsAndBookmarksBarOnFullScreenParameter = "showTabsAndBookmarksBarOnFullScreen"
         static let dismissNextStepsCardsAfterDays = 9
     }
 
@@ -333,7 +335,9 @@ final class AppearancePreferences: ObservableObject {
     @Published var showTabsAndBookmarksBarOnFullScreen: Bool {
         didSet {
             persistor.showTabsAndBookmarksBarOnFullScreen = showTabsAndBookmarksBarOnFullScreen
-            // TODO: Send notification when this changes
+            NotificationCenter.default.post(name: Notifications.showTabsAndBookmarksBarOnFullScreenChanged,
+                                            object: nil,
+                                            userInfo: [Constants.showTabsAndBookmarksBarOnFullScreenParameter: showTabsAndBookmarksBarOnFullScreen])
         }
     }
 
