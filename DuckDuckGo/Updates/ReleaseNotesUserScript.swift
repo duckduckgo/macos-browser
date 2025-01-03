@@ -77,7 +77,10 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
             return
         }
 
-        let updateController = Application.appDelegate.updateController
+        guard let updateController = Application.appDelegate.updateController else {
+            return
+        }
+
         let values = ReleaseNotesValues(from: updateController)
         broker?.push(method: "onUpdate", params: values, for: self, into: webView)
     }
