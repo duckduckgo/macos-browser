@@ -1,5 +1,5 @@
 //
-//  NewTabPageActiveRemoteMessageProviding.swift
+//  TabBarRemoteMessage.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,14 +16,11 @@
 //  limitations under the License.
 //
 
-import Combine
-import RemoteMessaging
+struct TabBarRemoteMessage {
+    static let tabBarPermanentSurveyRemoteMessageId = "macos_permanent_survey_tab_bar"
 
-public protocol NewTabPageActiveRemoteMessageProviding {
-    var newTabPageRemoteMessage: RemoteMessageModel? { get set }
-    var newTabPageRemoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> { get }
-
-    func isMessageSupported(_ message: RemoteMessageModel) -> Bool
-
-    func handleAction(_ action: RemoteAction?, andDismissUsing button: RemoteMessageButton) async
+    let buttonTitle: String
+    let popupTitle: String
+    let popupSubtitle: String
+    let surveyURL: URL
 }
