@@ -529,7 +529,7 @@ final class TabBarViewController: NSViewController, TabBarRemoteMessagePresentin
             if dividedWidth < TabBarViewItem.Width.minimumSelected {
                 dividedWidth = (tabsWidth - TabBarViewItem.Width.minimumSelected) / (numberOfItems - 1)
             }
-            return min(TabBarViewItem.Width.maximum, max(minimumWidth, dividedWidth)).rounded()
+            return min(TabBarViewItem.Width.maximum, max(minimumWidth, dividedWidth))
         } else {
             return minimumWidth
         }
