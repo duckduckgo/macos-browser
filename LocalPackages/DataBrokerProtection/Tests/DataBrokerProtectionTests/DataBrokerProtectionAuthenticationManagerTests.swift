@@ -45,10 +45,11 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
         XCTAssertEqual(authenticationManager.isUserAuthenticated, false)
     }
 
-    func testEmptyAccessTokenResultsInNilAuthHeader() {
+    func testEmptyAccessTokenResultsInNilAuthHeader() async {
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
-        XCTAssertNil(authenticationManager.getAuthHeader())
+        let authHeader = await authenticationManager.getAuthHeader()
+        XCTAssertNil(authHeader)
     }
 
     func testUserAuthenticatedWhenSubscriptionManagerReturnsTrue() {
@@ -59,13 +60,13 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
         XCTAssertEqual(authenticationManager.isUserAuthenticated, true)
     }
 
-    func testNonEmptyAccessTokenResultsInValidAuthHeader() {
+    func testNonEmptyAccessTokenResultsInValidAuthHeader() async {
         subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
-
-        XCTAssertNotNil(authenticationManager.getAuthHeader())
+        let authHeader = await authenticationManager.getAuthHeader()
+        XCTAssertNotNil(authHeader)
     }
 
     func testValidEntitlementCheckWithSuccess() async {

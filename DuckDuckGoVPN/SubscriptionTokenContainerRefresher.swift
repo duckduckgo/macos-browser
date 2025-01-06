@@ -22,7 +22,7 @@ import Networking
 import os.log
 
 struct SubscriptionTokenContainerRefresher {
-    
+
     let subscriptionManager: SubscriptionManager
 
     func refreshIfNeeded() async {

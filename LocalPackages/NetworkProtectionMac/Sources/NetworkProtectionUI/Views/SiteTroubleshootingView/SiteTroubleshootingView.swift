@@ -46,7 +46,7 @@ public struct SiteTroubleshootingView: View {
             .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
         VStack(alignment: .leading) {
-            Text("Website Preferences")
+            Text(UserText.networkProtectionSiteTroubleShootingViewTitle)
                 .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(.vertical, 3)
                 .padding(.horizontal, 9)
@@ -67,7 +67,7 @@ public struct SiteTroubleshootingView: View {
                             .frame(width: Self.iconSize, height: Self.iconSize)
                     }
 
-                    Text("Exclude \(siteInfo.domain) from VPN")
+                    Text(String(format: UserText.networkProtectionSiteTroubleShootingViewExcludeWebsite, siteInfo.domain))
                         .applyLabelAttributes(colorScheme: colorScheme)
 
                     Spacer()

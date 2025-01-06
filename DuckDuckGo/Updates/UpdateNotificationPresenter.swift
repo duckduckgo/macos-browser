@@ -26,7 +26,7 @@ final class UpdateNotificationPresenter {
     static let presentationTimeInterval: TimeInterval = 10
 
     func showUpdateNotification(icon: NSImage, text: String, buttonText: String? = nil, presentMultiline: Bool = false) {
-        Logger.updates.log("Notification presented: \(text)")
+        Logger.updates.log("Notification presented: \(text, privacy: .public)")
 
         DispatchQueue.main.async {
             guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController ?? WindowControllersManager.shared.mainWindowControllers.last,

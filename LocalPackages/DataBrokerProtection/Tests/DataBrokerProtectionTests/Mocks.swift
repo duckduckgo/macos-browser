@@ -1655,7 +1655,9 @@ final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManagin
 
     var isUserAuthenticated: Bool { isUserAuthenticatedValue }
 
-    var accessToken: String? { accessTokenValue }
+    func accessToken() async -> String? {
+        accessTokenValue
+    }
 
     func hasValidEntitlement() async -> Bool {
         return hasValidEntitlementValue

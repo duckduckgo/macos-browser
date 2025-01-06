@@ -15,7 +15,7 @@ jobs:
       matrix:
         runner: [macos-15-xlarge]
         include:
-          - xcode-version: "16.1"
+          - xcode-version: "16.2"
             runner: macos-15-xlarge
 
     if: |

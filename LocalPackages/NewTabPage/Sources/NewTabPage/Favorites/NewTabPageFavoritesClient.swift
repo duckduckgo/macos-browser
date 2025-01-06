@@ -207,11 +207,6 @@ public extension NewTabPageFavoritesClient {
     struct FavoriteFavicon: Encodable, Equatable {
         let maxAvailableSize: Int
         let src: String
-
-        init(maxAvailableSize: Int, src: String) {
-            self.maxAvailableSize = maxAvailableSize
-            self.src = src
-        }
     }
 }
 
