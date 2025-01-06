@@ -20,6 +20,8 @@ import Combine
 import NewTabPage
 
 final class CapturingNewTabPageCustomBackgroundProvider: NewTabPageCustomBackgroundProviding {
+    var customizerOpener: NewTabPageCustomizerOpener = NewTabPageCustomizerOpener()
+
     var customizerData: NewTabPageDataModel.CustomizerData = .init(background: .default, theme: .none, userColor: nil, userImages: [])
 
     @Published

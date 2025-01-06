@@ -34,7 +34,8 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         client = NewTabPageConfigurationClient(
             sectionsVisibilityProvider: sectionsVisibilityProvider,
             customBackgroundProvider: CapturingNewTabPageCustomBackgroundProvider(),
-            contextMenuPresenter: contextMenuPresenter
+            contextMenuPresenter: contextMenuPresenter,
+            linkOpener: CapturingNewTabPageLinkOpener()
         )
 
         userScript = NewTabPageUserScript()
