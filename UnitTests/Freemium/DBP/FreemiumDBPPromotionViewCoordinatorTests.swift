@@ -92,13 +92,14 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     }
 
     @MainActor
-    func testProceedAction_dismissesPromotion_callsShowFreemium_andFiresPixel() {
+    func testProceedAction_dismissesPromotion_callsShowFreemium_andFiresPixel() async throws {
         // Given
         mockUserStateManager.didActivate = false
 
         // When
-        let viewModel = sut.viewModel
-        viewModel!.proceedAction()
+        try await triggerViewModelUpdate()
+        let viewModel = try XCTUnwrap(sut.viewModel)
+        await viewModel.proceedAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -107,10 +108,11 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     }
 
     @MainActor
-    func testCloseAction_dismissesPromotion_andFiresPixel() {
+    func testCloseAction_dismissesPromotion_andFiresPixel() async throws {
         // When
-        let viewModel = sut.viewModel
-        viewModel!.closeAction()
+        try await triggerViewModelUpdate()
+        let viewModel = try XCTUnwrap(sut.viewModel)
+        viewModel.closeAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -118,14 +120,15 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     }
 
     @MainActor
-    func testProceedAction_dismissesResults_callsShowFreemium_andFiresPixel() {
+    func testProceedAction_dismissesResults_callsShowFreemium_andFiresPixel() async throws {
         // Given
         mockUserStateManager.didActivate = false
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
 
         // When
-        let viewModel = sut.viewModel
-        viewModel!.proceedAction()
+        try await triggerViewModelUpdate()
+        let viewModel = try XCTUnwrap(sut.viewModel)
+        await viewModel.proceedAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -134,13 +137,14 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     }
 
     @MainActor
-    func testCloseAction_dismissesResults_andFiresPixel() {
+    func testCloseAction_dismissesResults_andFiresPixel() async throws {
         // Given
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
 
         // When
-        let viewModel = sut.viewModel
-        viewModel!.closeAction()
+        try await triggerViewModelUpdate()
+        let viewModel = try XCTUnwrap(sut.viewModel)
+        viewModel.closeAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -148,14 +152,15 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     }
 
     @MainActor
-    func testProceedAction_dismissesNoResults_callsShowFreemium_andFiresPixel() {
+    func testProceedAction_dismissesNoResults_callsShowFreemium_andFiresPixel() async throws {
         // Given
         mockUserStateManager.didActivate = false
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
 
         // When
-        let viewModel = sut.viewModel
-        viewModel!.proceedAction()
+        try await triggerViewModelUpdate()
+        let viewModel = try XCTUnwrap(sut.viewModel)
+        await viewModel.proceedAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -164,13 +169,14 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     }
 
     @MainActor
-    func testCloseAction_dismissesNoResults_andFiresPixel() {
+    func testCloseAction_dismissesNoResults_andFiresPixel() async throws {
         // Given
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
 
         // When
-        let viewModel = sut.viewModel
-        viewModel!.closeAction()
+        try await triggerViewModelUpdate()
+        let viewModel = try XCTUnwrap(sut.viewModel)
+        viewModel.closeAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -178,33 +184,35 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     }
 
     @MainActor
-    func testViewModel_whenResultsExist_withMatches() {
+    func testViewModel_whenResultsExist_withMatches() async throws {
         // Given
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
 
         // When
-        let viewModel = sut.viewModel
+        let viewModel = try await triggerViewModelUpdate()
 
         // Then
-        XCTAssertEqual(viewModel!.description, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralDescription(resultCount: 5, brokerCount: 2))
+        XCTAssertEqual(viewModel?.description, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralDescription(resultCount: 5, brokerCount: 2))
     }
 
     @MainActor
-    func testViewModel_whenNoResultsExist() {
+    func testViewModel_whenNoResultsExist() async throws {
         // Given
         mockUserStateManager.firstScanResults = nil
 
         // When
-        let viewModel = sut.viewModel
+        let viewModel = try await triggerViewModelUpdate()
 
         // Then
-        XCTAssertEqual(viewModel!.description, UserText.homePagePromotionFreemiumDBPDescriptionMarkdown)
+        XCTAssertEqual(viewModel?.description, UserText.homePagePromotionFreemiumDBPDescriptionMarkdown)
     }
 
     @MainActor
-    func testViewModel_whenFeatureNotEnabled() {
+    func testViewModel_whenFeatureNotEnabled() async throws {
         // Given
-        mockFeature.featureAvailable = false
+        try await ensureNoViewModelUpdate {
+            mockFeature.featureAvailable = false
+        }
 
         // When
         let viewModel = sut.viewModel
@@ -345,6 +353,36 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
         // Then
         XCTAssertFalse(sut.isHomePagePromotionVisible)
+    }
+
+    // MARK: - Helpers
+
+    @discardableResult
+    func triggerViewModelUpdate() async throws -> PromotionViewModel? {
+        try await waitForViewModelUpdate {
+            sut.isHostingViewOnScreen = true
+            sut.isHomePagePromotionVisible = true
+        }
+        return sut.viewModel
+    }
+
+    /**
+     * Sets up an expectation, then sets up Combine subscription for `sut.$viewModel` that fulfills the expectation,
+     * then calls the provided block and waits for time specified by `duration` before cancelling the subscription.
+     */
+    func waitForViewModelUpdate(for duration: TimeInterval = 1, inverted: Bool = false, _ block: () async -> Void) async throws {
+        let expectation = self.expectation(description: "viewModelUpdate")
+        expectation.isInverted = inverted
+        let cancellable = sut.$viewModel.dropFirst().prefix(1).sink { _ in expectation.fulfill() }
+
+        await block()
+
+        await fulfillment(of: [expectation], timeout: duration)
+        cancellable.cancel()
+    }
+
+    func ensureNoViewModelUpdate(for duration: TimeInterval = 1, _ block: () async -> Void) async throws {
+        try await waitForViewModelUpdate(for: duration, inverted: true, block)
     }
 }
 

@@ -93,6 +93,7 @@ final class FreemiumDBPPromotionViewCoordinator: ObservableObject {
         $isHostingViewOnScreen.dropFirst().filter { $0 }
             .combineLatest($isHomePagePromotionVisible.dropFirst()) { $1 }
             .prepend(true)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.viewModel = self?.createViewModel()
             }
@@ -158,7 +159,7 @@ private extension FreemiumDBPPromotionViewCoordinator {
     ///
     /// - Returns: The `PromotionViewModel` that represents the current state of the promotion.
     func createViewModel() -> PromotionViewModel? {
-        guard isHomePagePromotionVisible else {
+        guard isHostingViewOnScreen, isHomePagePromotionVisible else {
             return nil
         }
 
@@ -190,6 +191,8 @@ private extension FreemiumDBPPromotionViewCoordinator {
     /// changes to the feature's availability. It performs the following actions when an update is received:
     func subscribeToFeatureAvailabilityUpdates() {
         freemiumDBPFeature.isAvailablePublisher
+            .prepend(freemiumDBPFeature.isAvailable)
+            .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isAvailable in
                 guard let self else { return }
