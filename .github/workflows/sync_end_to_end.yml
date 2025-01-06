@@ -41,7 +41,7 @@ jobs:
             runner: macos-13-xlarge
           - xcode-version: "15.4"
             runner: macos-14-xlarge
-          - xcode-version: "16.1"
+          - xcode-version: "16.2"
             runner: macos-15-xlarge
 
     timeout-minutes: 60

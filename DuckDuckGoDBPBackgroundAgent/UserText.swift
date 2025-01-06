@@ -21,6 +21,6 @@ import Foundation
 final class UserText {
     // MARK: - Status Menu
 
-    static let networkProtectionStatusMenuSendFeedback = NSLocalizedString("network.protection.status.menu.send.feedback", value: "Send Feedback…", comment: "The status menu 'Send Feedback' menu item")
-    static let networkProtectionStatusMenuOpenDuckDuckGo = NSLocalizedString("network.protection.status.menu.open.duckduckgo", value: "Open DuckDuckGo…", comment: "The status menu 'Open DuckDuckGo' menu item")
+    static let networkProtectionStatusMenuSendFeedback = NSLocalizedString("dbp.menu.send.feedback", value: "Send Feedback…", comment: "The status menu 'Send Feedback' menu item")
+    static let networkProtectionStatusMenuOpenDuckDuckGo = NSLocalizedString("dbp.open.duckduckgo", value: "Open DuckDuckGo…", comment: "The status menu 'Open DuckDuckGo' menu item")
 }

@@ -797,7 +797,6 @@ protocol NewWindowPolicyDecisionMaker {
 #endif
 
         if PixelExperiment.cohort == .newOnboarding {
-            Application.appDelegate.onboardingStateMachine.state = .notStarted
             setContent(.onboarding)
         } else {
             setContent(.onboardingDeprecated)
