@@ -260,13 +260,7 @@ extension WindowControllersManager {
     }
 
     func showShareFeedbackModal(source: UnifiedFeedbackSource = .default) {
-        let feedbackFormViewController: NSViewController = {
-            if subscriptionFeatureAvailability.usesUnifiedFeedbackForm {
-                return UnifiedFeedbackFormViewController(source: source)
-            } else {
-                return VPNFeedbackFormViewController()
-            }
-        }()
+        let feedbackFormViewController = UnifiedFeedbackFormViewController(source: source)
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
         guard let feedbackFormWindow = feedbackFormWindowController.window else {

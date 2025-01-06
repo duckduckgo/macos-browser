@@ -107,7 +107,7 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
     }
 
     func getFeatureConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        [PrivacyProSubfeature.useUnifiedFeedback.rawValue: subscriptionFeatureAvailability.usesUnifiedFeedbackForm]
+        [PrivacyProSubfeature.useUnifiedFeedback.rawValue: true]
     }
 
     func openSendFeedbackModal(params: Any, original: WKScriptMessage) async throws -> Encodable? {

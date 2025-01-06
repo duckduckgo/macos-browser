@@ -175,8 +175,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
                                                        accountManager: accountManager)
 
         subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
-                                                                              isSubscriptionPurchaseAllowed: true,
-                                                                              usesUnifiedFeedbackForm: false)
+                                                                              isSubscriptionPurchaseAllowed: true)
 
         // Real SubscriptionManager
         subscriptionManager = DefaultSubscriptionManager(storePurchaseManager: storePurchaseManager,

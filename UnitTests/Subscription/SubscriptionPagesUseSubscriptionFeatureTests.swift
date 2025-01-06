@@ -171,8 +171,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         subscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler()
 
         subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
-                                                                              isSubscriptionPurchaseAllowed: true,
-                                                                              usesUnifiedFeedbackForm: false)
+                                                                              isSubscriptionPurchaseAllowed: true)
 
         // Real SubscriptionManager
         subscriptionManager = DefaultSubscriptionManager(storePurchaseManager: storePurchaseManager,
