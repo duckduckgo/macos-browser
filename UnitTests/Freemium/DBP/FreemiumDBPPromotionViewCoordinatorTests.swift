@@ -96,6 +96,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         // Given
         try await waitForViewModelUpdate {
             mockUserStateManager.didActivate = false
+            sut.isHomePagePromotionVisible = true
         }
 
         // When
@@ -111,7 +112,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testCloseAction_dismissesPromotion_andFiresPixel() async throws {
         // When
-        try await triggerCreatingViewModel()
+        try await waitForViewModelUpdate()
         let viewModel = try XCTUnwrap(sut.viewModel)
         viewModel.closeAction()
 
@@ -196,7 +197,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         }
 
         // When
-        let viewModel = try await triggerCreatingViewModel()
+        let viewModel = try await waitForViewModelUpdate()
 
         // Then
         XCTAssertEqual(viewModel?.description, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralDescription(resultCount: 5, brokerCount: 2))
@@ -363,16 +364,10 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
     // MARK: - Helpers
 
-    @discardableResult
-    func triggerCreatingViewModel() async throws -> PromotionViewModel? {
-        try await waitForViewModelUpdate {
-            sut.isHomePagePromotionVisible = true
-        }
-    }
-
     /**
      * Sets up an expectation, then sets up Combine subscription for `sut.$viewModel` that fulfills the expectation,
-     * then calls the provided `block` and waits for time specified by `duration` before cancelling the subscription.
+     * then calls the provided `block`, enables home page promotion and waits for time specified by `duration`
+     * before cancelling the subscription.
      */
     @discardableResult
     func waitForViewModelUpdate(for duration: TimeInterval = 1, _ block: () async -> Void = {}) async throws -> PromotionViewModel? {
@@ -380,6 +375,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         let cancellable = sut.$viewModel.dropFirst().prefix(1).sink { _ in expectation.fulfill() }
 
         await block()
+        sut.isHomePagePromotionVisible = true
 
         await fulfillment(of: [expectation], timeout: duration)
         cancellable.cancel()
