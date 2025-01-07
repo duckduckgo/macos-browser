@@ -368,7 +368,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         try await waitForViewModelUpdate {
             sut.isHomePagePromotionVisible = true
         }
-        return sut.viewModel
     }
 
     /**
