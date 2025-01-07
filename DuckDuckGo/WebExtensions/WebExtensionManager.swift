@@ -73,8 +73,14 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         return context
     }
 
+    override init() {
+        super.init()
+
+        internalSiteHandler.dataSource = self
+    }
+
     lazy var extensions: [_WKWebExtension] = {
-        guard let nativeMessaging = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "add-on", ofType: nil)!) else {
+        guard let lastpassForSafari = WebExtensionManager.loadWebExtension(path: "/Applications/LastPass for Safari.app/Contents/PlugIns/LastPass for Safari Extension.appex/Contents/Resources/") else {
             return []
         }
 
@@ -88,7 +94,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 //        let adBlock = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
 //        let nightEye = WebExtensionManager.loadWebExtension(path: "/Applications/Night Eye.app/Contents/PlugIns/Night Eye Extension.appex/Contents/Resources/")
 
-        return [nativeMessaging]
+        return [lastpassForSafari]
     }()
 
     // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.
@@ -114,6 +120,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }()
 
     let nativeMessagingHandler = NativeMessagingHandler()
+    let internalSiteHandler = WebExtensionInternalSiteHandler()
 
     func setUpWebExtensionController(for configuration: WKWebViewConfiguration) {
         configuration._webExtensionController = extensionController
@@ -280,9 +287,9 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
 
         if let tabCollectionViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
            let url = options.desiredURL {
-            let configuration = url.isWebExtensionUrl ? extensionContext.webViewConfiguration : nil
-            let tab = Tab(content: .url(url, source: .ui),
-                          webViewConfiguration: configuration,
+
+            let content = TabContent.contentFromURL(url, source: .ui)
+            let tab = Tab(content: content,
                           burnerMode: tabCollectionViewModel.burnerMode)
             tabCollectionViewModel.append(tab: tab)
             return tab
@@ -341,6 +348,16 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
         try await nativeMessagingHandler.webExtensionController(controller,
                                                                 connectUsingMessagePort: port,
                                                                 for: extensionContext)
+    }
+
+}
+
+@available(macOS 14.4, *)
+extension WebExtensionManager: WebExtensionInternalSiteHandlerDataSource {
+
+    func webExtensionContextForUrl(_ url: URL) -> _WKWebExtensionContext? {
+        // TODO: Adjust to support more than one loaded extension
+        return contexts.first
     }
 
 }
