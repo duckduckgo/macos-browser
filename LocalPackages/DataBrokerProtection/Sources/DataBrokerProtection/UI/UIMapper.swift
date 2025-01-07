@@ -240,7 +240,7 @@ struct MapperToUI {
             encoder.outputFormatting = .prettyPrinted
             let jsonData = try encoder.encode(metadataUI)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                Logger.dataBrokerProtection.debug("Metadata: \(jsonString, privacy: .public)")
+                Logger.dataBrokerProtection.log("Metadata: \(jsonString, privacy: .public)")
             }
         } catch {
             Logger.dataBrokerProtection.error("Error encoding struct to JSON: \(error.localizedDescription, privacy: .public)")

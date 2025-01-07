@@ -339,7 +339,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                 let fileURL = URL(fileURLWithPath: "\(path)/\(fileName)")
                 try csv.write(to: fileURL, atomically: true, encoding: .utf8)
             } else {
-                Logger.dataBrokerProtection.debug("Error getting path")
+                Logger.dataBrokerProtection.error("Error getting path")
             }
         } catch {
             Logger.dataBrokerProtection.error("Error writing to file: \(error)")
