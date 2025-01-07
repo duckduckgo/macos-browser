@@ -67,10 +67,10 @@ final class MockPrivacyStatsTrackerDataProvider: PrivacyStatsTrackerDataProvidin
 
 final class NewTabPagePrivacyStatsModelTests: XCTestCase {
 
-    var model: NewTabPagePrivacyStatsModel!
-    var privacyStats: CapturingPrivacyStats!
-    var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
-    var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
+    private var model: NewTabPagePrivacyStatsModel!
+    private var privacyStats: CapturingPrivacyStats!
+    private var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
+    private var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
 
     override func setUp() async throws {
         try await super.setUp()

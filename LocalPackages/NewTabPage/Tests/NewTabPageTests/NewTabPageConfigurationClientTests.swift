@@ -22,10 +22,10 @@ import XCTest
 @testable import NewTabPage
 
 final class NewTabPageConfigurationClientTests: XCTestCase {
-    var client: NewTabPageConfigurationClient!
-    var sectionsVisibilityProvider: MockNewTabPageSectionsVisibilityProvider!
-    var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
-    var userScript: NewTabPageUserScript!
+    private var client: NewTabPageConfigurationClient!
+    private var sectionsVisibilityProvider: MockNewTabPageSectionsVisibilityProvider!
+    private var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
+    private var userScript: NewTabPageUserScript!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -77,6 +77,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         let configuration: NewTabPageDataModel.NewTabPageConfiguration = try await sendMessage(named: .initialSetup)
         XCTAssertEqual(configuration.widgets, [
             .init(id: .rmf),
+            .init(id: .freemiumPIRBanner),
             .init(id: .nextSteps),
             .init(id: .favorites),
             .init(id: .privacyStats)

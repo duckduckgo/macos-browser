@@ -22,9 +22,9 @@ import XCTest
 @testable import NewTabPage
 
 final class NewTabPageRMFClientTests: XCTestCase {
-    var client: NewTabPageRMFClient!
-    var remoteMessageProvider: CapturingNewTabPageActiveRemoteMessageProvider!
-    var userScript: NewTabPageUserScript!
+    private var client: NewTabPageRMFClient!
+    private var remoteMessageProvider: CapturingNewTabPageActiveRemoteMessageProvider!
+    private var userScript: NewTabPageUserScript!
 
     override func setUpWithError() throws {
         try super.setUpWithError()

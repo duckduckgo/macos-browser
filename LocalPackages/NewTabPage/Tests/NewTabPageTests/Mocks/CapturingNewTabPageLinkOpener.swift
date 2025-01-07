@@ -25,5 +25,6 @@ final class CapturingNewTabPageLinkOpener: NewTabPageLinkOpening {
     }
 
     var openLinkCalls: [NewTabPageDataModel.OpenAction.Target] = []
+    // swiftlint:disable:next identifier_name
     var _openLink: (NewTabPageDataModel.OpenAction.Target) async -> Void = { _ in }
 }

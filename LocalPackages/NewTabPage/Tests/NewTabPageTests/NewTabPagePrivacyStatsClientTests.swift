@@ -24,15 +24,15 @@ import XCTest
 @testable import NewTabPage
 
 final class NewTabPagePrivacyStatsClientTests: XCTestCase {
-    var client: NewTabPagePrivacyStatsClient!
-    var model: NewTabPagePrivacyStatsModel!
+    private var client: NewTabPagePrivacyStatsClient!
+    private var model: NewTabPagePrivacyStatsModel!
 
-    var privacyStats: CapturingPrivacyStats!
-    var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
-    var eventMapping: CapturingNewTabPagePrivacyStatsEventHandler!
-    var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
+    private var privacyStats: CapturingPrivacyStats!
+    private var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
+    private var eventMapping: CapturingNewTabPagePrivacyStatsEventHandler!
+    private var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
 
-    var userScript: NewTabPageUserScript!
+    private var userScript: NewTabPageUserScript!
 
     override func setUp() async throws {
         try await super.setUp()
