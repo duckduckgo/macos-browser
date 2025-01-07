@@ -91,6 +91,7 @@ final class AddressBarTextField: NSTextField {
     }
     // flag when updating the Value from `handleTextDidChange()`
     private var currentTextDidChangeEvent: TextDidChangeEventType = .none
+    private var lastValueChangeRemovedSuggestion: Bool = false
 
 //    var subscriptionEnvironment: SubscriptionEnvironment {
 //        Application.appDelegate.subscriptionManager.currentEnvironment
@@ -168,8 +169,12 @@ final class AddressBarTextField: NSTextField {
 
     @Published private(set) var value: Value = .text("", userTyped: false) {
         didSet {
-            guard value != oldValue else { return }
+            guard value != oldValue else {
+                lastValueChangeRemovedSuggestion = false
+                return
+            }
 
+            lastValueChangeRemovedSuggestion = (oldValue.isSuggestion && !value.isSuggestion)
             saveUndoValue(oldValue: oldValue)
             updateAttributedStringValue()
 
@@ -1096,6 +1101,16 @@ extension AddressBarTextField: NSTextViewDelegate {
 
         currentTextDidChangeEvent = .none
         isUndoDisabled = false
+    }
+
+    func textView(_ textView: NSTextView, shouldChangeTextIn affectedCharRange: NSRange, replacementString: String?) -> Bool {
+        // When a suggestion is visible and the user presses Delete, the suggestion should get removed but the text should remain as-is.
+        if self.window?.currentEvent?.specialKey == NSEvent.SpecialKey.delete, lastValueChangeRemovedSuggestion {
+            lastValueChangeRemovedSuggestion = false
+            return false
+        }
+
+        return true
     }
 
     func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange _: NSRange, toCharacterRange range: NSRange) -> NSRange {
