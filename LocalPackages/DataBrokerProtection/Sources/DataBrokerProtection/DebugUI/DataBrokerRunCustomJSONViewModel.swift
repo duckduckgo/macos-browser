@@ -165,7 +165,8 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                   passwordGeneration: false,
                                                   inlineIconCredentials: false,
                                                   thirdPartyCredentialsProvider: false,
-                                                  unknownUsernameCategorization: false)
+                                                  unknownUsernameCategorization: false,
+                                                  partialFormSaves: false)
 
         let sessionKey = UUID().uuidString
         let messageSecret = UUID().uuidString
