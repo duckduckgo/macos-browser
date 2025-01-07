@@ -94,10 +94,11 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testProceedAction_dismissesPromotion_callsShowFreemium_andFiresPixel() async throws {
         // Given
-        mockUserStateManager.didActivate = false
+        try await waitForViewModelUpdate {
+            mockUserStateManager.didActivate = false
+        }
 
         // When
-        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         await viewModel.proceedAction()
 
@@ -122,11 +123,12 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testProceedAction_dismissesResults_callsShowFreemium_andFiresPixel() async throws {
         // Given
-        mockUserStateManager.didActivate = false
-        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+        try await waitForViewModelUpdate {
+            mockUserStateManager.didActivate = false
+            mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+        }
 
         // When
-        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         await viewModel.proceedAction()
 
@@ -139,10 +141,11 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testCloseAction_dismissesResults_andFiresPixel() async throws {
         // Given
-        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+        try await waitForViewModelUpdate {
+            mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+        }
 
         // When
-        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         viewModel.closeAction()
 
@@ -154,11 +157,12 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testProceedAction_dismissesNoResults_callsShowFreemium_andFiresPixel() async throws {
         // Given
-        mockUserStateManager.didActivate = false
-        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+        try await waitForViewModelUpdate {
+            mockUserStateManager.didActivate = false
+            mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+        }
 
         // When
-        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         await viewModel.proceedAction()
 
@@ -171,10 +175,11 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testCloseAction_dismissesNoResults_andFiresPixel() async throws {
         // Given
-        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+        try await waitForViewModelUpdate {
+            mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+        }
 
         // When
-        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         viewModel.closeAction()
 
@@ -186,7 +191,9 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testViewModel_whenResultsExist_withMatches() async throws {
         // Given
-        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+        try await waitForViewModelUpdate {
+            mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+        }
 
         // When
         let viewModel = try await triggerCreatingViewModel()
@@ -198,10 +205,9 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testViewModel_whenNoResultsExist() async throws {
         // Given
-        mockUserStateManager.firstScanResults = nil
-
-        // When
-        let viewModel = try await triggerCreatingViewModel()
+        let viewModel = try await waitForViewModelUpdate {
+            mockUserStateManager.firstScanResults = nil
+        }
 
         // Then
         XCTAssertEqual(viewModel?.description, UserText.homePagePromotionFreemiumDBPDescriptionMarkdown)
