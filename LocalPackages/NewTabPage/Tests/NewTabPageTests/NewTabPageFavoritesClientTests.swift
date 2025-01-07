@@ -18,9 +18,9 @@
 
 import Combine
 import RemoteMessaging
-import TestUtils
 import XCTest
 @testable import NewTabPage
+import PersistenceTestingUtils
 
 final class NewTabPageFavoritesClientTests: XCTestCase {
     typealias NewTabPageFavoritesClientUnderTest = NewTabPageFavoritesClient<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>

@@ -23,7 +23,9 @@ import BrowserServicesKit
 import SubscriptionTestingUtilities
 import Freemium
 import Combine
-import TestUtils
+import Networking
+import NetworkingTestingUtils
+
 final class FreemiumDBPFeatureTests: XCTestCase {
 
     private var sut: FreemiumDBPFeature!

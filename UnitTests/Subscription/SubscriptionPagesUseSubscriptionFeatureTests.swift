@@ -28,7 +28,8 @@ import PixelKitTestingUtilities
 import os.log
 import DataBrokerProtection
 import Networking
-import TestUtils
+import Networking
+import NetworkingTestingUtils
 
 @available(macOS 12.0, *)
 final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {

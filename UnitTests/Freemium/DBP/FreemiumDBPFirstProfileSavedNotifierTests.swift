@@ -18,7 +18,8 @@
 
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
-import TestUtils
+import Networking
+import NetworkingTestingUtils
 import SubscriptionTestingUtilities
 
 final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {

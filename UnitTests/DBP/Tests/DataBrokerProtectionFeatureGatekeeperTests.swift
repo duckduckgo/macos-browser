@@ -19,7 +19,8 @@
 import XCTest
 @testable import BrowserServicesKit
 @testable import Subscription
-import TestUtils
+import Networking
+import NetworkingTestingUtils
 import SubscriptionTestingUtilities
 
 @testable import DuckDuckGo_Privacy_Browser

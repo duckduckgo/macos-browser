@@ -27,7 +27,7 @@ import UserScript
 import PixelKitTestingUtilities
 import os.log
 import Networking
-import TestUtils
+import NetworkingTestingUtils
 
 @available(macOS 12.0, *)
 final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {

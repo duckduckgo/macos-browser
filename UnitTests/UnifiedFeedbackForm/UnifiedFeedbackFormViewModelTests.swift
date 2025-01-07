@@ -20,8 +20,10 @@ import XCTest
 import Subscription
 import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
-@testable import TestUtils
+@testable import PersistenceTestingUtils
 @testable import Networking
+import NetworkingTestingUtils
+
 final class UnifiedFeedbackFormViewModelTests: XCTestCase {
 
     var subscriptionManager: SubscriptionManagerMock!

@@ -21,7 +21,7 @@ import XCTest
 import Subscription
 import SubscriptionTestingUtilities
 import Networking
-import TestUtils
+import NetworkingTestingUtils
 
 class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     var authenticationManager: DataBrokerProtectionAuthenticationManager!

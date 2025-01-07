@@ -20,7 +20,9 @@ import XCTest
 import SubscriptionTestingUtilities
 import Subscription
 @testable import DuckDuckGo_Privacy_Browser
-import TestUtils
+import Networking
+import NetworkingTestingUtils
+
 final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
 
     private var sut: FreemiumDBPPixelExperimentManaging!
