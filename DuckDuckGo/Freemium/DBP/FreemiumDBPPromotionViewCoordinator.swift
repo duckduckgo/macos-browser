@@ -30,12 +30,9 @@ final class FreemiumDBPPromotionViewCoordinator: ObservableObject {
     /// Published property that determines whether the promotion is visible on the home page.
     @Published var isHomePagePromotionVisible: Bool = false
 
-    /// Published property that determines whether the view displaying the promotion view (i.e. the home page) is currently visible.
-    @Published var isHostingViewOnScreen: Bool = false
-
     /// The view model representing the promotion, which updates based on the user's state. Returns `nil` if the feature is not enabled
     @Published
-    var viewModel: PromotionViewModel?
+    private(set) var viewModel: PromotionViewModel?
 
     /// Stores whether the user has dismissed the home page promotion.
     private var didDismissHomePagePromotion: Bool {
@@ -89,15 +86,7 @@ final class FreemiumDBPPromotionViewCoordinator: ObservableObject {
         setInitialPromotionVisibilityState()
         subscribeToFeatureAvailabilityUpdates()
         observeFreemiumDBPNotifications()
-
-        $isHostingViewOnScreen.dropFirst().filter { $0 }
-            .combineLatest($isHomePagePromotionVisible.dropFirst()) { $1 }
-            .prepend(true)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.viewModel = self?.createViewModel()
-            }
-            .store(in: &cancellables)
+        setUpViewModelRefreshing()
     }
 }
 
@@ -159,7 +148,7 @@ private extension FreemiumDBPPromotionViewCoordinator {
     ///
     /// - Returns: The `PromotionViewModel` that represents the current state of the promotion.
     func createViewModel() -> PromotionViewModel? {
-        guard isHostingViewOnScreen, isHomePagePromotionVisible else {
+        guard freemiumDBPFeature.isAvailable, isHomePagePromotionVisible else {
             return nil
         }
 
@@ -183,6 +172,16 @@ private extension FreemiumDBPPromotionViewCoordinator {
             self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabScanImpression)
             return .freemiumDBPPromotion(proceedAction: proceedAction, closeAction: closeAction)
         }
+    }
+
+    /// This method defines the entry point to updating `viewModel` which is every change to `isHomePagePromotionVisible`.
+    func setUpViewModelRefreshing() {
+        $isHomePagePromotionVisible.dropFirst().asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.viewModel = self?.createViewModel()
+            }
+            .store(in: &cancellables)
     }
 
     /// Subscribes to feature availability updates from the `freemiumDBPFeature`'s availability publisher.

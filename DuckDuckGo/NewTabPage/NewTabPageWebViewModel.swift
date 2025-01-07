@@ -40,8 +40,7 @@ final class NewTabPageWebViewModel: NSObject {
     init(
         featureFlagger: FeatureFlagger,
         actionsManager: NewTabPageActionsManaging,
-        activeRemoteMessageModel: ActiveRemoteMessageModel,
-        freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
+        activeRemoteMessageModel: ActiveRemoteMessageModel
     ) {
         newTabPageUserScript = NewTabPageUserScript()
         actionsManager.registerUserScript(newTabPageUserScript)
@@ -58,9 +57,8 @@ final class NewTabPageWebViewModel: NSObject {
 
         windowCancellable = webView.publisher(for: \.window)
             .map { $0 != nil }
-            .sink { [weak activeRemoteMessageModel, weak freemiumDBPPromotionViewCoordinator] isOnScreen in
+            .sink { [weak activeRemoteMessageModel] isOnScreen in
                 activeRemoteMessageModel?.isViewOnScreen = isOnScreen
-                freemiumDBPPromotionViewCoordinator?.isHostingViewOnScreen = isOnScreen
 
                 if isOnScreen {
                     NotificationCenter.default.post(name: .newTabPageWebViewDidAppear, object: nil)

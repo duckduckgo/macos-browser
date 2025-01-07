@@ -97,7 +97,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockUserStateManager.didActivate = false
 
         // When
-        try await triggerViewModelUpdate()
+        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         await viewModel.proceedAction()
 
@@ -110,7 +110,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testCloseAction_dismissesPromotion_andFiresPixel() async throws {
         // When
-        try await triggerViewModelUpdate()
+        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         viewModel.closeAction()
 
@@ -126,7 +126,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
 
         // When
-        try await triggerViewModelUpdate()
+        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         await viewModel.proceedAction()
 
@@ -142,7 +142,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
 
         // When
-        try await triggerViewModelUpdate()
+        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         viewModel.closeAction()
 
@@ -158,7 +158,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
 
         // When
-        try await triggerViewModelUpdate()
+        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         await viewModel.proceedAction()
 
@@ -174,7 +174,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
 
         // When
-        try await triggerViewModelUpdate()
+        try await triggerCreatingViewModel()
         let viewModel = try XCTUnwrap(sut.viewModel)
         viewModel.closeAction()
 
@@ -189,7 +189,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
 
         // When
-        let viewModel = try await triggerViewModelUpdate()
+        let viewModel = try await triggerCreatingViewModel()
 
         // Then
         XCTAssertEqual(viewModel?.description, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralDescription(resultCount: 5, brokerCount: 2))
@@ -201,7 +201,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockUserStateManager.firstScanResults = nil
 
         // When
-        let viewModel = try await triggerViewModelUpdate()
+        let viewModel = try await triggerCreatingViewModel()
 
         // Then
         XCTAssertEqual(viewModel?.description, UserText.homePagePromotionFreemiumDBPDescriptionMarkdown)
@@ -210,7 +210,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     @MainActor
     func testViewModel_whenFeatureNotEnabled() async throws {
         // Given
-        try await ensureNoViewModelUpdate {
+        try await waitForViewModelUpdate {
             mockFeature.featureAvailable = false
         }
 
@@ -358,9 +358,8 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     // MARK: - Helpers
 
     @discardableResult
-    func triggerViewModelUpdate() async throws -> PromotionViewModel? {
+    func triggerCreatingViewModel() async throws -> PromotionViewModel? {
         try await waitForViewModelUpdate {
-            sut.isHostingViewOnScreen = true
             sut.isHomePagePromotionVisible = true
         }
         return sut.viewModel
@@ -368,21 +367,19 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
     /**
      * Sets up an expectation, then sets up Combine subscription for `sut.$viewModel` that fulfills the expectation,
-     * then calls the provided block and waits for time specified by `duration` before cancelling the subscription.
+     * then calls the provided `block` and waits for time specified by `duration` before cancelling the subscription.
      */
-    func waitForViewModelUpdate(for duration: TimeInterval = 1, inverted: Bool = false, _ block: () async -> Void) async throws {
+    @discardableResult
+    func waitForViewModelUpdate(for duration: TimeInterval = 1, _ block: () async -> Void = {}) async throws -> PromotionViewModel? {
         let expectation = self.expectation(description: "viewModelUpdate")
-        expectation.isInverted = inverted
         let cancellable = sut.$viewModel.dropFirst().prefix(1).sink { _ in expectation.fulfill() }
 
         await block()
 
         await fulfillment(of: [expectation], timeout: duration)
         cancellable.cancel()
-    }
 
-    func ensureNoViewModelUpdate(for duration: TimeInterval = 1, _ block: () async -> Void) async throws {
-        try await waitForViewModelUpdate(for: duration, inverted: true, block)
+        return sut.viewModel
     }
 }
 

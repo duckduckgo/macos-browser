@@ -44,13 +44,11 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
     private let activeRemoteMessageModel: ActiveRemoteMessageModel
-    private let freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
     private let newTabPageActionsManager: NewTabPageActionsManaging
     private(set) lazy var newTabPageWebViewModel: NewTabPageWebViewModel = NewTabPageWebViewModel(
         featureFlagger: featureFlagger,
         actionsManager: newTabPageActionsManager,
-        activeRemoteMessageModel: activeRemoteMessageModel,
-        freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator
+        activeRemoteMessageModel: activeRemoteMessageModel
     )
     private(set) weak var webView: WebView?
     private weak var webViewContainer: NSView?
@@ -96,8 +94,7 @@ final class BrowserTabViewController: NSViewController {
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
          newTabPageActionsManager: NewTabPageActionsManaging = NSApp.delegateTyped.newTabPageActionsManager,
-         activeRemoteMessageModel: ActiveRemoteMessageModel = NSApp.delegateTyped.activeRemoteMessageModel,
-         freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator = NSApp.delegateTyped.freemiumDBPPromotionViewCoordinator
+         activeRemoteMessageModel: ActiveRemoteMessageModel = NSApp.delegateTyped.activeRemoteMessageModel
     ) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -106,7 +103,6 @@ final class BrowserTabViewController: NSViewController {
         self.featureFlagger = featureFlagger
         self.newTabPageActionsManager = newTabPageActionsManager
         self.activeRemoteMessageModel = activeRemoteMessageModel
-        self.freemiumDBPPromotionViewCoordinator = freemiumDBPPromotionViewCoordinator
         containerStackView = NSStackView()
 
         super.init(nibName: nil, bundle: nil)
