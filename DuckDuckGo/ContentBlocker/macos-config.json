@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1734691010823,
+    "version": 1736158448802,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -5158,6 +5158,22 @@
                             {
                                 "selector": "[class*='sdaContainer']",
                                 "type": "hide"
+                            },
+                            {
+                                "selector": "#sda-Horizon-viewer",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='mrt-node-Lead']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='mrt-node-Secondary']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='rrvkqH1']",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -5327,7 +5343,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "f03105d9a96fe2bc97460562f6f61ee2"
+            "hash": "4b7d6ec384400e39c7ad8ca500154b1c"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5556,9 +5572,6 @@
                     "domain": "secureserver.net"
                 },
                 {
-                    "domain": "hyatt.com"
-                },
-                {
                     "domain": "proton.me"
                 },
                 {
@@ -5626,7 +5639,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "04e4f97a4ad60cd13663ac5d486d3ac4"
+            "hash": "53cc82526eaeeaa1490c8538b78fdb35"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -5658,9 +5671,6 @@
                     "domain": "godaddy.com"
                 },
                 {
-                    "domain": "hyatt.com"
-                },
-                {
                     "domain": "litebluesso.usps.gov"
                 },
                 {
@@ -5683,7 +5693,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "9c9c85ea83b8e7c6d07c20d1539a000f"
+            "hash": "a26b20181df02a3dc1cce0945d6e0ccb"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [
@@ -5776,6 +5786,9 @@
                     "domain": "visible.com"
                 },
                 {
+                    "domain": "flyfrontier.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -5800,7 +5813,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "7bac9629b3b6d7cbe2e473c1273d31ee"
+            "hash": "fdb3180769d77fd3cedfc8601e184dcd"
         },
         "harmfulApis": {
             "settings": {
@@ -8023,6 +8036,7 @@
                                     "eatroyo.com",
                                     "experian.com",
                                     "ljsilvers.com",
+                                    "tesla.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
                                     "vanguardplan.com",
@@ -8713,6 +8727,16 @@
                                 "rule": "cdn.accounts.nintendo.com/account/js/common.js",
                                 "domains": [
                                     "nintendo.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "nitropay.com": {
+                        "rules": [
+                            {
+                                "rule": "nitropay.com/ads",
+                                "domains": [
+                                    "maxroll.gg"
                                 ]
                             }
                         ]
@@ -9989,7 +10013,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "b97838ac43243028e26d0b2e1d73c12a"
+            "hash": "55d91756006df4ec366628990eb345d5"
         },
         "trackingCookies1p": {
             "settings": {

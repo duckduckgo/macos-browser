@@ -181,6 +181,9 @@
                   Identifier = "HTTPSUpgradeIntegrationTests">
                </Test>
                <Test
+                  Identifier = "MaliciousSiteProtectionIntegrationTests">
+               </Test>
+               <Test
                   Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
                </Test>
                <Test
