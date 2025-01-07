@@ -370,7 +370,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
      * before cancelling the subscription.
      */
     @discardableResult
-    func waitForViewModelUpdate(for duration: TimeInterval = 1, _ block: () async -> Void = {}) async throws -> PromotionViewModel? {
+    private func waitForViewModelUpdate(for duration: TimeInterval = 1, _ block: () async -> Void = {}) async throws -> PromotionViewModel? {
         let expectation = self.expectation(description: "viewModelUpdate")
         let cancellable = sut.$viewModel.dropFirst().prefix(1).sink { _ in expectation.fulfill() }
 

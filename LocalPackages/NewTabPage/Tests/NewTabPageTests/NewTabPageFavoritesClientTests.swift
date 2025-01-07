@@ -25,11 +25,11 @@ import XCTest
 final class NewTabPageFavoritesClientTests: XCTestCase {
     typealias NewTabPageFavoritesClientUnderTest = NewTabPageFavoritesClient<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>
 
-    var client: NewTabPageFavoritesClientUnderTest!
-    var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
-    var actionsHandler: CapturingNewTabPageFavoritesActionsHandler!
-    var favoritesModel: NewTabPageFavoritesModel<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>!
-    var userScript: NewTabPageUserScript!
+    private var client: NewTabPageFavoritesClientUnderTest!
+    private var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
+    private var actionsHandler: CapturingNewTabPageFavoritesActionsHandler!
+    private var favoritesModel: NewTabPageFavoritesModel<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>!
+    private var userScript: NewTabPageUserScript!
 
     @MainActor
     override func setUpWithError() throws {

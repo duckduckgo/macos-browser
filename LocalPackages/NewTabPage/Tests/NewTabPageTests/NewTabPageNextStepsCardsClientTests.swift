@@ -22,9 +22,9 @@ import XCTest
 @testable import NewTabPage
 
 final class NewTabPageNextStepsCardsClientTests: XCTestCase {
-    var client: NewTabPageNextStepsCardsClient!
-    var model: CapturingNewTabPageNextStepsCardsProvider!
-    var userScript: NewTabPageUserScript!
+    private var client: NewTabPageNextStepsCardsClient!
+    private var model: CapturingNewTabPageNextStepsCardsProvider!
+    private var userScript: NewTabPageUserScript!
 
     @MainActor
     override func setUpWithError() throws {

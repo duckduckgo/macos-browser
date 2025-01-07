@@ -22,9 +22,9 @@ import XCTest
 @testable import NewTabPage
 
 final class NewTabPageFreemiumDBPClientTests: XCTestCase {
-    var client: NewTabPageFreemiumDBPClient!
-    var provider: CapturingNewTabPageFreemiumDBPBannerProvider!
-    var userScript: NewTabPageUserScript!
+    private var client: NewTabPageFreemiumDBPClient!
+    private var provider: CapturingNewTabPageFreemiumDBPBannerProvider!
+    private var userScript: NewTabPageUserScript!
 
     override func setUpWithError() throws {
         try super.setUpWithError()

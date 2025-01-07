@@ -22,9 +22,9 @@ import XCTest
 @testable import NewTabPage
 
 final class NewTabPageCustomBackgroundClientTests: XCTestCase {
-    var client: NewTabPageCustomBackgroundClient!
-    var model: CapturingNewTabPageCustomBackgroundProvider!
-    var userScript: NewTabPageUserScript!
+    private var client: NewTabPageCustomBackgroundClient!
+    private var model: CapturingNewTabPageCustomBackgroundProvider!
+    private var userScript: NewTabPageUserScript!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
