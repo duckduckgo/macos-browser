@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "fcappelli/subscription_oauth_api_v2",
-        "revision" : "de310ea9360d8bd1c1a0243ad6e6e39b1470a4c8"
+        "revision" : "d1998cae838ac33584b24c99662dd898e2eca0f0"
       }
     },
     {

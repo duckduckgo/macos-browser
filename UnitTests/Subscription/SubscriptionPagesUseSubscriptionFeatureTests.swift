@@ -28,7 +28,6 @@ import PixelKitTestingUtilities
 import os.log
 import DataBrokerProtection
 import Networking
-import Networking
 import NetworkingTestingUtils
 
 @available(macOS 12.0, *)
