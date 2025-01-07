@@ -21,7 +21,7 @@ import Foundation
 import NewTabPage
 
 final class CapturingNewTabPageFreemiumDBPBannerProvider: NewTabPageFreemiumDBPBannerProviding {
-    @Published var bannerMessage: NewTabPageDataModel.FreemiumPIRBannerMessage? = nil
+    @Published var bannerMessage: NewTabPageDataModel.FreemiumPIRBannerMessage?
 
     var bannerMessagePublisher: AnyPublisher<NewTabPageDataModel.FreemiumPIRBannerMessage?, Never> {
         $bannerMessage.dropFirst().eraseToAnyPublisher()
@@ -40,6 +40,8 @@ final class CapturingNewTabPageFreemiumDBPBannerProvider: NewTabPageFreemiumDBPB
     var dismissCallCount: Int = 0
     var actionCallCount: Int = 0
 
+    // swiftlint:disable identifier_name
     var _dismiss: () async -> Void = {}
     var _action: () async -> Void = {}
+    // swiftlint:enable identifier_name
 }
