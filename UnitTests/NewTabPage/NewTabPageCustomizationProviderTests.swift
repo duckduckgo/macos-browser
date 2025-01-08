@@ -17,6 +17,7 @@
 //
 
 import AppKitExtensions
+import Combine
 import NewTabPage
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
@@ -26,6 +27,7 @@ final class NewTabPageCustomizationProviderTests: XCTestCase {
     var appearancePreferences: AppearancePreferences!
     var userColorProvider: MockUserColorProvider!
     var userBackgroundImagesManager: CapturingUserBackgroundImagesManager!
+    var openFilePanelCalls: Int = 0
     private var settingsModel: HomePage.Models.SettingsModel!
     private var provider: NewTabPageCustomizationProvider!
 
@@ -36,12 +38,16 @@ final class NewTabPageCustomizationProviderTests: XCTestCase {
         storageLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         userBackgroundImagesManager = CapturingUserBackgroundImagesManager(storageLocation: storageLocation, maximumNumberOfImages: 4)
         userColorProvider = MockUserColorProvider()
+        openFilePanelCalls = 0
 
         settingsModel = HomePage.Models.SettingsModel(
             appearancePreferences: appearancePreferences,
             userBackgroundImagesManager: userBackgroundImagesManager,
             sendPixel: { _ in },
-            openFilePanel: { nil },
+            openFilePanel: {
+                self.openFilePanelCalls += 1
+                return nil
+            },
             userColorProvider: self.userColorProvider,
             showAddImageFailedAlert: {},
             navigator: MockHomePageSettingsModelNavigator()
@@ -121,14 +127,132 @@ final class NewTabPageCustomizationProviderTests: XCTestCase {
         )
     }
 
+    func testThatBackgroundPublisherPublishesEvents() throws {
+        var events: [NewTabPageDataModel.Background] = []
+        let cancellable = provider.backgroundPublisher.sink { events.append($0) }
+
+        settingsModel.customBackground = .gradient(.gradient04)
+        settingsModel.customBackground = .solidColor(.color13)
+        settingsModel.customBackground = .solidColor(.color13)
+        settingsModel.customBackground = .solidColor(.color13)
+        settingsModel.customBackground = .solidColor(.color13)
+        settingsModel.customBackground = .solidColor(try XCTUnwrap(.init("#123abc")))
+        settingsModel.customBackground = nil
+        settingsModel.customBackground = .userImage(.init(fileName: "1.jpg", colorScheme: .light))
+
+        cancellable.cancel()
+
+        XCTAssertEqual(
+            events,
+            [
+                .gradient("gradient04"),
+                .solidColor("color13"),
+                .hexColor("#123abc"),
+                .default,
+                .userImage(.init(.init(fileName: "1.jpg", colorScheme: .light)))
+            ]
+        )
+    }
+
+    func testThatThemeGetterReturnsAppearancePreferencesTheme() {
+        appearancePreferences.currentThemeName = .dark
+        XCTAssertEqual(provider.theme, .dark)
+        appearancePreferences.currentThemeName = .light
+        XCTAssertEqual(provider.theme, .light)
+        appearancePreferences.currentThemeName = .systemDefault
+        XCTAssertEqual(provider.theme, nil)
+    }
+
+    func testThatThemeSetterSetsAppearancePreferencesTheme() {
+        provider.theme = .dark
+        XCTAssertEqual(appearancePreferences.currentThemeName, .dark)
+        provider.theme = .light
+        XCTAssertEqual(appearancePreferences.currentThemeName, .light)
+        provider.theme = nil
+        XCTAssertEqual(appearancePreferences.currentThemeName, .systemDefault)
+    }
+
+    func testThatThemePublisherPublishesEvents() throws {
+        var events: [NewTabPageDataModel.Theme?] = []
+        let cancellable = provider.themePublisher.sink { events.append($0) }
+
+        appearancePreferences.currentThemeName = .light
+        appearancePreferences.currentThemeName = .dark
+        appearancePreferences.currentThemeName = .dark
+        appearancePreferences.currentThemeName = .dark
+        appearancePreferences.currentThemeName = .dark
+        appearancePreferences.currentThemeName = .systemDefault
+        appearancePreferences.currentThemeName = .systemDefault
+        appearancePreferences.currentThemeName = .light
+
+        cancellable.cancel()
+
+        XCTAssertEqual(events, [.light, .dark, nil, .light])
+    }
+
+    func testThatUserImagesPublisherPublishesEvents() async throws {
+        var events: [[NewTabPageDataModel.UserImage]] = []
+        let cancellable = provider.userImagesPublisher.sink { events.append($0) }
+
+        let image1 = UserBackgroundImage(fileName: "1.jpg", colorScheme: .light)
+        let image2 = UserBackgroundImage(fileName: "2.jpg", colorScheme: .dark)
+
+        try await waitForAvailableUserBackgroundImages {
+            userBackgroundImagesManager.availableImages = [image1]
+        }
+        try await waitForAvailableUserBackgroundImages {
+            userBackgroundImagesManager.availableImages = [image1, image2]
+        }
+        try await waitForAvailableUserBackgroundImages(inverted: true) {
+            userBackgroundImagesManager.availableImages = [image1, image2]
+        }
+        try await waitForAvailableUserBackgroundImages(inverted: true) {
+            userBackgroundImagesManager.availableImages = [image1, image2]
+        }
+        try await waitForAvailableUserBackgroundImages {
+            userBackgroundImagesManager.availableImages = []
+        }
+        try await waitForAvailableUserBackgroundImages {
+            userBackgroundImagesManager.availableImages = [image2, image1]
+        }
+
+        cancellable.cancel()
+
+        XCTAssertEqual(events, [
+            [.init(image1)],
+            [.init(image1), .init(image2)],
+            [],
+            [.init(image2), .init(image1)]
+        ])
+    }
+
+    func testThatPresentUploadDialogCallsAddImage() async {
+        await provider.presentUploadDialog()
+        XCTAssertEqual(openFilePanelCalls, 1)
+    }
+
+    func testThatDeleteImageCallsImagesManager() async throws {
+        try await waitForAvailableUserBackgroundImages {
+            userBackgroundImagesManager.availableImages = [.init(fileName: "1.jpg", colorScheme: .light)]
+        }
+        await provider.deleteImage(with: "1.jpg")
+        XCTAssertEqual(userBackgroundImagesManager.deleteImageCallCount, 1)
+    }
+
+    func testThatDeleteImageReturnsEarlyIfImageIsNotPresent() async {
+        await provider.deleteImage(with: "aaaaaa.jpg")
+        XCTAssertEqual(userBackgroundImagesManager.deleteImageCallCount, 0)
+    }
+
     // MARK: - Helpers
 
     /**
      * Sets up an expectation, then sets up Combine subscription for `settingsModel.$availableUserBackgroundImages` that fulfills
      * the expectation, then calls the provided `block` and waits for time specified by `duration` before cancelling the subscription.
      */
-    private func waitForAvailableUserBackgroundImages(for duration: TimeInterval = 1, _ block: () async -> Void = {}) async throws {
+    private func waitForAvailableUserBackgroundImages(for duration: TimeInterval = 1, inverted: Bool = false, _ block: () async -> Void = {}) async throws {
         let expectation = self.expectation(description: "viewModelUpdate")
+        expectation.isInverted = inverted
         let cancellable = settingsModel.$availableUserBackgroundImages.dropFirst().prefix(1).sink { _ in expectation.fulfill() }
 
         await block()

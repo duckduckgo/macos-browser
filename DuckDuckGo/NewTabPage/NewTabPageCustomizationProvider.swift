@@ -79,7 +79,7 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
     }
 
     @MainActor
-    func presentUploadDialog() async{
+    func presentUploadDialog() async {
         await homePageSettingsModel.addNewImage()
     }
 
@@ -187,15 +187,5 @@ extension NewTabPageDataModel.Theme {
         case .systemDefault:
             return nil
         }
-    }
-}
-
-extension URL {
-    static func duckUserBackgroundImage(for fileName: String) -> URL? {
-        return URL(string: "duck://user-background-image/\(fileName)")
-    }
-
-    static func duckUserBackgroundImageThumbnail(for fileName: String) -> URL? {
-        return URL(string: "duck://user-background-image/thumbnails/\(fileName)")
     }
 }
