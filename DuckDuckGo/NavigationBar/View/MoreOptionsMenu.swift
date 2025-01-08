@@ -419,8 +419,6 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     @MainActor
     private func addSubscriptionItems() {
-        guard subscriptionFeatureAvailability.isFeatureAvailable else { return }
-
         func shouldHideDueToNoProduct() -> Bool {
             let platform = subscriptionManager.currentEnvironment.purchasePlatform
             return platform == .appStore && subscriptionManager.canPurchase == false
@@ -966,7 +964,7 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func refreshAvailabilityBasedOnEntitlements() {
-        guard subscriptionFeatureAvailability.isFeatureAvailable, subscriptionManager.accountManager.isUserAuthenticated else { return }
+        guard subscriptionManager.accountManager.isUserAuthenticated else { return }
 
         @Sendable func hasEntitlement(for productName: Entitlement.ProductName) async -> Bool {
             switch await self.subscriptionManager.accountManager.hasEntitlement(forProductName: productName) {
