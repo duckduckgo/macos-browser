@@ -188,11 +188,13 @@ private extension DuckURLSchemeHandler {
 
 private extension DuckURLSchemeHandler {
     /**
-     * This handler supports special Duck favicon URLs and uses `FaviconManager`
-     * to return a favicon in response, based on the actual favicon URL that's
-     * encoded in the URL path.
+     * This handler supports Duck custom background image URL and uses `UserBackgroundImagesManager`
+     * to return an image in response, based on the image ID (file name) that's the last component of the URL path.
+
+     * Custom Background image has the format of `duck://new-tab/background/images/<file_name>`.
+     * Custom Background image thumbnail has the format of `duck://new-tab/background/thumbnails/<file_name>`.
      *
-     * If favicon is not found, an `HTTP 404` response is returned.
+     * If an image is not found, an `HTTP 404` response is returned.
      */
     func handleCustomBackgroundImage(urlSchemeTask: WKURLSchemeTask, isThumbnail: Bool = false) {
         guard let requestURL = urlSchemeTask.request.url else {
@@ -200,10 +202,6 @@ private extension DuckURLSchemeHandler {
             return
         }
 
-        /**
-         * Custom Background image has the format of `duck://new-tab/background/images/<file_name>`.
-         * Custom Background image thumbnail has the format of `duck://new-tab/background/thumbnails/<file_name>`.
-         */
         let fileName = requestURL.lastPathComponent
 
         guard let (response, data) = response(for: requestURL, withFileName: fileName, isThumbnail: isThumbnail) else { return }
