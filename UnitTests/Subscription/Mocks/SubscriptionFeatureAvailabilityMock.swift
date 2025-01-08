@@ -23,11 +23,9 @@ import BrowserServicesKit
 public final class SubscriptionFeatureAvailabilityMock: SubscriptionFeatureAvailability {
     public var isFeatureAvailable: Bool
     public var isSubscriptionPurchaseAllowed: Bool
-    public var usesUnifiedFeedbackForm: Bool
 
-    public init(isFeatureAvailable: Bool, isSubscriptionPurchaseAllowed: Bool, usesUnifiedFeedbackForm: Bool) {
+    public init(isFeatureAvailable: Bool, isSubscriptionPurchaseAllowed: Bool) {
         self.isFeatureAvailable = isFeatureAvailable
         self.isSubscriptionPurchaseAllowed = isSubscriptionPurchaseAllowed
-        self.usesUnifiedFeedbackForm = usesUnifiedFeedbackForm
     }
 }
