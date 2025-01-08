@@ -25,25 +25,27 @@ final class NewTabPageFreemiumDBPClientTests: XCTestCase {
     private var client: NewTabPageFreemiumDBPClient!
     private var provider: CapturingNewTabPageFreemiumDBPBannerProvider!
     private var userScript: NewTabPageUserScript!
+    private var messageHelper: MessageHelper<NewTabPageFreemiumDBPClient.MessageName>!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         provider = CapturingNewTabPageFreemiumDBPBannerProvider()
         client = NewTabPageFreemiumDBPClient(provider: provider)
         userScript = NewTabPageUserScript()
+        messageHelper = .init(userScript: userScript)
         client.registerMessageHandlers(for: userScript)
     }
 
     // MARK: - getData
 
     func testWhenMessageIsNilThenGetDataReturnsNilMessage() async throws {
-        let messageData: NewTabPageDataModel.FreemiumPIRBannerMessageData = try await sendMessage(named: .getData)
+        let messageData: NewTabPageDataModel.FreemiumPIRBannerMessageData = try await messageHelper.handleMessage(named: .getData)
         XCTAssertNil(messageData.content)
     }
 
     func testThatGetDataReturnsMessageIfPresent() async throws {
         provider.bannerMessage = .init(titleText: "sample_title", descriptionText: "sample_description", actionText: "sample_action")
-        let messageData: NewTabPageDataModel.FreemiumPIRBannerMessageData = try await sendMessage(named: .getData)
+        let messageData: NewTabPageDataModel.FreemiumPIRBannerMessageData = try await messageHelper.handleMessage(named: .getData)
         let message = try XCTUnwrap(messageData.content)
         XCTAssertEqual(message, .init(titleText: "sample_title", descriptionText: "sample_description", actionText: "sample_action"))
     }
@@ -51,28 +53,14 @@ final class NewTabPageFreemiumDBPClientTests: XCTestCase {
     // MARK: - dismiss
 
     func testThatDismissIsForwardedToProvider() async throws {
-        try await sendMessageExpectingNilResponse(named: .dismiss)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .dismiss)
         XCTAssertEqual(provider.dismissCallCount, 1)
     }
 
     // MARK: - action
 
     func testThatActionIsForwardedToProvider() async throws {
-        try await sendMessageExpectingNilResponse(named: .action)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .action)
         XCTAssertEqual(provider.actionCallCount, 1)
-    }
-
-    // MARK: - Helper functions
-
-    func sendMessage<Response: Encodable>(named methodName: NewTabPageFreemiumDBPClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
-        return try XCTUnwrap(response as? Response, file: file, line: line)
-    }
-
-    func sendMessageExpectingNilResponse(named methodName: NewTabPageFreemiumDBPClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
-        XCTAssertNil(response, file: file, line: line)
     }
 }

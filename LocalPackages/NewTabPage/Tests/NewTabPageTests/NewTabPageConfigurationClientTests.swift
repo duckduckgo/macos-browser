@@ -26,6 +26,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
     private var sectionsVisibilityProvider: MockNewTabPageSectionsVisibilityProvider!
     private var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
     private var userScript: NewTabPageUserScript!
+    private var messageHelper: MessageHelper<NewTabPageConfigurationClient.MessageName>!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -39,6 +40,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         )
 
         userScript = NewTabPageUserScript()
+        messageHelper = .init(userScript: userScript)
         client.registerMessageHandlers(for: userScript)
     }
 
@@ -53,7 +55,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
             .init(id: .favorites, title: "Favorites"),
             .init(id: .privacyStats, title: "Privacy Stats")
         ])
-        try await sendMessageExpectingNilResponse(named: .contextMenu, parameters: parameters)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .contextMenu, parameters: parameters)
 
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 1)
         let menu = try XCTUnwrap(contextMenuPresenter.showContextMenuCalls.first)
@@ -66,7 +68,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
 
     func testWhenContextMenuParamsIsEmptyThenContextMenuDoesNotShow() async throws {
         let parameters = NewTabPageDataModel.ContextMenuParams(visibilityMenuItems: [])
-        try await sendMessageExpectingNilResponse(named: .contextMenu, parameters: parameters)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .contextMenu, parameters: parameters)
 
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 0)
     }
@@ -74,7 +76,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
     // MARK: - initialSetup
 
     func testThatInitialSetupReturnsConfiguration() async throws {
-        let configuration: NewTabPageDataModel.NewTabPageConfiguration = try await sendMessage(named: .initialSetup)
+        let configuration: NewTabPageDataModel.NewTabPageConfiguration = try await messageHelper.handleMessage(named: .initialSetup)
         XCTAssertEqual(configuration.widgets, [
             .init(id: .rmf),
             .init(id: .freemiumPIRBanner),
@@ -96,7 +98,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
             .init(id: .favorites, isVisible: false),
             .init(id: .privacyStats, isVisible: true)
         ]
-        try await sendMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
         XCTAssertEqual(sectionsVisibilityProvider.isFavoritesVisible, false)
         XCTAssertEqual(sectionsVisibilityProvider.isPrivacyStatsVisible, true)
     }
@@ -107,22 +109,8 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         let configs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
             .init(id: .privacyStats, isVisible: false)
         ]
-        try await sendMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
         XCTAssertEqual(sectionsVisibilityProvider.isFavoritesVisible, initialIsFavoritesVisible)
         XCTAssertEqual(sectionsVisibilityProvider.isPrivacyStatsVisible, false)
-    }
-
-    // MARK: - Helper functions
-
-    func sendMessage<Response: Encodable>(named methodName: NewTabPageConfigurationClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
-        return try XCTUnwrap(response as? Response, file: file, line: line)
-    }
-
-    func sendMessageExpectingNilResponse(named methodName: NewTabPageConfigurationClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
-        XCTAssertNil(response, file: file, line: line)
     }
 }

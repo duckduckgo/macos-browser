@@ -30,6 +30,7 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     private var actionsHandler: CapturingNewTabPageFavoritesActionsHandler!
     private var favoritesModel: NewTabPageFavoritesModel<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>!
     private var userScript: NewTabPageUserScript!
+    private var messageHelper: MessageHelper<NewTabPageFavoritesClientUnderTest.MessageName>!
 
     @MainActor
     override func setUpWithError() throws {
@@ -46,13 +47,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
         client = NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: 100)
 
         userScript = NewTabPageUserScript()
+        messageHelper = .init(userScript: userScript)
         client.registerMessageHandlers(for: userScript)
     }
 
     // MARK: - add
 
     func testThatAddCallsAddAction() async throws {
-        try await handleMessageExpectingNilResponse(named: .add)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .add)
         XCTAssertEqual(actionsHandler.addNewFavoriteCallCount, 1)
     }
 
@@ -60,14 +62,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testWhenFavoritesViewIsExpandedThenGetConfigReturnsExpandedState() async throws {
         favoritesModel.isViewExpanded = true
-        let config: NewTabPageUserScript.WidgetConfig = try await handleMessage(named: .getConfig)
+        let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
         XCTAssertEqual(config.animation, .auto)
         XCTAssertEqual(config.expansion, .expanded)
     }
 
     func testWhenFavoritesViewIsCollapsedThenGetConfigReturnsCollapsedState() async throws {
         favoritesModel.isViewExpanded = false
-        let config: NewTabPageUserScript.WidgetConfig = try await handleMessage(named: .getConfig)
+        let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
         XCTAssertEqual(config.animation, .auto)
         XCTAssertEqual(config.expansion, .collapsed)
     }
@@ -77,14 +79,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     func testWhenSetConfigContainsExpandedStateThenFavoritesModelSettingIsSetToExpanded() async throws {
         favoritesModel.isViewExpanded = false
         let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .expanded)
-        try await handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(favoritesModel.isViewExpanded, true)
     }
 
     func testWhenSetConfigContainsCollapsedStateThenFavoritesModelSettingIsSetToCollapsed() async throws {
         favoritesModel.isViewExpanded = true
         let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .collapsed)
-        try await handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(favoritesModel.isViewExpanded, false)
     }
 
@@ -98,7 +100,7 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
             MockNewTabPageFavorite(id: "2", title: "D", url: "https://d.com"),
             MockNewTabPageFavorite(id: "3", title: "E", url: "https://e.com")
         ]
-        let data: NewTabPageDataModel.FavoritesData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.FavoritesData = try await messageHelper.handleMessage(named: .getData)
         XCTAssertEqual(data.favorites, [
             .init(id: "1", title: "A", url: "https://a.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//a.com")),
             .init(id: "10", title: "B", url: "https://b.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//b.com")),
@@ -110,7 +112,7 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testWhenFavoritesAreEmptyThenGetDataReturnsNoFavorites() async throws {
         favoritesModel.favorites = []
-        let data: NewTabPageDataModel.FavoritesData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.FavoritesData = try await messageHelper.handleMessage(named: .getData)
         XCTAssertEqual(data.favorites, [])
     }
 
@@ -118,13 +120,13 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testThatMoveActionIsForwardedToTheModel() async throws {
         let action = NewTabPageDataModel.FavoritesMoveAction(id: "abcd", fromIndex: 10, targetIndex: 4)
-        try await handleMessageExpectingNilResponse(named: .move, parameters: action)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .move, parameters: action)
         XCTAssertEqual(actionsHandler.moveCalls, [.init("abcd", 4)])
     }
 
     func testThatWhenFavoriteIsMovedToHigherIndexThenModelIncrementsIndex() async throws {
         let action = NewTabPageDataModel.FavoritesMoveAction(id: "abcd", fromIndex: 1, targetIndex: 4)
-        try await handleMessageExpectingNilResponse(named: .move, parameters: action)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .move, parameters: action)
         XCTAssertEqual(actionsHandler.moveCalls, [.init("abcd", 5)])
     }
 
@@ -132,13 +134,13 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testThatOpenActionIsForwardedToTheModel() async throws {
         let action = NewTabPageDataModel.FavoritesOpenAction(id: "abcd", url: "https://example.com")
-        try await handleMessageExpectingNilResponse(named: .open, parameters: action)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .open, parameters: action)
         XCTAssertEqual(actionsHandler.openCalls, [.init(URL(string: "https://example.com")!, .current)])
     }
 
     func testWhenURLIsInvalidThenOpenActionIsNotForwardedToTheModel() async throws {
         let action = NewTabPageDataModel.FavoritesOpenAction(id: "abcd", url: "abcd")
-        try await handleMessageExpectingNilResponse(named: .open, parameters: action)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .open, parameters: action)
         XCTAssertEqual(actionsHandler.openCalls, [])
     }
 
@@ -147,28 +149,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     func testThatOpenContextMenuActionForExistingFavoriteIsForwardedToTheModel() async throws {
         favoritesModel.favorites = [.init(id: "abcd", title: "A", url: "https://example.com")]
         let action = NewTabPageDataModel.FavoritesContextMenuAction(id: "abcd")
-        try await handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 1)
     }
 
     func testThatOpenContextMenuActionForNotExistingFavoriteIsNotForwardedToTheModel() async throws {
         favoritesModel.favorites = []
         let action = NewTabPageDataModel.FavoritesContextMenuAction(id: "abcd")
-        try await handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .openContextMenu, parameters: action)
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 0)
-    }
-
-    // MARK: - Helper functions
-
-    func handleMessage<Response: Encodable>(named methodName: NewTabPageFavoritesClientUnderTest.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
-        return try XCTUnwrap(response as? Response, file: file, line: line)
-    }
-
-    func handleMessageExpectingNilResponse(named methodName: NewTabPageFavoritesClientUnderTest.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
-        XCTAssertNil(response, file: file, line: line)
     }
 }
