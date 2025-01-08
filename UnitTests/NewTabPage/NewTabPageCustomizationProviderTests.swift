@@ -218,6 +218,11 @@ final class NewTabPageCustomizationProviderTests: XCTestCase {
 
         cancellable.cancel()
 
+        /// Slower machines may capture the initial empty array event so let's filter it out here
+        if events.first == [] {
+            events = Array(events.dropFirst())
+        }
+
         XCTAssertEqual(events, [
             [.init(image1)],
             [.init(image1), .init(image2)],
