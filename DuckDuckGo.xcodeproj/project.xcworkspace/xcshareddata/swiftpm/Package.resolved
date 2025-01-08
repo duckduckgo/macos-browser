@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "e8f94cf597f4a447f86f39f461b736ac9ea280ce",
-        "version" : "223.0.0"
+        "branch" : "michal/fix-expired-subscription-refresh-loop",
+        "revision" : "57f5cd3c5bdd99b330b4e6c3cef89ca6e12f2774"
       }
     },
     {
