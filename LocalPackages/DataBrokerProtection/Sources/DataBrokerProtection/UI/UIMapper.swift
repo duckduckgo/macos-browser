@@ -32,6 +32,10 @@ struct MapperToUI {
             return accumulator + brokerQueryData.totalScans
         }
 
+        let currentScans = groupedByBroker.reduce(0) { accumulator, brokerQueryData in
+            return accumulator + brokerQueryData.currentScans
+        }
+
         let withSortedGroups = groupedByBroker.map { $0.sortedByLastRunDate() }
 
         let sorted = withSortedGroups.sortedByLastRunDate()
@@ -40,7 +44,7 @@ struct MapperToUI {
             brokerQueryGroup.scannedBrokers
         }
 
-        let scanProgress = DBPUIScanProgress(currentScans: partiallyScannedBrokers.count,
+        let scanProgress = DBPUIScanProgress(currentScans: currentScans,
                                              totalScans: totalScans,
                                              scannedBrokers: partiallyScannedBrokers)
 
@@ -373,6 +377,18 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     var totalScans: Int {
         guard let broker = self.first?.dataBroker else { return 0 }
         return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+    }
+
+    var currentScans: Int {
+        guard let broker = self.first?.dataBroker else { return 0 }
+
+        let didAllQueriesFinished = allSatisfy { $0.scanJobData.lastRunDate != nil }
+
+        if !didAllQueriesFinished {
+            return 0
+        } else {
+            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+        }
     }
 
     /// Returns an array of brokers which have been either fully or partially scanned
