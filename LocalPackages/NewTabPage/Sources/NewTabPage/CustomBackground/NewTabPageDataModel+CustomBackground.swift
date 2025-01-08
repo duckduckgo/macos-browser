@@ -88,6 +88,26 @@ public extension NewTabPageDataModel {
         case gradient(String)
         case userImage(UserImage)
 
+        /**
+         * Custom implementation of this function is here to perform case-insensitive comparison for hex colors.
+         */
+        public static func == (lhs: Background, rhs: Background) -> Bool {
+            switch (lhs, rhs) {
+            case (.default, .default):
+                return true
+            case (.solidColor(let lColor), .solidColor(let rColor)):
+                return lColor == rColor
+            case (.hexColor(let lColor), .hexColor(let rColor)):
+                return lColor.lowercased() == rColor.lowercased()
+            case (.gradient(let lGradient), .gradient(let rGradient)):
+                return lGradient == rGradient
+            case (.userImage(let lUserImage), .userImage(let rUserImage)):
+                return lUserImage == rUserImage
+            default:
+                return false
+            }
+        }
+
         enum CodingKeys: CodingKey {
             case kind
             case value
