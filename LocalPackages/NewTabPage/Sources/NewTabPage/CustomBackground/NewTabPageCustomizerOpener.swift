@@ -1,5 +1,5 @@
 //
-//  NewTabPageCustomizerDisplayer.swift
+//  NewTabPageCustomizerOpener.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,6 +19,15 @@
 import Combine
 import WebKit
 
+/**
+ * This small class exposes an interface that allows for triggering
+ * events that should open New Tab Page settings.
+ *
+ * It's a requirement in `NewTabPageCustomBackgroundProviding` protocol
+ * and must be provided by classes implementing that protocol on the client app side.
+ * `NewTabPageCustomBackgroundClient` connects to the opener and forwards
+ * open settings requests to the JS side.
+ */
 public final class NewTabPageCustomizerOpener {
     public init() {
         openSettingsPublisher = openSettingsSubject.eraseToAnyPublisher()
