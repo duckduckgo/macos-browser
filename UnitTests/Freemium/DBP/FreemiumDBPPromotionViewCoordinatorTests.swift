@@ -33,7 +33,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     private var mockPixelHandler: MockFreemiumDBPExperimentPixelHandler!
     private var cancellables: Set<AnyCancellable> = []
 
-    @MainActor
     override func setUpWithError() throws {
         mockUserStateManager = MockFreemiumDBPUserStateManager()
         mockFeature = MockFreemiumDBPFeature()
@@ -57,7 +56,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockPresenter = nil
     }
 
-    @MainActor
     func testInitialPromotionVisibility_whenFeatureIsAvailable_andNotDismissed() {
         // Given
         mockUserStateManager.didDismissHomePagePromotion = false
@@ -74,7 +72,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertTrue(sut.isHomePagePromotionVisible)
     }
 
-    @MainActor
     func testInitialPromotionVisibility_whenPromotionDismissed() {
         // Given
         mockUserStateManager.didDismissHomePagePromotion = true
@@ -91,7 +88,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertFalse(sut.isHomePagePromotionVisible)
     }
 
-    @MainActor
     func testProceedAction_dismissesPromotion_callsShowFreemium_andFiresPixel() async throws {
         // Given
         try await waitForViewModelUpdate {
@@ -109,7 +105,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabScanClick)
     }
 
-    @MainActor
     func testCloseAction_dismissesPromotion_andFiresPixel() async throws {
         // When
         try await waitForViewModelUpdate()
@@ -121,7 +116,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabScanDismiss)
     }
 
-    @MainActor
     func testProceedAction_dismissesResults_callsShowFreemium_andFiresPixel() async throws {
         // Given
         try await waitForViewModelUpdate {
@@ -139,7 +133,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabResultsClick)
     }
 
-    @MainActor
     func testCloseAction_dismissesResults_andFiresPixel() async throws {
         // Given
         try await waitForViewModelUpdate {
@@ -155,7 +148,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabResultsDismiss)
     }
 
-    @MainActor
     func testProceedAction_dismissesNoResults_callsShowFreemium_andFiresPixel() async throws {
         // Given
         try await waitForViewModelUpdate {
@@ -173,7 +165,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabNoResultsClick)
     }
 
-    @MainActor
     func testCloseAction_dismissesNoResults_andFiresPixel() async throws {
         // Given
         try await waitForViewModelUpdate {
@@ -189,7 +180,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabNoResultsDismiss)
     }
 
-    @MainActor
     func testViewModel_whenResultsExist_withMatches() async throws {
         // Given
         try await waitForViewModelUpdate {
@@ -203,7 +193,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertEqual(viewModel?.description, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralDescription(resultCount: 5, brokerCount: 2))
     }
 
-    @MainActor
     func testViewModel_whenNoResultsExist() async throws {
         // Given
         let viewModel = try await waitForViewModelUpdate {
@@ -214,7 +203,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertEqual(viewModel?.description, UserText.homePagePromotionFreemiumDBPDescriptionMarkdown)
     }
 
-    @MainActor
     func testViewModel_whenFeatureNotEnabled() async throws {
         // Given
         try await waitForViewModelUpdate {
@@ -242,7 +230,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertFalse(mockUserStateManager.didDismissHomePagePromotion)
     }
 
-    @MainActor
     func testHomePageBecomesVisible_whenFeatureBecomesAvailable_andDidDismissFalse() {
         // Given
         mockUserStateManager.didDismissHomePagePromotion = false
@@ -272,7 +259,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertTrue(sut.isHomePagePromotionVisible)
     }
 
-    @MainActor
     func testHomePageBecomesInVisible_whenFeatureBecomesUnAvailable_andDidDismissFalse() {
         // Given
         mockUserStateManager.didDismissHomePagePromotion = false
@@ -302,7 +288,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertFalse(sut.isHomePagePromotionVisible)
     }
 
-    @MainActor
     func testHomePageDoesNotBecomeVisible_whenFeatureBecomesAvailable_andDidDismissTrue() {
         // Given
         mockUserStateManager.didDismissHomePagePromotion = true
@@ -332,7 +317,6 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         XCTAssertFalse(sut.isHomePagePromotionVisible)
     }
 
-    @MainActor
     func testHomePageDoesNotBecomeVisible_whenFeatureBecomesUnAvailable_andDidDismissTrue() {
         // Given
         mockUserStateManager.didDismissHomePagePromotion = true
