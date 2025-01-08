@@ -94,7 +94,7 @@ private extension FreemiumDBPPromotionViewCoordinator {
 
     /// Action to be executed when the user proceeds with the promotion (e.g opens DBP)
     var proceedAction: () async -> Void {
-        { [weak self] in
+        { @MainActor [weak self] in
             guard let self else { return }
 
             execute(resultsAction: {
@@ -105,7 +105,7 @@ private extension FreemiumDBPPromotionViewCoordinator {
                 self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabScanClick)
             })
 
-            await showFreemiumDBP()
+            showFreemiumDBP()
             dismissHomePagePromotion()
         }
     }
