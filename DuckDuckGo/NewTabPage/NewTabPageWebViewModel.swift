@@ -37,11 +37,7 @@ final class NewTabPageWebViewModel: NSObject {
     let webView: WebView
     private var windowCancellable: AnyCancellable?
 
-    init(
-        featureFlagger: FeatureFlagger,
-        actionsManager: NewTabPageActionsManaging,
-        activeRemoteMessageModel: ActiveRemoteMessageModel
-    ) {
+    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging, activeRemoteMessageModel: ActiveRemoteMessageModel) {
         newTabPageUserScript = NewTabPageUserScript()
         actionsManager.registerUserScript(newTabPageUserScript)
 
@@ -59,7 +55,6 @@ final class NewTabPageWebViewModel: NSObject {
             .map { $0 != nil }
             .sink { [weak activeRemoteMessageModel] isOnScreen in
                 activeRemoteMessageModel?.isViewOnScreen = isOnScreen
-
                 if isOnScreen {
                     NotificationCenter.default.post(name: .newTabPageWebViewDidAppear, object: nil)
                 }
