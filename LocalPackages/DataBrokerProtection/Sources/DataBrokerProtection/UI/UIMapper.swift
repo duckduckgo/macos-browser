@@ -32,10 +32,6 @@ struct MapperToUI {
             return accumulator + brokerQueryData.totalScans
         }
 
-        let currentScans = groupedByBroker.reduce(0) { accumulator, brokerQueryData in
-            return accumulator + brokerQueryData.currentScans
-        }
-
         let withSortedGroups = groupedByBroker.map { $0.sortedByLastRunDate() }
 
         let sorted = withSortedGroups.sortedByLastRunDate()
@@ -44,7 +40,7 @@ struct MapperToUI {
             brokerQueryGroup.scannedBrokers
         }
 
-        let scanProgress = DBPUIScanProgress(currentScans: currentScans,
+        let scanProgress = DBPUIScanProgress(currentScans: partiallyScannedBrokers.currentScans,
                                              totalScans: totalScans,
                                              scannedBrokers: partiallyScannedBrokers)
 
@@ -379,18 +375,6 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
         return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
     }
 
-    var currentScans: Int {
-        guard let broker = self.first?.dataBroker else { return 0 }
-
-        let didAllQueriesFinished = allSatisfy { $0.scanJobData.lastRunDate != nil }
-
-        if !didAllQueriesFinished {
-            return 0
-        } else {
-            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
-        }
-    }
-
     /// Returns an array of brokers which have been either fully or partially scanned
     ///
     /// A broker is considered fully scanned is all scan jobs for that broker have completed.
@@ -463,6 +447,15 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     func sortedByLastRunDate() -> Self {
         self.sorted { lhs, rhs in
             lhs.scanJobData.lastRunDate < rhs.scanJobData.lastRunDate
+        }
+    }
+}
+
+extension Array where Element == DBPUIScanProgress.ScannedBroker {
+    /// Number of completed broker scans
+    var currentScans: Int {
+        reduce(0) { accumulator, scannedBrokers in
+            scannedBrokers.status == .completed ? accumulator + 1 : accumulator
         }
     }
 }
