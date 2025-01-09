@@ -159,7 +159,6 @@ private class MockFeatureAvailability: SubscriptionFeatureAvailability {
     var mockSubscriptionPurchaseAllowed: Bool = false
     var mockUsesUnifiedFeedbackForm: Bool = false
 
-    var isFeatureAvailable: Bool { mockFeatureAvailable }
     var isSubscriptionPurchaseAllowed: Bool { mockSubscriptionPurchaseAllowed }
     var usesUnifiedFeedbackForm: Bool { mockUsesUnifiedFeedbackForm }
 
