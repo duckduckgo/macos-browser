@@ -32,7 +32,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "223.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.1.0"),
         .package(path: "../AppKitExtensions")
     ],
     targets: [
