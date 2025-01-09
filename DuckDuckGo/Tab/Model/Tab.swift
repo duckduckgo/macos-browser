@@ -795,8 +795,7 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 #endif
-
-        if PixelExperiment.cohort == .newOnboarding {
+        if #available(macOS 13, *), PixelExperiment.cohort == .newOnboarding {
             setContent(.onboarding)
         } else {
             setContent(.onboardingDeprecated)
