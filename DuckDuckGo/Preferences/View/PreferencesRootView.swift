@@ -185,14 +185,11 @@ enum Preferences {
                 }, restorePurchases: {
                     if #available(macOS 12.0, *) {
                         Task {
-                            let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
-                                                                                 storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                                 subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                                                 authEndpointService: subscriptionManager.authEndpointService)
-                            let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(
-                                subscriptionManager: subscriptionManager,
-                                appStoreRestoreFlow: appStoreRestoreFlow,
-                                uiHandler: subscriptionUIHandler)
+                            let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                                                 storePurchaseManager: subscriptionManager.storePurchaseManager())
+                            let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: subscriptionManager,
+                                                                                                   appStoreRestoreFlow: appStoreRestoreFlow,
+                                                                                                   uiHandler: subscriptionUIHandler)
                             await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                         }
                     }

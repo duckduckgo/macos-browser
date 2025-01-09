@@ -1656,12 +1656,11 @@ final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManagin
 
     var isUserAuthenticated: Bool { isUserAuthenticatedValue }
 
-    var accessToken: String? { accessTokenValue }
+    func accessToken() async -> String? {
+        accessTokenValue
+    }
 
-    func hasValidEntitlement() async throws -> Bool {
-        if shouldThrowEntitlementError {
-            throw NSError(domain: "duck.com", code: 0, userInfo: [NSLocalizedDescriptionKey: "Error"])
-        }
+    func hasValidEntitlement() async -> Bool {
         return hasValidEntitlementValue
     }
 

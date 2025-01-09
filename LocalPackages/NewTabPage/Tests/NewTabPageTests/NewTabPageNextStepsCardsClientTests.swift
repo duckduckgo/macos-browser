@@ -17,7 +17,7 @@
 //
 
 import Combine
-import TestUtils
+import PersistenceTestingUtils
 import XCTest
 @testable import NewTabPage
 

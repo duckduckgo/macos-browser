@@ -29,18 +29,6 @@ import WireGuard
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
-    static var isAppex: Bool {
-#if NETP_SYSTEM_EXTENSION
-        false
-#else
-        true
-#endif
-    }
-
-    static var subscriptionsAppGroup: String? {
-        isAppex ? Bundle.main.appGroup(bundle: .subs) : nil
-    }
-
     // MARK: - Additional Status Info
 
     /// Holds the date when the status was last changed so we can send it out as additional information
@@ -397,13 +385,16 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #if NETP_SYSTEM_EXTENSION
         "\(Bundle.main.bundleIdentifier!).authToken"
 #else
-        NetworkProtectionKeychainTokenStore.Defaults.tokenStoreService
+        "com.duckduckgo.networkprotection.authToken"
 #endif
     }
 
     // MARK: - Initialization
 
+    let subscriptionManager: any SubscriptionManager
+
     @MainActor @objc public init() {
+        Logger.networkProtection.log("[+] MacPacketTunnelProvider")
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
 #else
@@ -414,20 +405,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
         let settings = VPNSettings(defaults: defaults)
 
-        // MARK: - Configure Subscription
-        let subscriptionUserDefaults = UserDefaults(suiteName: MacPacketTunnelProvider.subscriptionsAppGroup)!
         let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
-        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
-                                                                           serviceName: Self.tokenServiceName,
-                                                                           errorEvents: debugEvents,
-                                                                           useAccessTokenProvider: false,
-                                                                           accessTokenProvider: { nil }
-        )
-        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
-                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
-                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+
+        // MARK: - Configure Subscription
+
         // Align Subscription environment to the VPN environment
         var subscriptionEnvironment = SubscriptionEnvironment.default
         switch settings.selectedEnvironment {
@@ -436,20 +419,62 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         case .staging:
             subscriptionEnvironment.serviceEnvironment = .staging
         }
+        subscriptionEnvironment.purchasePlatform = .stripe // we don't care about the purchasePlatform
 
-        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let accountManager = DefaultAccountManager(accessTokenStorage: tokenStore,
-                                                   entitlementsCache: entitlementsCache,
-                                                   subscriptionEndpointService: subscriptionEndpointService,
-                                                   authEndpointService: authEndpointService)
+        Logger.networkProtection.debug("Subscription ServiceEnvironment: \(subscriptionEnvironment.serviceEnvironment.rawValue, privacy: .public)")
+        let configuration = URLSessionConfiguration.default
+        configuration.httpCookieStorage = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        let urlSession = URLSession(configuration: configuration, delegate: SessionDelegate(), delegateQueue: nil)
+        let apiService = DefaultAPIService(urlSession: urlSession)
+        let authEnvironment: OAuthEnvironment = subscriptionEnvironment.serviceEnvironment == .production ? .production : .staging
 
-        let entitlementsCheck = {
-            await accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
+
+        let tokenStorage = NetworkProtectionKeychainStore(label: "DuckDuckGo Network Protection Auth Token",
+                                                          serviceName: Self.tokenServiceName,
+                                                          keychainType: Bundle.keychainType)
+        let authClient = DefaultOAuthClient(tokensStorage: tokenStorage, authService: authService)
+        apiService.authorizationRefresherCallback = { _ in
+            guard let tokenContainer = tokenStorage.tokenContainer else {
+                throw OAuthClientError.internalError("Missing refresh token")
+            }
+            if tokenContainer.decodedAccessToken.isExpired() {
+                Logger.networkProtection.debug("Refreshing tokens")
+                let tokens = try await authClient.getTokens(policy: .localForceRefresh)
+                return VPNAuthTokenBuilder.getVPNAuthToken(from: tokens.accessToken)
+            } else {
+                Logger.networkProtection.error("Trying to refresh valid token, using the old one")
+                return VPNAuthTokenBuilder.getVPNAuthToken(from: tokenContainer.accessToken)
+            }
+        }
+        let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
+                                                                             baseURL: subscriptionEnvironment.serviceEnvironment.url)
+        let pixelHandler: SubscriptionManager.PixelHandler = { type in
+            switch type {
+            case .deadToken:
+                PixelKit.fire(SubscriptionPixels.privacyProDeadTokenDetected)
+            }
+        }
+
+        let subscriptionManager = DefaultSubscriptionManager(oAuthClient: authClient,
+                                                             subscriptionEndpointService: subscriptionEndpointService,
+                                                             subscriptionEnvironment: subscriptionEnvironment,
+                                                             pixelHandler: pixelHandler)
+
+        // MARK: -
+
+        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
+            Logger.networkProtection.log("Entitlements check...")
+            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
+            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled", privacy: .public)")
+            return .success(isNetworkProtectionEnabled)
         }
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
+
+        self.subscriptionManager = subscriptionManager
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
@@ -457,7 +482,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    snoozeTimingStore: NetworkProtectionSnoozeTimingStore(userDefaults: .netP),
                    wireGuardInterface: DefaultWireGuardInterface(),
                    keychainType: Bundle.keychainType,
-                   tokenStore: tokenStore,
+                   tokenProvider: subscriptionManager,
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
@@ -465,7 +490,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    entitlementCheck: entitlementsCheck)
 
         setupPixels()
-        accountManager.delegate = self
         observeServerChanges()
         observeStatusUpdateRequests()
     }
@@ -551,8 +575,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - NEPacketTunnelProvider
 
-    public override func load(options: StartupOptions) throws {
-        try super.load(options: options)
+    public override func load(options: StartupOptions) async throws {
+        try await super.load(options: options)
 
 #if NETP_SYSTEM_EXTENSION
         loadExcludeLocalNetworks(from: options)
@@ -576,7 +600,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     }
 
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
-        try super.loadVendorOptions(from: provider)
+        try super.loadVendorOptions(from: provider) // empty
 
         guard let vendorOptions = provider?.providerConfiguration else {
             Logger.networkProtection.log("🔵 Provider is nil, or providerConfiguration is not set")
@@ -595,7 +619,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         setupPixels(defaultHeaders: defaultPixelHeaders)
     }
 
-    // MARK: - Overrideable Connection Events
+    // MARK: - Override-able Connection Events
 
     override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
         super.prepareToConnect(using: provider)
@@ -668,13 +692,5 @@ final class DefaultWireGuardInterface: WireGuardInterface {
 
     func setLogger(context: UnsafeMutableRawPointer?, logFunction: (@convention(c) (UnsafeMutableRawPointer?, Int32, UnsafePointer<CChar>?) -> Void)?) {
         wgSetLogger(context, logFunction)
-    }
-}
-
-extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
-
-    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
-        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
-                      frequency: .legacyDailyAndCount)
     }
 }

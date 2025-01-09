@@ -20,32 +20,22 @@ import XCTest
 import SubscriptionTestingUtilities
 import Subscription
 @testable import DuckDuckGo_Privacy_Browser
+import Networking
+import NetworkingTestingUtils
 
 final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
 
     private var sut: FreemiumDBPPixelExperimentManaging!
-    private var mockAccountManager: MockAccountManager!
     private var mockSubscriptionManager: SubscriptionManagerMock!
     private var mockUserDefaults: MockUserDefaults!
 
     override func setUp() {
        super.setUp()
-        mockAccountManager = MockAccountManager()
-        let mockSubscriptionService = SubscriptionEndpointServiceMock()
-        let mockAuthService = AuthEndpointServiceMock()
-        let mockStorePurchaseManager = StorePurchaseManagerMock()
-        let mockSubscriptionFeatureMappingCache = SubscriptionFeatureMappingCacheMock()
-
+        mockSubscriptionManager = SubscriptionManagerMock()
         let currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                          purchasePlatform: .appStore)
-
-        mockSubscriptionManager = SubscriptionManagerMock(accountManager: mockAccountManager,
-                                                          subscriptionEndpointService: mockSubscriptionService,
-                                                          authEndpointService: mockAuthService,
-                                                          storePurchaseManager: mockStorePurchaseManager,
-                                                          currentEnvironment: currentEnvironment,
-                                                          canPurchase: false,
-                                                          subscriptionFeatureMappingCache: mockSubscriptionFeatureMappingCache)
+        mockSubscriptionManager.currentEnvironment = currentEnvironment
+        mockSubscriptionManager = SubscriptionManagerMock()
         mockUserDefaults = MockUserDefaults()
         let testLocale = Locale(identifier: "en_US")
         sut = FreemiumDBPPixelExperimentManager(subscriptionManager: mockSubscriptionManager, userDefaults: mockUserDefaults, locale: testLocale)
@@ -63,7 +53,6 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
     func testAssignUserToCohort_whenUserEligibleAndNotEnrolled_assignsToCohort() {
         // Given
         mockSubscriptionManager.canPurchase = true
-        mockAccountManager.accessToken = nil
         mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.experimentCohort)
         mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.enrollmentDate)
 
@@ -87,7 +76,6 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
         mockUserDefaults.set(existingCohort.rawValue, forKey: MockUserDefaults.Keys.experimentCohort)
         mockUserDefaults.set(existingDate, forKey: MockUserDefaults.Keys.enrollmentDate)
         mockSubscriptionManager.canPurchase = true
-        mockAccountManager.accessToken = nil
 
         // When
         sut.assignUserToCohort()
@@ -104,7 +92,7 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
     func testAssignUserToCohort_whenUserNotEligible_dueToSubscription_doesNotAssign() {
         // Given
         mockSubscriptionManager.canPurchase = false
-        mockAccountManager.accessToken = "some_token"
+        mockSubscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
         mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.experimentCohort)
         mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.enrollmentDate)
 
@@ -124,7 +112,6 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
         let nonUSLocale = Locale(identifier: "en_GB")
         sut = FreemiumDBPPixelExperimentManager(subscriptionManager: mockSubscriptionManager, userDefaults: mockUserDefaults, locale: nonUSLocale)
         mockSubscriptionManager.canPurchase = true
-        mockAccountManager.accessToken = nil
         mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.experimentCohort)
         mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.enrollmentDate)
 

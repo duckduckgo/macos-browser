@@ -116,6 +116,8 @@ final class ConfigurationManager: DefaultConfigurationManager {
             do {
                 try await task.value
                 didFetchAnyTrackerBlockingDependencies = true
+            } catch APIRequest.Error.invalidStatusCode(304) {
+                tryAgainSoon()
             } catch {
                 Logger.config.error(
                     "Failed to complete configuration update to \(configuration.rawValue, privacy: .public): \(error.localizedDescription, privacy: .public)"

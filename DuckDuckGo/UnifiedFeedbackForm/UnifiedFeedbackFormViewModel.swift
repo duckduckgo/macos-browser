@@ -28,7 +28,7 @@ protocol UnifiedFeedbackFormViewModelDelegate: AnyObject {
 }
 
 final class UnifiedFeedbackFormViewModel: ObservableObject {
-    private static let feedbackEndpoint = URL(string: "https://subscriptions.duckduckgo.com/api/feedback")!
+    static let feedbackEndpoint = URL(string: "https://subscriptions.duckduckgo.com/api/feedback")!
     private static let platform = "macos"
 
     enum ViewState {
@@ -50,6 +50,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     enum Error: String, Swift.Error {
         case missingAccessToken
         case invalidResponse
+        case invalidRequest
     }
 
     enum ViewAction {
@@ -149,7 +150,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
 
     weak var delegate: UnifiedFeedbackFormViewModelDelegate?
 
-    private let accountManager: any AccountManager
+    private let subscriptionManager: any SubscriptionManager
     private let apiService: any Networking.APIService
     private let vpnMetadataCollector: any UnifiedMetadataCollector
     private let defaultMetadataCollector: any UnifiedMetadataCollector
@@ -165,24 +166,29 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
          feedbackSender: any UnifiedFeedbackSender = DefaultFeedbackSender(),
          source: UnifiedFeedbackSource = .default) {
         self.viewState = .feedbackPending
-
-        self.accountManager = subscriptionManager.accountManager
         self.apiService = apiService
         self.vpnMetadataCollector = vpnMetadataCollector
         self.defaultMetadataCollector = defaultMetadataCollector
         self.feedbackSender = feedbackSender
         self.source = source
+        self.subscriptionManager = subscriptionManager
 
         Task {
-            let features = await subscriptionManager.currentSubscriptionFeatures()
+            let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
+            let vpnFeature = features.first { $0.entitlement == .networkProtection }
+            let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }
+            let itrFeature = features.first { $0.entitlement == .identityTheftRestoration }
+            let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
 
-            if features.contains(.networkProtection) {
+            if vpnFeature?.enabled ?? false {
                 availableCategories.append(.vpn)
             }
-            if features.contains(.dataBrokerProtection) {
+            if dbpFeature?.enabled ?? false {
                 availableCategories.append(.pir)
             }
-            if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
+            let idpEnabled = itrFeature?.enabled ?? false
+            let idpgEnabled = itrgFeature?.enabled ?? false
+            if idpEnabled || idpgEnabled {
                 availableCategories.append(.itr)
             }
         }
@@ -281,7 +287,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     private func submitIssue(metadata: UnifiedFeedbackMetadata?) async throws {
         guard !userEmail.isEmpty else { return }
 
-        guard let accessToken = accountManager.accessToken else {
+        guard let accessToken = try? await subscriptionManager.getTokenContainer(policy: .localValid) else {
             throw Error.missingAccessToken
         }
 
@@ -293,7 +299,9 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
                               problemSubCategory: selectedSubcategory,
                               customMetadata: metadata?.toString() ?? "")
         let headers = APIRequestV2.HeadersV2(additionalHeaders: [HTTPHeaderKey.authorization: "Bearer \(accessToken)"])
-        let request = APIRequestV2(url: Self.feedbackEndpoint, method: .post, headers: headers, body: payload.toData())
+        guard let request = APIRequestV2(url: Self.feedbackEndpoint, method: .post, headers: headers, body: payload.toData()) else {
+            throw Error.invalidRequest
+        }
 
         let response: Response = try await apiService.fetch(request: request).decodeBody()
         if let error = response.error, !error.isEmpty {

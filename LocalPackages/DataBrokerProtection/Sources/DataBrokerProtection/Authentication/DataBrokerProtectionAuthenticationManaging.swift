@@ -17,40 +17,44 @@
 //
 
 import Foundation
+import Subscription
 
 public protocol DataBrokerProtectionAuthenticationManaging {
     var isUserAuthenticated: Bool { get }
-    var accessToken: String? { get }
-    func hasValidEntitlement() async throws -> Bool
+    func accessToken() async -> String?
+    func hasValidEntitlement() async -> Bool
     func shouldAskForInviteCode() -> Bool
     func redeem(inviteCode: String) async throws
-    func getAuthHeader() -> String?
+    func getAuthHeader() async -> String?
 }
 
 public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtectionAuthenticationManaging {
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-    private let subscriptionManager: DataBrokerProtectionSubscriptionManaging
+    private let subscriptionManager: any SubscriptionManager
 
     public var isUserAuthenticated: Bool {
         subscriptionManager.isUserAuthenticated
     }
 
-    public var accessToken: String? {
-        subscriptionManager.accessToken
+    public func accessToken() async -> String? {
+        try? await subscriptionManager.getTokenContainer(policy: .localValid).accessToken
     }
 
-    public init(redeemUseCase: any DataBrokerProtectionRedeemUseCase,
-                subscriptionManager: any DataBrokerProtectionSubscriptionManaging) {
+    public init(redeemUseCase: any DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
+                subscriptionManager: any SubscriptionManager) {
         self.redeemUseCase = redeemUseCase
         self.subscriptionManager = subscriptionManager
     }
 
-    public func hasValidEntitlement() async throws -> Bool {
-        try await subscriptionManager.hasValidEntitlement()
+    public func hasValidEntitlement() async -> Bool {
+//        await subscriptionManager.isFeatureActive(.dataBrokerProtection)
+        let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: .localValid)
+        return tokenContainer?.decodedAccessToken.subscriptionEntitlements.contains(.dataBrokerProtection) ?? false
     }
 
-    public func getAuthHeader() -> String? {
-        ServicesAuthHeaderBuilder().getAuthHeader(accessToken)
+    public func getAuthHeader() async -> String? {
+        guard let token = await accessToken() else { return nil }
+        return ServicesAuthHeaderBuilder().getAuthHeader(token)
     }
 
     // MARK: - Redeem code flow

@@ -21,7 +21,7 @@ import Common
 import PixelKit
 import os.log
 
-enum SubscriptionError: Error {
+enum SubscriptionError: LocalizedError {
     case purchaseFailed,
          missingEntitlements,
          failedToGetSubscriptionOptions,
@@ -36,6 +36,39 @@ enum SubscriptionError: Error {
          accountCreationFailed,
          activeSubscriptionAlreadyPresent,
          generalError
+
+    var localizedDescription: String {
+        switch self {
+        case .purchaseFailed:
+            return "Purchase process failed. Please try again."
+        case .missingEntitlements:
+            return "Required entitlements are missing."
+        case .failedToGetSubscriptionOptions:
+            return "Unable to retrieve subscription options."
+        case .failedToSetSubscription:
+            return "Failed to set the subscription."
+        case .failedToRestoreFromEmail:
+            return "Email restore process failed."
+        case .failedToRestoreFromEmailSubscriptionInactive:
+            return "Cannot restore; email subscription is inactive."
+        case .failedToRestorePastPurchase:
+            return "Failed to restore your past purchase."
+        case .subscriptionNotFound:
+            return "No subscription could be found."
+        case .subscriptionExpired:
+            return "Your subscription has expired."
+        case .hasActiveSubscription:
+            return "You already have an active subscription."
+        case .cancelledByUser:
+            return "Action was cancelled by the user."
+        case .accountCreationFailed:
+            return "Account creation failed. Please try again."
+        case .activeSubscriptionAlreadyPresent:
+            return "There is already an active subscription present."
+        case .generalError:
+            return "A general error has occurred."
+        }
+    }
 }
 
 protocol SubscriptionErrorReporter {

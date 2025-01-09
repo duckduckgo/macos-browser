@@ -23,6 +23,7 @@ import Foundation
 import WebKit
 import Subscription
 import UserScript
+import os.log
 
 ///
 /// The user script that will be the broker for all subscription features
@@ -72,7 +73,7 @@ extension IdentityTheftRestorationPagesUserScript: WKScriptMessageHandler {
 final class IdentityTheftRestorationPagesFeature: Subfeature {
     weak var broker: UserScriptMessageBroker?
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-
+    private let subscriptionManager: any SubscriptionManager
     var featureName = "useIdentityTheftRestoration"
 
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
@@ -80,8 +81,10 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
         .exact(hostname: "abrown.duckduckgo.com")
     ])
 
-    init(subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
+    init(subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
+         subscriptionManager: any SubscriptionManager) {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
+        self.subscriptionManager = subscriptionManager
     }
 
     func with(broker: UserScriptMessageBroker) {
@@ -99,9 +102,11 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
     }
 
     func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = await Application.appDelegate.subscriptionManager.accountManager.accessToken {
+        do {
+            let accessToken = try await subscriptionManager.getTokenContainer(policy: .localValid).accessToken
             return ["token": accessToken]
-        } else {
+        } catch {
+            Logger.subscription.debug("No access token available: \(error)")
             return [String: String]()
         }
     }

@@ -68,7 +68,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Subscriptions
 
-    private let accessTokenStorage: SubscriptionTokenKeychainStorage
+    private let subscriptionManager: any SubscriptionManager
 
     // MARK: - Debug Options Support
 
@@ -158,7 +158,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
          settings: VPNSettings,
          defaults: UserDefaults,
          notificationCenter: NotificationCenter = .default,
-         accessTokenStorage: SubscriptionTokenKeychainStorage) {
+         subscriptionManager: any SubscriptionManager) {
 
         self.featureFlagger = featureFlagger
         self.networkExtensionBundleID = networkExtensionBundleID
@@ -166,7 +166,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.notificationCenter = notificationCenter
         self.settings = settings
         self.defaults = defaults
-        self.accessTokenStorage = accessTokenStorage
+        self.subscriptionManager = subscriptionManager
 
         subscribeToSettingsChanges()
         subscribeToStatusChanges()
@@ -532,6 +532,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection
     ///
     func start() async {
+        Logger.networkProtection.log("Start VPN")
         VPNOperationErrorRecorder().beginRecordingControllerStart()
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
                       frequency: .legacyDailyAndCount)
@@ -572,7 +573,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
                 // It's important to note that we've seen instances where the above call to start()
                 // doesn't throw any errors, yet the tunnel fails to start.  In any case this pixel
-                // should be interpreted as "the controller successfully requrested the tunnel to be
+                // should be interpreted as "the controller successfully requested the tunnel to be
                 // started".  Meaning there's no error caught in this start attempt.  There are pixels
                 // in the packet tunnel provider side that can be used to debug additional logic.
                 //
@@ -580,6 +581,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                               frequency: .legacyDailyAndCount)
             }
         } catch {
+            Logger.networkProtection.error("Starting tunnel error: \(error, privacy: .public)")
+
             VPNOperationErrorRecorder().recordControllerStartFailure(error)
             knownFailureStore.lastKnownFailure = KnownFailure(error)
 
@@ -606,12 +609,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     private func start(_ tunnelManager: NETunnelProviderManager) async throws {
         var options = [String: NSObject]()
-
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        guard let authToken = try fetchAuthToken() else {
-            throw StartError.noAuthToken
-        }
-        options[NetworkProtectionOptionKey.authToken] = authToken
+
+        let tokenContainer = try await fetchTokenContainer()
+        options[NetworkProtectionOptionKey.tokenContainer] = tokenContainer.data
+
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 
@@ -647,8 +649,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
 
         do {
+            Logger.networkProtection.debug("Starting NetworkProtectionTunnelController, options: \(options, privacy: .public)")
             try tunnelManager.connection.startVPNTunnel(options: options)
         } catch {
+            Logger.networkProtection.error("Failed to start VPN tunnel: \(error, privacy: .public)")
             throw StartError.startTunnelFailure(error)
         }
 
@@ -665,6 +669,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     @MainActor
     func stop() async {
+        Logger.networkProtection.log("Stop VPN")
         await stop(disableOnDemand: true)
     }
 
@@ -792,17 +797,14 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
     }
 
-    private func fetchAuthToken() throws -> NSString? {
-        if let accessToken = try? accessTokenStorage.getAccessToken() {
-            Logger.networkProtection.log("🟢 TunnelController found token")
-            return Self.adaptAccessTokenForVPN(accessToken) as NSString?
-        } else {
-            Logger.networkProtection.error("TunnelController found no token")
-            return nil
+    private func fetchTokenContainer() async throws -> TokenContainer {
+        do {
+            let tokenContainer = try await subscriptionManager.getTokenContainer(policy: .localValid)
+            Logger.networkProtection.log("🟢 TunnelController found token container")
+            return tokenContainer
+        } catch {
+            Logger.networkProtection.fault("TunnelController found no token container")
+            throw StartError.noAuthToken
         }
-    }
-
-    private static func adaptAccessTokenForVPN(_ token: String) -> String {
-        "ddg:\(token)"
     }
 }

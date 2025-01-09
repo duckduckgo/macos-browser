@@ -20,7 +20,8 @@ import BrowserServicesKit
 import Combine
 import Foundation
 import MaliciousSiteProtection
-import TestUtils
+import Networking
+import NetworkingTestingUtils
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -35,7 +36,7 @@ final class MaliciousSiteProtectionTests: XCTestCase {
     var dataManager: MaliciousSiteProtection.DataManager!
 
     override func setUp() async throws {
-        apiService = MockAPIService(apiResponse: .failure(CancellationError()))
+        apiService = MockAPIService(requestHandler: { request in .failure(CancellationError()) })
         let mockFileStore = MockMaliciousSiteFileStore()
         mockDataProvider = MockMaliciousSiteDataProvider()
         dataManager = MaliciousSiteProtection.DataManager(fileStore: mockFileStore, embeddedDataProvider: mockDataProvider, fileNameProvider: { _ in "file.json" })

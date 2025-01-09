@@ -22,6 +22,7 @@ import Subscription
 import DataBrokerProtection
 import PixelKit
 import Common
+import Networking
 
 final class DataBrokerProtectionSubscriptionEventHandler {
 
@@ -58,28 +59,13 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     }
 
     private func entitlementsDidChange(_ notification: Notification) {
-        guard let entitlements = notification.userInfo?[UserDefaultsCacheKey.subscriptionEntitlements] as? [Entitlement] else {
-
-            assertionFailure("Missing entitlements are truly unexpected")
-            return
-        }
-
-        let hasEntitlements = entitlements.contains { entitlement in
-            entitlement.product == .dataBrokerProtection
-        }
-
         Task {
-            await entitlementsDidChange(hasEntitlements: hasEntitlements)
-        }
-    }
-
-    @MainActor
-    private func entitlementsDidChange(hasEntitlements: Bool) async {
-        if hasEntitlements {
-            pixelHandler.fire(.entitlementCheckValid)
-        } else {
-            pixelHandler.fire(.entitlementCheckInvalid)
-            featureDisabler.disableAndDelete()
+            if await authenticationManager.hasValidEntitlement() {
+                pixelHandler.fire(.entitlementCheckValid)
+            } else {
+                pixelHandler.fire(.entitlementCheckInvalid)
+                featureDisabler.disableAndDelete()
+            }
         }
     }
 }

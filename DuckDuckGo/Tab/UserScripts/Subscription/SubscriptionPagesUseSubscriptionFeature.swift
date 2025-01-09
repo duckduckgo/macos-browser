@@ -26,6 +26,7 @@ import PixelKit
 import os.log
 import Freemium
 import DataBrokerProtection
+import Networking
 
 /// Use Subscription sub-feature
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
@@ -36,16 +37,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         .exact(hostname: "abrown.duckduckgo.com")
     ])
     let subscriptionManager: SubscriptionManager
-    var accountManager: AccountManager { subscriptionManager.accountManager }
     var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
-
-    let stripePurchaseFlow: StripePurchaseFlow
+    let stripePurchaseFlow: any StripePurchaseFlow
     let subscriptionErrorReporter = DefaultSubscriptionErrorReporter()
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
     let uiHandler: SubscriptionUIHandling
-
     let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-
     private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     private let freemiumDBPPixelExperimentManager: FreemiumDBPPixelExperimentManaging
     private let notificationCenter: NotificationCenter
@@ -96,6 +93,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
+        Logger.subscription.debug("WebView handler: \(methodName)")
+
         switch methodName {
         case Handlers.getSubscription: return getSubscription
         case Handlers.setSubscription: return setSubscription
@@ -130,39 +129,53 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let authToken = accountManager.authToken ?? ""
-        return Subscription(token: authToken)
+        guard subscriptionManager.isUserAuthenticated else { return Subscription(token: "") }
+
+        do {
+            let accessToken = try await subscriptionManager.getTokenContainer(policy: .localValid).accessToken
+            return Subscription(token: accessToken)
+        } catch {
+            Logger.subscription.debug("No subscription available: \(error)")
+            return Subscription(token: "")
+        }
     }
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        // Note: This is called by the web FE when a subscription is retrieved, `params` contains an auth token V1 that will need to be exchanged for a V2. This is a temporary workaround until the FE fully supports v2 auth.
 
         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailSuccess, frequency: .legacyDailyAndCount)
 
-        guard let subscriptionValues: SubscriptionValues = DecodableHelper.decode(from: params) else {
+        guard let subscriptionValues: SubscriptionValues = CodableHelper.decode(from: params) else {
+            Logger.subscription.fault("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
             assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
             return nil
         }
 
-        let authToken = subscriptionValues.token
-        if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
-           case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
-            accountManager.storeAuthToken(token: authToken)
-            accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
+        // Clear subscription Cache
+        await subscriptionManager.signOut()
+
+        guard !subscriptionValues.token.isEmpty else {
+            Logger.subscription.fault("Empty token provided, Failed to exchange v1 token for v2")
+            return nil
         }
 
+        do {
+            _ = try await subscriptionManager.exchange(tokenV1: subscriptionValues.token)
+            Logger.subscription.log("v1 token exchanged for v2")
+            // forcing subscription refresh
+            try await subscriptionManager.getSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
+            Logger.subscription.log("Subscription retrieved")
+        } catch {
+            Logger.subscription.error("Failed to exchange v1 token for v2 \(error, privacy: .public)")
+        }
         return nil
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = accountManager.accessToken,
-           case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
-            accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
-        }
-
+        _ = try? await subscriptionManager.getTokenContainer(policy: .localForceRefresh)
         DispatchQueue.main.async { [weak self] in
             self?.notificationCenter.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
         }
-
         return nil
     }
 
@@ -202,41 +215,38 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
-                guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
+                guard let subscriptionSelection: SubscriptionSelection = CodableHelper.decode(from: params) else {
                     assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
                     subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
                     await uiHandler.dismissProgressViewController()
                     return nil
                 }
 
-                Logger.subscription.info("[Purchase] Starting purchase for: \(subscriptionSelection.id, privacy: .public)")
+                Logger.subscription.log("[Purchase] Starting purchase for: \(subscriptionSelection.id, privacy: .public)")
 
                 await uiHandler.presentProgressViewController(withTitle: UserText.purchasingSubscriptionTitle)
 
                 // Check for active subscriptions
                 if await subscriptionManager.storePurchaseManager().hasActiveSubscription() {
+                    // Sandbox note: Looks like our BE is not receiving updates when a subscription transitions from grace period to expired, so during testing we can end up with a subscription in grace period and we will not be able to purchase a new one, only restore it because Transaction.currentEntitlements will not return the subscription to restore.
                     PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
-                    Logger.subscription.info("[Purchase] Found active subscription during purchase")
+                    Logger.subscription.log("[Purchase] Found active subscription during purchase")
                     subscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
                     await showSubscriptionFoundAlert(originalMessage: message)
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                     return nil
                 }
 
-                let emailAccessToken = try? EmailManager().getToken()
                 let purchaseTransactionJWS: String
-                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
-                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                     subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                                     authEndpointService: subscriptionManager.authEndpointService)
-                let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager())
+                let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
                                                                        storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                       accountManager: subscriptionManager.accountManager,
-                                                                       appStoreRestoreFlow: appStoreRestoreFlow,
-                                                                       authEndpointService: subscriptionManager.authEndpointService)
+                                                                       appStoreRestoreFlow: appStoreRestoreFlow)
 
-                Logger.subscription.info("[Purchase] Purchasing")
-                switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
+                Logger.subscription.log("[Purchase] Purchasing")
+                let purchaseResult = await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id)
+                switch purchaseResult {
                 case .success(let transactionJWS):
                     purchaseTransactionJWS = transactionJWS
                 case .failure(let error):
@@ -270,11 +280,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 await uiHandler.updateProgressViewController(title: UserText.completingPurchaseTitle)
 
-                Logger.subscription.info("[Purchase] Completing purchase")
                 let completePurchaseResult = await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS)
                 switch completePurchaseResult {
                 case .success(let purchaseUpdate):
-                    Logger.subscription.info("[Purchase] Purchase complete")
+                    Logger.subscription.log("[Purchase] Purchase completed")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .legacyDailyAndCount)
                     sendFreemiumSubscriptionPixelIfFreemiumActivated()
                     saveSubscriptionUpgradeTimestampIfFreemiumActivated()
@@ -344,10 +353,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func featureSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct FeatureSelection: Codable {
-            let productFeature: Entitlement.ProductName
+            let productFeature: SubscriptionEntitlement
         }
 
-        guard let featureSelection: FeatureSelection = DecodableHelper.decode(from: params) else {
+        guard let featureSelection: FeatureSelection = CodableHelper.decode(from: params) else {
             assertionFailure("SubscriptionPagesUserScript: expected JSON representation of FeatureSelection")
             return nil
         }
@@ -412,9 +421,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = accountManager.accessToken {
+        do {
+            let accessToken = try await subscriptionManager.getTokenContainer(policy: .localValid).accessToken
             return ["token": accessToken]
-        } else {
+        } catch {
+            Logger.subscription.debug("No access token available: \(error)")
             return [String: String]()
         }
     }
@@ -427,7 +438,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     @MainActor
     func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) {
-        pushAction(method: .onPurchaseUpdate, webView: originalMessage.webView!, params: purchaseUpdate)
+        guard let webView = originalMessage.webView else {
+            return
+        }
+        pushAction(method: .onPurchaseUpdate, webView: webView, params: purchaseUpdate)
     }
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
@@ -463,14 +477,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         switch await uiHandler.dismissProgressViewAndShow(alertType: .subscriptionFound, text: nil) {
         case .alertFirstButtonReturn:
             if #available(macOS 12.0, *) {
-                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
-                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                     subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                                     authEndpointService: subscriptionManager.authEndpointService)
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager())
                 let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                 switch result {
-                case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .legacyDailyAndCount)
-                case .failure: break
+                case .success:
+                    PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .legacyDailyAndCount)
+                case .failure(let error):
+                    Logger.subscription.error("Failed to restore account from past purchase: \(error, privacy: .public)")
                 }
                 Task { @MainActor in
                     originalMessage.webView?.reload()
@@ -498,10 +512,8 @@ extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandl
     func subscriptionAccessActionRestorePurchases(message: WKScriptMessage) {
         if #available(macOS 12.0, *) {
             Task { @MainActor in
-                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
-                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                     subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                                     authEndpointService: subscriptionManager.authEndpointService)
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager())
                 let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager,
                                                                                        appStoreRestoreFlow: appStoreRestoreFlow,
                                                                                        uiHandler: self.uiHandler)

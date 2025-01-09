@@ -107,7 +107,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let remoteMessagingClient: RemoteMessagingClient!
     let onboardingStateMachine: ContextualOnboardingStateMachine & ContextualOnboardingStateUpdater
 
-    public let subscriptionManager: SubscriptionManager
+    public let subscriptionManager: any SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
     private let subscriptionCookieManager: SubscriptionCookieManaging
     private var subscriptionCookieManagerFeatureFlagCancellable: AnyCancellable?
@@ -133,9 +133,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - DBP
 
     private lazy var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler = {
-        let authManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: subscriptionManager)
+        let authenticationManager = DataBrokerProtectionAuthenticationManager(
+            subscriptionManager: subscriptionManager)
         return DataBrokerProtectionSubscriptionEventHandler(featureDisabler: DataBrokerProtectionFeatureDisabler(),
-                                                            authenticationManager: authManager,
+                                                            authenticationManager: authenticationManager,
                                                             pixelHandler: DataBrokerProtectionPixelsHandler())
     }()
 
@@ -152,7 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         return VPNRedditSessionWorkaround(
-            accountManager: subscriptionManager.accountManager,
+            subscriptionManager: subscriptionManager,
             ipcClient: ipcClient,
             statusReporter: statusReporter
         )
@@ -292,8 +293,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         onboardingStateMachine = ContextualOnboardingStateMachine()
 
-        // Configure Subscription
-        subscriptionManager = DefaultSubscriptionManager(featureFlagger: featureFlagger)
+        // MARK: - Subscription configuration
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
+                                                         environment: subscriptionEnvironment,
+                                                         userDefaults: subscriptionUserDefaults)
+// featureFlagger: featureFlagger
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
         })
@@ -301,6 +308,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
             WKHTTPCookieStoreWrapper(store: WKWebsiteDataStore.default().httpCookieStore)
         }, eventMapping: SubscriptionCookieManageEventPixelMapping())
+
+        // MARK: -
 
         // Update VPN environment and match the Subscription environment
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
@@ -321,7 +330,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
                                                        experimentManager: experimentManager,
                                                        subscriptionManager: subscriptionManager,
-                                                       accountManager: subscriptionManager.accountManager,
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
@@ -372,6 +380,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             didFinishLaunching = true
         }
 
+        subscriptionManager.loadInitialData()
+
         HistoryCoordinator.shared.loadHistory {
             HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
         }
@@ -405,8 +415,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statisticsLoader?.load()
 
         startupSync()
-
-        subscriptionManager.loadInitialData()
 
         let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
 
@@ -481,8 +489,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
-                                                                            subscriptionManager.accountManager,
+        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(subscriptionManager: subscriptionManager,
                                                                          freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidFinishLaunching()
@@ -539,15 +546,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
-                                                                            subscriptionManager.accountManager,
+        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(subscriptionManager: subscriptionManager,
                                                                          freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidBecomeActive()
 
-        subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
-            if isSubscriptionActive {
-                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
+        Task {
+            do {
+                let subscription = try await subscriptionManager.getSubscription(cachePolicy: .returnCacheDataDontLoad)
+                if subscription.isActive {
+                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
+                }
+            } catch {
+                Logger.general.log("Subscription not active")
             }
         }
 

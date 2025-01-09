@@ -18,6 +18,7 @@
 
 import Foundation
 import NetworkProtection
+import Common
 
 /// Implements convenience default for the client apps making use of this.
 ///

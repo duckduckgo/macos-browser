@@ -59,7 +59,6 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     private let internalUserDecider: InternalUserDecider
     @MainActor
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
     private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     private let freemiumDBPFeature: FreemiumDBPFeature
@@ -145,7 +144,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self,
                                                    tabCollectionViewModel: tabCollectionViewModel,
                                                    subscriptionFeatureAvailability: subscriptionFeatureAvailability,
-                                                   accountManager: accountManager)
+                                                   subscriptionManager: subscriptionManager)
         addItem(feedbackMenuItem)
 
 #endif // FEEDBACK
@@ -426,7 +425,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem).withImage(.subscriptionIcon)
 
-        if !accountManager.isUserAuthenticated {
+        if !subscriptionManager.isUserAuthenticated {
             privacyProItem.target = self
             privacyProItem.action = #selector(openSubscriptionPurchasePage(_:))
 
@@ -611,14 +610,14 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
 final class FeedbackSubMenu: NSMenu {
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-    private let accountManager: AccountManager
+    private let subscriptionManager: any SubscriptionManager
 
     init(targetting target: AnyObject,
          tabCollectionViewModel: TabCollectionViewModel,
          subscriptionFeatureAvailability: SubscriptionFeatureAvailability,
-         accountManager: AccountManager) {
+         subscriptionManager: any SubscriptionManager) {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
-        self.accountManager = accountManager
+        self.subscriptionManager = subscriptionManager
         super.init(title: UserText.sendFeedback)
         updateMenuItems(with: tabCollectionViewModel, targetting: target)
     }
@@ -642,7 +641,7 @@ final class FeedbackSubMenu: NSMenu {
             .withImage(.siteBreakage)
         addItem(reportBrokenSiteItem)
 
-        if subscriptionFeatureAvailability.usesUnifiedFeedbackForm, accountManager.isUserAuthenticated {
+        if subscriptionFeatureAvailability.usesUnifiedFeedbackForm, subscriptionManager.isUserAuthenticated {
             addItem(.separator())
 
             let sendPProFeedbackItem = NSMenuItem(title: UserText.sendPProFeedback,
@@ -906,7 +905,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
         self.subscriptionSettingsItem = makeSubscriptionSettingsItem(target: target)
 
         delegate = self
-
         Task {
             await addMenuItems()
         }
@@ -917,15 +915,19 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func addMenuItems() async {
-        let features = await subscriptionManager.currentSubscriptionFeatures()
+        let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
+        let vpnFeature = features.first { $0.entitlement == .networkProtection }
+        let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }
+        let itrFeature = features.first { $0.entitlement == .identityTheftRestoration }
+        let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
 
-        if features.contains(.networkProtection) {
+        if vpnFeature != nil {
             addItem(networkProtectionItem)
         }
-        if features.contains(.dataBrokerProtection) {
+        if dbpFeature != nil {
             addItem(dataBrokerProtectionItem)
         }
-        if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
+        if itrFeature != nil || itrgFeature != nil {
             addItem(identityTheftRestorationItem)
         }
         addItem(NSMenuItem.separator())
@@ -963,38 +965,27 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
         .targetting(target)
     }
 
-    private func refreshAvailabilityBasedOnEntitlements() {
-        guard subscriptionManager.accountManager.isUserAuthenticated else { return }
+    private func refreshAvailabilityBasedOnEntitlements() async {
+        guard subscriptionManager.isUserAuthenticated else { return }
+        let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
+        let vpnFeature = features.first { $0.entitlement == .networkProtection }
+        let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }
+        let itrFeature = features.first { $0.entitlement == .identityTheftRestoration }
+        let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
 
-        @Sendable func hasEntitlement(for productName: Entitlement.ProductName) async -> Bool {
-            switch await self.subscriptionManager.accountManager.hasEntitlement(forProductName: productName) {
-            case let .success(result):
-                return result
-            case .failure:
-                return false
-            }
-        }
-
-        Task.detached(priority: .background) { [weak self] in
-            guard let self else { return }
-
-            let isNetworkProtectionItemEnabled = await hasEntitlement(for: .networkProtection)
-            let isDataBrokerProtectionItemEnabled = await hasEntitlement(for: .dataBrokerProtection)
-
-            let hasIdentityTheftRestoration = await hasEntitlement(for: .identityTheftRestoration)
-            let hasIdentityTheftRestorationGlobal = await hasEntitlement(for: .identityTheftRestorationGlobal)
-            let isIdentityTheftRestorationItemEnabled = hasIdentityTheftRestoration || hasIdentityTheftRestorationGlobal
-
-            Task { @MainActor in
-                self.networkProtectionItem.isEnabled = isNetworkProtectionItemEnabled
-                self.dataBrokerProtectionItem.isEnabled = isDataBrokerProtectionItemEnabled
-                self.identityTheftRestorationItem.isEnabled = isIdentityTheftRestorationItemEnabled
-            }
+        Task { @MainActor in
+            self.networkProtectionItem.isEnabled = vpnFeature?.enabled ?? false
+            self.dataBrokerProtectionItem.isEnabled = dbpFeature?.enabled ?? false
+            let hasIdentityTheftRestoration = itrFeature?.enabled ?? false
+            let hasIdentityTheftRestorationGlobal = itrgFeature?.enabled ?? false
+            self.identityTheftRestorationItem.isEnabled = hasIdentityTheftRestoration || hasIdentityTheftRestorationGlobal
         }
     }
 
     public func menuWillOpen(_ menu: NSMenu) {
-        refreshAvailabilityBasedOnEntitlements()
+        Task {
+            await refreshAvailabilityBasedOnEntitlements()
+        }
     }
 
 }

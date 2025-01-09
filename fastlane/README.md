@@ -69,7 +69,7 @@ Makes App Store release build and uploads it to TestFlight
 [bundle exec] fastlane mac promote_latest_testflight_to_appstore
 ```
 
-Promotes the latest testflight build to appstore without submitting for review
+Promotes the latest TestFlight build to App Store without submitting for review
 
 ### mac release_appstore
 
@@ -134,6 +134,14 @@ Updates embedded files and pushes to remote.
 ```
 
 Executes the release preparation work in the repository
+
+### mac create_keychain_ui_tests
+
+```sh
+[bundle exec] fastlane mac create_keychain_ui_tests
+```
+
+Creates a new Kechain to use on UI tests
 
 ----
 

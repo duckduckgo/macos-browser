@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift
+//  DefaultSubscriptionEndpointService+SubscriptionFeatureMappingCache.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,26 +18,18 @@
 
 import Foundation
 import Subscription
-import NetworkProtection
-import Common
+import Networking
 import os.log
 
-extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStoring {
+extension DefaultSubscriptionEndpointService: @retroactive SubscriptionFeatureMappingCache {
 
-    public func store(accessToken: String) throws {
-        try store(accessToken)
-    }
-
-    public func getAccessToken() throws -> String? {
-        guard var token = try fetchToken() else { return nil }
-        if token.hasPrefix("ddg:") {
-            token = token.replacingOccurrences(of: "ddg:", with: "")
+    public func subscriptionFeatures(for subscriptionIdentifier: String) async -> [Networking.SubscriptionEntitlement] {
+        do {
+            let response = try await getSubscriptionFeatures(for: subscriptionIdentifier)
+            return response.features
+        } catch {
+            Logger.subscription.error("Failed to get subscription features: \(error)")
+            return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
         }
-        Logger.networkProtection.log("🟢 Wrapper successfully fetched token \(token)")
-        return token
-    }
-
-    public func removeAccessToken() throws {
-        try deleteToken()
     }
 }

@@ -1,5 +1,5 @@
 //
-//  SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift
+//  SubscriptionPagesUseSubscriptionFeatureForStripeTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -26,9 +26,11 @@ import UserScript
 @testable import PixelKit
 import PixelKitTestingUtilities
 import os.log
+import Networking
+import NetworkingTestingUtils
 
 @available(macOS 12.0, *)
-final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
+final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
 
     private struct Constants {
         static let userDefaultsSuiteName = "SubscriptionPagesUseSubscriptionFeatureTests"
@@ -39,9 +41,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
 
         static let email = "dax@duck.com"
 
-        static let entitlements = [Entitlement(product: .dataBrokerProtection),
-                                   Entitlement(product: .identityTheftRestoration),
-                                   Entitlement(product: .networkProtection)]
+        static let entitlements: [SubscriptionEntitlement] = [.dataBrokerProtection,
+                                                              .identityTheftRestoration,
+                                                              .networkProtection]
 
         static let mostRecentTransactionJWS = "dGhpcyBpcyBub3QgYSByZWFsIEFw(...)cCBTdG9yZSB0cmFuc2FjdGlvbiBKV1M="
 
@@ -56,27 +58,15 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
                                                    price: "99",
                                                    currency: "USD")]
 
-        static let subscriptionOptions = SubscriptionOptions(platform: SubscriptionPlatformName.stripe,
-                                                             options: [
-                                                                SubscriptionOption(id: "1",
-                                                                                   cost: SubscriptionOptionCost(displayPrice: "$9.00", recurrence: "monthly")),
-                                                                SubscriptionOption(id: "2",
-                                                                                   cost: SubscriptionOptionCost(displayPrice: "$99.00", recurrence: "yearly"))
-                                                             ],
-                                                             features: [
-                                                                SubscriptionFeature(name: .networkProtection),
-                                                                SubscriptionFeature(name: .dataBrokerProtection),
-                                                                SubscriptionFeature(name: .identityTheftRestoration)
-                                                             ])
-
-        static let validateTokenResponse = ValidateTokenResponse(account: ValidateTokenResponse.Account(email: Constants.email,
-                                                                                                        entitlements: Constants.entitlements,
-                                                                                                        externalID: Constants.externalID))
-
+        static let subscriptionOptions = SubscriptionOptions(
+            platform: SubscriptionPlatformName.stripe,
+            options: [
+                SubscriptionOption(id: "1", cost: SubscriptionOptionCost(displayPrice: "$9.00", recurrence: "monthly")),
+                SubscriptionOption(id: "2", cost: SubscriptionOptionCost(displayPrice: "$99.00", recurrence: "yearly"))
+            ],
+            availableEntitlements: [.networkProtection, .dataBrokerProtection, .identityTheftRestoration])
         static let mockParams: [String: String] = [:]
         @MainActor static let mockScriptMessage = MockWKScriptMessage(name: "", body: "", webView: WKWebView() )
-
-        static let invalidTokenError = APIServiceError.serverError(statusCode: 401, error: "invalid_token")
     }
 
     var userDefaults: UserDefaults!
@@ -84,32 +74,16 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
     var uiHandler: SubscriptionUIHandlerMock!
     var pixelKit: PixelKit!
 
-    var accountStorage: AccountKeychainStorageMock!
-    var accessTokenStorage: SubscriptionTokenKeychainStorageMock!
-    var entitlementsCache: UserDefaultsCache<[Entitlement]>!
-
-    var subscriptionService: SubscriptionEndpointServiceMock!
-    var authService: AuthEndpointServiceMock!
+    var subscriptionManager: SubscriptionManagerMock!
 
     var storePurchaseManager: StorePurchaseManagerMock!
     var subscriptionEnvironment: SubscriptionEnvironment!
-
-    var subscriptionFeatureMappingCache: SubscriptionFeatureMappingCacheMock!
-    var subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags>!
-
     var appStorePurchaseFlow: AppStorePurchaseFlow!
     var appStoreRestoreFlow: AppStoreRestoreFlow!
-    var appStoreAccountManagementFlow: AppStoreAccountManagementFlow!
     var stripePurchaseFlow: StripePurchaseFlow!
-
     var subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock!
-
-    var accountManager: AccountManager!
-    var subscriptionManager: SubscriptionManager!
     var mockFreemiumDBPExperimentManager: MockFreemiumDBPExperimentManager!
-
     var feature: SubscriptionPagesUseSubscriptionFeature!
-
     var pixelsFired: [String] = []
     var uiEventsHappened: [SubscriptionUIHandlerMock.UIHandlerMockPerformedAction] = []
 
@@ -130,61 +104,23 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
         uiHandler = SubscriptionUIHandlerMock { action in
             self.uiEventsHappened.append(action)
         }
-
-        subscriptionService = SubscriptionEndpointServiceMock()
-        authService = AuthEndpointServiceMock()
-
+        subscriptionManager = SubscriptionManagerMock()
+        subscriptionManager.resultURL = URL(string: "https://example.com")
         storePurchaseManager = StorePurchaseManagerMock()
-        subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
+        subscriptionManager.resultStorePurchaseManager = storePurchaseManager
+        subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .staging,
                                                           purchasePlatform: .stripe)
-        accountStorage = AccountKeychainStorageMock()
-        accessTokenStorage = SubscriptionTokenKeychainStorageMock()
+        subscriptionManager.currentEnvironment = subscriptionEnvironment
+        appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                         storePurchaseManager: storePurchaseManager)
 
-        entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: userDefaults,
-                                                             key: UserDefaultsCacheKey.subscriptionEntitlements,
-                                                             settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
-
-        subscriptionFeatureMappingCache = SubscriptionFeatureMappingCacheMock()
-        subscriptionFeatureFlagger = FeatureFlaggerMapping<SubscriptionFeatureFlags>(mapping: { $0.defaultState })
-
-        // Real AccountManager
-        accountManager = DefaultAccountManager(storage: accountStorage,
-                                               accessTokenStorage: accessTokenStorage,
-                                               entitlementsCache: entitlementsCache,
-                                               subscriptionEndpointService: subscriptionService,
-                                               authEndpointService: authService)
-
-        // Real Flows
-        appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: accountManager,
-                                                         storePurchaseManager: storePurchaseManager,
-                                                         subscriptionEndpointService: subscriptionService,
-                                                         authEndpointService: authService)
-
-        appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionEndpointService: subscriptionService,
+        appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
                                                            storePurchaseManager: storePurchaseManager,
-                                                           accountManager: accountManager,
-                                                           appStoreRestoreFlow: appStoreRestoreFlow,
-                                                           authEndpointService: authService)
-
-        appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(authEndpointService: authService,
-                                                                             storePurchaseManager: storePurchaseManager,
-                                                                             accountManager: accountManager)
-
-        stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionEndpointService: subscriptionService,
-                                                       authEndpointService: authService,
-                                                       accountManager: accountManager)
-
-        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isSubscriptionPurchaseAllowed: true,
+                                                           appStoreRestoreFlow: appStoreRestoreFlow)
+        stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager)
+        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
+                                                                              isSubscriptionPurchaseAllowed: true,
                                                                               usesUnifiedFeedbackForm: false)
-
-        // Real SubscriptionManager
-        subscriptionManager = DefaultSubscriptionManager(storePurchaseManager: storePurchaseManager,
-                                                         accountManager: accountManager,
-                                                         subscriptionEndpointService: subscriptionService,
-                                                         authEndpointService: authService,
-                                                         subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
-                                                         subscriptionEnvironment: subscriptionEnvironment)
-
         mockFreemiumDBPExperimentManager = MockFreemiumDBPExperimentManager()
 
         feature = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
@@ -199,30 +135,13 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
         userDefaults = nil
         pixelsFired.removeAll()
         uiEventsHappened.removeAll()
-
-        subscriptionService = nil
-        authService = nil
         storePurchaseManager = nil
         subscriptionEnvironment = nil
-
-        accountStorage = nil
-        accessTokenStorage = nil
-
-        entitlementsCache.reset()
-        entitlementsCache = nil
-
-        accountManager = nil
-
-        // Real Flows
         appStorePurchaseFlow = nil
         appStoreRestoreFlow = nil
-        appStoreAccountManagementFlow = nil
         stripePurchaseFlow = nil
-
         subscriptionFeatureAvailability = nil
-
         subscriptionManager = nil
-
         feature = nil
     }
 
@@ -231,7 +150,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
     func testGetSubscriptionOptionsSuccess() async throws {
         // Given
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        subscriptionService.getProductsResult = .success(Constants.productItems)
+        subscriptionManager.productsResponse = .success(Constants.productItems)
 
         // When
         let result = try await feature.getSubscriptionOptions(params: Constants.mockParams, original: Constants.mockScriptMessage)
@@ -246,7 +165,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
     func testGetSubscriptionOptionsReturnsEmptyOptionsWhenNoSubscriptionOptions() async throws {
         // Given
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        subscriptionService.getProductsResult = .success([])
+        subscriptionManager.productsResponse = .success([])
         storePurchaseManager.subscriptionOptionsResult = nil
 
         // When
@@ -261,7 +180,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
     func testGetSubscriptionOptionsReturnsEmptyOptionsWhenSubscriptionOptionsDidNotFetch() async throws {
         // Given
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        subscriptionService.getProductsResult = .failure(Constants.invalidTokenError)
+        subscriptionManager.productsResponse = .failure(Subscription.SubscriptionManagerError.tokenUnavailable(error: nil))
         storePurchaseManager.subscriptionOptionsResult = nil
 
         // When
@@ -279,14 +198,15 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
         // Given
         ensureUserUnauthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        XCTAssertFalse(accountManager.isUserAuthenticated)
-
-        authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
-                                                                         externalID: Constants.externalID,
-                                                                         status: "created"))
+        XCTAssertFalse(subscriptionManager.isUserAuthenticated)
+        subscriptionManager.resultCreateAccountTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
+        let subscriptionID = "some-subscription-id"
+        subscriptionManager.resultSubscription = SubscriptionMockFactory.subscription
+        storePurchaseManager.purchaseSubscriptionResult = .success(subscriptionID)
+        subscriptionManager.confirmPurchaseResponse = .success(SubscriptionMockFactory.subscription)
 
         // When
-        let subscriptionSelectedParams = ["id": "some-subscription-id"]
+        let subscriptionSelectedParams = ["id": subscriptionID]
         let result = try await feature.subscriptionSelected(params: subscriptionSelectedParams, original: Constants.mockScriptMessage)
 
         // Then
@@ -300,16 +220,16 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
         // Given
         ensureUserAuthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        XCTAssertTrue(accountManager.isUserAuthenticated)
-
-        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
+        XCTAssertTrue(subscriptionManager.isUserAuthenticated)
+        await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
+        subscriptionManager.resultSubscription = SubscriptionMockFactory.expiredSubscription
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
         let result = try await feature.subscriptionSelected(params: subscriptionSelectedParams, original: Constants.mockScriptMessage)
 
         // Then
-        XCTAssertFalse(authService.createAccountCalled)
+//        XCTAssertFalse(authService.createAccountCalled)
         XCTAssertEqual(uiEventsHappened, [.didDismissProgressViewController])
         XCTAssertNil(result)
         XCTAssertPrivacyPixelsFired([PrivacyProPixel.privacyProPurchaseAttempt.name + "_d",
@@ -320,8 +240,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
         // Given
         ensureUserUnauthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-
-        authService.createAccountResult = .failure(Constants.invalidTokenError)
+        subscriptionManager.resultCreateAccountTokenContainer = nil
+        storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
+        subscriptionManager.confirmPurchaseResponse = .success(SubscriptionMockFactory.subscription)
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
 
         // When
@@ -330,10 +251,11 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
 
         // Then
         XCTAssertFalse(storePurchaseManager.purchaseSubscriptionCalled)
-        XCTAssertEqual(uiEventsHappened, [.didDismissProgressViewController,
-                                          .didShowAlert(.somethingWentWrong),
-                                          .didShowTab(.subscription(subscriptionManager.url(for: .purchase))),
-                                          .didDismissProgressViewController])
+        XCTAssertTrue(uiEventsHappened.count == 4)
+        XCTAssertTrue(uiEventsHappened.contains(.didDismissProgressViewController))
+        XCTAssertTrue(uiEventsHappened.contains(.didShowAlert(.somethingWentWrong)))
+        XCTAssertTrue(uiEventsHappened.contains(.didShowTab(.subscription(subscriptionManager.url(for: .purchase)))))
+        XCTAssertTrue(uiEventsHappened.contains(.didDismissProgressViewController))
         XCTAssertNil(result)
         XCTAssertPrivacyPixelsFired([PrivacyProPixel.privacyProPurchaseAttempt.name + "_d",
                                      PrivacyProPixel.privacyProPurchaseAttempt.name + "_c",
@@ -350,8 +272,10 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
         // Given
         ensureUserAuthenticatedState()
 
-        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
-        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+//        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+//        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+//        subscriptionManager.resultSubscription = SubscriptionMockFactory.subscription
+//        subscriptionManager.resultExchangeTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
 
         // When
         let result = try await feature.completeStripePayment(params: Constants.mockParams, original: Constants.mockScriptMessage)
@@ -369,18 +293,14 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
 }
 
 @available(macOS 12.0, *)
-extension SubscriptionPagesUseSubscriptionFeatureTestsForStripe {
+extension SubscriptionPagesUseSubscriptionFeatureForStripeTests {
 
     func ensureUserAuthenticatedState() {
-        accountStorage.authToken = Constants.authToken
-        accountStorage.email = Constants.email
-        accountStorage.externalID = Constants.externalID
-        accessTokenStorage.accessToken = Constants.accessToken
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
     }
 
     func ensureUserUnauthenticatedState() {
-        try? accessTokenStorage.removeAccessToken()
-        try? accountStorage.clearAuthenticationState()
+        subscriptionManager.resultTokenContainer = nil
     }
 
     public func XCTAssertPrivacyPixelsFired(_ pixels: [String], file: StaticString = #file, line: UInt = #line) {

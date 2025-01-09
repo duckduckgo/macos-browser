@@ -16,15 +16,29 @@
 //  limitations under the License.
 //
 
+import XCTest
 import Subscription
 import SubscriptionTestingUtilities
-import XCTest
-
 @testable import DuckDuckGo_Privacy_Browser
+@testable import PersistenceTestingUtils
 @testable import Networking
-@testable import TestUtils
+import NetworkingTestingUtils
 
 final class UnifiedFeedbackFormViewModelTests: XCTestCase {
+
+    var subscriptionManager: SubscriptionManagerMock!
+    var apiService: MockAPIService!
+
+    override func setUpWithError() throws {
+        subscriptionManager = SubscriptionManagerMock()
+        apiService = MockAPIService()
+    }
+
+    override func tearDownWithError() throws {
+        subscriptionManager = nil
+        apiService = nil
+    }
+
     enum Error: String, Swift.Error {
         case generic
     }
@@ -32,8 +46,9 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: SubscriptionManagerMock(),
-                                                     apiService: MockAPIService(apiResponse: .failure(Error.generic)),
+
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
+                                                     apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
 
@@ -43,8 +58,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenNoEmail_WhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: SubscriptionManagerMock(),
-                                                     apiService: MockAPIService(apiResponse: .failure(Error.generic)),
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
+                                                     apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
         viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
@@ -60,10 +75,16 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenEmail_WhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
+
+        // API request to mock
         let payload = UnifiedFeedbackFormViewModel.Response(message: "something", error: nil)
         let response = APIResponseV2(data: try! JSONEncoder().encode(payload), httpResponse: HTTPURLResponse())
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: SubscriptionManagerMock(),
-                                                     apiService: MockAPIService(apiResponse: .success(response)),
+
+        apiService.set(response: response, forRequestURL: UnifiedFeedbackFormViewModel.feedbackEndpoint)
+
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
+                                                     apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
         viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
@@ -80,8 +101,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: SubscriptionManagerMock(),
-                                                     apiService: MockAPIService(apiResponse: .failure(Error.generic)),
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
+                                                     apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
         viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
@@ -98,8 +119,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenInvalidEmail_WhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: SubscriptionManagerMock(),
-                                                     apiService: MockAPIService(apiResponse: .failure(Error.generic)),
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
+                                                     apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
         viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
@@ -117,8 +138,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenValidEmail_WhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: SubscriptionManagerMock(),
-                                                     apiService: MockAPIService(apiResponse: .failure(Error.generic)),
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
+                                                     apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
         viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
@@ -137,8 +158,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let delegate = MockVPNFeedbackFormViewModelDelegate()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: SubscriptionManagerMock(),
-                                                     apiService: MockAPIService(apiResponse: .failure(Error.generic)),
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
+                                                     apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
         viewModel.delegate = delegate
@@ -270,26 +291,4 @@ private class MockVPNFeedbackFormViewModelDelegate: UnifiedFeedbackFormViewModel
         receivedDismissedViewCallback = true
     }
 
-}
-
-extension MockAPIService {
-    convenience init(apiResponse: Result<APIResponseV2, Error>) {
-        self.init { _ in apiResponse }
-    }
-}
-
-extension SubscriptionManagerMock {
-
-    convenience init() {
-        let accountManager = AccountManagerMock()
-        accountManager.accessToken = "token"
-        self.init(accountManager: accountManager,
-                  subscriptionEndpointService: SubscriptionEndpointServiceMock(),
-                  authEndpointService: AuthEndpointServiceMock(),
-                  storePurchaseManager: StorePurchaseManagerMock(),
-                  currentEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
-                                                              purchasePlatform: .appStore),
-                  canPurchase: false,
-                  subscriptionFeatureMappingCache: SubscriptionFeatureMappingCacheMock())
-    }
 }
