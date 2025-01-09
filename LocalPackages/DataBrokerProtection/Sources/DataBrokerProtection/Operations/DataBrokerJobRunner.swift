@@ -125,6 +125,6 @@ final class DataBrokerJobRunner: WebJobRunner {
     }
 
     deinit {
-        Logger.dataBrokerProtection.debug("WebOperationRunner Deinit")
+        Logger.dataBrokerProtection.log("WebOperationRunner Deinit")
     }
 }

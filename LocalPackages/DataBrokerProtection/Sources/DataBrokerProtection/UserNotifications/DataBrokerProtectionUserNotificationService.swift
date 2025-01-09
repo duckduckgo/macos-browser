@@ -97,7 +97,7 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
         if let days = days {
             let calendar = Calendar.current
             guard let date = calendar.date(byAdding: .day, value: days, to: Date()) else {
-                Logger.dataBrokerProtection.debug("Notification scheduled for an invalid date")
+                Logger.dataBrokerProtection.log("Notification scheduled for an invalid date")
                 return
             }
             let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
@@ -110,9 +110,9 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
         userNotificationCenter.add(request) { error in
             if error == nil {
                 if days != nil {
-                    Logger.dataBrokerProtection.debug("Notification scheduled")
+                    Logger.dataBrokerProtection.log("Notification scheduled")
                 } else {
-                    Logger.dataBrokerProtection.debug("Notification sent")
+                    Logger.dataBrokerProtection.log("Notification sent")
                 }
             }
         }
