@@ -62,10 +62,6 @@ final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling
         editCalls.append(favorite)
     }
 
-    func onFaviconMissing() {
-        onFaviconMissingCallCount += 1
-    }
-
     func removeFavorite(_ favorite: MockNewTabPageFavorite) {
         removeFavoriteCalls.append(favorite)
     }

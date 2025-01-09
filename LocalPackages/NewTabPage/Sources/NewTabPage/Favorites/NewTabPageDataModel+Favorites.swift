@@ -61,7 +61,7 @@ extension NewTabPageDataModel {
         }
 
         @MainActor
-        init(_ bookmark: NewTabPageFavorite, preferredFaviconSize: Int, onFaviconMissing: () -> Void) {
+        init(_ bookmark: NewTabPageFavorite, preferredFaviconSize: Int) {
             id = bookmark.id
             title = bookmark.title
             url = bookmark.url
@@ -69,7 +69,6 @@ extension NewTabPageDataModel {
             if let url = bookmark.urlObject, let duckFaviconURL = URL.duckFavicon(for: url) {
                 favicon = FavoriteFavicon(maxAvailableSize: preferredFaviconSize, src: duckFaviconURL.absoluteString)
             } else {
-                onFaviconMissing()
                 favicon = nil
             }
         }

@@ -31,7 +31,6 @@ public protocol FavoritesActionsHandling {
     @MainActor func open(_ url: URL, target: FavoriteOpenTarget)
     @MainActor func addNewFavorite()
     @MainActor func edit(_ favorite: FavoriteType)
-    @MainActor func onFaviconMissing()
 
     func removeFavorite(_ favorite: FavoriteType)
     func deleteBookmark(for favorite: FavoriteType)
