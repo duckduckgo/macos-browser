@@ -111,7 +111,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                    isManual: Bool = false,
                                    userNotificationService: DataBrokerProtectionUserNotificationService,
                                    shouldRunNextStep: @escaping () -> Bool) async throws {
-        Logger.dataBrokerProtection.debug("Running scan operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
+        Logger.dataBrokerProtection.log("Running scan operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
 
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id else {
             // Maybe send pixel?
@@ -120,7 +120,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         defer {
             try? database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId)
-            Logger.dataBrokerProtection.debug("Finished scan operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
+            Logger.dataBrokerProtection.log("Finished scan operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
 
@@ -135,7 +135,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             try database.add(event)
 
             let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, pixelHandler: pixelHandler, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
-            Logger.dataBrokerProtection.debug("Extracted profiles: \(extractedProfiles)")
+            Logger.dataBrokerProtection.log("Extracted profiles: \(extractedProfiles)")
 
             if !extractedProfiles.isEmpty {
                 stageCalculator.fireScanSuccess(matchesFound: extractedProfiles.count)
@@ -158,7 +158,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                             try database.updateRemovedDate(nil, on: id)
                         }
 
-                        Logger.dataBrokerProtection.debug("Extracted profile already exists in database: \(id.description)")
+                        Logger.dataBrokerProtection.log("Extracted profile already exists in database: \(id.description)")
                     } else {
                         // If it's a new found profile, we'd like to opt-out ASAP
                         // If this broker has a parent opt out, we set the preferred date to nil, as we will only perform the operation within the parent.
@@ -185,7 +185,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
                         try database.saveOptOutJob(optOut: optOutJobData, extractedProfile: extractedProfile)
 
-                        Logger.dataBrokerProtection.debug("Creating new opt-out operation data for: \(String(describing: extractedProfile.name))")
+                        Logger.dataBrokerProtection.log("Creating new opt-out operation data for: \(String(describing: extractedProfile.name))")
                     }
                 }
             } else {
@@ -218,7 +218,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                             database: database
                         )
 
-                        Logger.dataBrokerProtection.debug("Profile removed from optOutsData: \(String(describing: removedProfile))")
+                        Logger.dataBrokerProtection.log("Profile removed from optOutsData: \(String(describing: removedProfile))")
 
                         if let attempt = try database.fetchAttemptInformation(for: extractedProfileId), let attemptUUID = UUID(uuidString: attempt.attemptId) {
                             let now = Date()
@@ -291,12 +291,12 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         guard extractedProfile.removedDate == nil else {
-            Logger.dataBrokerProtection.debug("Profile already removed, skipping...")
+            Logger.dataBrokerProtection.log("Profile already removed, skipping...")
             return
         }
 
         guard !brokerProfileQueryData.dataBroker.performsOptOutWithinParent() else {
-            Logger.dataBrokerProtection.debug("Broker opts out in parent, skipping...")
+            Logger.dataBrokerProtection.log("Broker opts out in parent, skipping...")
             return
         }
 
@@ -305,10 +305,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                                                   dataBrokerVersion: brokerProfileQueryData.dataBroker.version,
                                                                                   handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
-        Logger.dataBrokerProtection.debug("Running opt-out operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
+        Logger.dataBrokerProtection.log("Running opt-out operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
 
         defer {
-            Logger.dataBrokerProtection.debug("Finished opt-out operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
+            Logger.dataBrokerProtection.log("Finished opt-out operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
 
             try? database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             do {
@@ -443,7 +443,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 database: database
             )
         } catch {
-            Logger.dataBrokerProtection.debug("Can't update operation date after error")
+            Logger.dataBrokerProtection.log("Can't update operation date after error")
         }
 
         Logger.dataBrokerProtection.error("Error on operation : \(error.localizedDescription, privacy: .public)")

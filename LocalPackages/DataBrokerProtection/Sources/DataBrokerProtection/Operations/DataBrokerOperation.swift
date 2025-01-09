@@ -64,7 +64,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
     private var _isFinished = false
 
     deinit {
-        Logger.dataBrokerProtection.debug("Deinit operation: \(String(describing: self.id.uuidString), privacy: .public)")
+        Logger.dataBrokerProtection.log("Deinit operation: \(String(describing: self.id.uuidString), privacy: .public)")
     }
 
     init(dataBrokerID: Int64,
@@ -156,11 +156,11 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                                                                                operationType: operationType,
                                                                                priorityDate: priorityDate)
 
-        Logger.dataBrokerProtection.debug("filteredAndSortedOperationsData count: \(filteredAndSortedOperationsData.count, privacy: .public) for brokerID \(self.dataBrokerID, privacy: .public)")
+        Logger.dataBrokerProtection.log("filteredAndSortedOperationsData count: \(filteredAndSortedOperationsData.count, privacy: .public) for brokerID \(self.dataBrokerID, privacy: .public)")
 
         for operationData in filteredAndSortedOperationsData {
             if isCancelled {
-                Logger.dataBrokerProtection.debug("Cancelled operation, returning...")
+                Logger.dataBrokerProtection.log("Cancelled operation, returning...")
                 return
             }
 
@@ -172,7 +172,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                 continue
             }
             do {
-                Logger.dataBrokerProtection.debug("Running operation: \(String(describing: operationData), privacy: .public)")
+                Logger.dataBrokerProtection.log("Running operation: \(String(describing: operationData), privacy: .public)")
 
                 try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
                                                                                 brokerProfileQueryData: brokerProfileData,
@@ -189,7 +189,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                 })
 
                 let sleepInterval = operationDependencies.config.intervalBetweenSameBrokerOperations
-                Logger.dataBrokerProtection.debug("Waiting...: \(sleepInterval, privacy: .public)")
+                Logger.dataBrokerProtection.log("Waiting...: \(sleepInterval, privacy: .public)")
                 try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
             } catch {
                 Logger.dataBrokerProtection.error("Error: \(error.localizedDescription, privacy: .public)")
@@ -211,7 +211,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         didChangeValue(forKey: #keyPath(isExecuting))
         didChangeValue(forKey: #keyPath(isFinished))
 
-        Logger.dataBrokerProtection.debug("Finished operation: \(self.id.uuidString, privacy: .public)")
+        Logger.dataBrokerProtection.log("Finished operation: \(self.id.uuidString, privacy: .public)")
     }
 }
 // swiftlint:enable explicit_non_final_class
