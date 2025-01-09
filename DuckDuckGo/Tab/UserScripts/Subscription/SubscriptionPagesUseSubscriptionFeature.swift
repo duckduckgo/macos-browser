@@ -152,7 +152,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 
         // Clear subscription Cache
-        await subscriptionManager.signOut()
+        subscriptionManager.clearSubscriptionCache()
 
         guard !subscriptionValues.token.isEmpty else {
             Logger.subscription.fault("Empty token provided, Failed to exchange v1 token for v2")
