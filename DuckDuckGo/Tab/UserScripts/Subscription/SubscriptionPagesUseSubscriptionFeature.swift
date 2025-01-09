@@ -33,7 +33,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     var featureName = "useSubscription"
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "duckduckgo.com"),
-        .exact(hostname: "abrown.duckduckgo.com")
+        .exact(hostname: "abrown.duckduckgo.com"),
+        .exact(hostname: "abuliga.duckduckgo.com"),
     ])
     let subscriptionManager: SubscriptionManager
     var accountManager: AccountManager { subscriptionManager.accountManager }
