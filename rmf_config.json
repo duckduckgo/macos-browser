@@ -1,0 +1,154 @@
+{
+  "version": 5,
+  "messages": [
+    {
+      "id": "1",
+      "content": {
+        "messageType": "big_single_action",
+        "titleText": "Tell Us What Brought You Here",
+        "descriptionText": "Browser updated to version 1.97.0.",
+        "placeholder": "AppUpdate",
+        "primaryActionText": "See What's New",
+        "primaryAction": {
+          "type": "url",
+          "value": "https://duckduckgo.com/mac"
+        }
+      },
+      "matchingRules": [],
+      "exclusionRules": []
+    },
+    {
+      "id": "1-1",
+      "content": {
+        "messageType": "small",
+        "titleText": "Title Goes Here",
+        "descriptionText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus."
+      },
+      "matchingRules": [],
+      "exclusionRules": [],
+      "translations": {
+        "pl-US": {
+          "messageType": "medium",
+          "titleText": "Tytuł idzie tutaj",
+          "descriptionText": "Lorem ipsum dolor sit amet, pozdrawiam adipiscing elit. Etiam eget elit vel ex dapibus.",
+          "placeholder": "AppUpdate"
+        }
+      }
+    },
+    {
+      "id": "1-2",
+      "content": {
+        "messageType": "small",
+        "titleText": "Title Goes Here",
+        "descriptionText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus."
+      },
+      "matchingRules": [],
+      "exclusionRules": [],
+      "translations": {
+        "pl-US": {
+          "messageType": "medium",
+          "titleText": "Tytuł idzie tutaj",
+          "descriptionText": "Lorem ipsum dolor sit amet, pozdrawiam adipiscing elit. Etiam eget elit vel ex dapibus.",
+          "placeholder": "AppUpdate"
+        }
+      }
+    },
+    {
+      "id": "1-3",
+      "content": {
+        "messageType": "big_two_action",
+        "titleText": "macOS Update Recommended",
+        "descriptionText": "Support for macOS Big Sur is ending soon. Update to macOS Monterey or newer before July 8, 2024, to keep getting the latest browser updates and improvements. Support for macOS Big Sur is ending soon. Update to macOS Monterey or newer before July 8, 2024, to keep getting the latest browser updates and improvements. Support for macOS Big Sur is ending soon. Update to macOS Monterey or newer before July 8, 2024, to keep getting the latest browser updates and improvements.",
+        "placeholder": "CriticalUpdate",
+        "primaryActionText": "How To Update macOS",
+        "primaryAction": {
+          "type": "url",
+          "value": "https://support.apple.com/en-us/108382"
+        },
+        "secondaryActionText": "Remind Me Later",
+        "secondaryAction": {
+          "type": "dismiss",
+          "value": ""
+        }
+      },
+      "matchingRules": [],
+      "exclusionRules": []
+    },
+    {
+      "id": "2",
+      "content": {
+        "messageType": "medium",
+        "titleText": "Title Goes Here",
+        "descriptionText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus.",
+        "placeholder": "AppUpdate"
+      },
+      "matchingRules": [],
+      "exclusionRules": []
+    },
+    {
+      "id": "3",
+      "content": {
+        "messageType": "big_single_action",
+        "titleText": "Update Available!",
+        "descriptionText": "A new version of DuckDuckGo Browser is available. Update now to enjoy improved privacy features and enhanced performance.",
+        "placeholder": "AppUpdate",
+        "primaryActionText": "Update Now",
+        "primaryAction": {
+          "type": "url",
+          "value": "https://duckduckgo.com/mac"
+        }
+      },
+      "matchingRules": [],
+      "exclusionRules": []
+    },
+    {
+      "id": "4",
+      "content": {
+        "messageType": "big_single_action",
+        "titleText": "Tell Us Your Thoughts on Privacy Pro",
+        "descriptionText": "Take our short anonymous survey and share your feedback.",
+        "placeholder": "Announce",
+        "primaryActionText": "Take Survey...",
+        "primaryAction": {
+          "type": "url",
+          "value": "https://duckduckgo.com/pro"
+        }
+      },
+      "matchingRules": [],
+      "exclusionRules": []
+    },
+    {
+      "id": "6",
+      "content": {
+        "messageType": "big_single_action",
+        "titleText": "New Search Feature!",
+        "descriptionText": "DuckDuckGo now offers Instant Answers for quicker access to the information you need.",
+        "placeholder": "DDGAnnounce",
+        "primaryActionText": "Learn More",
+        "primaryAction": {
+          "type": "url",
+          "value": "https://duckduckgo.com"
+        }
+      },
+      "matchingRules": [],
+      "exclusionRules": []
+    },
+    {
+      "id": "7",
+      "content": {
+        "messageType": "big_single_action",
+        "titleText": "Tell Us Why You Left Privacy Pro",
+        "descriptionText": "By taking our brief survey, you'll help us improve Privacy Pro for all subscribers.",
+        "placeholder": "PrivacyShield",
+        "primaryActionText": "Take Survey...",
+        "primaryAction": {
+          "type": "url",
+          "value": "https://duckduckgo.com/pro"
+        }
+      },
+      "matchingRules": [],
+      "exclusionRules": []
+    }
+  ],
+  "rules": []
+}
