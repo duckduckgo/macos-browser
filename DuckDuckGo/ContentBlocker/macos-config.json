@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1736158448802,
+    "version": 1736421544754,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -181,6 +181,9 @@
             "exceptions": [
                 {
                     "domain": "allocine.fr"
+                },
+                {
+                    "domain": "barmer.de"
                 },
                 {
                     "domain": "bild.de"
@@ -659,8 +662,7 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media",
-                    "bing.com"
+                    "healthline-media"
                 ]
             },
             "state": "enabled",
@@ -669,7 +671,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "6e8df7847b365381429db33fe036be43"
+            "hash": "4325c2a57ea299381b17c7591a29aafb"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -3075,6 +3077,15 @@
                         ]
                     },
                     {
+                        "domain": "ebay.ca",
+                        "rules": [
+                            {
+                                "selector": "#g-yolo-overlay-holder",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "ebay.com",
                         "rules": [
                             {
@@ -3484,6 +3495,15 @@
                         ]
                     },
                     {
+                        "domain": "google.ca",
+                        "rules": [
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19030391'])",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "google.com",
                         "rules": [
                             {
@@ -3568,6 +3588,10 @@
                             },
                             {
                                 "selector": "div:has(> iframe[src*='prid=19044636'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19046163'])",
                                 "type": "hide"
                             },
                             {
@@ -5343,7 +5367,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "4b7d6ec384400e39c7ad8ca500154b1c"
+            "hash": "88d54a6a951f833d3fbfa6289b582be2"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5725,6 +5749,11 @@
             "state": "disabled",
             "hash": "2dc4c0ade2e385d208695d770002c725"
         },
+        "fullScreenMode": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "googleRejected": {
             "exceptions": [
                 {
@@ -5939,6 +5968,16 @@
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
         },
+        "htmlNewTabPage": {
+            "state": "internal",
+            "exceptions": [],
+            "features": {
+                "isLaunched": {
+                    "state": "internal"
+                }
+            },
+            "hash": "78bcafbbe5e4868ccfde559de5dbd803"
+        },
         "https": {
             "state": "enabled",
             "exceptions": [
@@ -5998,7 +6037,7 @@
             "hash": "39a36ca9002bd5aea4dd7b6bdb5b79d4"
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "broken.third-party.site"
@@ -6008,7 +6047,7 @@
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "hash": "8ceb05ed570765a54738b77c1deb1f64"
+            "hash": "c5507786c7bd5326356357f2291fa536"
         },
         "marketplaceAdPostback": {
             "state": "disabled",
@@ -6249,6 +6288,23 @@
                 "isLaunchedOverride": {
                     "state": "disabled"
                 },
+                "isLaunchedROW": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.118.1"
+                },
                 "allowPurchase": {
                     "state": "enabled"
                 },
@@ -6297,7 +6353,7 @@
                     "minSupportedVersion": "1.116.0"
                 }
             },
-            "hash": "142f357c4bc40a01f99d03566c58cb8b"
+            "hash": "9738cff7f6a81e78fa9a0dfbd1dc99d6"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
