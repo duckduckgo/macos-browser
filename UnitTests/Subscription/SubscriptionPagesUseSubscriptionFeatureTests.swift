@@ -170,8 +170,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
         subscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler()
 
-        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
-                                                                              isSubscriptionPurchaseAllowed: true,
+        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isSubscriptionPurchaseAllowed: true,
                                                                               usesUnifiedFeedbackForm: false)
 
         // Real SubscriptionManager
@@ -180,8 +179,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
                                                          subscriptionEndpointService: subscriptionService,
                                                          authEndpointService: authService,
                                                          subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
-                                                         subscriptionEnvironment: subscriptionEnvironment,
-                                                         subscriptionFeatureFlagger: subscriptionFeatureFlagger)
+                                                         subscriptionEnvironment: subscriptionEnvironment)
 
         mockFreemiumDBPExperimentManager = MockFreemiumDBPExperimentManager()
         mockPixelHandler = MockFreemiumDBPExperimentPixelHandler()

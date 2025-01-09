@@ -53,10 +53,6 @@ extension DefaultSubscriptionManager {
             }
 
             switch feature {
-            case .isLaunchedROW:
-                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW)
-            case .isLaunchedROWOverride:
-                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
             case .usePrivacyProUSARegionOverride:
                 return (featureFlagger.internalUserDecider.isInternalUser &&
                         subscriptionEnvironment.serviceEnvironment == .staging &&
@@ -76,15 +72,13 @@ extension DefaultSubscriptionManager {
                       subscriptionEndpointService: subscriptionEndpointService,
                       authEndpointService: authEndpointService,
                       subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
-                      subscriptionEnvironment: subscriptionEnvironment,
-                      subscriptionFeatureFlagger: subscriptionFeatureFlagger)
+                      subscriptionEnvironment: subscriptionEnvironment)
         } else {
             self.init(accountManager: accountManager,
                       subscriptionEndpointService: subscriptionEndpointService,
                       authEndpointService: authEndpointService,
                       subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
-                      subscriptionEnvironment: subscriptionEnvironment,
-                      subscriptionFeatureFlagger: subscriptionFeatureFlagger)
+                      subscriptionEnvironment: subscriptionEnvironment)
         }
 
         accountManager.delegate = self

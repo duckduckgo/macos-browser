@@ -48,7 +48,6 @@ enum UserText {
 
     // MARK: Preferences footer
     static let preferencesSubscriptionFooterTitle = NSLocalizedString("subscription.preferences.subscription.footer.title", bundle: Bundle.module, value: "Need help with Privacy Pro?", comment: "Title for the subscription preferences pane footer")
-    static let preferencesSubscriptionFooterCaption = NSLocalizedString("subscription.preferences.subscription.footer.caption", bundle: Bundle.module, value: "Get answers to frequently asked questions or contact Privacy Pro support from our help pages.", comment: "Caption for the subscription preferences pane footer")
     static let preferencesSubscriptionHelpFooterCaption = NSLocalizedString("subscription.preferences.subscription.help.footer.caption", bundle: Bundle.module, value: "Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country.", comment: "Caption for the subscription preferences pane footer")
     static let viewFaqsButton = NSLocalizedString("subscription.preferences.view.faqs.button", bundle: Bundle.module, value: "FAQs and Support", comment: "Button to open page for FAQs")
     static let preferencesSubscriptionFeedbackTitle = NSLocalizedString("subscription.preferences.feedback.title", bundle: Bundle.module, value: "Send Feedback", comment: "Title for the subscription feedback section")

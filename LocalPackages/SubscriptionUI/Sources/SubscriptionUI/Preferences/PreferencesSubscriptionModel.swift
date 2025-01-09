@@ -43,7 +43,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
     let featureFlagger: FeatureFlagger
-    var isROWLaunched: Bool = false
 
     private var subscriptionPlatform: Subscription.Platform?
 
@@ -165,7 +164,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         } else {
             self.subscriptionStorefrontRegion = currentStorefrontRegion()
         }
-        isROWLaunched = featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW) || featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
     }
 
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
