@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -5072,27 +5072,6 @@
 		FD23FD2C2886A81D007F6985 /* AutoconsentManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoconsentManagement.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1D5C1B282D01C2620073ED65 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				README.md,
-			);
-			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
-		};
-		1D5C1B292D01C2630073ED65 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				README.md,
-			);
-			target = 3706FA6A293F65D500E42796 /* DuckDuckGo Privacy Browser App Store */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		1D5C1B102D01B9660073ED65 /* native-messaging */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (1D5C1B282D01C2620073ED65 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 1D5C1B292D01C2630073ED65 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = ("add-on", ); path = "native-messaging"; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		3706FCA6293F65D500E42796 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -5488,7 +5467,6 @@
 		1D2DB9A22CE26B7A00F73E96 /* WebExtensions */ = {
 			isa = PBXGroup;
 			children = (
-				1D5C1B102D01B9660073ED65 /* native-messaging */,
 				1D2DB9CA2CE26B9D00F73E96 /* Headers */,
 				1DF78E0A2CE5F58400AB898E /* WebExtensionManager.swift */,
 				1D3A2B622D2D225B00F06679 /* WebExtensionInternalSiteNavigationDelegate.swift */,
@@ -10069,9 +10047,6 @@
 				4BBA2D292B6ACD4D00F6A470 /* PBXTargetDependency */,
 				4B5F14FE2A1529230060320F /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				1D5C1B102D01B9660073ED65 /* native-messaging */,
-			);
 			name = "DuckDuckGo Privacy Browser App Store";
 			packageProductDependencies = (
 				3706FA71293F65D500E42796 /* BrowserServicesKit */,
@@ -10556,9 +10531,6 @@
 				7B4627742B9AF2C8004ACE0B /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				31C6E9AD2B0C07BA0086DC30 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				1D5C1B102D01B9660073ED65 /* native-messaging */,
 			);
 			name = "DuckDuckGo Privacy Browser";
 			packageProductDependencies = (
