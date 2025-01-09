@@ -3713,7 +3713,7 @@
     },
     "subscription.preferences.subscription.footer.caption" : {
       "comment" : "Caption for the subscription preferences pane footer",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
