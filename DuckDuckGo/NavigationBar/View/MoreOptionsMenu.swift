@@ -418,8 +418,6 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     @MainActor
     private func addSubscriptionItems() {
-        guard subscriptionFeatureAvailability.isFeatureAvailable else { return }
-
         func shouldHideDueToNoProduct() -> Bool {
             let platform = subscriptionManager.currentEnvironment.purchasePlatform
             return platform == .appStore && subscriptionManager.canPurchase == false
@@ -968,7 +966,7 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func refreshAvailabilityBasedOnEntitlements() async {
-//        guard subscriptionFeatureAvailability.isFeatureAvailable, subscriptionManager.isUserAuthenticated else { return }
+        guard subscriptionManager.isUserAuthenticated else { return }
         let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
         let vpnFeature = features.first { $0.entitlement == .networkProtection }
         let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }

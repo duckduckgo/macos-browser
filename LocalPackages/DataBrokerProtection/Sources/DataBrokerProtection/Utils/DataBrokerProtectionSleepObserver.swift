@@ -41,7 +41,7 @@ final class DataBrokerProtectionSleepObserver: SleepObserver {
     }
 
     deinit {
-        Logger.dataBrokerProtection.debug("SleepObserver: Deinit \(self.brokerProfileQueryData.dataBroker.name, privacy: .public) \(self.brokerProfileQueryData.profileQuery.firstName, privacy: .public) \(self.brokerProfileQueryData.profileQuery.city, privacy: .public)")
+        Logger.dataBrokerProtection.log("SleepObserver: Deinit \(self.brokerProfileQueryData.dataBroker.name, privacy: .public) \(self.brokerProfileQueryData.profileQuery.firstName, privacy: .public) \(self.brokerProfileQueryData.profileQuery.city, privacy: .public)")
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -50,18 +50,18 @@ final class DataBrokerProtectionSleepObserver: SleepObserver {
             return 0
         }
 
-        Logger.dataBrokerProtection.debug("SleepObserver: Total Sleep time more than zero: \(String(totalSleepTime), privacy: .public)")
+        Logger.dataBrokerProtection.log("SleepObserver: Total Sleep time more than zero: \(String(totalSleepTime), privacy: .public)")
 
         return totalSleepTime
     }
 
     @objc func willSleepNotification(_ notification: Notification) {
-        Logger.dataBrokerProtection.debug("SleepObserver: Computer will sleep on \(self.brokerProfileQueryData.dataBroker.name, privacy: .public) \(self.brokerProfileQueryData.profileQuery.firstName, privacy: .public) \(self.brokerProfileQueryData.profileQuery.city, privacy: .public)")
+        Logger.dataBrokerProtection.log("SleepObserver: Computer will sleep on \(self.brokerProfileQueryData.dataBroker.name, privacy: .public) \(self.brokerProfileQueryData.profileQuery.firstName, privacy: .public) \(self.brokerProfileQueryData.profileQuery.city, privacy: .public)")
         startSleepTime = Date()
     }
 
     @objc func didWakeNotification(_ notification: Notification) {
-        Logger.dataBrokerProtection.debug("SleepObserver: Computer waking up \(self.brokerProfileQueryData.dataBroker.name, privacy: .public) \(self.brokerProfileQueryData.profileQuery.firstName, privacy: .public) \(self.brokerProfileQueryData.profileQuery.city, privacy: .public)")
+        Logger.dataBrokerProtection.log("SleepObserver: Computer waking up \(self.brokerProfileQueryData.dataBroker.name, privacy: .public) \(self.brokerProfileQueryData.profileQuery.firstName, privacy: .public) \(self.brokerProfileQueryData.profileQuery.city, privacy: .public)")
         guard let startSleepTime = self.startSleepTime else {
             return
         }

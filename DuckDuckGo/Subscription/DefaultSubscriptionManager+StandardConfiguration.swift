@@ -71,10 +71,6 @@ extension DefaultSubscriptionManager {
             }
 
             switch feature {
-            case .isLaunchedROW:
-                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW)
-            case .isLaunchedROWOverride:
-                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
             case .usePrivacyProUSARegionOverride:
                 return (featureFlagger.internalUserDecider.isInternalUser &&
                         environment.serviceEnvironment == .staging &&
@@ -98,13 +94,11 @@ extension DefaultSubscriptionManager {
                       oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
                       subscriptionEnvironment: environment,
-                      subscriptionFeatureFlagger: subscriptionFeatureFlagger,
                       pixelHandler: pixelHandler)
         } else {
             self.init(oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
                       subscriptionEnvironment: environment,
-                      subscriptionFeatureFlagger: subscriptionFeatureFlagger,
                       pixelHandler: pixelHandler)
         }
     }

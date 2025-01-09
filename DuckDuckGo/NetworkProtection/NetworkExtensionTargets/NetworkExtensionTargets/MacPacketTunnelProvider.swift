@@ -460,7 +460,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let subscriptionManager = DefaultSubscriptionManager(oAuthClient: authClient,
                                                              subscriptionEndpointService: subscriptionEndpointService,
                                                              subscriptionEnvironment: subscriptionEnvironment,
-                                                             subscriptionFeatureFlagger: nil,
                                                              pixelHandler: pixelHandler)
 
         // MARK: -

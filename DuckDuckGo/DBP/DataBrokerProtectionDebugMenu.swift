@@ -175,21 +175,21 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func startScheduledOperations(_ sender: NSMenuItem) {
-        Logger.dataBrokerProtection.debug("Running queued operations...")
+        Logger.dataBrokerProtection.log("Running queued operations...")
         let showWebView = sender.representedObject as? Bool ?? false
 
         DataBrokerProtectionManager.shared.loginItemInterface.startScheduledOperations(showWebView: showWebView)
     }
 
     @objc private func runScanOperations(_ sender: NSMenuItem) {
-        Logger.dataBrokerProtection.debug("Running scan operations...")
+        Logger.dataBrokerProtection.log("Running scan operations...")
         let showWebView = sender.representedObject as? Bool ?? false
 
         DataBrokerProtectionManager.shared.loginItemInterface.startImmediateOperations(showWebView: showWebView)
     }
 
     @objc private func runOptoutOperations(_ sender: NSMenuItem) {
-        Logger.dataBrokerProtection.debug("Running Optout operations...")
+        Logger.dataBrokerProtection.log("Running Optout operations...")
         let showWebView = sender.representedObject as? Bool ?? false
 
         DataBrokerProtectionManager.shared.loginItemInterface.runAllOptOuts(showWebView: showWebView)

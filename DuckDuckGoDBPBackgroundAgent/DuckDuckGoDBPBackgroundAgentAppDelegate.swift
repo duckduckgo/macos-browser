@@ -33,8 +33,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let subscriptionManager: SubscriptionManager
 
     override init() {
-        Logger.dbpBackgroundAgent.debug("🟢 Starting: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
-
+        Logger.dbpBackgroundAgent.log("🟢 Starting: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
         let dryRun: Bool
 #if DEBUG
         dryRun = true
@@ -112,7 +111,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        Logger.dbpBackgroundAgent.debug("DuckDuckGo DBP Agent launched")
+        Logger.dbpBackgroundAgent.log("DuckDuckGo DBP Agent launched")
         subscriptionManager.loadInitialData()
         manager?.agentFinishedLaunching()
         setupStatusBarMenu()

@@ -65,13 +65,13 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
             let didActivateFreemium = freemiumDBPUserStateManager.didActivate
 
             if !hasProfile || (!isAuthenticated && !didActivateFreemium) {
-                Logger.dataBrokerProtection.debug("Prerequisites are invalid")
+                Logger.dataBrokerProtection.log("Prerequisites are invalid")
                 stopAgent()
                 return
             }
 
             if satisfiesFreemiumPrerequisites() {
-                Logger.dataBrokerProtection.debug("User is Freemium")
+                Logger.dataBrokerProtection.log("User is Freemium")
                 return
             }
 
@@ -107,14 +107,14 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     private func stopAgentBasedOnEntitlementCheckResult(_ result: DataBrokerProtectionEntitlementMonitorResult) {
         switch result {
         case .enabled:
-            Logger.dataBrokerProtection.debug("Valid entitlement")
+            Logger.dataBrokerProtection.log("Valid entitlement")
             pixelHandler.fire(.entitlementCheckValid)
         case .disabled:
-            Logger.dataBrokerProtection.debug("Invalid entitlement")
+            Logger.dataBrokerProtection.log("Invalid entitlement")
             pixelHandler.fire(.entitlementCheckInvalid)
             stopAgent()
         case .error:
-            Logger.dataBrokerProtection.debug("Error when checking entitlement")
+            Logger.dataBrokerProtection.log("Error when checking entitlement")
             /// We don't want to disable the agent in case of an error while checking for entitlements.
             /// Since this is a destructive action, the only situation that should cause the data to be deleted and the agent to be removed is .success(false)
             pixelHandler.fire(.entitlementCheckError)
@@ -128,7 +128,7 @@ protocol DataProtectionStopAction {
 
 struct DefaultDataProtectionStopAction: DataProtectionStopAction {
     func stopAgent() {
-        Logger.dataBrokerProtection.debug("Stopping DataBrokerProtection Agent")
+        Logger.dataBrokerProtection.log("Stopping DataBrokerProtection Agent")
         exit(EXIT_SUCCESS)
     }
 }

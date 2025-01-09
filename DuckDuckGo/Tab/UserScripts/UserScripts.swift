@@ -124,22 +124,20 @@ final class UserScripts: UserScriptsProvider {
             }
             userScripts.append(specialPages)
         }
-
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let subscriptionManager = Application.appDelegate.subscriptionManager
-            let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager)
-            let freemiumDBPPixelExperimentManager = FreemiumDBPPixelExperimentManager(subscriptionManager: subscriptionManager)
-            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
-                                                                   stripePurchaseFlow: stripePurchaseFlow,
-                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler,
-                                                                   freemiumDBPPixelExperimentManager: freemiumDBPPixelExperimentManager)
-            subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
-            userScripts.append(subscriptionPagesUserScript)
-
-            let identityTheftRestorationPagesFeature = IdentityTheftRestorationPagesFeature(subscriptionManager: subscriptionManager)
-            identityTheftRestorationPagesUserScript.registerSubfeature(delegate: identityTheftRestorationPagesFeature)
-            userScripts.append(identityTheftRestorationPagesUserScript)
-        }
+        
+        let subscriptionManager = Application.appDelegate.subscriptionManager
+        let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager)
+        let freemiumDBPPixelExperimentManager = FreemiumDBPPixelExperimentManager(subscriptionManager: subscriptionManager)
+        let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
+                                                               stripePurchaseFlow: stripePurchaseFlow,
+                                                               uiHandler: Application.appDelegate.subscriptionUIHandler,
+                                                               freemiumDBPPixelExperimentManager: freemiumDBPPixelExperimentManager)
+        subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
+        userScripts.append(subscriptionPagesUserScript)
+        
+        let identityTheftRestorationPagesFeature = IdentityTheftRestorationPagesFeature(subscriptionManager: subscriptionManager)
+        identityTheftRestorationPagesUserScript.registerSubfeature(delegate: identityTheftRestorationPagesFeature)
+        userScripts.append(identityTheftRestorationPagesUserScript)
     }
 
     lazy var userScripts: [UserScript] = [

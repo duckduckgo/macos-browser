@@ -65,24 +65,22 @@ struct PreferencesSection: Hashable, Identifiable {
             .init(id: .about, panes: otherPanes)
         ]
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let subscriptionManager = Application.appDelegate.subscriptionManager
-            let platform = subscriptionManager.currentEnvironment.purchasePlatform
-            var shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
+        let subscriptionManager = Application.appDelegate.subscriptionManager
+        let platform = subscriptionManager.currentEnvironment.purchasePlatform
+        var shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
 
-            if subscriptionManager.isUserAuthenticated {
-                shouldHidePrivacyProDueToNoProducts = false
+        if subscriptionManager.isUserAuthenticated {
+            shouldHidePrivacyProDueToNoProducts = false
+        }
+
+        if !shouldHidePrivacyProDueToNoProducts {
+            var subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+
+            if includingVPN {
+                subscriptionPanes.append(.vpn)
             }
 
-            if !shouldHidePrivacyProDueToNoProducts {
-                var subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
-
-                if includingVPN {
-                    subscriptionPanes.append(.vpn)
-                }
-
-                sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
-            }
+            sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
         }
 
         return sections

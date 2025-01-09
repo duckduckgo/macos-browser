@@ -165,7 +165,8 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                   passwordGeneration: false,
                                                   inlineIconCredentials: false,
                                                   thirdPartyCredentialsProvider: false,
-                                                  unknownUsernameCategorization: false)
+                                                  unknownUsernameCategorization: false,
+                                                  partialFormSaves: false)
 
         let sessionKey = UUID().uuidString
         let messageSecret = UUID().uuidString
@@ -339,7 +340,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                 let fileURL = URL(fileURLWithPath: "\(path)/\(fileName)")
                 try csv.write(to: fileURL, atomically: true, encoding: .utf8)
             } else {
-                Logger.dataBrokerProtection.debug("Error getting path")
+                Logger.dataBrokerProtection.error("Error getting path")
             }
         } catch {
             Logger.dataBrokerProtection.error("Error writing to file: \(error)")
