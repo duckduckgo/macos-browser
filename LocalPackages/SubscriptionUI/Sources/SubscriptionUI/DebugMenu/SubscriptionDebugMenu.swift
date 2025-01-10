@@ -200,7 +200,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func signOut() {
         Task {
-            await subscriptionManager.signOut()
+            await subscriptionManager.signOut(notifyUI: true)
         }
     }
 

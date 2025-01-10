@@ -293,7 +293,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     func removeFromThisDeviceAction() {
         userEventHandler(.removeSubscriptionClick)
         Task {
-            await subscriptionManager.signOut()
+            await subscriptionManager.signOut(notifyUI: true)
         }
     }
 
