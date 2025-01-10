@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Common
 import os.log
+import WebKit
 
 /**
  * This protocol describes a feature or set of features that use HTML New Tab Page.
@@ -55,6 +56,17 @@ public extension NewTabPageScriptClient {
             }
             userScript.broker?.push(method: method, params: params, for: userScript, into: webView)
         }
+    }
+
+    /**
+     * Convenience method to push a message with specific parameters to the user script
+     * associated with the given `webView`.
+     */
+    func pushMessage(named method: String, params: Encodable?, to webView: WKWebView) {
+        guard let userScript = userScriptsSource?.userScripts.first(where: { $0.webView === webView }) else {
+            return
+        }
+        userScript.broker?.push(method: method, params: params, for: userScript, into: webView)
     }
 }
 

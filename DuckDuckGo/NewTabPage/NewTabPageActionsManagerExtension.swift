@@ -41,9 +41,18 @@ extension NewTabPageActionsManager {
             getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowAllFavorites, defaultValue: false).wrappedValue
         )
 
+        let customizationProvider = NewTabPageCustomizationProvider(homePageSettingsModel: NSApp.delegateTyped.homePageSettingsModel)
+        let freemiumDBPBannerProvider = NewTabPageFreemiumDBPBannerProvider(model: NSApp.delegateTyped.freemiumDBPPromotionViewCoordinator)
+
         self.init(scriptClients: [
-            NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences),
+            NewTabPageConfigurationClient(
+                sectionsVisibilityProvider: appearancePreferences,
+                customBackgroundProvider: customizationProvider,
+                linkOpener: DefaultHomePageSettingsModelNavigator()
+            ),
+            NewTabPageCustomBackgroundClient(model: customizationProvider),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel),
+            NewTabPageFreemiumDBPClient(provider: freemiumDBPBannerProvider),
             NewTabPageNextStepsCardsClient(model: NewTabPageNextStepsCardsProvider(continueSetUpModel: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener()))),
             NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: Int(Favicon.SizeCategory.medium.rawValue)),
             NewTabPagePrivacyStatsClient(model: privacyStatsModel)

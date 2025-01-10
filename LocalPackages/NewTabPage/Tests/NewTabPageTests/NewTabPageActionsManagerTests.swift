@@ -30,7 +30,7 @@ final class MockNewTabPageScriptClient: NewTabPageScriptClient {
 }
 
 final class NewTabPageActionsManagerTests: XCTestCase {
-    var actionsManager: NewTabPageActionsManager!
+    private var actionsManager: NewTabPageActionsManager!
 
     func testThatUserScriptsReturnsAllRegisteredUserScripts() {
         let actionsManager = NewTabPageActionsManager(scriptClients: [])
