@@ -117,6 +117,11 @@ final class DefaultHomePageNavigator: HomePageNavigator {
             if let window = WindowControllersManager.shared.lastKeyMainWindowController {
                 let homePageViewController = window.mainViewController.browserTabViewController.homePageViewController
                 homePageViewController?.settingsVisibilityModel.isSettingsVisible = true
+
+                if NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage) {
+                    let newTabPageViewModel = window.mainViewController.browserTabViewController.newTabPageWebViewModel
+                    NSApp.delegateTyped.homePageSettingsModel.customizerOpener.openSettings(for: newTabPageViewModel.webView)
+                }
             }
         }
     }

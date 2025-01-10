@@ -34,8 +34,7 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
 
-        sut = PrivacyProSubscriptionRedirectManager(featureAvailabiltyProvider: true,
-                                                    subscriptionEnvironment: Constants.environment,
+        sut = PrivacyProSubscriptionRedirectManager(subscriptionEnvironment: Constants.environment,
                                                     baseURL: Constants.redirectURL,
                                                     canPurchase: { [self] in canPurchase })
     }
