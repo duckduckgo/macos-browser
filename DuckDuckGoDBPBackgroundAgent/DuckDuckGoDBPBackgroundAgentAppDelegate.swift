@@ -71,10 +71,9 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-        subscriptionManager = DefaultSubscriptionManager(
-            keychainType: .dataProtection(.named(subscriptionAppGroup)),
-            environment: subscriptionEnvironment,
-            userDefaults: subscriptionUserDefaults)
+        subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
+                                                         environment: subscriptionEnvironment,
+                                                         userDefaults: subscriptionUserDefaults)
         _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate(subscriptionManager: subscriptionManager)
 
         super.init()

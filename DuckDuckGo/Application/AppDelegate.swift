@@ -300,7 +300,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
                                                          environment: subscriptionEnvironment,
                                                          userDefaults: subscriptionUserDefaults)
-// featureFlagger: featureFlagger
+
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
         })

@@ -430,11 +430,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let authEnvironment: OAuthEnvironment = subscriptionEnvironment.serviceEnvironment == .production ? .production : .staging
 
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
-
         let tokenStorage = NetworkProtectionKeychainStore(label: "DuckDuckGo Network Protection Auth Token",
                                                           serviceName: Self.tokenServiceName,
                                                           keychainType: Bundle.keychainType)
-        let authClient = DefaultOAuthClient(tokensStorage: tokenStorage, authService: authService)
+        let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
+                                            legacyTokenStorage: nil, // Note: The VPN SysExt will stop at the first transition from auth v1 to v2, is up to the user to re-enable it
+                                            authService: authService)
         apiService.authorizationRefresherCallback = { _ in
             guard let tokenContainer = tokenStorage.tokenContainer else {
                 throw OAuthClientError.internalError("Missing refresh token")
@@ -465,9 +466,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         // MARK: -
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-            Logger.networkProtection.log("Entitlements check...")
+            Logger.networkProtection.log("Subscription Entitlements check...")
             let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
-            Logger.networkProtection.log("NetworkProtectionEnabled if: \( isNetworkProtectionEnabled ? "Enabled" : "Disabled", privacy: .public)")
+            Logger.networkProtection.log("Network protection is \( isNetworkProtectionEnabled ? "🟢 Enabled" : "⚫️ Disabled", privacy: .public)")
             return .success(isNetworkProtectionEnabled)
         }
 
@@ -576,6 +577,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - NEPacketTunnelProvider
 
     public override func load(options: StartupOptions) async throws {
+        Logger.networkProtection.log("Loading startup options...")
         try await super.load(options: options)
 
 #if NETP_SYSTEM_EXTENSION

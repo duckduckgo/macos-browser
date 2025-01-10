@@ -649,10 +649,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
 
         do {
-            Logger.networkProtection.debug("Starting NetworkProtectionTunnelController, options: \(options, privacy: .public)")
+            Logger.networkProtection.log("Starting NetworkProtectionTunnelController, options: \(options, privacy: .public)")
             try tunnelManager.connection.startVPNTunnel(options: options)
         } catch {
-            Logger.networkProtection.error("Failed to start VPN tunnel: \(error, privacy: .public)")
+            Logger.networkProtection.fault("Failed to start VPN tunnel: \(error, privacy: .public)")
             throw StartError.startTunnelFailure(error)
         }
 
@@ -803,7 +803,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             Logger.networkProtection.log("🟢 TunnelController found token container")
             return tokenContainer
         } catch {
-            Logger.networkProtection.fault("TunnelController found no token container")
+            Logger.networkProtection.fault("🔴 TunnelController found no token container")
             throw StartError.noAuthToken
         }
     }
