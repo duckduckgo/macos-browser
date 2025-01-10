@@ -32,7 +32,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.4.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "bunn/aichat-deeplink"),
         .package(path: "../AppKitExtensions")
     ],
     targets: [
