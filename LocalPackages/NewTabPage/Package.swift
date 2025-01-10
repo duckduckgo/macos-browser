@@ -32,7 +32,7 @@ let package = Package(
             targets: ["NewTabPage"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "bunn/aichat-deeplink"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.6.0"),
         .package(path: "../WebKitExtensions"),
         .package(path: "../Utilities"),
     ],

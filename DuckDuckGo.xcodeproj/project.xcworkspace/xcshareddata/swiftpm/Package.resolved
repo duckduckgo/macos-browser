@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "bunn/aichat-deeplink",
-        "revision" : "d7e5d4c4392ca31b9f2505ff8d3238425a2603ce"
+        "revision" : "20316b105d8874e10cf544a9c97e97237441ae01",
+        "version" : "224.6.0"
       }
     },
     {
