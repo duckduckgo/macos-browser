@@ -94,7 +94,26 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-    @Published public var dnsSettings: NetworkProtectionDNSSettings = .default
+    @Published public var dnsSettings: NetworkProtectionDNSSettings = .default {
+        didSet {
+            guard dnsSettings != oldValue else {
+                return
+            }
+
+            settings.dnsSettings = dnsSettings
+
+            switch dnsSettings {
+            case .ddg(let malwareProtection):
+                self.malwareProtection = malwareProtection
+                self.isCustomDNSSelected = false
+            default:
+                self.malwareProtection = false
+                self.isCustomDNSSelected = true
+            }
+        }
+    }
+
+    @Published public var malwareProtection = false
     @Published public var isCustomDNSSelected = false
     @Published public var customDNSServers: String?
 
@@ -102,6 +121,8 @@ final class VPNPreferencesModel: ObservableObject {
     private let settings: VPNSettings
     private let pinningManager: PinningManager
     private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Initializers
 
     init(vpnXPCClient: VPNControllerXPCClient = .shared,
          settings: VPNSettings = .init(defaults: .netP),
@@ -242,7 +263,7 @@ final class VPNPreferencesModel: ObservableObject {
 extension NetworkProtectionDNSSettings {
     var dnsServersText: String? {
         switch self {
-        case .default: return nil
+        case .ddg: return nil
         case .custom(let servers): return servers.joined(separator: ", ")
         }
     }

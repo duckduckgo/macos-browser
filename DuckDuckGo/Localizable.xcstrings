@@ -36889,6 +36889,9 @@
         }
       }
     },
+    "Malware protection" : {
+
+    },
     "malware.error.page.tab.title" : {
       "comment" : "Title shown in an error page tab that warn users of security risks on a website that has been flagged as Malware.",
       "extractionState" : "extracted_with_value",
