@@ -391,8 +391,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
-    let subscriptionManager: any SubscriptionManager
-
     @MainActor @objc public init() {
         Logger.networkProtection.log("[+] MacPacketTunnelProvider")
 #if NETP_SYSTEM_EXTENSION
@@ -452,9 +450,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
                                                                              baseURL: subscriptionEnvironment.serviceEnvironment.url)
         let pixelHandler: SubscriptionManager.PixelHandler = { type in
+            // The SysExt handles only dead token pixels
             switch type {
             case .deadToken:
-                PixelKit.fire(SubscriptionPixels.privacyProDeadTokenDetected)
+                PixelKit.fire(PrivacyProPixel.privacyProDeadTokenDetected)
+            case .subscriptionIsActive, .v1MigrationFailed, .v1MigrationSuccessful: // handled by the main app only
+                break
             }
         }
 
@@ -475,15 +476,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 
-        self.subscriptionManager = subscriptionManager
-
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
                    snoozeTimingStore: NetworkProtectionSnoozeTimingStore(userDefaults: .netP),
                    wireGuardInterface: DefaultWireGuardInterface(),
                    keychainType: Bundle.keychainType,
-                   tokenProvider: subscriptionManager,
+                   subscriptionManager: subscriptionManager,
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,

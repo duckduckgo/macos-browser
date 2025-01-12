@@ -104,8 +104,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
                                                            appStoreRestoreFlow: appStoreRestoreFlow)
         stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager)
         subscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler()
-        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
-                                                                              isSubscriptionPurchaseAllowed: true,
+        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isSubscriptionPurchaseAllowed: true,
                                                                               usesUnifiedFeedbackForm: false)
         mockFreemiumDBPExperimentManager = MockFreemiumDBPExperimentManager()
         mockPixelHandler = MockFreemiumDBPExperimentPixelHandler()

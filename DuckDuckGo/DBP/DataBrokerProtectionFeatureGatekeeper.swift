@@ -104,7 +104,7 @@ private extension DefaultDataBrokerProtectionFeatureGatekeeper {
 
     func firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: Bool, isAuthenticatedResult: Bool) {
         if !hasEntitlements {
-            Logger.dataBrokerProtection.error("DBP feature Gatekeeper: Entitlement check failed")
+            Logger.dataBrokerProtection.log("DBP feature Gatekeeper: No Entitlements available")
         }
 
         if !isAuthenticatedResult {

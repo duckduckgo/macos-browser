@@ -31,7 +31,9 @@ extension DefaultSubscriptionManager {
     public convenience init(keychainType: KeychainType,
                             environment: SubscriptionEnvironment,
                             featureFlagger: FeatureFlagger? = nil,
-                            userDefaults: UserDefaults) {
+                            userDefaults: UserDefaults,
+                            handleMigration: Bool,
+                            handlePixels: Bool) {
 
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieStorage = nil
@@ -43,7 +45,7 @@ extension DefaultSubscriptionManager {
         let authEnvironment: OAuthEnvironment = environment.serviceEnvironment == .production ? .production : .staging
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
         let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: keychainType)
-        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: keychainType)
+        let legacyAccountStorage = handleMigration == true ? SubscriptionTokenKeychainStorage(keychainType: keychainType) : nil
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
                                             legacyTokenStorage: legacyAccountStorage,
                                             authService: authService)
@@ -81,11 +83,24 @@ extension DefaultSubscriptionManager {
                         userDefaults.storefrontRegionOverride == .restOfWorld)
             }
         }
-        let pixelHandler: SubscriptionManager.PixelHandler = { type in
-            switch type {
-            case .deadToken:
-                PixelKit.fire(SubscriptionPixels.privacyProDeadTokenDetected)
+
+        // Pixel handler configuration
+        let pixelHandler: SubscriptionManager.PixelHandler
+        if handlePixels {
+            pixelHandler = { type in
+                switch type {
+                case .deadToken:
+                    PixelKit.fire(PrivacyProPixel.privacyProDeadTokenDetected)
+                case .subscriptionIsActive:
+                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
+                case .v1MigrationFailed:
+                    PixelKit.fire(PrivacyProPixel.authV1MigrationFailed)
+                case .v1MigrationSuccessful:
+                    PixelKit.fire(PrivacyProPixel.authV1MigrationSucceeded)
+                }
             }
+        } else {
+            pixelHandler = { _ in }
         }
 
         if #available(macOS 12.0, *) {

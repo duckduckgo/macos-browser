@@ -47,8 +47,8 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func subscribeToEntitlementChanges() {
         Task {
-            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
-            await handleEntitlementsChange(hasEntitlements: isNetworkProtectionEnabled)
+//            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
+//            await handleEntitlementsChange(hasEntitlements: isNetworkProtectionEnabled)
 
             NotificationCenter.default
                 .publisher(for: .entitlementsDidChange)

@@ -299,7 +299,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
         subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
                                                          environment: subscriptionEnvironment,
-                                                         userDefaults: subscriptionUserDefaults)
+                                                         userDefaults: subscriptionUserDefaults,
+                                                         handleMigration: true,
+                                                         handlePixels: true)
 
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
@@ -379,8 +381,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         defer {
             didFinishLaunching = true
         }
-
-        subscriptionManager.loadInitialData()
 
         HistoryCoordinator.shared.loadHistory {
             HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
@@ -551,22 +551,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidBecomeActive()
 
+        // Subscription initial tasks
         Task {
-            do {
-                let subscription = try await subscriptionManager.getSubscription(cachePolicy: .returnCacheDataDontLoad)
-                if subscription.isActive {
-                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
-                }
-            } catch {
-                Logger.general.log("Subscription not active")
-            }
+            await subscriptionManager.loadInitialData()
         }
 
         Task { @MainActor in
             await vpnRedditSessionWorkaround.installRedditSessionWorkaround()
-        }
-
-        Task { @MainActor in
             await subscriptionCookieManager.refreshSubscriptionCookie()
         }
     }

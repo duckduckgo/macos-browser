@@ -1652,7 +1652,6 @@ final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManagin
     var redeemCodeCalled = false
     var authHeaderValue: String? = "fake auth header"
     var hasValidEntitlementValue = false
-    var shouldThrowEntitlementError = false
 
     var isUserAuthenticated: Bool { isUserAuthenticatedValue }
 
@@ -1679,7 +1678,6 @@ final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManagin
         redeemCodeCalled = false
         authHeaderValue = "fake auth header"
         hasValidEntitlementValue = false
-        shouldThrowEntitlementError = false
     }
 }
 

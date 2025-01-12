@@ -73,7 +73,9 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
         let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
         subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
                                                          environment: subscriptionEnvironment,
-                                                         userDefaults: subscriptionUserDefaults)
+                                                         userDefaults: subscriptionUserDefaults,
+                                                         handleMigration: false,
+                                                         handlePixels: false)
         _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate(subscriptionManager: subscriptionManager)
 
         super.init()
@@ -111,7 +113,12 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         Logger.dbpBackgroundAgent.log("DuckDuckGo DBP Agent launched")
-        subscriptionManager.loadInitialData()
+
+        // Subscription initial tasks
+        Task {
+            await subscriptionManager.loadInitialData()
+        }
+
         manager?.agentFinishedLaunching()
         setupStatusBarMenu()
     }

@@ -118,8 +118,7 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
                                                            storePurchaseManager: storePurchaseManager,
                                                            appStoreRestoreFlow: appStoreRestoreFlow)
         stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager)
-        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
-                                                                              isSubscriptionPurchaseAllowed: true,
+        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isSubscriptionPurchaseAllowed: true,
                                                                               usesUnifiedFeedbackForm: false)
         mockFreemiumDBPExperimentManager = MockFreemiumDBPExperimentManager()
 

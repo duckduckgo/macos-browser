@@ -3171,14 +3171,6 @@
 		F18E51022CF8C5650020D129 /* BrowserTabViewControllerOnboardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567A23E02C89B1EE0010F66C /* BrowserTabViewControllerOnboardingTests.swift */; };
 		F18E51032CF8DAFB0020D129 /* WindowManagerStateRestorationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */; };
 		F18E51042CF8DB2B0020D129 /* AppStateChangePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */; };
-		F18E51062CF9DC970020D129 /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */; };
-		F18E51072CF9DC970020D129 /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */; };
-		F18E51082CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */; };
-		F18E510A2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */; };
-		F18E510C2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */; };
-		F18E510D2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */; };
-		F18E510E2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */; };
-		F18E510F2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */; };
 		F198C7122BD18A28000BF24D /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F198C7112BD18A28000BF24D /* PixelKit */; };
 		F198C7142BD18A30000BF24D /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F198C7132BD18A30000BF24D /* PixelKit */; };
 		F198C7162BD18A44000BF24D /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F198C7152BD18A44000BF24D /* PixelKit */; };
@@ -3263,8 +3255,6 @@
 		F1FDC93B2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
 		F1FDC93C2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
 		F1FDC93D2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
-		F1FEB7A72D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FEB7A62D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift */; };
-		F1FEB7A82D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FEB7A62D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 		F4A6198C283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */; };
@@ -5003,7 +4993,6 @@
 		F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPixel.swift; sourceTree = "<group>"; };
 		F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyProPixel.swift; sourceTree = "<group>"; };
 		F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PixelKit+Assertion.swift"; sourceTree = "<group>"; };
-		F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPixels.swift; sourceTree = "<group>"; };
 		F1AFDBD12C231B7A00710F2C /* SubscriptionAppStoreRestorerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAppStoreRestorerTests.swift; sourceTree = "<group>"; };
 		F1AFDBD32C231B9700710F2C /* SubscriptionErrorReporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionErrorReporterTests.swift; sourceTree = "<group>"; };
 		F1B09DA72D020F7A0045AD44 /* NetworkProtectionKeychainStore+TokenStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtectionKeychainStore+TokenStoring.swift"; sourceTree = "<group>"; };
@@ -5022,7 +5011,6 @@
 		F1F861142C1B25D4005DB446 /* SubscriptionUIHandlerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUIHandlerMock.swift; sourceTree = "<group>"; };
 		F1FD5B662C2B0AAA0040FA0D /* SubscriptionPagesUseSubscriptionFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPagesUseSubscriptionFeature.swift; sourceTree = "<group>"; };
 		F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VPNSettings+Environment.swift"; sourceTree = "<group>"; };
-		F1FEB7A62D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTokenContainerRefresher.swift; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 		F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentScopeFeatureFlagging.swift; sourceTree = "<group>"; };
@@ -7207,7 +7195,6 @@
 				02FDA6612C765D0F0024CD8B /* VPNAgentConfigurationURLProvider.swift */,
 				7B60AFF92C511B65008E32A3 /* VPNUIActionHandler.swift */,
 				7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */,
-				F1FEB7A62D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift */,
 				7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */,
 				7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */,
 				7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */,
@@ -9897,7 +9884,6 @@
 				F1DA51852BF607D200CF29FA /* SubscriptionRedirectManager.swift */,
 				F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */,
 				1E25A4FD2CC937120080EFD4 /* SubscriptionCookieManageEventPixelMapping.swift */,
-				F18E51052CF9DC970020D129 /* SubscriptionPixels.swift */,
 			);
 			path = Subscription;
 			sourceTree = "<group>";
@@ -11416,7 +11402,6 @@
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
-				F18E51062CF9DC970020D129 /* SubscriptionPixels.swift in Sources */,
 				3706FAD6293F65D500E42796 /* ConfigurationStore.swift in Sources */,
 				EEDFA38B2CD148DE00D1C558 /* SyncDiagnosisHelper.swift in Sources */,
 				3706FAD7293F65D500E42796 /* Feedback.swift in Sources */,
@@ -12684,7 +12669,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B25377A2A11C01700610219 /* UserText+NetworkProtectionExtensions.swift in Sources */,
-				F18E510A2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */,
 				B65DA5F42A77D3FA00CBEE8D /* BundleExtension.swift in Sources */,
 				4B52354D2C854CB600AFAF64 /* DuckDuckGoUserAgent.swift in Sources */,
 				EEBCA0C72BD7CE2C004DF19C /* VPNFailureRecoveryPixel.swift in Sources */,
@@ -12733,11 +12717,9 @@
 				7B4D8A232BDA857300852966 /* VPNOperationErrorRecorder.swift in Sources */,
 				7BD1688E2AD4A4C400D24876 /* NetworkExtensionController.swift in Sources */,
 				7BA7CC3E2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */,
-				F18E510C2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */,
 				F1DA51982BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */,
 				F1C70D802BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
 				7BA7CC402AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
-				F1FEB7A82D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift in Sources */,
 				02FDA65B2C764C200024CD8B /* ConfigurationStore.swift in Sources */,
 				7BDBAD202CBFF977000379B7 /* TipKitAppEventHandling.swift in Sources */,
 				7B0694982B6E980F00FA4DBA /* VPNProxyLauncher.swift in Sources */,
@@ -12783,11 +12765,9 @@
 				4BF0E5152AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				F1DA51992BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */,
 				F1C70D812BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
-				F18E510D2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */,
 				7BA7CC5C2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */,
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				BDA764852BC49E4000D0400C /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
-				F1FEB7A72D0C356B00BE2E39 /* SubscriptionTokenContainerRefresher.swift in Sources */,
 				02FDA65D2C764CB30024CD8B /* ConfigurationStore.swift in Sources */,
 				7BDBAD212CBFF977000379B7 /* TipKitAppEventHandling.swift in Sources */,
 				7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
@@ -12843,7 +12823,6 @@
 				4B4D60A52A0B2EC000BCD287 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				4BF0E50C2AD2552300FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				B65DA5F22A77D3C600CBEE8D /* UserDefaultsWrapper.swift in Sources */,
-				F18E51082CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */,
 				F1DA51882BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				F1FDC93A2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */,
 			);
@@ -12927,7 +12906,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F17E7DDC2C7C7F8100907A84 /* Logger+DBPBackgroundAgent.swift in Sources */,
-				F18E510E2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */,
 				31A83FB72BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
 				F1D042942BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				F1C70D822BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
@@ -12944,7 +12922,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F10C99422C7E20A1005568B4 /* Logger+DBPBackgroundAgent.swift in Sources */,
-				F18E510F2CF9DCB40020D129 /* SubscriptionPixels.swift in Sources */,
 				31A83FB82BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
 				F1D042952BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				F1C70D832BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
@@ -13451,7 +13428,6 @@
 				B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */,
 				B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */,
 				F188268D2BBF01C300D9AC4F /* PixelDataModel.xcdatamodeld in Sources */,
-				F18E51072CF9DC970020D129 /* SubscriptionPixels.swift in Sources */,
 				7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */,
 				1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
