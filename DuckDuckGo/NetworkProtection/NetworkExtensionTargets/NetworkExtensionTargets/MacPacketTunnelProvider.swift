@@ -447,8 +447,18 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 return VPNAuthTokenBuilder.getVPNAuthToken(from: tokenContainer.accessToken)
             }
         }
+
+#if DEBUG
+        let cacheExpiration: Int = 1
+#else
+        let cacheExpiration: Int = 120
+#endif
+        let subscriptionCache = UserDefaultsCache<PrivacyProSubscription>(userDefaults: defaults,
+                                                                          key: UserDefaultsCacheKey.subscription,
+                                                                          settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(cacheExpiration)))
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
-                                                                             baseURL: subscriptionEnvironment.serviceEnvironment.url)
+                                                                             baseURL: subscriptionEnvironment.serviceEnvironment.url,
+                                                                             subscriptionCache: subscriptionCache)
         let pixelHandler: SubscriptionManager.PixelHandler = { type in
             // The SysExt handles only dead token pixels
             switch type {

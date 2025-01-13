@@ -50,11 +50,11 @@ final class DuckDuckGoVPNApplication: NSApplication {
         }
 
         // MARK: - Configure Subscription
-        let appGroup = Bundle.main.appGroup(bundle: .subs)
-        let subscriptionUserDefaults = UserDefaults(suiteName: appGroup)!
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
 
-        subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(appGroup)),
+        subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
                                                          environment: subscriptionEnvironment,
                                                          userDefaults: subscriptionUserDefaults,
                                                          handleMigration: false,
@@ -376,12 +376,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         setupMenuVisibility()
 
-        // Subscription initial tasks
-        Task {
-            await subscriptionManager.loadInitialData()
-        }
-
         Task { @MainActor in
+            // Subscription initial tasks
+            await subscriptionManager.loadInitialData()
+
             // Initialize lazy properties
             _ = tunnelControllerIPCService
             _ = vpnProxyLauncher
@@ -436,7 +434,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         guard subscriptionManager.isUserAuthenticated else { return }
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
+            Logger.networkProtection.log("Subscription Entitlements check...")
             let isNetworkProtectionEnabled = await self.subscriptionManager.isFeatureActive(.networkProtection)
+            Logger.networkProtection.log("Network protection is \( isNetworkProtectionEnabled ? "🟢 Enabled" : "⚫️ Disabled", privacy: .public)")
             return .success(isNetworkProtectionEnabled)
         }
 

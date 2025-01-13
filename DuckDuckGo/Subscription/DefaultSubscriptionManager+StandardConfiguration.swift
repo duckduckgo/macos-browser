@@ -64,8 +64,17 @@ extension DefaultSubscriptionManager {
             }
         }
 
+#if DEBUG
+        let cacheExpiration: Int = 1
+#else
+        let cacheExpiration: Int = 120
+#endif
+        let subscriptionCache = UserDefaultsCache<PrivacyProSubscription>(userDefaults: userDefaults,
+                                                                          key: UserDefaultsCacheKey.subscription,
+                                                                          settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(cacheExpiration)))
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
-                                                                             baseURL: environment.serviceEnvironment.url)
+                                                                             baseURL: environment.serviceEnvironment.url,
+                                                                             subscriptionCache: subscriptionCache)
         let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
             guard let featureFlagger else {
                 // With no featureFlagger provided there is no gating of features
