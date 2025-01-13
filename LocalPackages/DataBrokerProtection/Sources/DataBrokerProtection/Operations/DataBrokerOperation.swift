@@ -131,7 +131,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
 
         if let priorityDate = priorityDate {
             filteredAndSortedOperationsData = operationsData
-                .filtered(using: priorityDate)
+                .eligibleForRun(byDate: priorityDate)
                 .sortedByPreferredRunDate()
         } else {
             filteredAndSortedOperationsData = operationsData
@@ -224,7 +224,7 @@ extension Array where Element == BrokerJobData {
     /// Note: Opt-out jobs without a preferred run date may be:
     /// 1. From child brokers (will be skipped during runOptOutOperation).
     /// 2. From former child brokers now acting as parent brokers (will be processed if extractedProfile hasn't been removed).
-    func filtered(using priorityDate: Date) -> [BrokerJobData] {
+    func eligibleForRun(byDate priorityDate: Date) -> [BrokerJobData] {
         filter { jobData in
             guard let preferredRunDate = jobData.preferredRunDate else {
                 return jobData is OptOutJobData
