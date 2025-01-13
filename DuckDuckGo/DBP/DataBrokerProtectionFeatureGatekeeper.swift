@@ -75,7 +75,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     func disableAndDeleteForAllUsers() {
         featureDisabler.disableAndDelete()
 
-        Logger.dataBrokerProtection.debug("Disabling and removing DBP for all users")
+        Logger.dataBrokerProtection.log("Disabling and removing DBP for all users")
     }
 
     /// Checks DBP prerequisites

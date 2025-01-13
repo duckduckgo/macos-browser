@@ -54,6 +54,10 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
     var privacyConfigurationManager: PrivacyConfigurationManaging
     var featureFlagger: FeatureFlagger
 
+    public enum Constants {
+        public static let baseTdsURL: String = "https://staticcdn.duckduckgo.com/trackerblocking/v6/"
+    }
+
     init (privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
           featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger) {
         self.privacyConfigurationManager = privacyConfigurationManager
@@ -69,7 +73,9 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
         case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
-        case .trackerDataSet: return trackerDataURL()
+        case .trackerDataSet:
+            print("trackerRadar  \(trackerDataURL())")
+            return trackerDataURL()
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
         case .remoteMessagingConfig: return RemoteMessagingClient.Constants.endpoint
         }
@@ -77,16 +83,15 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     private func trackerDataURL() -> URL {
         for experimentType in TdsExperimentType.allCases {
-            if let cohort = Application.appDelegate.featureFlagger.getCohortIfEnabled(for: experimentType.experiment) as?  TdsNextExperimentFlag.Cohort {
+            if let cohort = featureFlagger.getCohortIfEnabled(for: experimentType.experiment) as? TdsNextExperimentFlag.Cohort {
                 let url = trackerDataURLfromConfiguration(subfeature: experimentType.subfeature, cohort: cohort)
                 return url ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
             }
         }
-
         return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
     }
 
-    private func trackerDataURLfromConfiguration(subfeature:  any PrivacySubfeature, cohort: TdsNextExperimentFlag.Cohort) -> URL? {
+    private func trackerDataURLfromConfiguration(subfeature: any PrivacySubfeature, cohort: TdsNextExperimentFlag.Cohort) -> URL? {
         guard let settings = privacyConfigurationManager.privacyConfig.settings(for: subfeature) else { return nil }
         if let jsonData = settings.data(using: .utf8) {
             do {
@@ -95,9 +100,9 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
                    let treatmentUrl = settings["treatmentUrl"] {
                     switch cohort {
                     case .control:
-                        return URL(string: controlUrl)
+                        return URL(string: Constants.baseTdsURL + controlUrl)
                     case .treatment:
-                        return URL(string: treatmentUrl)
+                        return URL(string: Constants.baseTdsURL + treatmentUrl)
                     }
                 }
             } catch {
@@ -110,7 +115,7 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
 }
 
-public enum TdsExperimentType: CaseIterable {
+public enum TdsExperimentType: Int, CaseIterable {
     case baseline
     case feb24
     case mar24

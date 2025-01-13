@@ -171,6 +171,7 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
 }
 
 final class PrivacyConfigurationMock: PrivacyConfiguration {
+    
     var identifier: String = "mock"
     var version: String? = "123456789"
 
@@ -222,6 +223,10 @@ final class PrivacyConfigurationMock: PrivacyConfiguration {
 
     func settings(for feature: BrowserServicesKit.PrivacyFeature) -> BrowserServicesKit.PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
         [String: Any]()
+    }
+
+    func settings(for subfeature: any BrowserServicesKit.PrivacySubfeature) -> PrivacyConfigurationData.PrivacyFeature.SubfeatureSettings? {
+        return nil
     }
 
     func userEnabledProtection(forDomain: String) {

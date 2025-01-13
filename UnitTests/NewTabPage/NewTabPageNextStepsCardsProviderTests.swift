@@ -65,7 +65,7 @@ final class NewTabPageNextStepsCardsProviderTests: XCTestCase {
         provider.appearancePreferences.isContinueSetUpCardsViewOutdated = false
         provider.continueSetUpModel.featuresMatrix = [[.defaultBrowser]]
 
-        var cardsEvents = [[NewTabPageNextStepsCardsClient.CardID]]()
+        var cardsEvents = [[NewTabPageDataModel.CardID]]()
 
         let cancellable = provider.cardsPublisher
             .sink { cards in
@@ -84,7 +84,7 @@ final class NewTabPageNextStepsCardsProviderTests: XCTestCase {
         provider.appearancePreferences.isContinueSetUpCardsViewOutdated = true
         provider.continueSetUpModel.featuresMatrix = [[.defaultBrowser]]
 
-        var cardsEvents = [[NewTabPageNextStepsCardsClient.CardID]]()
+        var cardsEvents = [[NewTabPageDataModel.CardID]]()
 
         let cancellable = provider.cardsPublisher
             .sink { cards in
@@ -103,7 +103,7 @@ final class NewTabPageNextStepsCardsProviderTests: XCTestCase {
         provider.appearancePreferences.isContinueSetUpCardsViewOutdated = false
         provider.continueSetUpModel.featuresMatrix = [[.defaultBrowser]]
 
-        var cardsEvents = [[NewTabPageNextStepsCardsClient.CardID]]()
+        var cardsEvents = [[NewTabPageDataModel.CardID]]()
 
         let cancellable = provider.cardsPublisher
             .sink { cards in

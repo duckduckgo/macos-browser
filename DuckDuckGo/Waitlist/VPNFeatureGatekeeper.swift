@@ -65,10 +65,6 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     /// For subscription users this means they have entitlements.
     ///
     func canStartVPN() async throws -> Bool {
-        guard subscriptionFeatureAvailability.isFeatureAvailable else {
-            return false
-        }
-
         switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .networkProtection) {
         case .success(let hasEntitlement):
             return hasEntitlement
@@ -83,22 +79,13 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     /// For subscription users this means they are authenticated.
     ///
     func isVPNVisible() -> Bool {
-        guard subscriptionFeatureAvailability.isFeatureAvailable else {
-            return false
-        }
-        return subscriptionManager.accountManager.isUserAuthenticated
-    }
-
-    /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
-    ///
-    var subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability {
-        DefaultSubscriptionFeatureAvailability()
+        subscriptionManager.accountManager.isUserAuthenticated
     }
 
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
-        return subscriptionFeatureAvailability.isFeatureAvailable && !subscriptionManager.accountManager.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
+        !subscriptionManager.accountManager.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
     }
 
     /// Whether the user is fully onboarded

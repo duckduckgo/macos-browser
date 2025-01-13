@@ -47,17 +47,13 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/0/72649045549333/1208241266421040/f
     case htmlNewTabPage
 
-    case isPrivacyProLaunchedROW
-    case isPrivacyProLaunchedROWOverride
-
     case autofillPartialFormSaves
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .htmlNewTabPage,
-             .isPrivacyProLaunchedROWOverride:
+        case .htmlNewTabPage:
             return true
         case .maliciousSiteProtection:
             return true
@@ -71,8 +67,7 @@ extension FeatureFlag: FeatureFlagDescribing {
              .unknownUsernameCategorization,
              .credentialsImportPromotionForExistingUsers,
              .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes,
-             .isPrivacyProLaunchedROW:
+             .networkProtectionEnforceRoutes:
             return false
         }
     }
@@ -101,10 +96,6 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
             return .disabled
-        case .isPrivacyProLaunchedROW:
-            return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROW))
-        case .isPrivacyProLaunchedROWOverride:
-            return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROWOverride))
         case .autofillPartialFormSaves:
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         }

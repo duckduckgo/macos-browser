@@ -36,20 +36,4 @@ struct RedirectNavigationResponder: NavigationResponder {
             navigator.load(request)
         }
     }
-
-//    private func redirectURL(for url: URL) -> URL? {
-//        guard url.isPart(ofDomain: "duckduckgo.com") else { return nil }
-//
-//        if url.pathComponents == URL.privacyPro.pathComponents {
-//            let isFeatureAvailable = DefaultSubscriptionFeatureAvailability().isFeatureAvailable
-//            let subscriptionManager = Application.appDelegate.subscriptionManager
-//            let platform = subscriptionManager.currentEnvironment.purchasePlatform
-//            let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
-//            let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
-//            let url = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
-//            return isPurchasePageRedirectActive ? url : nil
-//        }
-//
-//        return nil
-//    }
 }
