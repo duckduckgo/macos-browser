@@ -361,6 +361,8 @@ final class AddressBarTextField: NSTextField {
                 }
             case .historyEntry:
                 return .autocompleteClickHistory(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
+            case .openTab:
+                return .autocompleteClickOpenTab(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
             default:
                 return nil
             }
