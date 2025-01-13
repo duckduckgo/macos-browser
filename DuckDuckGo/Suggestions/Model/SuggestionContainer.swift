@@ -111,7 +111,7 @@ final class SuggestionContainer {
     private static func defaultOpenTabsProvider(burnerMode: BurnerMode, windowControllersManager: WindowControllersManagerProtocol) -> OpenTabsProvider {
         { @MainActor in
             let selectedTab = windowControllersManager.selectedTab
-            let openTabViewModels = windowControllersManager.allTabViewModels(for: burnerMode, includingPinnedTabs: true)
+            let openTabViewModels = windowControllersManager.allTabViewModels(for: burnerMode, includingPinnedTabs: !burnerMode.isBurner)
             var usedUrls = Set<String>() // deduplicate
             return openTabViewModels.compactMap { model in
                 guard model.tab !== selectedTab,
@@ -148,7 +148,7 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
 
     @MainActor func internalPages(for suggestionLoading: Suggestions.SuggestionLoading) -> [Suggestions.InternalPage] {
         var result = [Suggestions.InternalPage]()
-        let openTabs = windowControllersManager.allTabViewModels(for: burnerMode, includingPinnedTabs: true)
+        let openTabs = windowControllersManager.allTabViewModels(for: burnerMode, includingPinnedTabs: !burnerMode.isBurner)
         var isSettingsOpened = false
         var isBookmarksOpened = false
         // suggestions for Bookmarks&Settings if not Switch to Tab suggestions
