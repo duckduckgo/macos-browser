@@ -196,7 +196,8 @@ extension WindowControllersManager {
                     tabCollectionViewModel.remove(at: selectionIndex)
 
                     // close the window if no more non-pinned tabs are open
-                    if tabCollectionViewModel.tabs.isEmpty, let window = windowController.window, window.isVisible {
+                    if tabCollectionViewModel.tabs.isEmpty, let window = windowController.window, window.isVisible,
+                       mainWindowController?.mainViewController.tabCollectionViewModel.selectedTabIndex?.isPinnedTab != true {
                         window.performClose(nil)
                     }
                 }
