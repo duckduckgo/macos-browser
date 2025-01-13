@@ -20,6 +20,23 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class AppConfigurationURLProviderTests: XCTestCase {
+    private var mockPrivacyConfigurationManager: MockPrivacyConfigurationManager!
+    private var mockFeatureFlagger: MockFeatureFlagger!
+    private var urlProvider: AppConfigurationURLProvider!
+
+    override func setUp() {
+        super.setUp()
+        mockPrivacyConfigurationManager = MockPrivacyConfigurationManager()
+        mockFeatureFlagger = MockFeatureFlagger()
+        urlProvider = AppConfigurationURLProvider(privacyConfigurationManager: mockPrivacyConfigurationManager, featureFlagger: mockFeatureFlagger)
+    }
+
+    override func tearDown() {
+        urlProvider = nil
+        mockPrivacyConfigurationManager = nil
+        mockFeatureFlagger = nil
+        super.tearDown()
+    }
 
     func testExternalURLDependenciesAreExpected() throws {
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .bloomFilterBinary).absoluteString, "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")
@@ -28,6 +45,48 @@ final class AppConfigurationURLProviderTests: XCTestCase {
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString, "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .surrogates).absoluteString, "https://staticcdn.duckduckgo.com/surrogates.txt")
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .trackerDataSet).absoluteString, "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")
+    }
+
+    func testTrackerDataURL_forControlCohort_returnsControlUrl() {
+        // GIVEN
+        let featureJson =
+        """
+            "features": {
+                "tdsNextExperimentBaseline": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52200000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "control.url.json",
+                        "treatmentUrl": "tratement.url.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+        """.data(using: .utf8)!
+        _ = mockPrivacyConfigurationManager.reload(etag: "2", data: featureJson)
+
+        mockFeatureFlagger.cohort = TdsNextExperimentFlag.Cohort.treatment
+
+        // WHEN
+        let url = urlProvider.url(for: .trackerDataSet)
+
+        // THEN
+        XCTAssertEqual(url.absoluteString, "tratement.url.json")
     }
 
 }

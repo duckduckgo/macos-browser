@@ -24,7 +24,7 @@ import Combine
 import TrackerRadarKit
 
 final class ConfigurationManagerTests: XCTestCase {
-    private var operationLog: [ConfigurationStep] = []
+    private var operationLog: OperationLog!
     private var sut: ConfigurationManager!
     private var mockFetcher: MockConfigurationFetcher!
     private var mockStore: MockConfigurationStore!
@@ -33,13 +33,15 @@ final class ConfigurationManagerTests: XCTestCase {
     private var mockContentBlockingManager: MockContentBlockerRulesManager!
 
     override func setUpWithError() throws {
+        operationLog = OperationLog()
         let userDefaults = UserDefaults(suiteName: "ConfigurationManagerTests")!
         userDefaults.removePersistentDomain(forName: "ConfigurationManagerTests")
-        mockFetcher = MockConfigurationFetcher(operationLog: &operationLog)
-        mockPrivacyConfigManager = MockPrivacyConfigurationManager(fetchedETag: nil, fetchedData: nil, embeddedDataProvider: MockEmbeddedDataProvider(), localProtection: MockDomainsProtectionStore(), internalUserDecider: DefaultInternalUserDecider())
+        mockFetcher = MockConfigurationFetcher(operationLog: operationLog)
+        mockStore = MockConfigurationStore()
+        mockPrivacyConfigManager = MockPrivacyConfigurationManager(operationLog: operationLog, fetchedETag: nil, fetchedData: nil, embeddedDataProvider: MockEmbeddedDataProvider(), localProtection: MockDomainsProtectionStore(), internalUserDecider: DefaultInternalUserDecider())
         mockPrivacyConfigManager.operationLog = operationLog
-        mockTrackerDataManager = MockTrackerDataManager(etag: nil, data: nil, embeddedDataProvider: MockEmbeddedDataProvider())
-        mockContentBlockingManager = MockContentBlockerRulesManager()
+        mockTrackerDataManager = MockTrackerDataManager(operationLog: operationLog, etag: nil, data: nil, embeddedDataProvider: MockEmbeddedDataProvider())
+        mockContentBlockingManager = MockContentBlockerRulesManager(operationLog: operationLog)
         sut = ConfigurationManager(fetcher: mockFetcher, store: mockStore, defaults: userDefaults)
         sut.setContentBlockingManagers(
             trackerDataManager: mockTrackerDataManager,
@@ -49,7 +51,7 @@ final class ConfigurationManagerTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        operationLog = []
+        operationLog = nil
         sut = nil
         mockStore = nil
         mockFetcher = nil
@@ -58,38 +60,68 @@ final class ConfigurationManagerTests: XCTestCase {
         mockContentBlockingManager = nil
     }
 
-    func testPrivacyConfigFetchAndReloadBeforeTrackerDataSetFetch() async {
+    func test_WhenRefreshNow_AndPrivacyConfigFetchFails_OtherFetchStillHappen() async {
         // GIVEN
+        mockFetcher.shouldFailPrivacyFetch = true
+        operationLog.steps = []
         let expectedOrder: [ConfigurationStep] = [
-            .fetchSurrogates,
-            .fetchPrivacyConfig,
+            .fetchPrivacyConfigStarted,
+            .fetchSurrogatesStarted,
+            .fetchTrackerDataSetStarted,
+            .reloadTrackerDataSet,
             .reloadPrivacyConfig,
-            .fetchTrackerDataSet
+            .contentBlockingScheduleCompilation
         ]
 
         // WHEN
         await sut.refreshNow(isDebug: false)
 
-        XCTAssertEqual(operationLog, expectedOrder, "Operations did not occur in the expected order.")
+        // THEN
+        XCTAssertEqual(operationLog.steps, expectedOrder, "Operations did not occur in the expected order.")
+    }
+
+    func test_WhenRefreshNow_ThenPrivacyConfigFetchAndReloadBeforeTrackerDataSetFetch() async {
+        // GIVEN
+        operationLog.steps = []
+        let expectedOrder: [ConfigurationStep] = [
+            .fetchPrivacyConfigStarted,
+            .fetchSurrogatesStarted,
+            .reloadPrivacyConfig,
+            .fetchTrackerDataSetStarted,
+            .reloadTrackerDataSet,
+            .reloadPrivacyConfig,
+            .contentBlockingScheduleCompilation
+        ]
+
+        // WHEN
+        await sut.refreshNow(isDebug: false)
+
+        // THEN
+        XCTAssertEqual(operationLog.steps, expectedOrder, "Operations did not occur in the expected order.")
+    }
+
+    func test_WhenRefreshNow_ThenPrivacyConfigFetchAndReloadBeforeTrackerDataSetFetch2() async {
     }
 
 }
 
 // Step enum to track operations
 private enum ConfigurationStep: String, Equatable {
-    case fetchSurrogates
-    case fetchPrivacyConfig
+    case fetchSurrogatesStarted
+    case fetchPrivacyConfigStarted
+    case fetchTrackerDataSetStarted
     case reloadPrivacyConfig
-    case fetchTrackerDataSet
+    case reloadTrackerDataSet
+    case contentBlockingScheduleCompilation
 }
 
 private class MockConfigurationFetcher: ConfigurationFetching {
-    var operationLog: [ConfigurationStep]
+    var operationLog: OperationLog
     var shouldFailPrivacyFetch = false
     var shouldFailSurrogatesFetch = false
     var shouldFailTdsFetch = false
 
-    init(operationLog: inout [ConfigurationStep]) {
+    init(operationLog: OperationLog) {
         self.operationLog = operationLog
     }
 
@@ -102,18 +134,18 @@ private class MockConfigurationFetcher: ConfigurationFetching {
         case .bloomFilterExcludedDomains:
             break
         case .privacyConfiguration:
-            operationLog.append(.fetchPrivacyConfig)
+            operationLog.steps.append(.fetchPrivacyConfigStarted)
             if shouldFailPrivacyFetch {
                 throw NSError(domain: "TestError", code: 1, userInfo: nil)
             }
             try await Task.sleep(nanoseconds: 50_000_000)
         case .surrogates:
-            operationLog.append(.fetchTrackerDataSet)
+            operationLog.steps.append(.fetchSurrogatesStarted)
             if shouldFailSurrogatesFetch {
                 throw NSError(domain: "TestError", code: 1, userInfo: nil)
             }
         case .trackerDataSet:
-            operationLog.append(.fetchTrackerDataSet)
+            operationLog.steps.append(.fetchTrackerDataSetStarted)
             if shouldFailTdsFetch {
                 throw NSError(domain: "TestError", code: 1, userInfo: nil)
             }
@@ -126,24 +158,46 @@ private class MockConfigurationFetcher: ConfigurationFetching {
 }
 
 private class MockPrivacyConfigurationManager: PrivacyConfigurationManager {
-    var operationLog: [ConfigurationStep] = []
+    var operationLog: OperationLog
+
+    init(operationLog: OperationLog, fetchedETag: String?, fetchedData: Data?, embeddedDataProvider: any EmbeddedDataProvider, localProtection: any DomainsProtectionStore, internalUserDecider: any InternalUserDecider) {
+        self.operationLog = operationLog
+        super.init(fetchedETag: fetchedETag, fetchedData: fetchedData, embeddedDataProvider: embeddedDataProvider, localProtection: localProtection, internalUserDecider: internalUserDecider)
+    }
 
     override func reload(etag: String?, data: Data?) -> ReloadResult {
-        operationLog.append(.reloadPrivacyConfig)
+        operationLog.steps.append(.reloadPrivacyConfig)
         return .embedded
     }
 }
 
-class MockTrackerDataManager: TrackerDataManager {
-    func reload(etag: String?, data: Data?) {}
+private class MockTrackerDataManager: TrackerDataManager {
+    var operationLog: OperationLog
+
+    init(operationLog: OperationLog, etag: String?, data: Data?, embeddedDataProvider: any EmbeddedDataProvider) {
+        self.operationLog = operationLog
+        super.init(etag: etag, data: data, embeddedDataProvider: embeddedDataProvider)
+    }
+
+    public override func reload(etag: String?, data: Data?) -> ReloadResult {
+        operationLog.steps.append(.reloadTrackerDataSet)
+        return .embedded
+    }
 }
 
-class MockContentBlockerRulesManager: ContentBlockerRulesManagerProtocol {
+private class MockContentBlockerRulesManager: ContentBlockerRulesManagerProtocol {
+    var operationLog: OperationLog
+
+    init(operationLog: OperationLog) {
+        self.operationLog = operationLog
+    }
+
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> = Empty<ContentBlockerRulesManager.UpdateEvent, Never>().eraseToAnyPublisher()
 
     var currentRules: [ContentBlockerRulesManager.Rules] = []
 
     func scheduleCompilation() -> ContentBlockerRulesManager.CompletionToken {
+        operationLog.steps.append(.contentBlockingScheduleCompilation)
         return ""
     }
 
@@ -156,4 +210,8 @@ class MockContentBlockerRulesManager: ContentBlockerRulesManagerProtocol {
     }
 
     func scheduleCompilation() {}
+}
+
+private class OperationLog {
+    var steps: [ConfigurationStep] = []
 }

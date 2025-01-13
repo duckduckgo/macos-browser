@@ -28,9 +28,9 @@ import PixelKit
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
-    private var trackerDataManager: TrackerDataManager?
-    private var privacyConfigurationManager: PrivacyConfigurationManaging?
-    private var contentBlockingManager: ContentBlockerRulesManagerProtocol?
+    private lazy var trackerDataManager = ContentBlocking.shared.trackerDataManager
+    private lazy var privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+    private lazy var contentBlockingManager = ContentBlocking.shared.contentBlockingManager
 
     private enum Constants {
         static let lastConfigurationInstallDateKey = "config.last.installed"
@@ -48,7 +48,6 @@ final class ConfigurationManager: DefaultConfigurationManager {
     }
 
     static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
-        print("🚨 configurationDebugEvents initialized")
         let domainEvent: GeneralPixel
         switch event {
         case .invalidPayload(let configuration):
@@ -61,7 +60,6 @@ final class ConfigurationManager: DefaultConfigurationManager {
     override init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
                   store: ConfigurationStoring = ConfigurationStore(),
                   defaults: KeyValueStoring = UserDefaults.appConfiguration) {
-        print("🚨 Initializing ConfigurationManager")
         self.defaults = defaults
         super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
@@ -120,7 +118,6 @@ final class ConfigurationManager: DefaultConfigurationManager {
         do {
             try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug)
             didFetchAnyTrackerBlockingDependencies = true
-            let privacyConfigurationManager = self.privacyConfigurationManager ?? ContentBlocking.shared.privacyConfigurationManager
             privacyConfigurationManager.reload(etag: store.loadEtag(for: .privacyConfiguration),
                                                data: store.loadData(for: .privacyConfiguration))
         } catch {
@@ -168,14 +165,11 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
     private func updateTrackerBlockingDependencies() {
         lastConfigurationInstallDate = Date()
-        let trackerDataManager = self.trackerDataManager ?? ContentBlocking.shared.trackerDataManager
-        let privacyConfigurationManager = self.privacyConfigurationManager ?? ContentBlocking.shared.privacyConfigurationManager
-        let contentBlockingManager = self.contentBlockingManager ?? ContentBlocking.shared.contentBlockingManager
 
         trackerDataManager.reload(etag: store.loadEtag(for: .trackerDataSet),
-                                                         data: store.loadData(for: .trackerDataSet))
+                                  data: store.loadData(for: .trackerDataSet))
         privacyConfigurationManager.reload(etag: store.loadEtag(for: .privacyConfiguration),
-                                                                  data: store.loadData(for: .privacyConfiguration))
+                                           data: store.loadData(for: .privacyConfiguration))
         contentBlockingManager.scheduleCompilation()
     }
 
