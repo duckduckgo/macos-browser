@@ -40,7 +40,7 @@ struct MapperToUI {
             brokerQueryGroup.scannedBrokers
         }
 
-        let scanProgress = DBPUIScanProgress(currentScans: partiallyScannedBrokers.count,
+        let scanProgress = DBPUIScanProgress(currentScans: partiallyScannedBrokers.currentScans,
                                              totalScans: totalScans,
                                              scannedBrokers: partiallyScannedBrokers)
 
@@ -447,6 +447,15 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     func sortedByLastRunDate() -> Self {
         self.sorted { lhs, rhs in
             lhs.scanJobData.lastRunDate < rhs.scanJobData.lastRunDate
+        }
+    }
+}
+
+extension Array where Element == DBPUIScanProgress.ScannedBroker {
+    /// Number of completed broker scans
+    var currentScans: Int {
+        reduce(0) { accumulator, scannedBrokers in
+            scannedBrokers.status == .completed ? accumulator + 1 : accumulator
         }
     }
 }

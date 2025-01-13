@@ -173,6 +173,56 @@ class AutoconsentIntegrationTests: XCTestCase {
         XCTAssertTrue(isBannerHidden == true)
     }
 
+    @MainActor
+    func testFilterlistRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
+        // enable the feature
+        CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/filterlist.html")!
+        let tab = self.tabViewModel.tab
+        // expect `cosmetic` to be published
+        let cookieConsentManagedPromise = tab.privacyInfoPublisher
+            .compactMap {
+                return $0?.$cookieConsentManaged
+            }
+            .switchToLatest()
+            .compactMap {
+                return $0?.isCosmeticRuleApplied == true ? true : nil
+            }
+            .receive(on: DispatchQueue.main)
+            .timeout(10)
+            .first()
+            .promise()
+
+        _=await tab.setUrl(url, source: .link)?.result
+
+        do {
+            let cookieConsentManaged = try await cookieConsentManagedPromise.value
+            XCTAssertTrue(cookieConsentManaged == true)
+        } catch {
+            struct ErrorWithHTML: Error, LocalizedError, CustomDebugStringConvertible {
+                let originalError: Error
+                let html: String
+
+                var errorDescription: String? {
+                    (originalError as CustomDebugStringConvertible).debugDescription + "\nHTML:\n\(html)"
+                }
+                var debugDescription: String {
+                    errorDescription!
+                }
+            }
+            let html = try await tab.webView.evaluateJavaScript("document.documentElement.outerHTML") as String?
+
+            if let html {
+                throw ErrorWithHTML(originalError: error, html: html)
+            } else {
+                throw error
+            }
+        }
+
+        let isBannerHidden = try await tab.webView.evaluateJavaScript("window.getComputedStyle(banner).opacity === '0'") as Bool?
+        XCTAssertTrue(isBannerHidden == true)
+    }
+
 }
 
 private extension CookieConsentInfo {
