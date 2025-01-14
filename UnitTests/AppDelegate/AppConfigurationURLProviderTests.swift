@@ -26,7 +26,6 @@ final class AppConfigurationURLProviderTests: XCTestCase {
     private var urlProvider: AppConfigurationURLProvider!
     let controlURL = "control/url.json"
     let treatmentURL = "treatment/url.json"
-    let standardTdsURL = "current/macos-tds.json"
 
     override func setUp() {
         super.setUp()
@@ -63,7 +62,7 @@ final class AppConfigurationURLProviderTests: XCTestCase {
         let url = urlProvider.url(for: .trackerDataSet)
 
         // THEN
-        XCTAssertEqual(url.absoluteString, AppConfigurationURLProvider.Constants.baseTdsURL + controlURL)
+        XCTAssertEqual(url.absoluteString, AppConfigurationURLProvider.Constants.baseTdsURLString + controlURL)
     }
 
     func testTrackerDataURL_forTreatmentCohort_returnsTreatmentUrl() {
@@ -78,7 +77,7 @@ final class AppConfigurationURLProviderTests: XCTestCase {
         let url = urlProvider.url(for: .trackerDataSet)
 
         // THEN
-        XCTAssertEqual(url.absoluteString, AppConfigurationURLProvider.Constants.baseTdsURL + treatmentURL)
+        XCTAssertEqual(url.absoluteString, AppConfigurationURLProvider.Constants.baseTdsURLString + treatmentURL)
     }
 
     func testTrackerDataURL_ifNoSettings_returnsDefaultURL() {
@@ -92,7 +91,7 @@ final class AppConfigurationURLProviderTests: XCTestCase {
         let url = urlProvider.url(for: .trackerDataSet)
 
         // THEN
-        XCTAssertEqual(url.absoluteString, AppConfigurationURLProvider.Constants.baseTdsURL + standardTdsURL)
+        XCTAssertEqual(url, AppConfigurationURLProvider.Constants.defaultTrackerDataURL)
     }
 
     func testTrackerDataURL_ifNoCohort_returnsDefaultURL() {
@@ -105,7 +104,7 @@ final class AppConfigurationURLProviderTests: XCTestCase {
         let url = urlProvider.url(for: .trackerDataSet)
 
         // THEN
-        XCTAssertEqual(url.absoluteString, AppConfigurationURLProvider.Constants.baseTdsURL + standardTdsURL)
+        XCTAssertEqual(url, AppConfigurationURLProvider.Constants.defaultTrackerDataURL)
     }
 
     func test_trackerDataURL_returnsFirstAvailableCohortURL() {
@@ -144,7 +143,7 @@ final class AppConfigurationURLProviderTests: XCTestCase {
         let url = urlProvider.url(for: .trackerDataSet)
 
         // THEN
-        XCTAssertEqual(url.absoluteString, AppConfigurationURLProvider.Constants.baseTdsURL + secondExperimentTreatmentURL)
+        XCTAssertEqual(url.absoluteString, AppConfigurationURLProvider.Constants.baseTdsURLString + secondExperimentTreatmentURL)
     }
 
 }

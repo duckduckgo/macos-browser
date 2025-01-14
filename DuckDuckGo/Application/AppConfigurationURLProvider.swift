@@ -55,7 +55,8 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
     var featureFlagger: FeatureFlagger
 
     public enum Constants {
-        public static let baseTdsURL: String = "https://staticcdn.duckduckgo.com/trackerblocking/v6/"
+        public static let baseTdsURLString = "https://staticcdn.duckduckgo.com/trackerblocking/"
+        public static let defaultTrackerDataURL = URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
     }
 
     init (privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
@@ -83,32 +84,24 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     private func trackerDataURL() -> URL {
         for experimentType in TdsExperimentType.allCases {
-            if let cohort = featureFlagger.getCohortIfEnabled(for: experimentType.experiment) as? TdsNextExperimentFlag.Cohort {
-                let url = trackerDataURLfromConfiguration(subfeature: experimentType.subfeature, cohort: cohort)
-                return url ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
+            if let cohort = featureFlagger.getCohortIfEnabled(for: experimentType.experiment) as? TdsNextExperimentFlag.Cohort,
+               let url = trackerDataURL(for: experimentType.subfeature, cohort: cohort) {
+                return url
             }
         }
-        return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
+        return Constants.defaultTrackerDataURL
     }
 
-    private func trackerDataURLfromConfiguration(subfeature: any PrivacySubfeature, cohort: TdsNextExperimentFlag.Cohort) -> URL? {
-        guard let settings = privacyConfigurationManager.privacyConfig.settings(for: subfeature) else { return nil }
-        if let jsonData = settings.data(using: .utf8) {
-            do {
-                if let settings = try JSONSerialization.jsonObject(with: jsonData) as? [String: String],
-                   let controlUrl = settings["controlUrl"],
-                   let treatmentUrl = settings["treatmentUrl"] {
-                    switch cohort {
-                    case .control:
-                        return URL(string: Constants.baseTdsURL + controlUrl)
-                    case .treatment:
-                        return URL(string: Constants.baseTdsURL + treatmentUrl)
-                    }
-                }
-            } catch {
-                print("Failed to parse JSON: \(error)")
-                return nil
+    private func trackerDataURL(for subfeature: any PrivacySubfeature, cohort: TdsNextExperimentFlag.Cohort) -> URL? {
+        guard let settings = privacyConfigurationManager.privacyConfig.settings(for: subfeature),
+              let jsonData = settings.data(using: .utf8) else { return nil }
+        do {
+            if let settingsDict = try JSONSerialization.jsonObject(with: jsonData) as? [String: String],
+               let urlString = cohort == .control ? settingsDict["controlUrl"] : settingsDict["treatmentUrl"] {
+                return URL(string: Constants.baseTdsURLString + urlString)
             }
+        } catch {
+            print("Failed to parse JSON: \(error)")
         }
         return nil
     }
@@ -117,17 +110,17 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
 public enum TdsExperimentType: Int, CaseIterable {
     case baseline
-    case feb24
-    case mar24
-    case apr24
-    case may24
-    case jun24
-    case jul24
-    case aug24
-    case sep24
-    case oct24
-    case nov24
-    case dec24
+    case feb25
+    case mar25
+    case apr25
+    case may25
+    case jun25
+    case jul25
+    case aug25
+    case sep25
+    case oct25
+    case nov25
+    case dec25
 
     var experiment: any FeatureFlagExperimentDescribing {
         TdsNextExperimentFlag(subfeature: self.subfeature)
@@ -137,28 +130,28 @@ public enum TdsExperimentType: Int, CaseIterable {
         switch self {
         case .baseline:
             ContentBlockingSubfeature.tdsNextExperimentBaseline
-        case .feb24:
-            ContentBlockingSubfeature.tdsNextExperimentFeb24
-        case .mar24:
-            ContentBlockingSubfeature.tdsNextExperimentMar24
-        case .apr24:
-            ContentBlockingSubfeature.tdsNextExperimentApr24
-        case .may24:
-            ContentBlockingSubfeature.tdsNextExperimentMay24
-        case .jun24:
-            ContentBlockingSubfeature.tdsNextExperimentJun24
-        case .jul24:
-            ContentBlockingSubfeature.tdsNextExperimentJul24
-        case .aug24:
-            ContentBlockingSubfeature.tdsNextExperimentAug24
-        case .sep24:
-            ContentBlockingSubfeature.tdsNextExperimentSep24
-        case .oct24:
-            ContentBlockingSubfeature.tdsNextExperimentOct24
-        case .nov24:
-            ContentBlockingSubfeature.tdsNextExperimentNov24
-        case .dec24:
-            ContentBlockingSubfeature.tdsNextExperimentDec24
+        case .feb25:
+            ContentBlockingSubfeature.tdsNextExperimentFeb25
+        case .mar25:
+            ContentBlockingSubfeature.tdsNextExperimentMar25
+        case .apr25:
+            ContentBlockingSubfeature.tdsNextExperimentApr25
+        case .may25:
+            ContentBlockingSubfeature.tdsNextExperimentMay25
+        case .jun25:
+            ContentBlockingSubfeature.tdsNextExperimentJun25
+        case .jul25:
+            ContentBlockingSubfeature.tdsNextExperimentJul25
+        case .aug25:
+            ContentBlockingSubfeature.tdsNextExperimentAug25
+        case .sep25:
+            ContentBlockingSubfeature.tdsNextExperimentSep25
+        case .oct25:
+            ContentBlockingSubfeature.tdsNextExperimentOct25
+        case .nov25:
+            ContentBlockingSubfeature.tdsNextExperimentNov25
+        case .dec25:
+            ContentBlockingSubfeature.tdsNextExperimentDec25
         }
     }
 
