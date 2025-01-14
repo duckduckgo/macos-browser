@@ -81,7 +81,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     lazy var statePublisher: AnyPublisher<PreferencesSubscriptionState, Never> = {
         let isSubscriptionActivePublisher: AnyPublisher<Bool, Never> = $subscriptionStatus.map {
-//            guard let status = $0 else { return false}
             let status = $0
             return status != .expired && status != .inactive && status != .unknown
         }.eraseToAnyPublisher()
@@ -94,8 +93,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             .map { isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement in
                 switch (isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement) {
                 case (false, _, _): return PreferencesSubscriptionState.noSubscription
-                case (true, false, _): return PreferencesSubscriptionState.subscriptionExpired
-//                case (true, nil, _): return PreferencesSubscriptionState.subscriptionPendingActivation
+                case (true, false, _):
+                    switch self.subscriptionStatus {
+                    case .expired, .inactive:
+                        return PreferencesSubscriptionState.subscriptionExpired
+                    default:
+                        return PreferencesSubscriptionState.subscriptionPendingActivation
+                    }
                 case (true, true, false): return PreferencesSubscriptionState.subscriptionPendingActivation
                 case (true, true, true): return PreferencesSubscriptionState.subscriptionActive
                 }
