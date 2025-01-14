@@ -812,7 +812,8 @@ final class BrowserTabViewController: NSViewController {
             updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
-            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
+            // We only use HTML New Tab Page in regular windows for now
+            if featureFlagger.isFeatureOn(.htmlNewTabPage) && !tabCollectionViewModel.isBurner {
                 updateTabIfNeeded(tabViewModel: tabViewModel)
             } else {
                 removeAllTabContent()

@@ -92,8 +92,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                           passwordManagerCoordinator: passwordManagerCoordinator,
                                           vpnFeatureGatekeeper: networkProtectionVisibilityMock,
-                                          subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
-                                                                                                               isSubscriptionPurchaseAllowed: true,
+                                          subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock(isSubscriptionPurchaseAllowed: true,
                                                                                                                usesUnifiedFeedbackForm: false),
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
@@ -358,7 +357,11 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
 }
 
 final class MockFreemiumDBPFeature: FreemiumDBPFeature {
-    var featureAvailable = false
+    var featureAvailable = false {
+        didSet {
+            isAvailableSubject.send(featureAvailable)
+        }
+    }
     var isAvailableSubject = PassthroughSubject<Bool, Never>()
 
     var isAvailable: Bool {

@@ -44,44 +44,44 @@ final class NewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsProviding 
         continueSetUpModel.shouldShowAllFeaturesPublisher.eraseToAnyPublisher()
     }
 
-    var cards: [NewTabPageNextStepsCardsClient.CardID] {
+    var cards: [NewTabPageDataModel.CardID] {
         guard !appearancePreferences.isContinueSetUpCardsViewOutdated else {
             return []
         }
-        return continueSetUpModel.featuresMatrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
+        return continueSetUpModel.featuresMatrix.flatMap { $0.map(NewTabPageDataModel.CardID.init) }
     }
 
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> {
+    var cardsPublisher: AnyPublisher<[NewTabPageDataModel.CardID], Never> {
         let features = continueSetUpModel.$featuresMatrix.dropFirst().removeDuplicates()
         let cardsDidBecomeOutdated = appearancePreferences.$isContinueSetUpCardsViewOutdated.removeDuplicates()
 
         return Publishers.CombineLatest(features, cardsDidBecomeOutdated)
-            .map { features, isOutdated -> [NewTabPageNextStepsCardsClient.CardID] in
+            .map { features, isOutdated -> [NewTabPageDataModel.CardID] in
                 guard !isOutdated else {
                     return []
                 }
-                return features.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
+                return features.flatMap { $0.map(NewTabPageDataModel.CardID.init) }
             }
             .eraseToAnyPublisher()
     }
 
     @MainActor
-    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID) {
+    func handleAction(for card: NewTabPageDataModel.CardID) {
         continueSetUpModel.performAction(for: .init(card))
     }
 
     @MainActor
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID) {
+    func dismiss(_ card: NewTabPageDataModel.CardID) {
         continueSetUpModel.removeItem(for: .init(card))
     }
 
     @MainActor
-    func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID]) {
+    func willDisplayCards(_ cards: [NewTabPageDataModel.CardID]) {
         appearancePreferences.continueSetUpCardsViewDidAppear()
         fireAddToDockPixelIfNeeded(cards)
     }
 
-    private func fireAddToDockPixelIfNeeded(_ cards: [NewTabPageNextStepsCardsClient.CardID]) {
+    private func fireAddToDockPixelIfNeeded(_ cards: [NewTabPageDataModel.CardID]) {
         guard cards.contains(.addAppToDockMac) else {
             return
         }
@@ -92,7 +92,7 @@ final class NewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsProviding 
 }
 
 extension HomePage.Models.FeatureType {
-    init(_ card: NewTabPageNextStepsCardsClient.CardID) {
+    init(_ card: NewTabPageDataModel.CardID) {
         switch card {
         case .bringStuff:
             self = .importBookmarksAndPasswords
@@ -108,7 +108,7 @@ extension HomePage.Models.FeatureType {
     }
 }
 
-extension NewTabPageNextStepsCardsClient.CardID {
+extension NewTabPageDataModel.CardID {
     init(_ feature: HomePage.Models.FeatureType) {
         switch feature {
         case .duckplayer:

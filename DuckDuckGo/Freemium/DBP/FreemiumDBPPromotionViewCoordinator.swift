@@ -25,17 +25,14 @@ import Common
 
 /// Default implementation of `FreemiumDBPPromotionViewCoordinating`, responsible for managing
 /// the visibility of the promotion and responding to user interactions with the promotion view.
-@MainActor
 final class FreemiumDBPPromotionViewCoordinator: ObservableObject {
 
     /// Published property that determines whether the promotion is visible on the home page.
     @Published var isHomePagePromotionVisible: Bool = false
 
     /// The view model representing the promotion, which updates based on the user's state. Returns `nil` if the feature is not enabled
-    var viewModel: PromotionViewModel? {
-        guard freemiumDBPFeature.isAvailable else { return nil }
-        return createViewModel()
-    }
+    @Published
+    private(set) var viewModel: PromotionViewModel?
 
     /// Stores whether the user has dismissed the home page promotion.
     private var didDismissHomePagePromotion: Bool {
@@ -89,14 +86,15 @@ final class FreemiumDBPPromotionViewCoordinator: ObservableObject {
         setInitialPromotionVisibilityState()
         subscribeToFeatureAvailabilityUpdates()
         observeFreemiumDBPNotifications()
+        setUpViewModelRefreshing()
     }
 }
 
 private extension FreemiumDBPPromotionViewCoordinator {
 
     /// Action to be executed when the user proceeds with the promotion (e.g opens DBP)
-    var proceedAction: () -> Void {
-        { [weak self] in
+    var proceedAction: () async -> Void {
+        { @MainActor [weak self] in
             guard let self else { return }
 
             execute(resultsAction: {
@@ -130,6 +128,7 @@ private extension FreemiumDBPPromotionViewCoordinator {
     }
 
     /// Shows the Freemium DBP user interface via the presenter.
+    @MainActor
     func showFreemiumDBP() {
         freemiumDBPPresenter.showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManager.shared)
     }
@@ -148,7 +147,10 @@ private extension FreemiumDBPPromotionViewCoordinator {
     /// Creates the view model for the promotion, updating based on the user's scan results.
     ///
     /// - Returns: The `PromotionViewModel` that represents the current state of the promotion.
-    func createViewModel() -> PromotionViewModel {
+    func createViewModel() -> PromotionViewModel? {
+        guard freemiumDBPFeature.isAvailable, isHomePagePromotionVisible else {
+            return nil
+        }
 
         if let results = freemiumDBPUserStateManager.firstScanResults {
             if results.matchesCount > 0 {
@@ -172,12 +174,24 @@ private extension FreemiumDBPPromotionViewCoordinator {
         }
     }
 
+    /// This method defines the entry point to updating `viewModel` which is every change to `isHomePagePromotionVisible`.
+    func setUpViewModelRefreshing() {
+        $isHomePagePromotionVisible.dropFirst().asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.viewModel = self?.createViewModel()
+            }
+            .store(in: &cancellables)
+    }
+
     /// Subscribes to feature availability updates from the `freemiumDBPFeature`'s availability publisher.
     ///
     /// This method listens to the `isAvailablePublisher` of the `freemiumDBPFeature`, which publishes
     /// changes to the feature's availability. It performs the following actions when an update is received:
     func subscribeToFeatureAvailabilityUpdates() {
         freemiumDBPFeature.isAvailablePublisher
+            .prepend(freemiumDBPFeature.isAvailable)
+            .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isAvailable in
                 guard let self else { return }
