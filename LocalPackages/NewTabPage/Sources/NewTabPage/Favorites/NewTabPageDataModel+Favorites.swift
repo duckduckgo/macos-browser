@@ -48,16 +48,18 @@ extension NewTabPageDataModel {
     }
 
     struct Favorite: Encodable, Equatable {
+        let etldPlusOne: String?
         let favicon: FavoriteFavicon?
         let id: String
         let title: String
         let url: String
 
-        init(id: String, title: String, url: String, favicon: NewTabPageDataModel.FavoriteFavicon? = nil) {
+        init(id: String, title: String, url: String, etldPlusOne: String?, favicon: NewTabPageDataModel.FavoriteFavicon? = nil) {
             self.id = id
             self.title = title
             self.url = url
             self.favicon = favicon
+            self.etldPlusOne = etldPlusOne
         }
 
         @MainActor
@@ -65,6 +67,7 @@ extension NewTabPageDataModel {
             id = bookmark.id
             title = bookmark.title
             url = bookmark.url
+            etldPlusOne = bookmark.etldPlusOne
 
             if let url = bookmark.urlObject, let duckFaviconURL = URL.duckFavicon(for: url) {
                 favicon = FavoriteFavicon(maxAvailableSize: preferredFaviconSize, src: duckFaviconURL.absoluteString)

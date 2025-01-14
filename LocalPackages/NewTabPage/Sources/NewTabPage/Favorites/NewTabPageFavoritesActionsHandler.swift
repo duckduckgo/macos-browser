@@ -23,6 +23,7 @@ public protocol NewTabPageFavorite {
     var title: String { get }
     var url: String { get }
     var urlObject: URL? { get }
+    var etldPlusOne: String? { get }
 }
 
 public protocol FavoritesActionsHandling {

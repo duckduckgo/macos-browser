@@ -83,4 +83,15 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     }
 }
 
-extension Bookmark: NewTabPageFavorite {}
+extension Bookmark: NewTabPageFavorite {
+    private enum Const {
+        static let wwwPreffix = "www."
+    }
+
+    var etldPlusOne: String? {
+        guard let domain = urlObject?.host else {
+            return nil
+        }
+        return ContentBlocking.shared.tld.eTLDplus1(domain)?.dropping(prefix: Const.wwwPreffix)
+    }
+}
