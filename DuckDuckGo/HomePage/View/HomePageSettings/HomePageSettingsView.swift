@@ -247,7 +247,7 @@ extension HomePage.Views.BackgroundCategoryView {
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dockCustomizer: DockCustomizer(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
-            tabCollectionViewModel: TabCollectionViewModel(),
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: TabCollectionViewModel()),
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
         ))
         .environmentObject(HomePage.Models.FavoritesModel(
@@ -276,7 +276,7 @@ extension HomePage.Views.BackgroundCategoryView {
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dockCustomizer: DockCustomizer(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
-            tabCollectionViewModel: TabCollectionViewModel(),
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: TabCollectionViewModel()),
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
         ))
         .environmentObject(HomePage.Models.FavoritesModel(

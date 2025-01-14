@@ -16,10 +16,12 @@
 //  limitations under the License.
 //
 
-import Foundation
 import AppKit
 import Bookmarks
+import BrowserServicesKit
 import Common
+import FeatureFlags
+import Foundation
 import PixelKit
 import os.log
 
@@ -115,6 +117,11 @@ final class DefaultHomePageNavigator: HomePageNavigator {
             if let window = WindowControllersManager.shared.lastKeyMainWindowController {
                 let homePageViewController = window.mainViewController.browserTabViewController.homePageViewController
                 homePageViewController?.settingsVisibilityModel.isSettingsVisible = true
+
+                if NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage) {
+                    let newTabPageViewModel = window.mainViewController.browserTabViewController.newTabPageWebViewModel
+                    NSApp.delegateTyped.homePageSettingsModel.customizerOpener.openSettings(for: newTabPageViewModel.webView)
+                }
             }
         }
     }
@@ -165,7 +172,7 @@ enum ThemeName: String, Equatable, CaseIterable {
     }
 }
 
-extension FavoritesDisplayMode: LosslessStringConvertible {
+extension FavoritesDisplayMode: @retroactive LosslessStringConvertible {
     static let `default` = FavoritesDisplayMode.displayNative(.desktop)
 
     public init?(_ description: String) {
@@ -230,6 +237,11 @@ final class AppearancePreferences: ObservableObject {
         didSet {
             persistor.continueSetUpCardsClosed = continueSetUpCardsClosed
         }
+    }
+
+    var isContinueSetUpCardsVisibilityControlAvailable: Bool {
+        // HTML NTP doesn't allow for hiding Next Steps Cards section
+        !featureFlagger().isFeatureOn(.htmlNewTabPage)
     }
 
     var isContinueSetUpVisible: Bool {
@@ -337,12 +349,14 @@ final class AppearancePreferences: ObservableObject {
     init(
         persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor(),
         homePageNavigator: HomePageNavigator = DefaultHomePageNavigator(),
+        featureFlagger: @autoclosure @escaping () -> FeatureFlagger = NSApp.delegateTyped.featureFlagger,
         dateTimeProvider: @escaping () -> Date = Date.init
     ) {
         self.persistor = persistor
         self.homePageNavigator = homePageNavigator
         self.dateTimeProvider = dateTimeProvider
         self.isContinueSetUpCardsViewOutdated = persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays
+        self.featureFlagger = featureFlagger
         self.continueSetUpCardsClosed = persistor.continueSetUpCardsClosed
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
@@ -359,6 +373,7 @@ final class AppearancePreferences: ObservableObject {
 
     private var persistor: AppearancePreferencesPersistor
     private var homePageNavigator: HomePageNavigator
+    private let featureFlagger: () -> FeatureFlagger
     private let dateTimeProvider: () -> Date
 
     private func requestSync() {

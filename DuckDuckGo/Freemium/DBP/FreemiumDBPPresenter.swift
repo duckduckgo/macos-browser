@@ -21,6 +21,7 @@ import Freemium
 
 /// Conforming types provide functionality to show Freemium DBP
 protocol FreemiumDBPPresenter {
+    @MainActor
     func showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManagerProtocol?)
 }
 

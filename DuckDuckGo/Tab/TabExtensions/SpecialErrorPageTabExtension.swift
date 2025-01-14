@@ -43,6 +43,7 @@ final class SpecialErrorPageTabExtension {
 
     @MainActor private weak var webView: ErrorPageTabExtensionNavigationDelegate?
     @MainActor private weak var specialErrorPageUserScript: SpecialErrorPageUserScript?
+    private let closeTab: () -> Void
 
     @MainActor private var exemptions: [URL: MaliciousSiteProtection.ThreatKind] = [:]
     @MainActor private var shouldBypassSSLError = false
@@ -53,6 +54,7 @@ final class SpecialErrorPageTabExtension {
 
     init(webViewPublisher: some Publisher<some ErrorPageTabExtensionNavigationDelegate, Never>,
          scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
+         closeTab: @escaping () -> Void,
          urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
          maliciousSiteDetector: some MaliciousSiteDetecting) {
@@ -60,6 +62,7 @@ final class SpecialErrorPageTabExtension {
         self.featureFlagger = featureFlagger
         self.urlCredentialCreator = urlCredentialCreator
         self.detector = maliciousSiteDetector
+        self.closeTab = closeTab
 
         webViewPublisher.sink { [weak self] webView in
             MainActor.assumeIsolated {
@@ -131,7 +134,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 
     @MainActor
     private func redirectMaliciousIframeNavigationAction(_ navigationAction: NavigationAction, with threatKind: MaliciousSiteProtection.ThreatKind) -> NavigationActionPolicy? {
-        PixelKit.fire(MaliciousSiteProtection.Event.iframeLoaded)
+        PixelKit.fire(MaliciousSiteProtection.Event.iframeLoaded(category: threatKind))
 
         // Extract the URL of the source frame (the iframe) that initiated the navigation action
         let iframeTopUrl = navigationAction.sourceFrame.url
@@ -152,7 +155,8 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     }
 
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
-        guard navigation.isCurrent, let url = error.failingUrl else {
+        guard navigation.isCurrent else { return }
+        guard let url = error.failingUrl else {
             self.errorData = nil
             return
         }
@@ -179,6 +183,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
+        guard navigation.isCurrent else { return }
         specialErrorPageUserScript?.isEnabled = (errorData != nil && navigation.navigationAction.navigationType == .alternateHtmlLoad)
     }
 
@@ -199,22 +204,35 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
 
     // Special error page "Leave site" button action
     func leaveSiteAction() {
-        guard webView?.canGoBack == true else {
-            webView?.close()
-            return
+        guard let errorData, let webView else { return }
+        switch errorData {
+        case .maliciousSite:
+            closeAndOpenNewTab()
+        case .ssl:
+            if webView.canGoBack {
+                _=webView.goBack()
+            } else {
+                closeAndOpenNewTab()
+            }
         }
-        _ = webView?.goBack()
+    }
+
+    private func closeAndOpenNewTab() {
+        Task { @MainActor in
+            await self.webView?.openNewTabFromErrorPage()
+            self.closeTab()
+        }
     }
 
     // Special error page "Visit site" button action
     func visitSiteAction() {
         defer {
-            webView?.reloadPage()
+            webView?.reloadPageFromErrorPage()
         }
         guard let errorData, let webView, let url = webView.url else { return }
         switch errorData {
         case .maliciousSite(kind: let threatKind, url: _):
-            PixelKit.fire(MaliciousSiteProtection.Event.visitSite)
+            PixelKit.fire(MaliciousSiteProtection.Event.visitSite(category: threatKind))
 
             exemptions[url] = threatKind
             state.bypassedMaliciousSiteThreatKind = threatKind
@@ -250,16 +268,22 @@ protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     func load(_ request: URLRequest) -> WKNavigation?
     func goBack() -> WKNavigation?
     func close()
-    @discardableResult func reloadPage() -> WKNavigation?
+    @MainActor func reloadPageFromErrorPage()
+    @MainActor func openNewTabFromErrorPage() async
 }
 
 extension ErrorPageTabExtensionNavigationDelegate {
-    func reloadPage() -> WKNavigation? {
-        guard let wevView = self as? WKWebView else { return nil }
-        if let item = wevView.backForwardList.currentItem {
-            return wevView.go(to: item)
-        }
-        return nil
+
+    @MainActor func reloadPageFromErrorPage() {
+        guard let webView = self as? WKWebView, let url = webView.url else { return }
+        // reloading creates an extra back history record;
+        // `webView.go(to: backForwardList.currentItem)` breaks downloads as we don‘t load “Back” requests (with `returnCacheElseLoad` cache policy)
+        webView.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: nil, in: .defaultClient)
+    }
+
+    @MainActor func openNewTabFromErrorPage() async {
+        guard let webView = self as? WKWebView else { return }
+        try? await webView.evaluateJavaScript("window.open('\(URL.newtab.absoluteString.escapedJavaScriptString())', '_blank')") as Void?
     }
 }
 

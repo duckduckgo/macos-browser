@@ -77,7 +77,10 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
             return
         }
 
-        let updateController = Application.appDelegate.updateController
+        guard let updateController = Application.appDelegate.updateController else {
+            return
+        }
+
         let values = ReleaseNotesValues(from: updateController)
         broker?.push(method: "onUpdate", params: values, for: self, into: webView)
     }
@@ -113,7 +116,7 @@ extension ReleaseNotesUserScript {
     @MainActor
     private func retryUpdate(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         DispatchQueue.main.async { [weak self] in
-            self?.updateController.checkForUpdateIfNeeded()
+            self?.updateController.checkForUpdateSkippingRollout()
         }
         return nil
     }

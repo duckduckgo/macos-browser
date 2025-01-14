@@ -144,7 +144,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             return DefaultDataBrokerProtectionBrokerUpdater(vault: vault)
         }
 
-        Logger.dataBrokerProtection.debug("Error when trying to create vault for data broker protection updater debug menu item")
+        Logger.dataBrokerProtection.log("Error when trying to create vault for data broker protection updater debug menu item")
         return nil
     }
 
@@ -163,7 +163,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             do {
                 try update(broker)
             } catch {
-                Logger.dataBrokerProtection.debug("Error updating broker: \(broker.name, privacy: .public), with version: \(broker.version, privacy: .public)")
+                Logger.dataBrokerProtection.log("Error updating broker: \(broker.name, privacy: .public), with version: \(broker.version, privacy: .public)")
                 pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             }
         }

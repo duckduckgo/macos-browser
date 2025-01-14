@@ -105,11 +105,11 @@ final class ReleaseNotesTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-#if !DEBUG
         guard NSApp.runType != .uiTests, navigation.url == .releaseNotes else { return }
         let updateController = Application.appDelegate.updateController!
-        updateController.checkForUpdateIfNeeded()
-#endif
+        if updateController.latestUpdate?.needsLatestReleaseNote == true {
+            updateController.checkForUpdateSkippingRollout()
+        }
     }
 }
 
@@ -133,7 +133,7 @@ extension ReleaseNotesValues {
          releaseNotes: [String]? = nil,
          releaseNotesPrivacyPro: [String]? = nil,
          downloadProgress: Double? = nil,
-         automaticUpdate: Bool? = nil) {
+         automaticUpdate: Bool?) {
         self.status = status.rawValue
         self.currentVersion = currentVersion
         self.latestVersion = latestVersion
@@ -145,14 +145,15 @@ extension ReleaseNotesValues {
         self.automaticUpdate = automaticUpdate
     }
 
-    init(from updateController: UpdateController?) {
+    init(from updateController: UpdateController) {
         let currentVersion = "\(AppVersion().versionNumber) (\(AppVersion().buildNumber))"
-        let lastUpdate = UInt((updateController?.lastUpdateCheckDate ?? Date()).timeIntervalSince1970)
+        let lastUpdate = UInt((updateController.lastUpdateCheckDate ?? Date()).timeIntervalSince1970)
 
-        guard let updateController, let latestUpdate = updateController.latestUpdate else {
-            self.init(status: updateController?.updateProgress.toStatus ?? .loaded,
+        guard let latestUpdate = updateController.latestUpdate else {
+            self.init(status: updateController.updateProgress.toStatus,
                       currentVersion: currentVersion,
-                      lastUpdate: lastUpdate)
+                      lastUpdate: lastUpdate,
+                      automaticUpdate: updateController.areAutomaticUpdatesEnabled)
             return
         }
 
@@ -194,11 +195,11 @@ private extension Update {
 private extension UpdateCycleProgress {
     var toStatus: ReleaseNotesValues.Status {
         switch self {
-        case .updateCycleDidStart: return .loading
+        case .updateCycleNotStarted, .updateCycleDidStart: return .loading
         case .downloadDidStart, .downloading: return .updateDownloading
         case .extractionDidStart, .extracting, .readyToInstallAndRelaunch, .installationDidStart, .installing: return .updatePreparing
         case .updaterError: return .updateError
-        case .updateCycleNotStarted, .updateCycleDone: return .updateReady
+        case .updateCycleDone: return .loaded
         }
     }
 

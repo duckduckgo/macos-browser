@@ -19,7 +19,7 @@
 import AppKit
 import Combine
 import Foundation
-import WebKit
+import WebKitExtensions
 
 enum NavigationDecision {
     case allow(NewWindowPolicy)

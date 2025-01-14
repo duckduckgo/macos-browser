@@ -43,9 +43,9 @@ public final class PrivacyStatsDatabase: PrivacyStatsDatabaseProviding {
             db.loadStore { context, error in
                 guard context != nil else {
                     if let error = error {
-                        PixelKit.fire(DebugEvent(GeneralPixel.privacyStatsCouldNotLoadDatabase, error: error))
+                        PixelKit.fire(DebugEvent(NewTabPagePixel.privacyStatsCouldNotLoadDatabase, error: error), frequency: .dailyAndCount)
                     } else {
-                        PixelKit.fire(DebugEvent(GeneralPixel.privacyStatsCouldNotLoadDatabase))
+                        PixelKit.fire(DebugEvent(NewTabPagePixel.privacyStatsCouldNotLoadDatabase), frequency: .dailyAndCount)
                     }
 
                     Thread.sleep(forTimeInterval: 1)

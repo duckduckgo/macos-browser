@@ -60,20 +60,20 @@ struct DataBrokerProtectionFeature: Subfeature {
             case .actionError: return onActionError
             }
         } else {
-            Logger.action.debug("Cant parse method: \(methodName, privacy: .public)")
+            Logger.action.log("Cant parse method: \(methodName, privacy: .public)")
             return nil
         }
     }
 
     func onActionCompleted(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        Logger.action.debug("Action completed")
+        Logger.action.log("Action completed")
 
         await parseActionCompleted(params: params)
         return nil
     }
 
     func parseActionCompleted(params: Any) async {
-        Logger.action.debug("Parse action completed")
+        Logger.action.log("Parse action completed")
 
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(CCFResult.self, from: data) else {
@@ -91,7 +91,7 @@ struct DataBrokerProtectionFeature: Subfeature {
     }
 
     func parseSuccess(success: CCFSuccessResponse) async {
-        Logger.action.debug("Parse success: \(String(describing: success.actionType.rawValue), privacy: .public)")
+        Logger.action.log("Parse success: \(String(describing: success.actionType.rawValue), privacy: .public)")
 
         switch success.response {
         case .navigate(let navigate):
@@ -114,7 +114,7 @@ struct DataBrokerProtectionFeature: Subfeature {
 
     func onActionError(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let error = DataBrokerProtectionError.parse(params: params)
-        Logger.action.debug("Action Error: \(String(describing: error.localizedDescription), privacy: .public)")
+        Logger.action.log("Action Error: \(String(describing: error.localizedDescription), privacy: .public)")
 
         await delegate?.onError(error: error)
         return nil
@@ -129,7 +129,7 @@ struct DataBrokerProtectionFeature: Subfeature {
             assertionFailure("Cannot continue without broker instance")
             return
         }
-        Logger.action.debug("Pushing into WebView: \(method.rawValue) params \(String(describing: params))")
+        Logger.action.log("Pushing into WebView: \(method.rawValue) params \(String(describing: params))")
 
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }

@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 //
 //  Package.swift
@@ -22,6 +22,7 @@ import PackageDescription
 
 let package = Package(
     name: "NetworkProtectionMac",
+    defaultLocalization: "en",
     platforms: [
         .macOS("11.4")
     ],
@@ -32,7 +33,7 @@ let package = Package(
         .library(name: "VPNAppLauncher", targets: ["VPNAppLauncher"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "217.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.6.1"),
         .package(url: "https://github.com/airbnb/lottie-spm", exact: "4.4.3"),
         .package(path: "../AppLauncher"),
         .package(path: "../UDSHelper"),
@@ -109,7 +110,7 @@ let package = Package(
                 .product(name: "Lottie", package: "lottie-spm")
             ],
             resources: [
-                .copy("Resources/Assets.xcassets")
+                .process("Resources")
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))

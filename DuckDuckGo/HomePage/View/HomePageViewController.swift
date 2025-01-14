@@ -162,6 +162,7 @@ final class HomePageViewController: NSViewController {
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
         return .init { [weak self] url in
+            PixelKit.fire(GeneralPixel.privacyFeedHistoryLinkOpened, frequency: .dailyAndCount)
             self?.openUrl(url)
         }
     }
@@ -171,7 +172,7 @@ final class HomePageViewController: NSViewController {
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dockCustomizer: DockCustomizer(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
-            tabCollectionViewModel: tabCollectionViewModel,
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: tabCollectionViewModel),
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
         )
     }

@@ -35,7 +35,9 @@ import os.log
  */
 final class ActiveRemoteMessageModel: ObservableObject {
 
-    @Published var remoteMessage: RemoteMessageModel?
+    @Published private var remoteMessage: RemoteMessageModel?
+    @Published var newTabPageRemoteMessage: RemoteMessageModel?
+    @Published var tabBarRemoteMessage: RemoteMessageModel?
     @Published var isViewOnScreen: Bool = false
 
     /**
@@ -47,10 +49,16 @@ final class ActiveRemoteMessageModel: ObservableObject {
      */
     let store: () -> RemoteMessagingStoring?
 
-    convenience init(remoteMessagingClient: RemoteMessagingClient) {
+    /**
+     * Handler for opening URLs for Remote Messages displayed on HTML New Tab Page
+     */
+    let openURLHandler: (URL) async -> Void
+
+    convenience init(remoteMessagingClient: RemoteMessagingClient, openURLHandler: @escaping (URL) async -> Void) {
         self.init(
             remoteMessagingStore: remoteMessagingClient.store,
-            remoteMessagingAvailabilityProvider: remoteMessagingClient.remoteMessagingAvailabilityProvider
+            remoteMessagingAvailabilityProvider: remoteMessagingClient.remoteMessagingAvailabilityProvider,
+            openURLHandler: openURLHandler
         )
     }
 
@@ -59,9 +67,11 @@ final class ActiveRemoteMessageModel: ObservableObject {
      */
     init(
         remoteMessagingStore: @escaping @autoclosure () -> RemoteMessagingStoring?,
-        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding?
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding?,
+        openURLHandler: @escaping (URL) async -> Void
     ) {
         self.store = remoteMessagingStore
+        self.openURLHandler = openURLHandler
 
         let messagesDidChangePublisher = NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
             .asVoid()
@@ -83,6 +93,21 @@ final class ActiveRemoteMessageModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateRemoteMessage()
+            }
+            .store(in: &cancellables)
+
+        $remoteMessage
+            .sink { [weak self] newMessage in
+                if let newMessage = newMessage {
+                    if newMessage.isForTabBar {
+                        self?.tabBarRemoteMessage = newMessage
+                    } else {
+                        self?.newTabPageRemoteMessage = newMessage
+                    }
+                } else {
+                    self?.newTabPageRemoteMessage = nil
+                    self?.tabBarRemoteMessage = nil
+                }
             }
             .store(in: &cancellables)
 
@@ -175,5 +200,12 @@ extension RemoteMessageModelType {
         default:
             return true
         }
+    }
+}
+
+private extension RemoteMessageModel {
+
+    var isForTabBar: Bool {
+        return id == TabBarRemoteMessage.tabBarPermanentSurveyRemoteMessageId
     }
 }

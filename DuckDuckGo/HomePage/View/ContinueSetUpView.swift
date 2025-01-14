@@ -119,7 +119,7 @@ extension HomePage.Views {
                 .onAppear {
                     if featureType == .dock {
                         PixelKit.fire(GeneralPixel.addToDockNewTabPageCardPresented,
-                                      frequency: .unique,
+                                      frequency: .uniqueByName,
                                       includeAppVersionParameter: false)
                     }
                 }
@@ -292,7 +292,7 @@ extension HomePage.Views {
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dockCustomizer: DockCustomizer(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
-            tabCollectionViewModel: TabCollectionViewModel(),
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: TabCollectionViewModel()),
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
         ))
 }

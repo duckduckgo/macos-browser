@@ -21,14 +21,15 @@ import Cocoa
 import Combine
 import Common
 import FeatureFlags
-import SwiftUI
-import WebKit
-import Subscription
-import PixelKit
-import os.log
-import Onboarding
 import Freemium
+import NewTabPage
+import Onboarding
+import os.log
+import PixelKit
+import Subscription
+import SwiftUI
 import UserScript
+import WebKit
 
 protocol BrowserTabViewControllerDelegate: AnyObject {
     func highlightFireButton()
@@ -810,7 +811,8 @@ final class BrowserTabViewController: NSViewController {
             updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
-            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
+            // We only use HTML New Tab Page in regular windows for now
+            if featureFlagger.isFeatureOn(.htmlNewTabPage) && !tabCollectionViewModel.isBurner {
                 updateTabIfNeeded(tabViewModel: tabViewModel)
             } else {
                 removeAllTabContent()

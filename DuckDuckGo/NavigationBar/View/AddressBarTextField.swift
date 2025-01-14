@@ -421,14 +421,13 @@ final class AddressBarTextField: NSTextField {
         }
 #endif
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let baseURL = Application.appDelegate.subscriptionManager.url(for: .baseURL)
-            let identityTheftRestorationURL = Application.appDelegate.subscriptionManager.url(for: .identityTheftRestoration)
-            if providedUrl.isChild(of: baseURL) || providedUrl.isChild(of: identityTheftRestorationURL) {
-                self.updateValue(selectedTabViewModel: nil, addressBarString: nil) // reset
-                self.window?.makeFirstResponder(nil)
-                return
-            }
+        // Prevent typing in subscription URLs directly in the address bar
+        let baseURL = Application.appDelegate.subscriptionManager.url(for: .baseURL)
+        let identityTheftRestorationURL = Application.appDelegate.subscriptionManager.url(for: .identityTheftRestoration)
+        if providedUrl.isChild(of: baseURL) || providedUrl.isChild(of: identityTheftRestorationURL) {
+            self.updateValue(selectedTabViewModel: nil, addressBarString: nil) // reset
+            self.window?.makeFirstResponder(nil)
+            return
         }
 
         self.window?.makeFirstResponder(nil)

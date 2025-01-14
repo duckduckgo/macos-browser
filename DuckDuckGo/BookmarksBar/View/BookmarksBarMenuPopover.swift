@@ -150,10 +150,10 @@ extension BookmarksBarMenuPopover: BookmarksBarMenuViewControllerDelegate {
     }
 
     func popover(shouldPreventClosure: Bool) {
-        var popover: BookmarksBarMenuPopover! = self
-        while popover != nil {
+        var window = contentViewController?.view.window
+        while let popover = window?.contentViewController?.nextResponder as? Self {
             popover.behavior = shouldPreventClosure ? .applicationDefined : .transient
-            popover = mainWindow?.contentViewController?.nextResponder as? BookmarksBarMenuPopover
+            window = window?.parent
         }
     }
 

@@ -263,6 +263,10 @@ protocol NewWindowPolicyDecisionMaker {
                           isTabBurner: burnerMode.isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           setContent: { tabGetter()?.setContent($0) },
+                          closeTab: {
+                guard let tab = tabGetter() else { return }
+                tab.delegate?.closeTab(tab)
+            },
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
@@ -791,10 +795,8 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 #endif
-
-        if PixelExperiment.cohort == .newOnboarding {
-            Application.appDelegate.onboardingStateMachine.state = .notStarted
-            setContent(.onboarding)
+        if #available(macOS 13, *) {
+            setContent(PixelExperiment.cohort == .newOnboarding ? .onboarding : .onboardingDeprecated)
         } else {
             setContent(.onboardingDeprecated)
         }
