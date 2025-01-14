@@ -88,7 +88,7 @@ struct OperationPreferredDateCalculator {
             // but we need this following the child-to-parent-broker transition
             // to prevent repeated scheduling of those former child broker opt-out jobs.
             // https://app.asana.com/0/0/1208832818650310/f
-            return date.now.addingTimeInterval(schedulingConfig.optOutReattempt.hoursToSeconds)
+            return date.now.addingTimeInterval(schedulingConfig.hoursUntilNextOptOutAttempt.hoursToSeconds)
         }
     }
 
