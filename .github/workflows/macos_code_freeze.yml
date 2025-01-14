@@ -56,7 +56,7 @@ jobs:
     name: Run Tests
 
     needs: create_release_branch
-    uses: ./.github/workflows/pr.yml
+    uses: ./.github/workflows/macos_pr.yml
     with:
       branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
     secrets:
@@ -99,7 +99,7 @@ jobs:
   prepare_release:
     name: Prepare Release
     needs: [ create_release_branch, increment_build_number ]
-    uses: ./.github/workflows/release.yml
+    uses: ./.github/workflows/macos_release.yml
     with:
       asana-task-url: ${{ needs.create_release_branch.outputs.asana_task_url }}
       branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
@@ -120,7 +120,7 @@ jobs:
   tag_and_merge:
     name: Tag and Merge Branch
     needs: [ create_release_branch, prepare_release ]
-    uses: ./.github/workflows/tag_release.yml
+    uses: ./.github/workflows/macos_tag_release.yml
     with:
       asana-task-url: ${{ needs.create_release_branch.outputs.asana_task_url }}
       base-branch: ${{ github.ref_name }}

@@ -78,7 +78,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.set-up-variants.outputs.build-variants-1) }}
-    uses: ./.github/workflows/create_variant.yml
+    uses: ./.github/workflows/macos_create_variant.yml
     with:
       atb-variant: ${{ matrix.variant }}
       origin-variant: ${{ matrix.origin }}
@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.set-up-variants.outputs.build-variants-2) }}
-    uses: ./.github/workflows/create_variant.yml
+    uses: ./.github/workflows/macos_create_variant.yml
     with:
       atb-variant: ${{ matrix.variant }}
       origin-variant: ${{ matrix.origin }}

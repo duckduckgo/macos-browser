@@ -39,7 +39,7 @@ jobs:
     name: Run Tests
 
     needs: assert_release_branch
-    uses: ./.github/workflows/pr.yml
+    uses: ./.github/workflows/macos_pr.yml
     secrets:
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -91,7 +91,7 @@ jobs:
   prepare_release:
     name: Prepare Release
     needs: run_tests
-    uses: ./.github/workflows/release.yml
+    uses: ./.github/workflows/macos_release.yml
     with:
       asana-task-url: ${{ github.event.inputs.asana-task-url }}
       destination: appstore
@@ -112,7 +112,7 @@ jobs:
   tag_and_merge:
     name: Tag and Merge Branch
     needs: [ prepare_release, update_asana ]
-    uses: ./.github/workflows/tag_release.yml
+    uses: ./.github/workflows/macos_tag_release.yml
     with:
       asana-task-url: ${{ github.event.inputs.asana-task-url }}
       branch: ${{ github.ref_name }}

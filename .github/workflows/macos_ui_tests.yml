@@ -1,14 +1,18 @@
-name: macOS - Sync End-to-End tests
+name: macOS - UI Tests
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 5 * * *' # run at 5 AM UTC
+     - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
+  pull_request:
+    branches:
+      - hotfix/*
+      - release/*
 
 jobs:
   create-notarized-app:
     name: Build Notarized Review app
-    uses: ./.github/workflows/build_notarized.yml
+    uses: ./.github/workflows/macos_build_notarized.yml
     with:
       release-type: review
       create-dmg: false
@@ -28,8 +32,8 @@ jobs:
       MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
       SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
-  sync-end-to-end-tests:
-    name: Sync End-to-End Tests
+  ui-tests:
+    name: UI tests
     needs: create-notarized-app
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -44,7 +48,11 @@ jobs:
           - xcode-version: "16.2"
             runner: macos-15-xlarge
 
-    timeout-minutes: 60
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.runner }}
+      cancel-in-progress: true
+
+    timeout-minutes: 120
 
     steps:
     - name: Install screenresolution
@@ -67,6 +75,9 @@ jobs:
 
     - name: Set up fastlane
       run: bundle install
+
+    - name: Create Default Keychain
+      run: bundle exec fastlane create_keychain_ui_tests
 
     - name: Sync code signing assets
       env:
@@ -105,16 +116,10 @@ jobs:
         echo "${{ matrix.xcode-version }}" > .xcode-version
         sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Create test account for Sync and return the recovery code
-      uses: duckduckgo/sync_crypto/action@main
-      id: sync-recovery-code
-      with:
-        debug: true
-
-    - name: Build Sync e2e tests
+    - name: Build for testing
       run: |
         set -o pipefail && xcodebuild build-for-testing \
-          -scheme "Sync End-to-End UI Tests CI" \
+          -scheme "UI Tests CI" \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
           -skipMacroValidation \
@@ -127,24 +132,10 @@ jobs:
         mv -f "DuckDuckGo Review.app" "../DerivedData/Build/Products/Review/DuckDuckGo Review.app"
 
     - name: Run UI Tests
-      env:
-        CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
-        # Set CODE environment variable in the scheme definition, since Xcode 15.4 doesn't
-        # seem to recognize global environment variables otherwise.
-        # We use xmlstarlet to edit the scheme XML file.
-        brew install xmlstarlet
-        xmlstarlet ed -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t elem -n "EnvironmentVariable" \
-          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "key" -v "CODE" \
-          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "value" -v "$CODE" \
-          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "isEnabled" -v "YES" \
-          "DuckDuckGo.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme" > updated.xcscheme
-        mv -f updated.xcscheme "DuckDuckGo.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme"
-
-        defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         set -o pipefail && xcodebuild test-without-building \
-          -scheme "Sync End-to-End UI Tests CI" \
+          -scheme "UI Tests CI" \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
           -skipMacroValidation \
@@ -160,7 +151,7 @@ jobs:
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v4
-      if: always() # always run even if the previous step fails
+      if: always()
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
@@ -179,8 +170,8 @@ jobs:
 
   notify-failure:
     name: Notify on failure
-    if: ${{ always() && github.event_name == 'schedule' && (needs.sync-end-to-end-tests.result == 'failure' || needs.sync-end-to-end-tests.result == 'cancelled') }}
-    needs: [sync-end-to-end-tests]
+    if: ${{ always() && github.event_name == 'schedule' && (needs.ui-tests.result == 'failure' || needs.ui-tests.result == 'cancelled') }}
+    needs: [ui-tests]
     runs-on: ubuntu-latest
 
     steps:
@@ -190,5 +181,5 @@ jobs:
         action: create-asana-task
         asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
         asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
-        asana-task-name: GH Workflow Failure - Sync End-to-End Tests
-        asana-task-description: The Sync end-to-end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        asana-task-name: GH Workflow Failure - UI Tests
+        asana-task-description: The UI Tests workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

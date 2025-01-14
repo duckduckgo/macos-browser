@@ -52,7 +52,7 @@ jobs:
     # Run if release-type is provided (not empty) and is not internal
     if: github.event.inputs.release-type != null && github.event.inputs.release-type != 'internal'
 
-    uses: ./.github/workflows/tag_release.yml
+    uses: ./.github/workflows/macos_tag_release.yml
     with:
       asana-task-url: ${{ inputs.asana-task-url || github.event.inputs.asana-task-url }}
       branch: ${{ github.ref_name }}
@@ -402,7 +402,7 @@ jobs:
     # Run if release-type is provided (not empty) an is not internal
     if: github.event.inputs.release-type != null && github.event.inputs.release-type != 'internal'
 
-    uses: duckduckgo/macos-browser/.github/workflows/create_variants.yml@main
+    uses: duckduckgo/macos-browser/.github/workflows/macos_create_variants.yml@main
     secrets:
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
