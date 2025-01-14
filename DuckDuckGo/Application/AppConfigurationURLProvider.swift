@@ -75,7 +75,6 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
         case .trackerDataSet:
-            print("trackerRadar  \(trackerDataURL())")
             return trackerDataURL()
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
         case .remoteMessagingConfig: return RemoteMessagingClient.Constants.endpoint
