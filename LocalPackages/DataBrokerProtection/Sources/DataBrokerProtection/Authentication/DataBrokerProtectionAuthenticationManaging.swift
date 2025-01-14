@@ -47,7 +47,6 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
     }
 
     public func hasValidEntitlement() async -> Bool {
-//        await subscriptionManager.isFeatureActive(.dataBrokerProtection)
         let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: .localValid)
         return tokenContainer?.decodedAccessToken.subscriptionEntitlements.contains(.dataBrokerProtection) ?? false
     }

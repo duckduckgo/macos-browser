@@ -40,7 +40,6 @@ protocol VPNFeatureGatekeeper {
 struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let vpnUninstaller: VPNUninstalling
-//    private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let defaults: UserDefaults
     private let subscriptionManager: SubscriptionManager
 

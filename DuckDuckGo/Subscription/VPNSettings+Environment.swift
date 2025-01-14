@@ -26,10 +26,8 @@ public extension VPNSettings {
     func alignTo(subscriptionEnvironment: SubscriptionEnvironment) {
         switch subscriptionEnvironment.serviceEnvironment {
         case .production:
-            // Do nothing for a production subscription, as it can be used for both VPN environments.
-            break
+            self.selectedEnvironment = .production
         case .staging:
-            // If using a staging subscription, force the staging VPN environment as it is not compatible with anything else.
             self.selectedEnvironment = .staging
         }
     }

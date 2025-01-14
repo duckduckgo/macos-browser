@@ -229,6 +229,20 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
+//    private func confirmIfSignedInToSameAccount() async -> Bool {
+//        if #available(macOS 12.0, *) {
+//            guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
+//            switch await subscriptionManager.authEndpointService.storeLogin(signature: lastTransactionJWSRepresentation) {
+//            case .success(let response):
+//                return response.externalID == accountManager.externalID
+//            case .failure:
+//                return false
+//            }
+//        }
+//
+//        return false
+//    }
+
     @MainActor
     func openVPN() {
         userEventHandler(.openVPN)

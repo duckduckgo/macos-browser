@@ -108,7 +108,7 @@ private extension DefaultDataBrokerProtectionFeatureGatekeeper {
         }
 
         if !isAuthenticatedResult {
-            Logger.dataBrokerProtection.error("DBP feature Gatekeeper: Authentication check failed")
+            Logger.dataBrokerProtection.log("DBP feature Gatekeeper: Authentication check failed")
         }
     }
 }

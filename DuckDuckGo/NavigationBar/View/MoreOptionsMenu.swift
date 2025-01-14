@@ -916,18 +916,14 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     private func addMenuItems() async {
         let features = await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false)
-        let vpnFeature = features.first { $0.entitlement == .networkProtection }
-        let dbpFeature = features.first { $0.entitlement == .dataBrokerProtection }
-        let itrFeature = features.first { $0.entitlement == .identityTheftRestoration }
-        let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
-
-        if vpnFeature != nil {
+        let entitlements = features.map { $0.entitlement }
+        if entitlements.contains(.networkProtection) {
             addItem(networkProtectionItem)
         }
-        if dbpFeature != nil {
+        if entitlements.contains(.dataBrokerProtection) {
             addItem(dataBrokerProtectionItem)
         }
-        if itrFeature != nil || itrgFeature != nil {
+        if entitlements.contains(.identityTheftRestoration) || entitlements.contains(.identityTheftRestorationGlobal) {
             addItem(identityTheftRestorationItem)
         }
         addItem(NSMenuItem.separator())

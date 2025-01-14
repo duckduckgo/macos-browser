@@ -44,7 +44,10 @@ extension DefaultSubscriptionManager {
         let apiService = DefaultAPIService(urlSession: urlSession)
         let authEnvironment: OAuthEnvironment = environment.serviceEnvironment == .production ? .production : .staging
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
-        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: keychainType)
+        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: keychainType) { keychainType, error in
+            PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: keychainType, accessError: error),
+                                      frequency: .legacyDailyAndCount)
+        }
         let legacyAccountStorage = handleMigration == true ? SubscriptionTokenKeychainStorage(keychainType: keychainType) : nil
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
                                             legacyTokenStorage: legacyAccountStorage,
@@ -64,17 +67,8 @@ extension DefaultSubscriptionManager {
             }
         }
 
-#if DEBUG
-        let cacheExpiration: Int = 1
-#else
-        let cacheExpiration: Int = 120
-#endif
-        let subscriptionCache = UserDefaultsCache<PrivacyProSubscription>(userDefaults: userDefaults,
-                                                                          key: UserDefaultsCacheKey.subscription,
-                                                                          settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(cacheExpiration)))
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
-                                                                             baseURL: environment.serviceEnvironment.url,
-                                                                             subscriptionCache: subscriptionCache)
+                                                                             baseURL: environment.serviceEnvironment.url)
         let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
             guard let featureFlagger else {
                 // With no featureFlagger provided there is no gating of features

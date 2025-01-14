@@ -420,6 +420,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         subscriptionEnvironment.purchasePlatform = .stripe // we don't care about the purchasePlatform
 
         Logger.networkProtection.debug("Subscription ServiceEnvironment: \(subscriptionEnvironment.serviceEnvironment.rawValue, privacy: .public)")
+
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieStorage = nil
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -448,17 +449,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             }
         }
 
-#if DEBUG
-        let cacheExpiration: Int = 1
-#else
-        let cacheExpiration: Int = 120
-#endif
-        let subscriptionCache = UserDefaultsCache<PrivacyProSubscription>(userDefaults: defaults,
-                                                                          key: UserDefaultsCacheKey.subscription,
-                                                                          settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(cacheExpiration)))
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
-                                                                             baseURL: subscriptionEnvironment.serviceEnvironment.url,
-                                                                             subscriptionCache: subscriptionCache)
+                                                                             baseURL: subscriptionEnvironment.serviceEnvironment.url)
         let pixelHandler: SubscriptionManager.PixelHandler = { type in
             // The SysExt handles only dead token pixels
             switch type {
@@ -611,7 +603,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     }
 
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
-        try super.loadVendorOptions(from: provider) // empty
+        try super.loadVendorOptions(from: provider)
 
         guard let vendorOptions = provider?.providerConfiguration else {
             Logger.networkProtection.log("🔵 Provider is nil, or providerConfiguration is not set")
@@ -630,7 +622,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         setupPixels(defaultHeaders: defaultPixelHeaders)
     }
 
-    // MARK: - Override-able Connection Events
+    // MARK: - Overrideable Connection Events
 
     override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
         super.prepareToConnect(using: provider)
