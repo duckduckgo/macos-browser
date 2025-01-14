@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "mgurgel/improved-breakage-form",
-        "revision" : "82a612a0c2d164a797f148356dd8d51dd804c52c"
+        "revision" : "c77e36efe790bc01af9b152fc0ef0fbb35a32f82"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "06d244c4e0951ef16217c46f23c4865c5f98dd5c",
-        "version" : "7.4.0"
+        "revision" : "0502ed7de4130bd8705daebaca9aeb20d3e62d15",
+        "version" : "7.5.0"
       }
     },
     {
