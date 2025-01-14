@@ -242,6 +242,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                   to: context)
                 }
             }
+
+            HistoryDatabase.shared.db.loadStore { context, error in
+                guard let context = context else {
+                    PixelKit.fire(DebugEvent(GeneralPixel.historyCouldNotLoadDatabase(error: error)))
+                    Thread.sleep(forTimeInterval: 1)
+                    fatalError("Could not create History database stack: \(error?.localizedDescription ?? "err")")
+                }
+
+                let legacyDB = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType)
+                legacyDB.performAndWait {
+                    LegacyHistoryStoreMigration.setupAndMigrate(from: legacyDB, to: context)
+                }
+            }
         }
 
 #if DEBUG

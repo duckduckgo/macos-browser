@@ -332,6 +332,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case blankNavigationOnBurnFailed
 
+    case historyCouldNotLoadDatabase(error: Error?)
+    case historyCouldNotPrepareDatabase
+    case historyMigrationFailed
     case historyRemoveFailed
     case historyReloadFailed
     case historyCleanEntriesFailed
@@ -972,6 +975,12 @@ enum GeneralPixel: PixelKitEventV2 {
         case .blankNavigationOnBurnFailed:
             return "blank_navigation_on_burn_failed"
 
+        case .historyCouldNotLoadDatabase:
+            return "history_could_not_load_database"
+        case .historyCouldNotPrepareDatabase:
+            return "history_could_not_prepare_database"
+        case .historyMigrationFailed:
+            return "history_migration_failed"
         case .historyRemoveFailed:
             return "history_remove_failed"
         case .historyReloadFailed:
@@ -1178,7 +1187,8 @@ enum GeneralPixel: PixelKitEventV2 {
                 .syncLoginExistingAccountError(let error),
                 .syncSecureStorageReadError(let error),
                 .syncSecureStorageDecodingError(let error),
-                .bookmarksCouldNotLoadDatabase(let error?):
+                .bookmarksCouldNotLoadDatabase(let error?),
+                .historyCouldNotLoadDatabase(let error?):
             return error
         default: return nil
         }

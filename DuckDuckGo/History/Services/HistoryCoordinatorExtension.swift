@@ -16,12 +16,52 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import History
 
+class HistoryStoreEventMapper: EventMapping<HistoryStore.HistoryStoreEvents> {
+    public init() {
+        super.init { event, error, _, _ in
+            print(event)
+//            switch event {
+//            case .removeFailed:
+//                Pixel.fire(pixel: .historyRemoveFailed, error: error)
+//
+//            case .reloadFailed:
+//                Pixel.fire(pixel: .historyReloadFailed, error: error)
+//
+//            case .cleanEntriesFailed:
+//                Pixel.fire(pixel: .historyCleanEntriesFailed, error: error)
+//
+//            case .cleanVisitsFailed:
+//                Pixel.fire(pixel: .historyCleanVisitsFailed, error: error)
+//
+//            case .saveFailed:
+//                Pixel.fire(pixel: .historySaveFailed, error: error)
+//
+//            case .insertVisitFailed:
+//                Pixel.fire(pixel: .historyInsertVisitFailed, error: error)
+//
+//            case .removeVisitsFailed:
+//                Pixel.fire(pixel: .historyRemoveVisitsFailed, error: error)
+//            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<HistoryStore.HistoryStoreEvents>.Mapping) {
+        fatalError("Use init()")
+    }
+}
+
 extension HistoryCoordinator {
 
-    static let shared = HistoryCoordinator(historyStoring: EncryptedHistoryStore(context: Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")))
+    static let shared = HistoryCoordinator(
+        historyStoring: HistoryStore(
+            context: HistoryDatabase.shared.db.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History"),
+            eventMapper: HistoryStoreEventMapper()
+        )
+    )
 
     func migrateModelV5toV6IfNeeded() {
         let defaults = MigrationDefaults()

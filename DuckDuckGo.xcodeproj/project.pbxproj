@@ -1061,6 +1061,10 @@
 		3707EC4B2C47E36A00B67CBE /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3707EC492C47E36A00B67CBE /* CloseButton.swift */; };
 		370A34B12AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
 		370A34B22AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
+		370B581A2D3697F400E78AD5 /* HistoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B58192D3697F100E78AD5 /* HistoryDatabase.swift */; };
+		370B581B2D3697F400E78AD5 /* HistoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B58192D3697F100E78AD5 /* HistoryDatabase.swift */; };
+		370B581D2D369B3000E78AD5 /* LegacyHistoryStoreMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B581C2D369B3000E78AD5 /* LegacyHistoryStoreMigration.swift */; };
+		370B581E2D369B3000E78AD5 /* LegacyHistoryStoreMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B581C2D369B3000E78AD5 /* LegacyHistoryStoreMigration.swift */; };
 		370C22FE2C7698AE00A80A3E /* ThemePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C22FD2C7698AE00A80A3E /* ThemePicker.swift */; };
 		370C23002C76996300A80A3E /* HomeContentSectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C22FF2C76996300A80A3E /* HomeContentSectionsView.swift */; };
 		370C23012C769A0F00A80A3E /* HomePageSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3797C79F2C61806500DA77FB /* HomePageSettingsView.swift */; };
@@ -3659,6 +3663,8 @@
 		3706FEC7293F6F7500E42796 /* BWManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWManagement.swift; sourceTree = "<group>"; };
 		3707EC492C47E36A00B67CBE /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
 		370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDebugMenu.swift; sourceTree = "<group>"; };
+		370B58192D3697F100E78AD5 /* HistoryDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDatabase.swift; sourceTree = "<group>"; };
+		370B581C2D369B3000E78AD5 /* LegacyHistoryStoreMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyHistoryStoreMigration.swift; sourceTree = "<group>"; };
 		370C22FD2C7698AE00A80A3E /* ThemePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePicker.swift; sourceTree = "<group>"; };
 		370C22FF2C76996300A80A3E /* HomeContentSectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeContentSectionsView.swift; sourceTree = "<group>"; };
 		370C23042C76A31F00A80A3E /* SettingsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsGrid.swift; sourceTree = "<group>"; };
@@ -8995,6 +9001,8 @@
 				AAE75278263B046100B973F8 /* History.xcdatamodeld */,
 				AAE7527B263B056C00B973F8 /* EncryptedHistoryStore.swift */,
 				85D0327A2B8E3D090041D1FB /* HistoryCoordinatorExtension.swift */,
+				370B58192D3697F100E78AD5 /* HistoryDatabase.swift */,
+				370B581C2D369B3000E78AD5 /* LegacyHistoryStoreMigration.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -11584,6 +11592,7 @@
 				3706FB25293F65D500E42796 /* PublishedAfter.swift in Sources */,
 				9FBB0C062CBD223D0006B6A6 /* ViewHighlighter.swift in Sources */,
 				BBB881892C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */,
+				370B581E2D369B3000E78AD5 /* LegacyHistoryStoreMigration.swift in Sources */,
 				3706FEC1293F6EFF00E42796 /* BWCredential.swift in Sources */,
 				3706FEC9293F6F7500E42796 /* BWManagement.swift in Sources */,
 				3706FB27293F65D500E42796 /* DeviceAuthenticationService.swift in Sources */,
@@ -11800,6 +11809,7 @@
 				1D36F4252A3B85C50052B527 /* TabCleanupPreparer.swift in Sources */,
 				3706FB97293F65D500E42796 /* ActionSpeech.swift in Sources */,
 				BD7090D72C540D5D009EED82 /* EmptyMetadataCollector.swift in Sources */,
+				370B581A2D3697F400E78AD5 /* HistoryDatabase.swift in Sources */,
 				B6AFE6BD29A5D621002FF962 /* HTTPSUpgradeTabExtension.swift in Sources */,
 				3706FB9A293F65D500E42796 /* FireproofDomainsStore.swift in Sources */,
 				3706FB9B293F65D500E42796 /* PrivacyDashboardPermissionHandler.swift in Sources */,
@@ -13229,6 +13239,7 @@
 				4BE6547F271FCD4D008D1D63 /* PasswordManagementCreditCardModel.swift in Sources */,
 				85707F26276A335700DC0649 /* Onboarding.swift in Sources */,
 				B68C92C1274E3EF4002AC6B0 /* PopUpWindow.swift in Sources */,
+				370B581B2D3697F400E78AD5 /* HistoryDatabase.swift in Sources */,
 				AA5FA6A0275F948900DCE9C9 /* Favicons.xcdatamodeld in Sources */,
 				9F6434612BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
 				37D0469F2C7D0EDD00AEAA50 /* CustomBackground.swift in Sources */,
@@ -13258,6 +13269,7 @@
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				37CD54CB27F2FDD100F1F7B9 /* DownloadsPreferences.swift in Sources */,
 				CBECDB872CDACE29005B8B87 /* BrokenSitePromptLimiter.swift in Sources */,
+				370B581D2D369B3000E78AD5 /* LegacyHistoryStoreMigration.swift in Sources */,
 				4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */,
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
 				37FC2A182CF903080048E226 /* MockPrivacyStats.swift in Sources */,
