@@ -1,4 +1,4 @@
-name: Create DMG Variants
+name: macOS - Create DMG Variants
 
 on:
   workflow_dispatch:
@@ -42,7 +42,7 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        
+
       - name: Fetch Build Variants
         id: get-build-variants
         uses: ./.github/actions/asana-get-build-variants-list
@@ -50,7 +50,7 @@ jobs:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           atb-asana-task-id: ${{ vars.DMG_VARIANTS_LIST_TASK_ID }}
           origin-asana-section-id: ${{ vars.DMG_VARIANTS_ORIGIN_SECTION_ID }}
-          
+
   download-dmg-and-upload-artifact:
 
     name: Download Release App and upload artifact
@@ -111,17 +111,17 @@ jobs:
       AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
-  
+
   mattermost:
-    
+
     name: Send Mattermost message
     needs: [create-variants-1, create-variants-2]
     runs-on: macos-15
-    
+
     env:
       success: ${{ needs.create-variants-1.result == 'success' && needs.create-variants-2.result == 'success' }}
       failure: ${{ needs.create-variants-1.result == 'failure' || needs.create-variants-2.result == 'failure' }}
-    
+
     steps:
       - name: Check out the code
         if: ${{ env.success || env.failure }} # Don't execute when cancelled

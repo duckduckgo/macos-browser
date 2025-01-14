@@ -1,4 +1,4 @@
-name: Build Hotfix Release
+name: macOS - Build Hotfix Release
 
 on:
   workflow_dispatch:

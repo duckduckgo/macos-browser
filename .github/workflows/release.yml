@@ -1,6 +1,6 @@
-name: Prepare Release
+name: macOS - Prepare Release
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       asana-task-url:
@@ -11,7 +11,7 @@ on:
         description: "Skip App Store release and only make a DMG build"
         default: false
         type: boolean
-      destination: 
+      destination:
         description: "Upload destination (TestFlight or App Store)"
         required: false
         default: testflight
@@ -30,7 +30,7 @@ on:
         description: "Skip App Store release and only make a DMG build"
         default: false
         type: boolean
-      destination: 
+      destination:
         description: "Upload destination (TestFlight or App Store)"
         required: false
         default: testflight

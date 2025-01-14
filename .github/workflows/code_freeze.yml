@@ -1,4 +1,4 @@
-name: Code Freeze
+name: macOS - Code Freeze
 
 on:
   workflow_dispatch:

@@ -1,6 +1,6 @@
-name: Make App Store Connect Release
+name: macOS - Make App Store Connect Release
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       destination:

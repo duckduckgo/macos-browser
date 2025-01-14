@@ -1,4 +1,4 @@
-name: Bump Internal Release
+name: macOS - Bump Internal Release
 
 on:
   schedule:

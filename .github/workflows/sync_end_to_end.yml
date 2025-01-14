@@ -1,4 +1,4 @@
-name: Sync End-to-End tests
+name: macOS - Sync End-to-End tests
 
 on:
   workflow_dispatch:
@@ -77,7 +77,7 @@ jobs:
         SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
       run: |
         bundle exec fastlane sync_signing_ci
-  
+
     - name: Download and unzip artifact
       uses: actions/download-artifact@v4
 
