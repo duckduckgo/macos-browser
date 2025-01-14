@@ -1,8 +1,7 @@
 {
   "name": "People Background Check",
   "url": "people-background-check.com",
-  "version": "0.5.0",
-  "parent": "verecor.com",
+  "version": "0.6.0",
   "addedDatetime": 1702965600000,
   "optOutUrl": "https://people-background-check.com/ng/control/privacy",
   "steps": [
@@ -51,8 +50,70 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://people-background-check.com/ng/control/privacy",
+          "id": "bc160586-6a98-4eac-9fbf-fa7d24ef8bd7"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#name"
+            },
+            {
+              "type": "email",
+              "selector": "#email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "02e4ce59-a0e1-42cb-9adc-d07e4f28a7ff"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "3ab8814b-39c1-4d3b-ab1d-5cbc69e43919"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "b3260029-4cec-43cf-9da2-dc15467e7264"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "c1b7e968-a183-4d91-88da-b8c70313e9b9"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "14e8f388-a24f-4ce8-a3d5-e3e6eda1e8ef"
+        }
+      ]
     }
   ],
   "schedulingConfig": {
