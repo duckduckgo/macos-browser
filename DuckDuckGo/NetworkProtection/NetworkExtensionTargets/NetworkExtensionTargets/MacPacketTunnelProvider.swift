@@ -426,9 +426,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         let urlSession = URLSession(configuration: configuration, delegate: SessionDelegate(), delegateQueue: nil)
         let apiService = DefaultAPIService(urlSession: urlSession)
-        let authEnvironment: OAuthEnvironment = subscriptionEnvironment.serviceEnvironment == .production ? .production : .staging
-
-        let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
+        let authService = DefaultOAuthService(baseURL: subscriptionEnvironment.authEnvironment.url, apiService: apiService)
         let tokenStorage = NetworkProtectionKeychainStore(label: "DuckDuckGo Network Protection Auth Token",
                                                           serviceName: Self.tokenServiceName,
                                                           keychainType: Bundle.keychainType)

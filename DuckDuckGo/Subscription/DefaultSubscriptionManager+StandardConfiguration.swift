@@ -42,8 +42,7 @@ extension DefaultSubscriptionManager {
                                     delegate: SessionDelegate(),
                                     delegateQueue: nil)
         let apiService = DefaultAPIService(urlSession: urlSession)
-        let authEnvironment: OAuthEnvironment = environment.serviceEnvironment == .production ? .production : .staging
-        let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
+        let authService = DefaultOAuthService(baseURL: environment.authEnvironment.url, apiService: apiService)
         let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: keychainType) { keychainType, error in
             PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: keychainType, accessError: error),
                                       frequency: .legacyDailyAndCount)
