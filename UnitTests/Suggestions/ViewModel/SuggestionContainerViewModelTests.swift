@@ -37,7 +37,8 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
                                                   suggestionLoading: suggestionLoadingMock,
                                                   historyCoordinating: historyCoordinatingMock,
-                                                  bookmarkManager: LocalBookmarkManager.shared)
+                                                  bookmarkManager: LocalBookmarkManager.shared,
+                                                  burnerMode: .regular)
         suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
     }
 

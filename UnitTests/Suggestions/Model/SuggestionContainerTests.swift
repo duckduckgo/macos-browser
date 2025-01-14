@@ -28,7 +28,8 @@ final class SuggestionContainerTests: XCTestCase {
         let suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
                                                       suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
-                                                      bookmarkManager: LocalBookmarkManager.shared)
+                                                      bookmarkManager: LocalBookmarkManager.shared,
+                                                      burnerMode: .regular)
 
         let e = expectation(description: "Suggestions updated")
         let cancellable = suggestionContainer.$result.sink {
@@ -54,7 +55,8 @@ final class SuggestionContainerTests: XCTestCase {
         let suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
                                                       suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
-                                              bookmarkManager: LocalBookmarkManager.shared)
+                                                      bookmarkManager: LocalBookmarkManager.shared,
+                                                      burnerMode: .regular)
 
         suggestionContainer.getSuggestions(for: "test")
         suggestionContainer.stopGettingSuggestions()
@@ -70,7 +72,8 @@ final class SuggestionContainerTests: XCTestCase {
         let suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
                                                       suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
-                                                      bookmarkManager: LocalBookmarkManager.shared)
+                                                      bookmarkManager: LocalBookmarkManager.shared,
+                                                      burnerMode: .regular)
 
         XCTAssertNil(suggestionContainer.suggestionDataCache)
         let e = expectation(description: "Suggestions updated")

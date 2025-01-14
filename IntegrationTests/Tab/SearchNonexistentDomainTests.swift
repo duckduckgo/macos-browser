@@ -241,7 +241,8 @@ final class SearchNonexistentDomainTests: XCTestCase {
         let suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
                                                       suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: HistoryCoordinator.shared,
-                                                      bookmarkManager: LocalBookmarkManager.shared)
+                                                      bookmarkManager: LocalBookmarkManager.shared,
+                                                      burnerMode: .regular)
         addressBar.suggestionContainerViewModel = SuggestionContainerViewModel(isHomePage: true, isBurner: false, suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: enteredString)
