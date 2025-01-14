@@ -24,6 +24,11 @@ import os.log
 @available(macOS 14.4, *)
 protocol WebExtensionManaging {
 
+    // Adding and removing extensions
+    var webExtensionPaths: [URL] { get }
+    func addExtension(path: URL)
+    func removeExtension(path: URL)
+
     func didOpenWindow(_ window: _WKWebExtensionWindow)
     func didCloseWindow(_ window: _WKWebExtensionWindow)
     func didFocusWindow(_ window: _WKWebExtensionWindow)
@@ -41,7 +46,6 @@ protocol WebExtensionManaging {
 // Manages web extensions and web extension context
 @available(macOS 14.4, *)
 final class WebExtensionManager: NSObject, WebExtensionManaging {
-
     static let shared = WebExtensionManager()
 
     static private func loadWebExtension(path: String) -> _WKWebExtension? {
@@ -73,18 +77,34 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         return context
     }
 
-    override init() {
+    init(webExtensionPathsCache: WebExtensionPathsCaching = WebExtensionPathsCache()) {
+        self.webExtensionPathsCache = webExtensionPathsCache
         super.init()
 
         internalSiteHandler.dataSource = self
     }
 
-    lazy var extensions: [_WKWebExtension] = {
-        guard let webextension = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "honey", ofType: nil)!) else {
-            return []
-        }
+    var webExtensionPathsCache: WebExtensionPathsCaching
 
-        return [webextension]
+    func addExtension(path: URL) {
+        webExtensionPathsCache.add(path.absoluteString)
+
+        //TODO: Reload extensions
+    }
+
+    func removeExtension(path: URL) {
+        webExtensionPathsCache.remove(path.absoluteString)
+
+        //TODO: Unload extension
+    }
+
+    var webExtensionPaths: [URL] {
+        return webExtensionPathsCache.cache.compactMap{ URL(string: $0) }
+    }
+
+    lazy var extensions: [_WKWebExtension] = {
+        //TODO: Load cached extensions
+        return []
     }()
 
     // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.

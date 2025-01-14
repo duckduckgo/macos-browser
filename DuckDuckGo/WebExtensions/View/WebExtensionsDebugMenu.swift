@@ -1,0 +1,94 @@
+//
+//  WebExtensionsDebugMenu.swift
+//
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+@available(macOS 14.4, *)
+final class WebExtensionsDebugMenu: NSMenu {
+
+    private let webExtensionManager: WebExtensionManaging
+
+    init(webExtensionManager: WebExtensionManaging = WebExtensionManager.shared) {
+        self.webExtensionManager = webExtensionManager
+        super.init(title: "")
+
+        buildItems {
+            NSMenuItem(title: "Load web extension...", action: #selector(selectAndLoadWebExtension), target: self)
+        }
+
+        if !webExtensionManager.webExtensionPaths.isEmpty {
+            self.addItem(.separator())
+            for webExtensionPath in webExtensionManager.webExtensionPaths {
+                self.addItem(WebExtensionMenuItem(webExtensionPath: webExtensionPath))
+            }
+        }
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    @objc func selectAndLoadWebExtension() {
+        let panel = NSOpenPanel(allowedFileTypes: [.directory], directoryURL: .downloadsDirectory)
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        guard case .OK = panel.runModal(),
+              let url = panel.url else { return }
+
+        webExtensionManager.addExtension(path: url)
+    }
+
+}
+
+@available(macOS 14.4, *)
+final class WebExtensionMenuItem: NSMenuItem {
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    init(webExtensionPath: URL) {
+        super.init(title: webExtensionPath.absoluteString, action: nil, keyEquivalent: "")
+        submenu = WebExtensionSubMenu(webExtensionPath: webExtensionPath)
+    }
+
+}
+
+@available(macOS 14.4, *)
+final class WebExtensionSubMenu: NSMenu {
+
+    private let webExtensionPath: URL
+    private let webExtensionManager: WebExtensionManaging
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    init(webExtensionPath: URL, webExtensionManager: WebExtensionManaging = WebExtensionManager.shared) {
+        self.webExtensionManager = webExtensionManager
+        self.webExtensionPath = webExtensionPath
+        super.init(title: "")
+
+        buildItems {
+            NSMenuItem(title: "Unload the extension", action: #selector(unloadWebExtension), target: self)
+        }
+    }
+
+    @objc func unloadWebExtension() {
+        webExtensionManager.removeExtension(path: webExtensionPath)
+    }
+
+}
