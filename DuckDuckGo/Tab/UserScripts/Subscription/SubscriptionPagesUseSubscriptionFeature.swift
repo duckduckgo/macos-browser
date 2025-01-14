@@ -147,6 +147,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         guard let subscriptionValues: SubscriptionValues = CodableHelper.decode(from: params) else {
             Logger.subscription.fault("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
+            PixelKit.fire(PrivacyProPixel.setSubscriptionInvalidSubscriptionValues)
             assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
             return nil
         }
@@ -156,6 +157,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         guard !subscriptionValues.token.isEmpty else {
             Logger.subscription.fault("Empty token provided, Failed to exchange v1 token for v2")
+            PixelKit.fire(PrivacyProPixel.setSubscriptionInvalidSubscriptionValues)
             return nil
         }
 
