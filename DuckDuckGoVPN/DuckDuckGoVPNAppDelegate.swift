@@ -407,10 +407,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     private func setupMenuVisibility() {
 
-//        Task {
-//            await tokenRefresher.refreshIfNeeded()
-//        }
-
         if tunnelSettings.showInMenuBar {
             networkProtectionMenu.show()
         } else {
