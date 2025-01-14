@@ -28,7 +28,6 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private let subscriptionManager: SubscriptionManager
     private let tunnelController: TunnelController
-//    private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let vpnUninstaller: VPNUninstalling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
@@ -47,9 +46,6 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func subscribeToEntitlementChanges() {
         Task {
-//            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
-//            await handleEntitlementsChange(hasEntitlements: isNetworkProtectionEnabled)
-
             NotificationCenter.default
                 .publisher(for: .entitlementsDidChange)
                 .receive(on: DispatchQueue.main)

@@ -72,13 +72,13 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     ///
     func isVPNVisible() -> Bool {
         return subscriptionManager.isUserAuthenticated
+        // Validate approach if we should use: return await subscriptionManager.currentSubscriptionFeatures(forceRefresh: false).map { $0.entitlement}.contains(.networkProtection)
     }
 
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
-        !subscriptionManager.isUserAuthenticated &&
-        LoginItem.vpnMenu.status.isInstalled
+        !subscriptionManager.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
     }
 
     /// Whether the user is fully onboarded

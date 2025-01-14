@@ -74,8 +74,8 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
         subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
                                                          environment: subscriptionEnvironment,
                                                          userDefaults: subscriptionUserDefaults,
-                                                         handleMigration: false,
-                                                         handlePixels: false)
+                                                         canPerformAuthMigration: false,
+                                                         canHandlePixels: false)
         _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate(subscriptionManager: subscriptionManager)
 
         super.init()

@@ -32,8 +32,8 @@ extension DefaultSubscriptionManager {
                             environment: SubscriptionEnvironment,
                             featureFlagger: FeatureFlagger? = nil,
                             userDefaults: UserDefaults,
-                            handleMigration: Bool,
-                            handlePixels: Bool) {
+                            canPerformAuthMigration: Bool,
+                            canHandlePixels: Bool) {
 
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieStorage = nil
@@ -48,7 +48,7 @@ extension DefaultSubscriptionManager {
             PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: keychainType, accessError: error),
                                       frequency: .legacyDailyAndCount)
         }
-        let legacyAccountStorage = handleMigration == true ? SubscriptionTokenKeychainStorage(keychainType: keychainType) : nil
+        let legacyAccountStorage = canPerformAuthMigration == true ? SubscriptionTokenKeychainStorage(keychainType: keychainType) : nil
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
                                             legacyTokenStorage: legacyAccountStorage,
                                             authService: authService)
@@ -89,7 +89,7 @@ extension DefaultSubscriptionManager {
 
         // Pixel handler configuration
         let pixelHandler: SubscriptionManager.PixelHandler
-        if handlePixels {
+        if canHandlePixels {
             pixelHandler = { type in
                 switch type {
                 case .deadToken:

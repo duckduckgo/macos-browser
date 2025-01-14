@@ -287,7 +287,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     private func submitIssue(metadata: UnifiedFeedbackMetadata?) async throws {
         guard !userEmail.isEmpty else { return }
 
-        guard let accessToken = try? await subscriptionManager.getTokenContainer(policy: .localValid) else {
+        guard let tokenContainer: TokenContainer = try? await subscriptionManager.getTokenContainer(policy: .localValid) else {
             throw Error.missingAccessToken
         }
 
@@ -298,7 +298,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
                               feedbackText: feedbackFormText,
                               problemSubCategory: selectedSubcategory,
                               customMetadata: metadata?.toString() ?? "")
-        let headers = APIRequestV2.HeadersV2(additionalHeaders: [HTTPHeaderKey.authorization: "Bearer \(accessToken)"])
+        let headers = APIRequestV2.HeadersV2(additionalHeaders: [HTTPHeaderKey.authorization: "Bearer \(tokenContainer.accessToken)"])
         guard let request = APIRequestV2(url: Self.feedbackEndpoint, method: .post, headers: headers, body: payload.toData()) else {
             throw Error.invalidRequest
         }

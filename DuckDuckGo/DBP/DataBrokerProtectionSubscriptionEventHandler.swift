@@ -58,9 +58,8 @@ final class DataBrokerProtectionSubscriptionEventHandler {
         featureDisabler.disableAndDelete()
     }
 
-    @MainActor
     private func entitlementsDidChange(_ notification: Notification) {
-        Task {
+        Task { @MainActor in
             if await authenticationManager.hasValidEntitlement() {
                 pixelHandler.fire(.entitlementCheckValid)
             } else {
