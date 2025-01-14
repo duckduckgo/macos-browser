@@ -35,17 +35,24 @@ public protocol NewTabPageCustomBackgroundProviding: AnyObject {
 
     @MainActor func presentUploadDialog() async
     func deleteImage(with imageID: String) async
+
+    @MainActor func showContextMenu(for imageID: String, using presenter: NewTabPageContextMenuPresenting) async
 }
 
 public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     let model: NewTabPageCustomBackgroundProviding
+    let contextMenuPresenter: NewTabPageContextMenuPresenting
     public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables: Set<AnyCancellable> = []
 
-    public init(model: NewTabPageCustomBackgroundProviding) {
+    public init(
+        model: NewTabPageCustomBackgroundProviding,
+        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter()
+    ) {
         self.model = model
+        self.contextMenuPresenter = contextMenuPresenter
 
         model.backgroundPublisher
             .sink { [weak self] background in
@@ -82,6 +89,7 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     enum MessageName: String, CaseIterable {
         case autoOpen = "customizer_autoOpen"
+        case contextMenu = "customizer_contextMenu"
         case deleteImage = "customizer_deleteImage"
         case onBackgroundUpdate = "customizer_onBackgroundUpdate"
         case onImagesUpdate = "customizer_onImagesUpdate"
@@ -93,11 +101,21 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
 
     public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
         userScript.registerMessageHandlers([
+            MessageName.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
             MessageName.deleteImage.rawValue: { [weak self] in try await self?.deleteImage(params: $0, original: $1) },
             MessageName.setBackground.rawValue: { [weak self] in try await self?.setBackground(params: $0, original: $1) },
             MessageName.setTheme.rawValue: { [weak self] in try await self?.setTheme(params: $0, original: $1) },
             MessageName.upload.rawValue: { [weak self] in try await self?.upload(params: $0, original: $1) },
         ])
+    }
+
+    @MainActor
+    func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let contextMenu: NewTabPageDataModel.UserImageContextMenu = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        await model.showContextMenu(for: contextMenu.id, using: contextMenuPresenter)
+        return nil
     }
 
     @MainActor

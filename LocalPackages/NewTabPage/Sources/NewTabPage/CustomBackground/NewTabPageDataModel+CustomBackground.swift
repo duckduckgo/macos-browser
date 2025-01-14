@@ -192,4 +192,13 @@ extension NewTabPageDataModel {
     struct DeleteImageData: Codable, Equatable {
         let id: String
     }
+
+    struct UserImageContextMenu: Codable, Equatable {
+        let target: Target
+        let id: String
+
+        enum Target: String, Codable, Equatable {
+            case userImage
+        }
+    }
 }
