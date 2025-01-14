@@ -32,7 +32,7 @@ let package = Package(
             targets: ["NewTabPage"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "225.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "mgurgel/improved-breakage-form"),
         .package(path: "../WebKitExtensions"),
         .package(path: "../Utilities"),
     ],
