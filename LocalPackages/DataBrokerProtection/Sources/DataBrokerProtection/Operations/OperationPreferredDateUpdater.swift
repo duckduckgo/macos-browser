@@ -174,6 +174,6 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
             throw error
         }
 
-        Logger.dataBrokerProtection.debug("Updating preferredRunDate on operation with brokerId \(brokerId.description, privacy: .public) and profileQueryId \(profileQueryId.description, privacy: .public)")
+        Logger.dataBrokerProtection.log("Updating preferredRunDate on operation with brokerId \(brokerId.description, privacy: .public) and profileQueryId \(profileQueryId.description, privacy: .public)")
     }
 }

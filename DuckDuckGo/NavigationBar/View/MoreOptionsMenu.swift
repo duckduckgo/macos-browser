@@ -331,12 +331,20 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 #if SPARKLE
         guard NSApp.runType != .uiTests,
               let updateController = Application.appDelegate.updateController,
-              let update = updateController.latestUpdate,
-              !update.isInstalled,
-              updateController.updateProgress.isDone
-        else {
+              let update = updateController.latestUpdate else {
             return
         }
+
+        // Log edge cases where menu item appears but doesn't function
+        // To be removed in a future version
+        if !update.isInstalled, updateController.updateProgress.isDone {
+            updateController.log()
+        }
+
+        guard updateController.hasPendingUpdate else {
+            return
+        }
+
         addItem(UpdateMenuItemFactory.menuItem(for: update))
         addItem(NSMenuItem.separator())
 #endif
@@ -411,8 +419,6 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     @MainActor
     private func addSubscriptionItems() {
-        guard subscriptionFeatureAvailability.isFeatureAvailable else { return }
-
         func shouldHideDueToNoProduct() -> Bool {
             let platform = subscriptionManager.currentEnvironment.purchasePlatform
             return platform == .appStore && subscriptionManager.canPurchase == false
@@ -958,7 +964,7 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func refreshAvailabilityBasedOnEntitlements() {
-        guard subscriptionFeatureAvailability.isFeatureAvailable, subscriptionManager.accountManager.isUserAuthenticated else { return }
+        guard subscriptionManager.accountManager.isUserAuthenticated else { return }
 
         @Sendable func hasEntitlement(for productName: Entitlement.ProductName) async -> Bool {
             switch await self.subscriptionManager.accountManager.hasEntitlement(forProductName: productName) {

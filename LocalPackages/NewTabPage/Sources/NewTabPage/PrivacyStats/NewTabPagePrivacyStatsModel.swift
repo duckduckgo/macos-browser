@@ -129,25 +129,25 @@ public final class NewTabPagePrivacyStatsModel {
         eventMapping?.fire(.showMore)
     }
 
-    func calculatePrivacyStats() async -> NewTabPagePrivacyStatsClient.PrivacyStatsData {
+    func calculatePrivacyStats() async -> NewTabPageDataModel.PrivacyStatsData {
         let stats = await privacyStats.fetchPrivacyStats()
 
         var totalCount: Int64 = 0
         var otherCount: Int64 = 0
 
-        var companiesStats: [NewTabPagePrivacyStatsClient.TrackerCompany] = stats.compactMap { key, value in
+        var companiesStats: [NewTabPageDataModel.TrackerCompany] = stats.compactMap { key, value in
             totalCount += value
             guard topCompanies.contains(key) else {
                 otherCount += value
                 return nil
             }
-            return NewTabPagePrivacyStatsClient.TrackerCompany(count: value, displayName: key)
+            return NewTabPageDataModel.TrackerCompany(count: value, displayName: key)
         }
 
         if otherCount > 0 {
             companiesStats.append(.otherCompanies(count: otherCount))
         }
-        return NewTabPagePrivacyStatsClient.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
+        return NewTabPageDataModel.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
     }
 
     private func refreshTopCompanies() {

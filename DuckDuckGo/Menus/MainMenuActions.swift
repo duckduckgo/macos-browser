@@ -909,21 +909,6 @@ extension MainViewController {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
-
-        if !DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            // We only clear PPro state when it's not available, as otherwise
-            // there should be no state to clear.  Clearing PPro state can
-            // trigger notifications which we want to avoid unless
-            // necessary.
-            clearPrivacyProState()
-        }
-    }
-
-    /// Clears the PrivacyPro state to make testing easier.
-    ///
-    private func clearPrivacyProState() {
-        Application.appDelegate.subscriptionManager.accountManager.signOut()
-        UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {

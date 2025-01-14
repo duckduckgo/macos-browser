@@ -1,5 +1,5 @@
 //
-//  NewTabPageTestsHelper.swift
+//  TabBarRemoteMessage.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import XCTest
+struct TabBarRemoteMessage {
+    static let tabBarPermanentSurveyRemoteMessageId = "macos_permanent_survey_tab_bar"
 
-enum NewTabPageTestsHelper {
-
-    static func asJSON(_ value: Any, file: StaticString = #file, line: UInt = #line) throws -> Any {
-        if JSONSerialization.isValidJSONObject(value) {
-            return value
-        }
-        if let encodableValue = value as? Encodable {
-            let jsonData = try JSONEncoder().encode(encodableValue)
-            return try JSONSerialization.jsonObject(with: jsonData)
-        }
-        XCTFail("invalid JSON value", file: file, line: line)
-        return []
-    }
+    let buttonTitle: String
+    let popupTitle: String
+    let popupSubtitle: String
+    let surveyURL: URL
 }
