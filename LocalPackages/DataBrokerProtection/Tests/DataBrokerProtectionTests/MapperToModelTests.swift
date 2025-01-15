@@ -84,6 +84,7 @@ final class MapperToModelTests: XCTestCase {
 
     func testMapToModel_invalidJSONStructure() throws {
         // Given
+        testableAssertionFailure = { _, _, _ in }
         let invalidJsonData = """
             {
                 "invalidKey": "value"
@@ -95,6 +96,7 @@ final class MapperToModelTests: XCTestCase {
         XCTAssertThrowsError(try sut.mapToModel(brokerDB)) { error in
             XCTAssertTrue(error is DecodingError)
         }
+        testableAssertionFailure = assertionFailure
     }
 
     func testMapToModel_missingUrlFallbackToName() throws {
@@ -114,5 +116,27 @@ final class MapperToModelTests: XCTestCase {
 
         // Then
         XCTAssertEqual(result.url, brokerDB.name)
+    }
+
+    func testMapToModel_missingMaxAttemptsFallbackToDefaultConfig() throws {
+        // Given
+        let brokerData = """
+            {
+                "name": "TestBroker",
+                "steps": [],
+                "version": "1.0",
+                "schedulingConfig": {"retryError": 1, "confirmOptOutScan": 2, "maintenanceScan": 3}
+            }
+            """.data(using: .utf8)!
+        let brokerDB = BrokerDB(id: 1, name: "TestBroker", json: brokerData, version: "1.0", url: "")
+
+        // When
+        let result = try sut.mapToModel(brokerDB)
+
+        // Then
+        XCTAssertEqual(result.schedulingConfig.retryError, DataBrokerScheduleConfig.Defaults.retryError)
+        XCTAssertEqual(result.schedulingConfig.confirmOptOutScan, DataBrokerScheduleConfig.Defaults.confirmOptOutScan)
+        XCTAssertEqual(result.schedulingConfig.maintenanceScan, DataBrokerScheduleConfig.Defaults.maintenanceScan)
+        XCTAssertEqual(result.schedulingConfig.maxAttempts, DataBrokerScheduleConfig.Defaults.maxAttempts)
     }
 }

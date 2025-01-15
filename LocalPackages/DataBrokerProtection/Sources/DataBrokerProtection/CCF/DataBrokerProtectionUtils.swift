@@ -22,6 +22,12 @@ import UserScript
 import os.log
 import Combine
 
+func testableAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #file, line: UInt = #line) {
+    testableAssertionFailure(message, file, line)
+}
+
+var testableAssertionFailure: (() -> String, StaticString, UInt) -> Void = assertionFailure
+
 final class DataBrokerUserContentController: WKUserContentController {
 
     @MainActor
