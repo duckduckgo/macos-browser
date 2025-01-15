@@ -55,9 +55,9 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
-                // SECTION: Excluded Sites
+                if !model.appExclusionsFeatureEnabled {
+                    // SECTION: Excluded Sites
 
-                if model.showExcludedSites {
                     PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
                         Text(UserText.vpnExcludedDomainsDescription)
                             .foregroundColor(.secondary)
@@ -111,6 +111,16 @@ extension Preferences {
                                    isOn: $model.notifyStatusChanges)
                 }
                 .padding(.bottom, 12)
+
+                if model.appExclusionsFeatureEnabled {
+                    // SECTION: Exclusions
+
+                    PreferencePaneSection {
+                        TextMenuItemHeader(UserText.vpnExclusionsTitle)
+                        VPNLocationPreferenceItem(model: model.locationItem)
+                    }
+                    .padding(.bottom, 12)
+                }
 
                 // SECTION: DNS Settings
 

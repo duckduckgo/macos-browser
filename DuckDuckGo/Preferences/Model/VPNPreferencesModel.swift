@@ -73,12 +73,9 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-    /// Whether the excluded sites section in preferences is shown.
-    ///
-    /// Only necessary because this is feature flagged to internal users.
-    ///
-    @Published
-    var showExcludedSites: Bool
+    var appExclusionsFeatureEnabled: Bool {
+        featureFlagger.isFeatureOn(.networkProtectionAppExclusions)
+    }
 
     @Published var notifyStatusChanges: Bool {
         didSet {
@@ -101,16 +98,19 @@ final class VPNPreferencesModel: ObservableObject {
     private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
     private let pinningManager: PinningManager
+    private let featureFlagger: FeatureFlagger
     private var cancellables = Set<AnyCancellable>()
 
     init(vpnXPCClient: VPNControllerXPCClient = .shared,
          settings: VPNSettings = .init(defaults: .netP),
          pinningManager: PinningManager = LocalPinningManager.shared,
-         defaults: UserDefaults = .netP) {
+         defaults: UserDefaults = .netP,
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
 
         self.vpnXPCClient = vpnXPCClient
         self.settings = settings
         self.pinningManager = pinningManager
+        self.featureFlagger = featureFlagger
 
         connectOnLogin = settings.connectOnLogin
         excludeLocalNetworks = settings.excludeLocalNetworks
@@ -118,7 +118,6 @@ final class VPNPreferencesModel: ObservableObject {
         showInMenuBar = settings.showInMenuBar
         showInBrowserToolbar = pinningManager.isPinned(.networkProtection)
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
-        showExcludedSites = true
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
