@@ -57,6 +57,7 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
     public enum Constants {
         public static let baseTdsURLString = "https://staticcdn.duckduckgo.com/trackerblocking/"
         public static let defaultTrackerDataURL = URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
+        public static let defaultPrivacyConfigurationURL = URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
     }
 
     init (privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
@@ -72,7 +73,7 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
         case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!
         case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
-        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
+        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? Constants.defaultPrivacyConfigurationURL
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
         case .trackerDataSet:
             return trackerDataURL()
