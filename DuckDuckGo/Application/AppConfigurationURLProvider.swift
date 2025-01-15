@@ -19,6 +19,7 @@
 import Configuration
 import Foundation
 import BrowserServicesKit
+import os.log
 
 struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
@@ -101,7 +102,7 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
                 return URL(string: Constants.baseTdsURLString + urlString)
             }
         } catch {
-            print("Failed to parse JSON: \(error)")
+            Logger.config.info("privacyConfiguration: Failed to parse subfeature settings JSON: \(error)")
         }
         return nil
     }

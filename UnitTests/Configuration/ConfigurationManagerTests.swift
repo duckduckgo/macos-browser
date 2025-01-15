@@ -25,7 +25,7 @@ import TrackerRadarKit
 
 final class ConfigurationManagerTests: XCTestCase {
     private var operationLog: OperationLog!
-    private var sut: ConfigurationManager!
+    private var configManager: ConfigurationManager!
     private var mockFetcher: MockConfigurationFetcher!
     private var mockStore: MockConfigurationStore!
     private var mockTrackerDataManager: MockTrackerDataManager!
@@ -42,8 +42,8 @@ final class ConfigurationManagerTests: XCTestCase {
         mockPrivacyConfigManager.operationLog = operationLog
         mockTrackerDataManager = MockTrackerDataManager(operationLog: operationLog, etag: nil, data: nil, embeddedDataProvider: MockEmbeddedDataProvider())
         mockContentBlockingManager = MockContentBlockerRulesManager(operationLog: operationLog)
-        sut = ConfigurationManager(fetcher: mockFetcher, store: mockStore, defaults: userDefaults)
-        sut.setContentBlockingManagers(
+        configManager = ConfigurationManager(fetcher: mockFetcher, store: mockStore, defaults: userDefaults)
+        configManager.setContentBlockingManagers(
             trackerDataManager: mockTrackerDataManager,
             privacyConfigurationManager: mockPrivacyConfigManager,
             contentBlockingManager: mockContentBlockingManager
@@ -52,7 +52,7 @@ final class ConfigurationManagerTests: XCTestCase {
 
     override func tearDownWithError() throws {
         operationLog = nil
-        sut = nil
+        configManager = nil
         mockStore = nil
         mockFetcher = nil
         mockTrackerDataManager = nil
@@ -74,7 +74,7 @@ final class ConfigurationManagerTests: XCTestCase {
         ]
 
         // WHEN
-        await sut.refreshNow(isDebug: false)
+        await configManager.refreshNow(isDebug: false)
 
         // THEN
         XCTAssertEqual(operationLog.steps, expectedOrder, "Operations did not occur in the expected order.")
@@ -94,13 +94,10 @@ final class ConfigurationManagerTests: XCTestCase {
         ]
 
         // WHEN
-        await sut.refreshNow(isDebug: false)
+        await configManager.refreshNow(isDebug: false)
 
         // THEN
         XCTAssertEqual(operationLog.steps, expectedOrder, "Operations did not occur in the expected order.")
-    }
-
-    func test_WhenRefreshNow_ThenPrivacyConfigFetchAndReloadBeforeTrackerDataSetFetch2() async {
     }
 
 }
@@ -118,8 +115,6 @@ private enum ConfigurationStep: String, Equatable {
 private class MockConfigurationFetcher: ConfigurationFetching {
     var operationLog: OperationLog
     var shouldFailPrivacyFetch = false
-    var shouldFailSurrogatesFetch = false
-    var shouldFailTdsFetch = false
 
     init(operationLog: OperationLog) {
         self.operationLog = operationLog
@@ -141,14 +136,8 @@ private class MockConfigurationFetcher: ConfigurationFetching {
             try await Task.sleep(nanoseconds: 50_000_000)
         case .surrogates:
             operationLog.steps.append(.fetchSurrogatesStarted)
-            if shouldFailSurrogatesFetch {
-                throw NSError(domain: "TestError", code: 1, userInfo: nil)
-            }
         case .trackerDataSet:
             operationLog.steps.append(.fetchTrackerDataSetStarted)
-            if shouldFailTdsFetch {
-                throw NSError(domain: "TestError", code: 1, userInfo: nil)
-            }
         case .remoteMessagingConfig:
             break
         }

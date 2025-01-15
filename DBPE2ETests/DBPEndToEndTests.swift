@@ -443,6 +443,7 @@ private extension DBPEndToEndTests {
     }
 
     final class PrivacyConfigurationMock: PrivacyConfiguration {
+        
         var identifier: String = "mock"
         var version: String? = "123456789"
 
@@ -494,6 +495,10 @@ private extension DBPEndToEndTests {
 
         func settings(for feature: BrowserServicesKit.PrivacyFeature) -> BrowserServicesKit.PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
             [String: Any]()
+        }
+
+        func settings(for subfeature: any BrowserServicesKit.PrivacySubfeature) -> PrivacyConfigurationData.PrivacyFeature.SubfeatureSettings? {
+            nil
         }
 
         func userEnabledProtection(forDomain: String) {
