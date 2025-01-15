@@ -53,8 +53,9 @@ struct BookmarkDialogFolderManagementView: View {
     }
 }
 
+@available(macOS 14.0, *)
 #Preview {
-    @State var selectedFolder: BookmarkFolder? = BookmarkFolder(id: "1", title: "Nested Folder", children: [])
+    @Previewable @State var selectedFolder: BookmarkFolder? = BookmarkFolder(id: "1", title: "Nested Folder", children: [])
     let folderViewModels: [FolderViewModel] = [
         .init(
             entity: .init(

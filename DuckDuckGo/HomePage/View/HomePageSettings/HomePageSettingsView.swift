@@ -233,8 +233,9 @@ extension HomePage.Views.BackgroundCategoryView {
 }
 
 #if DEBUG
+@available(macOS 14.0, *)
 #Preview("including continue set up cards") {
-    @State var isSettingsVisible: Bool = true
+    @Previewable @State var isSettingsVisible: Bool = true
 
     let settingsModel = HomePage.Models.SettingsModel()
     settingsModel.customBackground = .solidColor(.color10)
@@ -262,8 +263,9 @@ extension HomePage.Views.BackgroundCategoryView {
         .environmentObject(HomePage.Models.AddressBarModel(tabCollectionViewModel: TabCollectionViewModel(), privacyConfigurationManager: MockPrivacyConfigurationManager()))
 }
 
+@available(macOS 14.0, *)
 #Preview("no continue set up cards") {
-    @State var isSettingsVisible: Bool = true
+    @Previewable @State var isSettingsVisible: Bool = true
 
     let settingsModel = HomePage.Models.SettingsModel()
     settingsModel.customBackground = .solidColor(.color10)
