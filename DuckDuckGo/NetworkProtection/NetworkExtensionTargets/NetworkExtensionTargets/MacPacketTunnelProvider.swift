@@ -381,13 +381,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
-    static var tokenServiceName: String {
 #if NETP_SYSTEM_EXTENSION
-        "\(Bundle.main.bundleIdentifier!).authToken"
+    static let tokenServiceName = "\(Bundle.main.bundleIdentifier!).authToken"
 #else
-        "com.duckduckgo.networkprotection.authToken"
+    static let tokenServiceName = "com.duckduckgo.networkprotection.authToken"
 #endif
-    }
 
     // MARK: - Initialization
 
@@ -417,7 +415,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         case .staging:
             subscriptionEnvironment.serviceEnvironment = .staging
         }
-        subscriptionEnvironment.purchasePlatform = .stripe // we don't care about the purchasePlatform
+
+        // The SysExt doesn't care about the purchase platform because the only operations executed here are about the Auth token. No purchase or
+        // platforms-related operations are performed.
+        subscriptionEnvironment.purchasePlatform = .stripe
 
         Logger.networkProtection.debug("Subscription ServiceEnvironment: \(subscriptionEnvironment.serviceEnvironment.rawValue, privacy: .public)")
 
@@ -430,8 +431,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tokenStorage = NetworkProtectionKeychainStore(label: "DuckDuckGo Network Protection Auth Token",
                                                           serviceName: Self.tokenServiceName,
                                                           keychainType: Bundle.keychainType)
+        let legacyTokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
+                                                                           serviceName: Self.tokenServiceName,
+                                                                           errorEvents: debugEvents,
+                                                                           useAccessTokenProvider: false,
+                                                                           accessTokenProvider: { nil })
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
-                                            legacyTokenStorage: nil, // Note: The VPN SysExt will stop at the first transition from auth v1 to v2, is up to the user to re-enable it
+                                            legacyTokenStorage: legacyTokenStore,
                                             authService: authService)
         apiService.authorizationRefresherCallback = { _ in
             guard let tokenContainer = tokenStorage.tokenContainer else {
