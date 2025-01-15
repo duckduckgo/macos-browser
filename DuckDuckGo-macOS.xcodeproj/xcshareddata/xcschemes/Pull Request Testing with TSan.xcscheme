@@ -17,7 +17,7 @@
                BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
                BuildableName = "DuckDuckGo.app"
                BlueprintName = "DuckDuckGo Privacy Browser"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -31,7 +31,7 @@
                BlueprintIdentifier = "4B1AD89C25FC27E200261379"
                BuildableName = "Integration Tests.xctest"
                BlueprintName = "Integration Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -45,7 +45,7 @@
                BlueprintIdentifier = "AA585D8F248FD31400E9A3E2"
                BuildableName = "Unit Tests.xctest"
                BlueprintName = "Unit Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -68,7 +68,7 @@
                      BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
                      BuildableName = "DuckDuckGo.app"
                      BlueprintName = "DuckDuckGo Privacy Browser"
-                     ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+                     ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -91,7 +91,7 @@
                BlueprintIdentifier = "AA585D8F248FD31400E9A3E2"
                BuildableName = "Unit Tests.xctest"
                BlueprintName = "Unit Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
             <SkippedTests>
                <Test
@@ -109,7 +109,7 @@
                BlueprintIdentifier = "7B4CE8D926F02108009134B1"
                BuildableName = "UI Tests.xctest"
                BlueprintName = "UI Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -119,7 +119,7 @@
                BlueprintIdentifier = "4B1AD89C25FC27E200261379"
                BuildableName = "Integration Tests.xctest"
                BlueprintName = "Integration Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -142,7 +142,7 @@
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
             BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -159,7 +159,7 @@
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
             BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

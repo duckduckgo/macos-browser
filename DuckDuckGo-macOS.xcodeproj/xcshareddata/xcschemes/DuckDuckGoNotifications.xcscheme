@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1520"
-   version = "1.7">
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B9579252AC7AE700062CA31"
-               BuildableName = "DuckDuckGo Privacy Pro.app"
-               BlueprintName = "DuckDuckGo Privacy Pro"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
+               BuildableName = "DuckDuckGo Notifications.app"
+               BlueprintName = "DuckDuckGoNotifications"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -26,8 +26,9 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      shouldAutocreateTestPlan = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -43,10 +44,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4B9579252AC7AE700062CA31"
-            BuildableName = "DuckDuckGo Privacy Pro.app"
-            BlueprintName = "DuckDuckGo Privacy Pro"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
+            BuildableName = "DuckDuckGo Notifications.app"
+            BlueprintName = "DuckDuckGoNotifications"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -60,10 +61,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4B9579252AC7AE700062CA31"
-            BuildableName = "DuckDuckGo Privacy Pro.app"
-            BlueprintName = "DuckDuckGo Privacy Pro"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
+            BuildableName = "DuckDuckGo Notifications.app"
+            BlueprintName = "DuckDuckGoNotifications"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

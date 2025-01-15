@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-               BuildableName = "DuckDuckGo.app"
-               BlueprintName = "DuckDuckGo Privacy Browser"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               BlueprintIdentifier = "3706FA6A293F65D500E42796"
+               BuildableName = "DuckDuckGo App Store.app"
+               BlueprintName = "DuckDuckGo Privacy Browser App Store"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -44,10 +44,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-            BuildableName = "DuckDuckGo.app"
-            BlueprintName = "DuckDuckGo Privacy Browser"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            BlueprintIdentifier = "3706FA6A293F65D500E42796"
+            BuildableName = "DuckDuckGo App Store.app"
+            BlueprintName = "DuckDuckGo Privacy Browser App Store"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -57,16 +57,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-            BuildableName = "DuckDuckGo.app"
-            BlueprintName = "DuckDuckGo Privacy Browser"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            BlueprintIdentifier = "3706FA6A293F65D500E42796"
+            BuildableName = "DuckDuckGo App Store.app"
+            BlueprintName = "DuckDuckGo Privacy Browser App Store"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Review">

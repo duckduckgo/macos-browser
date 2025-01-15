@@ -17,7 +17,7 @@
                BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
                BuildableName = "DuckDuckGo.app"
                BlueprintName = "DuckDuckGo Privacy Browser"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -40,7 +40,7 @@
                      BlueprintIdentifier = "4B1AD89C25FC27E200261379"
                      BuildableName = "Integration Tests.xctest"
                      BlueprintName = "Integration Tests"
-                     ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+                     ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -63,7 +63,7 @@
                BlueprintIdentifier = "565E46DC2B2725DC0013AC2A"
                BuildableName = "SyncE2EUITests.xctest"
                BlueprintName = "SyncE2EUITests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -86,7 +86,7 @@
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
             BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -125,7 +125,7 @@
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
             BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

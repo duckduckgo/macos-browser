@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
+               BlueprintIdentifier = "4B2D06682A13318400DE1F49"
                BuildableName = "DuckDuckGo VPN.app"
-               BlueprintName = "DuckDuckGoVPN"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               BlueprintName = "DuckDuckGoVPNAppStore"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -43,10 +43,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
+            BlueprintIdentifier = "4B2D06682A13318400DE1F49"
             BuildableName = "DuckDuckGo VPN.app"
-            BlueprintName = "DuckDuckGoVPN"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            BlueprintName = "DuckDuckGoVPNAppStore"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -60,10 +60,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
+            BlueprintIdentifier = "4B2D06682A13318400DE1F49"
             BuildableName = "DuckDuckGo VPN.app"
-            BlueprintName = "DuckDuckGoVPN"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            BlueprintName = "DuckDuckGoVPNAppStore"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

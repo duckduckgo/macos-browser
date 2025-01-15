@@ -23,7 +23,7 @@
                      BlueprintIdentifier = "7B4CE8D926F02108009134B1"
                      BuildableName = "UI Tests.xctest"
                      BlueprintName = "UI Tests"
-                     ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+                     ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -52,7 +52,7 @@
                BlueprintIdentifier = "7B4CE8D926F02108009134B1"
                BuildableName = "UI Tests.xctest"
                BlueprintName = "UI Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
             <SkippedTests>
                <Test
@@ -79,7 +79,7 @@
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
             BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <CommandLineArguments>

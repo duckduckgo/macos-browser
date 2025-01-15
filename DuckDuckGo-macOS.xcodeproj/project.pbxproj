@@ -10658,7 +10658,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AA585D79248FD31100E9A3E2 /* Build configuration list for PBXProject "DuckDuckGo" */;
+			buildConfigurationList = AA585D79248FD31100E9A3E2 /* Build configuration list for PBXProject "DuckDuckGo-macOS" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -15255,7 +15255,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA585D79248FD31100E9A3E2 /* Build configuration list for PBXProject "DuckDuckGo" */ = {
+		AA585D79248FD31100E9A3E2 /* Build configuration list for PBXProject "DuckDuckGo-macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA585DA2248FD31500E9A3E2 /* Debug */,
