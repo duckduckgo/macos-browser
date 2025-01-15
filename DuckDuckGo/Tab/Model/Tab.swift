@@ -795,11 +795,7 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 #endif
-        if #available(macOS 13, *) {
-            setContent(PixelExperiment.cohort == .newOnboarding ? .onboarding : .onboardingDeprecated)
-        } else {
-            setContent(.onboardingDeprecated)
-        }
+        setContent(PixelExperiment.cohort == .newOnboarding ? .onboarding : .onboardingDeprecated)
     }
 
     @MainActor(unsafe)
