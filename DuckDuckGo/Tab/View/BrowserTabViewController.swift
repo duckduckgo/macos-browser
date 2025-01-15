@@ -1163,7 +1163,7 @@ extension BrowserTabViewController: TabDelegate {
         case .print(let query):
             activeUserDialogCancellable = runPrintOperation(with: query)
         case .none:
-            // modal sheet will close automatcially (or switch to another Tab‘s dialog) when switching tabs
+            // modal sheet will close automatically (or switch to another Tab‘s dialog) when switching tabs
             activeUserDialogCancellable = nil
         }
     }

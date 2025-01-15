@@ -163,7 +163,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
     }
 }
 
-// Explicitely use module name to silence warning for protocol conformance for protocols defined in an external library.
+// Explicitly use module name to silence warning for protocol conformance for protocols defined in an external library.
 // We run e2e tests on Xcode 15 so we can't use @retroactive keyword.
 // More info at https://github.com/swiftlang/swift-evolution/blob/main/proposals/0364-retroactive-conformance-warning.md
 extension File: Swift.Equatable, Swift.Hashable {
