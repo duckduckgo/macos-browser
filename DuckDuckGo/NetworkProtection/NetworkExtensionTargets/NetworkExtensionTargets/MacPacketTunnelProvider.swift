@@ -460,8 +460,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             switch type {
             case .deadToken:
                 PixelKit.fire(PrivacyProPixel.privacyProDeadTokenDetected)
-            case .subscriptionIsActive, .v1MigrationFailed, .v1MigrationSuccessful: // handled by the main app only
+            case .subscriptionIsActive: // handled by the main app only
                 break
+            case .v1MigrationFailed:
+                PixelKit.fire(PrivacyProPixel.authV1MigrationFailed)
+            case .v1MigrationSuccessful:
+                PixelKit.fire(PrivacyProPixel.authV1MigrationSucceeded)
             }
         }
 
