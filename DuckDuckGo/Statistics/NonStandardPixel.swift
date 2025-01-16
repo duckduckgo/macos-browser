@@ -28,6 +28,7 @@ enum NonStandardPixel: PixelKitEventV2 {
     case brokenSiteReport
     case brokenSiteReportShown
     case brokenSiteReportSent
+    case privacyDashboardReportBrokenSite
     case emailEnabled
     case emailDisabled
     case emailUserPressedUseAddress
@@ -39,6 +40,7 @@ enum NonStandardPixel: PixelKitEventV2 {
         case .brokenSiteReport: return "epbf_macos_desktop"
         case .brokenSiteReportSent: return "epbf_macos_desktop_sent"
         case .brokenSiteReportShown: return "m_report-broken-site_shown"
+        case .privacyDashboardReportBrokenSite: return "mp_rb"
         case .emailEnabled: return "email_enabled_macos_desktop"
         case .emailDisabled: return "email_disabled_macos_desktop"
         case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
