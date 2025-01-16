@@ -97,7 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private(set) lazy var historyViewActionsManager: HistoryViewActionsManager = HistoryViewActionsManager(scriptClients: [])
+    private(set) lazy var historyViewActionsManager: HistoryViewActionsManager = HistoryViewActionsManager()
     private(set) lazy var newTabPageActionsManager: NewTabPageActionsManager = NewTabPageActionsManager(
         appearancePreferences: .shared,
         activeRemoteMessageModel: activeRemoteMessageModel,
