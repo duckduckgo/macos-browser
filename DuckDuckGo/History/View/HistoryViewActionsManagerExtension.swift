@@ -22,7 +22,8 @@ extension HistoryViewActionsManager {
 
     convenience init() {
         self.init(scriptClients: [
-            HistoryViewConfigurationClient()
+            HistoryViewConfigurationClient(),
+            HistoryViewDataClient()
         ])
     }
 }
