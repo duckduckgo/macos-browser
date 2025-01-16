@@ -21,43 +21,37 @@
 import PackageDescription
 
 let package = Package(
-    name: "HistoryView",
+    name: "UserScriptActionsManager",
     platforms: [
         .macOS("11.4")
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "HistoryView",
-            targets: ["HistoryView"]),
+            name: "UserScriptActionsManager",
+            targets: ["UserScriptActionsManager"]),
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.6.1"),
         .package(path: "../WebKitExtensions"),
-        .package(path: "../UserScriptActionsManager"),
         .package(path: "../Utilities"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "HistoryView",
+            name: "UserScriptActionsManager",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "UserScript", package: "BrowserServicesKit"),
-                .product(name: "UserScriptActionsManager", package: "UserScriptActionsManager"),
-                .product(name: "WebKitExtensions", package: "WebKitExtensions"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ]
         ),
         .testTarget(
-            name: "HistoryViewTests",
-            dependencies: [
-                "HistoryView",
-                "Utilities",
-            ]
+            name: "UserScriptActionsManagerTests",
+            dependencies: ["UserScriptActionsManager"]
         ),
     ]
 )

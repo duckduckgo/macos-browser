@@ -32,50 +32,49 @@ import WebKit
 // * This class is inspired by `DBPUIViewModel`.
 // */
 //@MainActor
-//final class NewTabPageWebViewModel: NSObject {
-//    let newTabPageUserScript: NewTabPageUserScript
+//final class HistoryWebViewModel: NSObject {
+//    let historyViewUserScript: HistoryViewUserScript
 //    let webView: WebView
 //    private var windowCancellable: AnyCancellable?
 //
-//    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging, activeRemoteMessageModel: ActiveRemoteMessageModel) {
-//        newTabPageUserScript = NewTabPageUserScript()
-//        actionsManager.registerUserScript(newTabPageUserScript)
+//    init(featureFlagger: FeatureFlagger, actionsManager: UserScriptActionsManaging) {
+//        historyViewUserScript = HistoryViewUserScript()
+//        actionsManager.registerUserScript(historyViewUserScript)
 //
 //        let configuration = WKWebViewConfiguration()
-//        configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger, newTabPageUserScript: newTabPageUserScript)
+//        configuration.applyHistoryWebViewConfiguration(with: featureFlagger, historyViewUserScript: historyViewUserScript)
 //        webView = WebView(frame: .zero, configuration: configuration)
 //
 //        super.init()
 //
 //        webView.navigationDelegate = self
 //        webView.load(URLRequest(url: URL.newtab))
-//        newTabPageUserScript.webView = webView
+//        historyViewUserScript.webView = webView
 //
 //        windowCancellable = webView.publisher(for: \.window)
 //            .map { $0 != nil }
-//            .sink { [weak activeRemoteMessageModel] isOnScreen in
-//                activeRemoteMessageModel?.isViewOnScreen = isOnScreen
+//            .sink { isOnScreen in
 //                if isOnScreen {
-//                    NotificationCenter.default.post(name: .newTabPageWebViewDidAppear, object: nil)
+//                    NotificationCenter.default.post(name: .historyWebViewDidAppear, object: nil)
 //                }
 //            }
 //    }
 //}
 //
-//extension NewTabPageWebViewModel: WKNavigationDelegate {
+//extension HistoryWebViewModel: WKNavigationDelegate {
 //    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 //        navigationAction.request.url == .newtab ? .allow : .cancel
 //    }
 //}
 //
 //extension Notification.Name {
-//    static var newTabPageWebViewDidAppear = Notification.Name("newTabPageWebViewDidAppear")
+//    static var historyWebViewDidAppear = Notification.Name("historyWebViewDidAppear")
 //}
 //
 //extension WKWebViewConfiguration {
 //
 //    @MainActor
-//    func applyNewTabPageWebViewConfiguration(with featureFlagger: FeatureFlagger, newTabPageUserScript: NewTabPageUserScript) {
+//    func applyHistoryWebViewConfiguration(with featureFlagger: FeatureFlagger, historyViewUserScript: HistoryViewUserScript) {
 //        if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
 //            setURLSchemeHandler(
 //                DuckURLSchemeHandler(featureFlagger: featureFlagger, isNTPSpecialPageSupported: true),
@@ -83,7 +82,7 @@ import WebKit
 //            )
 //        }
 //        preferences[.developerExtrasEnabled] = true
-//        self.userContentController = NewTabPageUserContentController(newTabPageUserScript: newTabPageUserScript)
+//        self.userContentController = HistoryViewUserContentController(historyViewUserScript: historyViewUserScript)
 //     }
 //}
 //

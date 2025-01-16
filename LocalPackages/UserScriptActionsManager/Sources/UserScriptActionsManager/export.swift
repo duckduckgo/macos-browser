@@ -1,5 +1,5 @@
 //
-//  NewTabPageActionsManager.swift
+//  export.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,15 +16,4 @@
 //  limitations under the License.
 //
 
-import UserScriptActionsManager
-
-open class NewTabPageUserScriptClient: UserScriptClient {
-    public weak var userScriptsSource: (any UserScriptsSource)?
-    
-    public func registerMessageHandlers(for userScript: NewTabPageUserScript) {
-    }
-    
-    public typealias Script = NewTabPageUserScript
-}
-
-public final class NewTabPageActionsManager: UserScriptActionsManager<NewTabPageUserScript, NewTabPageUserScriptClient> {}
+@_exported import UserScript
