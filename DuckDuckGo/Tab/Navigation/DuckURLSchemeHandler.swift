@@ -268,6 +268,8 @@ private extension DuckURLSchemeHandler {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
         } else if url.isNewTabPage {
             directoryURL = URL(fileURLWithPath: "/pages/new-tab")
+        } else if url.isHistory {
+            directoryURL = URL(fileURLWithPath: "/pages/history")
         } else {
             assertionFailure("Unknown scheme")
             return nil
