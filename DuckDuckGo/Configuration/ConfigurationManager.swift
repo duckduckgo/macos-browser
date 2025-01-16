@@ -28,9 +28,9 @@ import PixelKit
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
-    private lazy var trackerDataManager = ContentBlocking.shared.trackerDataManager
-    private lazy var privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
-    private lazy var contentBlockingManager = ContentBlocking.shared.contentBlockingManager
+    private let trackerDataManager: TrackerDataManager
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private var contentBlockingManager: ContentBlockerRulesManagerProtocol
 
     private enum Constants {
         static let lastConfigurationInstallDateKey = "config.last.installed"
@@ -57,10 +57,18 @@ final class ConfigurationManager: DefaultConfigurationManager {
         PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
-    override init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
-                  store: ConfigurationStoring = ConfigurationStore(),
-                  defaults: KeyValueStoring = UserDefaults.appConfiguration) {
+    init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
+         store: ConfigurationStoring = ConfigurationStore(),
+         defaults: KeyValueStoring = UserDefaults.appConfiguration,
+         trackerDataManager: TrackerDataManager = ContentBlocking.shared.trackerDataManager,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+         contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager) {
+
+        self.trackerDataManager = trackerDataManager
+        self.privacyConfigurationManager = privacyConfigurationManager
+        self.contentBlockingManager = contentBlockingManager
         self.defaults = defaults
+
         super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
 
@@ -224,17 +232,3 @@ extension ConfigurationManager {
         updateTrackerBlockingDependencies()
     }
 }
-
-#if DEBUG
-extension ConfigurationManager {
-    func setContentBlockingManagers(trackerDataManager: TrackerDataManager,
-                                    privacyConfigurationManager: PrivacyConfigurationManager,
-                                    contentBlockingManager: ContentBlockerRulesManagerProtocol) {
-        if Application.runType == .unitTests {
-            self.trackerDataManager = trackerDataManager
-            self.privacyConfigurationManager = privacyConfigurationManager
-            self.contentBlockingManager = contentBlockingManager
-        }
-    }
-}
-#endif
