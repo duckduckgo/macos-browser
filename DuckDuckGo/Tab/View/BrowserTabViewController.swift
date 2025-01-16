@@ -559,7 +559,7 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
+            let newWebView = webView(for: tabViewModel)
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
@@ -580,6 +580,17 @@ final class BrowserTabViewController: NSViewController {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
         adjustFirstResponderAfterAddingContentViewIfNeeded()
+    }
+
+    private func webView(for tabViewModel: TabViewModel) -> WebView {
+        switch tabViewModel.tab.content {
+        case .newtab:
+            return newTabPageWebViewModel.webView
+        case .history:
+            return historyWebViewModel.webView
+        default:
+            return tabViewModel.tab.webView
+        }
     }
 
     private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
@@ -870,17 +881,7 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let newWebView: WKWebView = {
-            switch tabViewModel.tab.content {
-            case .newtab:
-                return newTabPageWebViewModel.webView
-            case .history:
-                return historyWebViewModel.webView
-            default:
-                return tabViewModel.tab.webView
-            }
-        }()
-
+        let newWebView = webView(for: tabViewModel)
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
 
