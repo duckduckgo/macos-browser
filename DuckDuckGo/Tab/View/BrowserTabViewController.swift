@@ -22,6 +22,7 @@ import Combine
 import Common
 import FeatureFlags
 import Freemium
+import HistoryView
 import NewTabPage
 import Onboarding
 import os.log
@@ -49,6 +50,11 @@ final class BrowserTabViewController: NSViewController {
         featureFlagger: featureFlagger,
         actionsManager: newTabPageActionsManager,
         activeRemoteMessageModel: activeRemoteMessageModel
+    )
+    private let historyViewActionsManager: HistoryViewActionsManager
+    private(set) lazy var historyWebViewModel: HistoryWebViewModel = HistoryWebViewModel(
+        featureFlagger: featureFlagger,
+        actionsManager: historyViewActionsManager
     )
     private(set) weak var webView: WebView?
     private weak var webViewContainer: NSView?
@@ -94,6 +100,7 @@ final class BrowserTabViewController: NSViewController {
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
          newTabPageActionsManager: NewTabPageActionsManager = NSApp.delegateTyped.newTabPageActionsManager,
+         historyViewActionsManager: HistoryViewActionsManager = NSApp.delegateTyped.historyViewActionsManager,
          activeRemoteMessageModel: ActiveRemoteMessageModel = NSApp.delegateTyped.activeRemoteMessageModel
     ) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -102,6 +109,7 @@ final class BrowserTabViewController: NSViewController {
         self.onboardingDialogFactory = onboardingDialogFactory
         self.featureFlagger = featureFlagger
         self.newTabPageActionsManager = newTabPageActionsManager
+        self.historyViewActionsManager = historyViewActionsManager
         self.activeRemoteMessageModel = activeRemoteMessageModel
         containerStackView = NSStackView()
 

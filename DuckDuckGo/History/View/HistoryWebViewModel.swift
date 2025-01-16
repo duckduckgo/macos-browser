@@ -21,68 +21,67 @@ import Combine
 import HistoryView
 import WebKit
 
-///**
-// * This class manages a dedicated web view for displaying New Tab Page.
-// *
-// * It initializes NTP user script, the NTP-specific web view configuration
-// * and then sets up a new web view with that configuration. It also serves
-// * as a navigation delegate for the web view, blocking all navigations other than
-// * to the New Tab Page.
-// *
-// * This class is inspired by `DBPUIViewModel`.
-// */
-//@MainActor
-//final class HistoryWebViewModel: NSObject {
-//    let historyViewUserScript: HistoryViewUserScript
-//    let webView: WebView
-//    private var windowCancellable: AnyCancellable?
-//
-//    init(featureFlagger: FeatureFlagger, actionsManager: UserScriptActionsManaging) {
-//        historyViewUserScript = HistoryViewUserScript()
-//        actionsManager.registerUserScript(historyViewUserScript)
-//
-//        let configuration = WKWebViewConfiguration()
-//        configuration.applyHistoryWebViewConfiguration(with: featureFlagger, historyViewUserScript: historyViewUserScript)
-//        webView = WebView(frame: .zero, configuration: configuration)
-//
-//        super.init()
-//
-//        webView.navigationDelegate = self
-//        webView.load(URLRequest(url: URL.newtab))
-//        historyViewUserScript.webView = webView
-//
-//        windowCancellable = webView.publisher(for: \.window)
-//            .map { $0 != nil }
-//            .sink { isOnScreen in
-//                if isOnScreen {
-//                    NotificationCenter.default.post(name: .historyWebViewDidAppear, object: nil)
-//                }
-//            }
-//    }
-//}
-//
-//extension HistoryWebViewModel: WKNavigationDelegate {
-//    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-//        navigationAction.request.url == .newtab ? .allow : .cancel
-//    }
-//}
-//
-//extension Notification.Name {
-//    static var historyWebViewDidAppear = Notification.Name("historyWebViewDidAppear")
-//}
-//
-//extension WKWebViewConfiguration {
-//
-//    @MainActor
-//    func applyHistoryWebViewConfiguration(with featureFlagger: FeatureFlagger, historyViewUserScript: HistoryViewUserScript) {
-//        if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
-//            setURLSchemeHandler(
-//                DuckURLSchemeHandler(featureFlagger: featureFlagger, isNTPSpecialPageSupported: true),
-//                forURLScheme: URL.NavigationalScheme.duck.rawValue
-//            )
-//        }
-//        preferences[.developerExtrasEnabled] = true
-//        self.userContentController = HistoryViewUserContentController(historyViewUserScript: historyViewUserScript)
-//     }
-//}
-//
+/**
+ * This class manages a dedicated web view for displaying New Tab Page.
+ *
+ * It initializes NTP user script, the NTP-specific web view configuration
+ * and then sets up a new web view with that configuration. It also serves
+ * as a navigation delegate for the web view, blocking all navigations other than
+ * to the New Tab Page.
+ *
+ * This class is inspired by `DBPUIViewModel`.
+ */
+@MainActor
+final class HistoryWebViewModel: NSObject {
+    let historyViewUserScript: HistoryViewUserScript
+    let webView: WebView
+    private var windowCancellable: AnyCancellable?
+
+    init(featureFlagger: FeatureFlagger, actionsManager: HistoryViewActionsManager) {
+        historyViewUserScript = HistoryViewUserScript()
+        actionsManager.registerUserScript(historyViewUserScript)
+
+        let configuration = WKWebViewConfiguration()
+        configuration.applyHistoryWebViewConfiguration(with: featureFlagger, historyViewUserScript: historyViewUserScript)
+        webView = WebView(frame: .zero, configuration: configuration)
+
+        super.init()
+
+        webView.navigationDelegate = self
+        webView.load(URLRequest(url: URL.newtab))
+        historyViewUserScript.webView = webView
+
+        windowCancellable = webView.publisher(for: \.window)
+            .map { $0 != nil }
+            .sink { isOnScreen in
+                if isOnScreen {
+                    NotificationCenter.default.post(name: .historyWebViewDidAppear, object: nil)
+                }
+            }
+    }
+}
+
+extension HistoryWebViewModel: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+        navigationAction.request.url == .newtab ? .allow : .cancel
+    }
+}
+
+extension Notification.Name {
+    static var historyWebViewDidAppear = Notification.Name("historyWebViewDidAppear")
+}
+
+extension WKWebViewConfiguration {
+
+    @MainActor
+    func applyHistoryWebViewConfiguration(with featureFlagger: FeatureFlagger, historyViewUserScript: HistoryViewUserScript) {
+        if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
+            setURLSchemeHandler(
+                DuckURLSchemeHandler(featureFlagger: featureFlagger, isNTPSpecialPageSupported: true),
+                forURLScheme: URL.NavigationalScheme.duck.rawValue
+            )
+        }
+        preferences[.developerExtrasEnabled] = true
+        self.userContentController = HistoryViewUserContentController(historyViewUserScript: historyViewUserScript)
+     }
+}

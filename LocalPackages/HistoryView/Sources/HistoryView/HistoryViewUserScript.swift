@@ -17,10 +17,10 @@
 //
 
 import Foundation
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
-public final class HistoryViewUserScript: NSObject, Subfeature {
+public final class HistoryViewUserScript: NSObject, SubfeatureWithExternalMessageHandling {
 
     public var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "history")])
     public let featureName: String = "history"
@@ -36,6 +36,10 @@ public final class HistoryViewUserScript: NSObject, Subfeature {
 
     public weak var webView: WKWebView?
     private var messageHandlers: [MessageName: Handler] = [:]
+
+    public func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
+        messageHandlers.merge(handlers, uniquingKeysWith: { $1 })
+    }
 
     public func handler(forMethodNamed methodName: MessageName) -> Handler? {
         messageHandlers[methodName]
