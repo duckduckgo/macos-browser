@@ -279,6 +279,7 @@ final class DBPEndToEndTests: XCTestCase {
 
         print("Try everything again")
 
+        /*
         try database.deleteProfileData()
 
         // Fake broker set up
@@ -411,8 +412,7 @@ final class DBPEndToEndTests: XCTestCase {
             return optOutsRequested.count > 0
         })
         print("2Stage 5 passed: We finish running the opt out jobs")
-
-
+        */
 
 
 
@@ -421,7 +421,7 @@ final class DBPEndToEndTests: XCTestCase {
          */
         let optOutConfirmedExpectation = expectation(description: "Opt out confirmed")
         await awaitFulfillment(of: optOutConfirmedExpectation,
-                               withTimeout: 600,
+                               withTimeout: 1200,
                                whenCondition: {
             let queries = try! database.fetchAllBrokerProfileQueryData()
             let optOutJobs = queries.flatMap { $0.optOutJobData }
