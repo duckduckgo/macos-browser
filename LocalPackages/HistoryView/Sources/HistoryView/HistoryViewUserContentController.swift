@@ -1,7 +1,7 @@
 //
-//  NewTabPageUserContentController.swift
+//  HistoryViewUserContentController.swift
 //
-//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -22,17 +22,17 @@ import BrowserServicesKit
 import UserScript
 import WebKitExtensions
 
-public final class NewTabPageUserContentController: WKUserContentController {
+public final class HistoryViewUserContentController: WKUserContentController {
 
-    private let newTabPageUserScriptProvider: NewTabPageUserScriptProvider
+    private let historyViewUserScriptProvider: HistoryViewUserScriptProvider
 
     @MainActor
-    public init(newTabPageUserScript: NewTabPageUserScript) {
-        newTabPageUserScriptProvider = NewTabPageUserScriptProvider(newTabPageUserScript: newTabPageUserScript)
+    public init(historyViewUserScript: HistoryViewUserScript) {
+        historyViewUserScriptProvider = HistoryViewUserScriptProvider(historyViewUserScript: historyViewUserScript)
 
         super.init()
 
-        newTabPageUserScriptProvider.userScripts.forEach { userScript in
+        historyViewUserScriptProvider.userScripts.forEach { userScript in
             addHandler(userScript)
             addUserScript(userScript.makeWKUserScriptSync())
         }
@@ -44,17 +44,17 @@ public final class NewTabPageUserContentController: WKUserContentController {
 }
 
 @MainActor
-private final class NewTabPageUserScriptProvider: UserScriptsProvider {
+private final class HistoryViewUserScriptProvider: UserScriptsProvider {
     lazy var userScripts: [UserScript] = [specialPagesUserScript]
 
     let specialPagesUserScript: SpecialPagesUserScript
 
-    init(newTabPageUserScript: NewTabPageUserScript) {
+    init(historyViewUserScript: HistoryViewUserScript) {
         specialPagesUserScript = SpecialPagesUserScript()
-        specialPagesUserScript.registerSubfeature(delegate: newTabPageUserScript)
+        specialPagesUserScript.registerSubfeature(delegate: historyViewUserScript)
     }
 
     func loadWKUserScripts() async -> [WKUserScript] {
-        [await specialPagesUserScript.makeWKUserScript().wkUserScript]
+        await [specialPagesUserScript.makeWKUserScript().wkUserScript]
     }
 }

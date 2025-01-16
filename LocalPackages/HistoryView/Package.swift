@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 //
 //  Package.swift
@@ -43,7 +43,7 @@ let package = Package(
             name: "HistoryView",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
-                .product(name: "TestUtils", package: "BrowserServicesKit"),
+                .product(name: "UserScript", package: "BrowserServicesKit"),
                 .product(name: "WebKitExtensions", package: "WebKitExtensions"),
             ],
             swiftSettings: [
