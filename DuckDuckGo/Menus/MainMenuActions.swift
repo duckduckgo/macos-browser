@@ -659,6 +659,11 @@ extension MainViewController {
         browserTabViewController.openNewTab(with: .bookmarks)
     }
 
+    @objc func showHistory(_ sender: Any?) {
+        makeKeyIfNeeded()
+        browserTabViewController.openNewTab(with: .history)
+    }
+
     // MARK: - Window
 
     @objc func showPreviousTab(_ sender: Any?) {

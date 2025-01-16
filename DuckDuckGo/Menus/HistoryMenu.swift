@@ -24,6 +24,7 @@ import os.log
 
 final class HistoryMenu: NSMenu {
 
+    let historyItem = NSMenuItem(title: "Show History", action: #selector(MainViewController.showHistory), keyEquivalent: "y")
     let backMenuItem = NSMenuItem(title: UserText.navigateBack, action: #selector(MainViewController.back), keyEquivalent: "[")
     let forwardMenuItem = NSMenuItem(title: UserText.navigateForward, action: #selector(MainViewController.forward), keyEquivalent: "]")
 
@@ -48,6 +49,9 @@ final class HistoryMenu: NSMenu {
         super.init(title: UserText.mainMenuHistory)
 
         self.buildItems {
+            historyItem
+            NSMenuItem.separator()
+
             backMenuItem
             forwardMenuItem
             NSMenuItem.separator()
@@ -72,6 +76,8 @@ final class HistoryMenu: NSMenu {
     @MainActor
     override func update() {
         super.update()
+
+        historyItem.isHidden = !NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView)
 
         updateRecentlyClosedMenu()
         updateReopenLastClosedMenuItem()
