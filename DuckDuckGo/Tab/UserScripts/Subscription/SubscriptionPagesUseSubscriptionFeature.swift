@@ -282,7 +282,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 await uiHandler.updateProgressViewController(title: UserText.completingPurchaseTitle)
 
-                let completePurchaseResult = await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS)
+                let completePurchaseResult = await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, additionalParams: nil)
                 switch completePurchaseResult {
                 case .success(let purchaseUpdate):
                     Logger.subscription.log("[Purchase] Purchase completed")

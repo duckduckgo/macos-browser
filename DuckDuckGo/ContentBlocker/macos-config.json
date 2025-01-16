@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1736158448802,
+    "version": 1736531050802,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -181,6 +181,9 @@
             "exceptions": [
                 {
                     "domain": "allocine.fr"
+                },
+                {
+                    "domain": "barmer.de"
                 },
                 {
                     "domain": "bild.de"
@@ -659,8 +662,137 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media",
-                    "bing.com"
+                    "healthline-media"
+                ],
+                "filterlistExceptions": [
+                    "google.ae",
+                    "google.at",
+                    "google.be",
+                    "google.bg",
+                    "google.by",
+                    "google.ca",
+                    "google.ch",
+                    "google.cl",
+                    "google.co.id",
+                    "google.co.il",
+                    "google.co.in",
+                    "google.co.jp",
+                    "google.co.ke",
+                    "google.co.kr",
+                    "google.co.nz",
+                    "google.co.th",
+                    "google.co.uk",
+                    "google.co.ve",
+                    "google.co.za",
+                    "google.com",
+                    "google.com.ar",
+                    "google.com.au",
+                    "google.com.br",
+                    "google.com.co",
+                    "google.com.ec",
+                    "google.com.eg",
+                    "google.com.hk",
+                    "google.com.mx",
+                    "google.com.my",
+                    "google.com.pe",
+                    "google.com.ph",
+                    "google.com.pk",
+                    "google.com.py",
+                    "google.com.sa",
+                    "google.com.sg",
+                    "google.com.tr",
+                    "google.com.tw",
+                    "google.com.ua",
+                    "google.com.uy",
+                    "google.com.vn",
+                    "google.cz",
+                    "google.de",
+                    "google.dk",
+                    "google.dz",
+                    "google.ee",
+                    "google.es",
+                    "google.fi",
+                    "google.fr",
+                    "google.gr",
+                    "google.hr",
+                    "google.hu",
+                    "google.ie",
+                    "google.it",
+                    "google.lt",
+                    "google.lv",
+                    "google.nl",
+                    "google.no",
+                    "google.pl",
+                    "google.pt",
+                    "google.ro",
+                    "google.rs",
+                    "google.ru",
+                    "google.se",
+                    "google.sk",
+                    "google.ae",
+                    "google.at",
+                    "google.be",
+                    "google.bg",
+                    "google.by",
+                    "google.ca",
+                    "google.ch",
+                    "google.cl",
+                    "google.co.id",
+                    "google.co.il",
+                    "google.co.in",
+                    "google.co.jp",
+                    "google.co.ke",
+                    "google.co.kr",
+                    "google.co.nz",
+                    "google.co.th",
+                    "google.co.uk",
+                    "google.co.ve",
+                    "google.co.za",
+                    "google.com",
+                    "google.com.ar",
+                    "google.com.au",
+                    "google.com.br",
+                    "google.com.co",
+                    "google.com.ec",
+                    "google.com.eg",
+                    "google.com.hk",
+                    "google.com.mx",
+                    "google.com.my",
+                    "google.com.pe",
+                    "google.com.ph",
+                    "google.com.pk",
+                    "google.com.py",
+                    "google.com.sa",
+                    "google.com.sg",
+                    "google.com.tr",
+                    "google.com.tw",
+                    "google.com.ua",
+                    "google.com.uy",
+                    "google.com.vn",
+                    "google.cz",
+                    "google.de",
+                    "google.dk",
+                    "google.dz",
+                    "google.ee",
+                    "google.es",
+                    "google.fi",
+                    "google.fr",
+                    "google.gr",
+                    "google.hr",
+                    "google.hu",
+                    "google.ie",
+                    "google.it",
+                    "google.lt",
+                    "google.lv",
+                    "google.nl",
+                    "google.no",
+                    "google.pl",
+                    "google.pt",
+                    "google.ro",
+                    "google.rs",
+                    "google.ru",
+                    "google.se",
+                    "google.sk"
                 ]
             },
             "state": "enabled",
@@ -669,7 +801,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "6e8df7847b365381429db33fe036be43"
+            "hash": "d528bbee567806eee09603f757d4f20c"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -738,6 +870,11 @@
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "bookmarksSorting": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "bookmarks": {
             "state": "enabled",
@@ -3075,7 +3212,14 @@
                         ]
                     },
                     {
-                        "domain": "ebay.com",
+                        "domain": [
+                            "ebay.com",
+                            "ebay.ca",
+                            "ebay.co.uk",
+                            "ebay.de",
+                            "ebay.fr",
+                            "ebay.com.au"
+                        ],
                         "rules": [
                             {
                                 "selector": "#g-yolo-overlay-holder",
@@ -3484,7 +3628,26 @@
                         ]
                     },
                     {
-                        "domain": "google.com",
+                        "domain": [
+                            "google.com",
+                            "google.ca",
+                            "google.de",
+                            "google.dk",
+                            "google.es",
+                            "google.fr",
+                            "google.ie",
+                            "google.it",
+                            "google.nl",
+                            "google.pl",
+                            "google.se",
+                            "google.com.au",
+                            "google.com.br",
+                            "google.com.mx",
+                            "google.co.in",
+                            "google.co.jp",
+                            "google.co.nz",
+                            "google.co.uk"
+                        ],
                         "rules": [
                             {
                                 "selector": "div:has(> iframe[src*='prid=19026802'])",
@@ -3568,6 +3731,10 @@
                             },
                             {
                                 "selector": "div:has(> iframe[src*='prid=19044636'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19046163'])",
                                 "type": "hide"
                             },
                             {
@@ -3742,6 +3909,10 @@
                             {
                                 "selector": "[data-mpu1=true]",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-ad-unit-path]",
+                                "type": "closest-empty"
                             },
                             {
                                 "selector": "#stickyFooterRoot",
@@ -5343,7 +5514,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "4b7d6ec384400e39c7ad8ca500154b1c"
+            "hash": "cb87fa6271457116f952dc4577cd35f3"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5725,6 +5896,11 @@
             "state": "disabled",
             "hash": "2dc4c0ade2e385d208695d770002c725"
         },
+        "fullScreenMode": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "googleRejected": {
             "exceptions": [
                 {
@@ -5939,6 +6115,16 @@
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
         },
+        "htmlNewTabPage": {
+            "state": "internal",
+            "exceptions": [],
+            "features": {
+                "isLaunched": {
+                    "state": "internal"
+                }
+            },
+            "hash": "78bcafbbe5e4868ccfde559de5dbd803"
+        },
         "https": {
             "state": "enabled",
             "exceptions": [
@@ -5998,7 +6184,7 @@
             "hash": "39a36ca9002bd5aea4dd7b6bdb5b79d4"
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "broken.third-party.site"
@@ -6008,7 +6194,7 @@
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "hash": "8ceb05ed570765a54738b77c1deb1f64"
+            "hash": "c5507786c7bd5326356357f2291fa536"
         },
         "marketplaceAdPostback": {
             "state": "disabled",
@@ -6249,6 +6435,23 @@
                 "isLaunchedOverride": {
                     "state": "disabled"
                 },
+                "isLaunchedROW": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.118.1"
+                },
                 "allowPurchase": {
                     "state": "enabled"
                 },
@@ -6297,7 +6500,7 @@
                     "minSupportedVersion": "1.116.0"
                 }
             },
-            "hash": "142f357c4bc40a01f99d03566c58cb8b"
+            "hash": "9738cff7f6a81e78fa9a0dfbd1dc99d6"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
@@ -7863,6 +8066,7 @@
                             {
                                 "rule": "google-analytics.com/analytics.js",
                                 "domains": [
+                                    "bswift.com",
                                     "doterra.com",
                                     "easyjet.com",
                                     "edx.org",
@@ -10013,7 +10217,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "55d91756006df4ec366628990eb345d5"
+            "hash": "2d19877231df04e21e86f3c271e10f28"
         },
         "trackingCookies1p": {
             "settings": {

@@ -403,7 +403,10 @@ extension WKWebView {
 
     // prevent exception if private API keys go missing
     open override func value(forUndefinedKey key: String) -> Any? {
-        // assertionFailure("valueForUndefinedKey: \(key)") // Temporary disabled https://app.asana.com/0/1199230911884351/1209123691403049/f
+        if key == #keyPath(serverTrust) {
+            return self.serverTrust
+        }
+        assertionFailure("valueForUndefinedKey: \(key)")
         return nil
     }
 

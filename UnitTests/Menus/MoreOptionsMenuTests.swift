@@ -341,7 +341,11 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
 }
 
 final class MockFreemiumDBPFeature: FreemiumDBPFeature {
-    var featureAvailable = false
+    var featureAvailable = false {
+        didSet {
+            isAvailableSubject.send(featureAvailable)
+        }
+    }
     var isAvailableSubject = PassthroughSubject<Bool, Never>()
 
     var isAvailable: Bool {

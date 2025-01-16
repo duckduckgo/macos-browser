@@ -23,9 +23,9 @@ import XCTest
 
 final class NewTabPageFavoritesModelTests: XCTestCase {
 
-    var model: NewTabPageFavoritesModel<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>!
-    var settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor!
-    var favoritesSubject: PassthroughSubject<[MockNewTabPageFavorite], Never>!
+    private var model: NewTabPageFavoritesModel<MockNewTabPageFavorite, CapturingNewTabPageFavoritesActionsHandler>!
+    private var settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor!
+    private var favoritesSubject: PassthroughSubject<[MockNewTabPageFavorite], Never>!
 
     override func setUp() async throws {
         try await super.setUp()
