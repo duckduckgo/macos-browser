@@ -48,7 +48,7 @@ final class HistoryWebViewModel: NSObject {
         super.init()
 
         webView.navigationDelegate = self
-        webView.load(URLRequest(url: URL.newtab))
+        webView.load(URLRequest(url: URL.history))
         historyViewUserScript.webView = webView
 
         windowCancellable = webView.publisher(for: \.window)
@@ -63,7 +63,7 @@ final class HistoryWebViewModel: NSObject {
 
 extension HistoryWebViewModel: WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-        navigationAction.request.url == .newtab ? .allow : .cancel
+        navigationAction.request.url == .history ? .allow : .cancel
     }
 }
 

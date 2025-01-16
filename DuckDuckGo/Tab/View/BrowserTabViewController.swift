@@ -828,6 +828,13 @@ final class BrowserTabViewController: NSViewController {
                 addAndLayoutChild(homePageViewControllerCreatingIfNeeded())
             }
 
+        case .history:
+            if featureFlagger.isFeatureOn(.historyView) {
+                updateTabIfNeeded(tabViewModel: tabViewModel)
+            } else {
+                removeAllTabContent()
+            }
+
         case .dataBrokerProtection:
             removeAllTabContent()
             let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
@@ -863,7 +870,16 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
+        let newWebView: WKWebView = {
+            switch tabViewModel.tab.content {
+            case .newtab:
+                return newTabPageWebViewModel.webView
+            case .history:
+                return historyWebViewModel.webView
+            default:
+                return tabViewModel.tab.webView
+            }
+        }()
 
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
