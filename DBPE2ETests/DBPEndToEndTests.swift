@@ -401,7 +401,7 @@ final class DBPEndToEndTests: XCTestCase {
         print("2Stage 5.1 passed: We start running the opt out jobs")
 
         let optOutRequestedExpectation2 = expectation(description: "2Opt out requested")
-        await awaitFulfillment(of: optOutRequestedExpectation,
+        await awaitFulfillment(of: optOutRequestedExpectation2,
                                withTimeout: 300,
                                whenCondition: {
             let queries = try! database.fetchAllBrokerProfileQueryData()
