@@ -277,6 +277,145 @@ final class DBPEndToEndTests: XCTestCase {
          */
         print("Stages 6-8 skipped: Fake broker doesn't support sending emails")
 
+        print("Try everything again")
+
+        try database.deleteProfileData()
+
+        // Fake broker set up
+        await deleteAllProfilesOnFakeBroker()
+
+        var mockUserProfile2 = mockFakeBrokerUserProfile()
+        var returnedUserProfile2 = await createProfileOnFakeBroker(mockUserProfile2)
+        XCTAssertEqual(mockUserProfile2.firstName, returnedUserProfile2.firstName)
+
+        // When
+        /*
+         1/ We save a profile
+         */
+        cache.profile = mockProfile
+        Task { @MainActor in
+            _ = try await communicationLayer.saveProfile(params: [], original: WKScriptMessage())
+        }
+
+        // Then
+        let profileSavedExpectation2 = expectation(description: "2Profile saved in DB")
+        let profileQueriesCreatedExpectation2 = expectation(description: "2Profile queries created")
+
+        await awaitFulfillment(of: profileSavedExpectation2,
+                               withTimeout: 3,
+                               whenCondition: {
+            try! database.fetchProfile() != nil
+        })
+        await awaitFulfillment(of: profileQueriesCreatedExpectation2,
+                               withTimeout: 3,
+                               whenCondition: {
+            try! database.fetchAllBrokerProfileQueryData().count > 0
+        })
+
+        // Also check that we made the broker profile queries correctly
+        let queries2 = try! database.fetchAllBrokerProfileQueryData()
+        let initialBrokers2 = queries.compactMap { $0.dataBroker }
+        assertCondition(withExpectationDescription: "2Correctly read and saved 1 broker after profile save",
+                        condition: { initialBrokers2.count == 1 })
+        assertCondition(withExpectationDescription: "2Saved correct broker after profile save",
+                        condition: { initialBrokers2.first?.name == "DDG Fake Broker" })
+        assertCondition(withExpectationDescription: "2Created 1 BrokerProfileQuery correctly after profile save",
+                        condition: { queries2.count == 1 })
+
+        // At this stage the login item should be running
+        assertCondition(withExpectationDescription: "2Login item enabled after profile save",
+                        condition: { loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]) })
+
+        // This needs to be await since it takes time to start the login item
+        let loginItemRunningExpectation2 = expectation(description: "2Login item running after profile save")
+        await awaitFulfillment(of: loginItemRunningExpectation2,
+                               withTimeout: 10,
+                               whenCondition: {
+            LoginItem.dbpBackgroundAgent.isRunning
+        })
+
+        print("2Stage 1 passed: We save a profile")
+
+        /*
+        2/ We scan brokers
+        */
+        let schedulerStartsExpectation2 = expectation(description: "2Scheduler starts")
+
+        await awaitFulfillment(of: schedulerStartsExpectation2,
+                               withTimeout: 100,
+                               whenCondition: {
+            try! self.pirProtectionManager.dataManager.prepareBrokerProfileQueryDataCache()
+            return await self.communicationDelegate.getBackgroundAgentMetadata().lastStartedSchedulerOperationTimestamp != nil
+        })
+
+        let metaData2 = await communicationDelegate.getBackgroundAgentMetadata()
+        assertCondition(withExpectationDescription: "Last operation broker URL is not nil",
+                        condition: { metaData2.lastStartedSchedulerOperationBrokerUrl != nil })
+
+        print("2Stage 2 passed: We scan brokers")
+
+        /*
+        3/ We find and save extracted profiles
+        */
+        let extractedProfilesFoundExpectation2 = expectation(description: "2Extracted profiles found and saved in DB")
+
+        await awaitFulfillment(of: extractedProfilesFoundExpectation2,
+                               withTimeout: 60,
+                               whenCondition: {
+            let queries = try! database.fetchAllBrokerProfileQueryData()
+            let brokerIDs = queries.compactMap { $0.dataBroker.id }
+            let extractedProfiles = brokerIDs.flatMap { try! database.fetchExtractedProfiles(for: $0) }
+            return extractedProfiles.count > 0
+        })
+
+        print("2Stage 3 passed: We find and save extracted profiles")
+
+        /*
+         4/ We create opt out jobs
+         */
+        let optOutJobsCreatedExpectation2 = expectation(description: "2Opt out jobs created")
+
+        await awaitFulfillment(of: optOutJobsCreatedExpectation2,
+                               withTimeout: 10,
+                               whenCondition: {
+            let queries = try! database.fetchAllBrokerProfileQueryData()
+            let optOutJobs = queries.flatMap { $0.optOutJobData }
+            return optOutJobs.count > 0
+        })
+
+        print("2Stage 4 passed: We create opt out jobs")
+
+        /*
+         5/ We run those opt out jobs
+         For now we check the lastRunDate on the optOutJob, but that could always be wrong. Ideally we need this information from the fake broker
+         */
+        let optOutJobsRunExpectation2 = expectation(description: "2Opt out jobs run")
+
+        await awaitFulfillment(of: optOutJobsRunExpectation2,
+                               withTimeout: 300,
+                               whenCondition: {
+            let queries = try! database.fetchAllBrokerProfileQueryData()
+            let optOutJobs = queries.flatMap { $0.optOutJobData }
+            return optOutJobs.first?.lastRunDate != nil
+        })
+        print("2Stage 5.1 passed: We start running the opt out jobs")
+
+        let optOutRequestedExpectation2 = expectation(description: "2Opt out requested")
+        await awaitFulfillment(of: optOutRequestedExpectation,
+                               withTimeout: 300,
+                               whenCondition: {
+            let queries = try! database.fetchAllBrokerProfileQueryData()
+            let optOutJobs = queries.flatMap { $0.optOutJobData }
+            let events = optOutJobs.flatMap { $0.historyEvents }
+            let optOutsRequested = events.filter{ $0.type == .optOutRequested }
+            return optOutsRequested.count > 0
+        })
+        print("2Stage 5 passed: We finish running the opt out jobs")
+
+
+
+
+
         /*
         9/ We confirm the opt out through a scan
          */
