@@ -48,7 +48,7 @@ final class WebExtensionsDebugMenu: NSMenu {
         guard case .OK = panel.runModal(),
               let url = panel.url else { return }
 
-        webExtensionManager.addExtension(path: url)
+        webExtensionManager.addExtension(path: url.absoluteString)
     }
 
 }
@@ -60,8 +60,8 @@ final class WebExtensionMenuItem: NSMenuItem {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(webExtensionPath: URL) {
-        super.init(title: webExtensionPath.absoluteString, action: nil, keyEquivalent: "")
+    init(webExtensionPath: String) {
+        super.init(title: webExtensionPath, action: nil, keyEquivalent: "")
         submenu = WebExtensionSubMenu(webExtensionPath: webExtensionPath)
     }
 
@@ -70,14 +70,14 @@ final class WebExtensionMenuItem: NSMenuItem {
 @available(macOS 14.4, *)
 final class WebExtensionSubMenu: NSMenu {
 
-    private let webExtensionPath: URL
+    private let webExtensionPath: String
     private let webExtensionManager: WebExtensionManaging
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(webExtensionPath: URL, webExtensionManager: WebExtensionManaging = WebExtensionManager.shared) {
+    init(webExtensionPath: String, webExtensionManager: WebExtensionManaging = WebExtensionManager.shared) {
         self.webExtensionManager = webExtensionManager
         self.webExtensionPath = webExtensionPath
         super.init(title: "")

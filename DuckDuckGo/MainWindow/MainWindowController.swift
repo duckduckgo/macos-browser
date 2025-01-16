@@ -61,7 +61,7 @@ final class MainWindowController: NSWindowController {
         subscribeToResolutionChange()
 
         if #available(macOS 14.4, *) {
-            WebExtensionManager.shared.didOpenWindow(self)
+            WebExtensionManager.shared.eventsListener.didOpenWindow(self)
         }
     }
 
@@ -73,7 +73,7 @@ final class MainWindowController: NSWindowController {
         NotificationCenter.default.removeObserver(self)
 
         if #available(macOS 14.4, *) {
-            WebExtensionManager.shared.didCloseWindow(self)
+            WebExtensionManager.shared.eventsListener.didCloseWindow(self)
         }
     }
 
@@ -228,7 +228,7 @@ extension MainWindowController: NSWindowDelegate {
         }
 
         if #available(macOS 14.4, *) {
-            WebExtensionManager.shared.didFocusWindow(self)
+            WebExtensionManager.shared.eventsListener.didFocusWindow(self)
         }
     }
 

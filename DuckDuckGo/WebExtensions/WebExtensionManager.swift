@@ -25,36 +25,97 @@ import os.log
 protocol WebExtensionManaging {
 
     // Adding and removing extensions
-    var webExtensionPaths: [URL] { get }
-    func addExtension(path: URL)
-    func removeExtension(path: URL)
+    var webExtensionPaths: [String] { get }
+    func addExtension(path: String)
+    func removeExtension(path: String)
 
-    func didOpenWindow(_ window: _WKWebExtensionWindow)
-    func didCloseWindow(_ window: _WKWebExtensionWindow)
-    func didFocusWindow(_ window: _WKWebExtensionWindow)
-    func didOpenTab(_ tab: _WKWebExtensionTab)
-    func didCloseTab(_ tab: _WKWebExtensionTab, windowIsClosing: Bool)
-    func didActivateTab(_ tab: _WKWebExtensionTab, previousActiveTab: _WKWebExtensionTab?)
-    func didSelectTabs(_ tabs: [_WKWebExtensionTab])
-    func didDeselectTabs(_ tabs: [_WKWebExtensionTab])
-    func didMoveTab(_ tab: _WKWebExtensionTab, from oldIndex: Int, in oldWindow: _WKWebExtensionWindow)
-    func didReplaceTab(_ oldTab: _WKWebExtensionTab, with tab: _WKWebExtensionTab)
-    func didChangeTabProperties(_ properties: _WKWebExtensionTabChangedProperties, for tab: _WKWebExtensionTab)
+    // Controller for tabs
+    var controller: _WKWebExtensionController? { get }
+
+    // Listening of events
+    var eventsListener: WebExtensionEventsListening { get }
 
 }
 
-// Manages web extensions and web extension context
+// Manages the initialization and ownership of key components: web extensions, contexts, and the controller
 @available(macOS 14.4, *)
 final class WebExtensionManager: NSObject, WebExtensionManaging {
+
     static let shared = WebExtensionManager()
 
-    static private func loadWebExtension(path: String) -> _WKWebExtension? {
-        let extensionURL = URL(fileURLWithPath: path)
-        let webExtension = try? _WKWebExtension(resourceBaseURL: extensionURL)
-        return webExtension
+    init(webExtensionPathsCache: WebExtensionPathsCaching = WebExtensionPathsCache()) {
+        self.webExtensionPathsCache = webExtensionPathsCache
+        super.init()
+
+        internalSiteHandler.dataSource = self
+
+        do {
+            try loadWebExtensions()
+        } catch {
+            assertionFailure("Failed to load web extensions")
+        }
     }
 
-    static private func makeContext(for webExtension: _WKWebExtension) -> _WKWebExtensionContext {
+    // Caches paths to selected web extensions
+    var webExtensionPathsCache: WebExtensionPathsCaching
+
+    // Loads web extensions after selection or application start
+    var loader = WebExtensionLoader()
+
+    // Loaded extensions
+    var extensions: [_WKWebExtension] = []
+
+    // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.
+    var contexts: [_WKWebExtensionContext] = []
+
+    // Controller manages a set of loaded extension contexts
+    var controller: _WKWebExtensionController?
+
+    // Events listening
+    var eventsListener: WebExtensionEventsListening = WebExtensionEventsListener()
+
+    // Handles native messaging
+    let nativeMessagingHandler = NativeMessagingHandler()
+
+    // Handles internal sites of web extenions
+    let internalSiteHandler = WebExtensionInternalSiteHandler()
+
+    // MARK: - Adding and removing extensions
+    var webExtensionPaths: [String] {
+        webExtensionPathsCache.cache
+    }
+
+    func addExtension(path: String) {
+        webExtensionPathsCache.add(path)
+    }
+
+    func removeExtension(path: String) {
+        webExtensionPathsCache.remove(path)
+    }
+
+    // MARK: - Lifecycle
+
+    private func loadWebExtensions() throws {
+        // Load extensions
+        extensions = loader.loadWebExtensions(from: webExtensionPathsCache.cache)
+
+        // Make contexts
+        contexts = extensions.map {
+            makeContext(for: $0)
+        }
+
+        // Make controller and load extension contexts
+        let controller = _WKWebExtensionController()
+        try contexts.forEach {
+            try controller.loadExtensionContext($0)
+        }
+
+        controller.delegate = self
+        eventsListener.controller = controller
+        self.controller = controller
+    }
+
+    private func makeContext(for webExtension: _WKWebExtension) -> _WKWebExtensionContext {
         let context = _WKWebExtensionContext(for: webExtension)
 
         // TODO: Temporary fix to have the same state on multiple browser sessions
@@ -77,64 +138,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         return context
     }
 
-    init(webExtensionPathsCache: WebExtensionPathsCaching = WebExtensionPathsCache()) {
-        self.webExtensionPathsCache = webExtensionPathsCache
-        super.init()
-
-        internalSiteHandler.dataSource = self
-    }
-
-    var webExtensionPathsCache: WebExtensionPathsCaching
-
-    func addExtension(path: URL) {
-        webExtensionPathsCache.add(path.absoluteString)
-
-        //TODO: Reload extensions
-    }
-
-    func removeExtension(path: URL) {
-        webExtensionPathsCache.remove(path.absoluteString)
-
-        //TODO: Unload extension
-    }
-
-    var webExtensionPaths: [URL] {
-        return webExtensionPathsCache.cache.compactMap{ URL(string: $0) }
-    }
-
-    lazy var extensions: [_WKWebExtension] = {
-        //TODO: Load cached extensions
-        return []
-    }()
-
-    // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.
-    lazy var contexts: [_WKWebExtensionContext] = {
-        return extensions.map {
-            WebExtensionManager.makeContext(for: $0)
-        }
-    }()
-
-    lazy var extensionController = {
-        let controller = _WKWebExtensionController()
-
-        contexts.forEach {
-            do {
-                try controller.loadExtensionContext($0)
-            } catch {
-                fatalError("Didn't load extension")
-            }
-        }
-
-        controller.delegate = self
-        return controller
-    }()
-
-    let nativeMessagingHandler = NativeMessagingHandler()
-    let internalSiteHandler = WebExtensionInternalSiteHandler()
-
-    func setUpWebExtensionController(for configuration: WKWebViewConfiguration) {
-        configuration._webExtensionController = extensionController
-    }
+    // MARK: - UI
 
     func toolbarButtons() -> [MouseOverButton] {
         return contexts.enumerated().map { (index, context) in
@@ -169,62 +173,21 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         return button
     }
 
-    func setBackgroundWebViewUserAgent() {
-        for context in extensionController.extensionContexts {
+    // MARK: - Internal
+
+    private func setBackgroundWebViewUserAgent() {
+        guard let controller else {
+            assertionFailure("No controller")
+            return
+        }
+
+        for context in controller.extensionContexts {
             if let backgroundWebView = context._backgroundWebView {
                 if backgroundWebView.customUserAgent != UserAgent.safari {
                     backgroundWebView.customUserAgent = UserAgent.safari
                 }
             }
         }
-    }
-
-    // MARK: - Context
-
-    func didOpenWindow(_ window: _WKWebExtensionWindow) {
-        extensionController.didOpen(window)
-    }
-
-    func didCloseWindow(_ window: _WKWebExtensionWindow) {
-        extensionController.didClose(window)
-    }
-
-    func didFocusWindow(_ window: _WKWebExtensionWindow) {
-        extensionController.didFocus(window)
-    }
-
-    func didOpenTab(_ tab: _WKWebExtensionTab) {
-        extensionController.didOpen(tab)
-    }
-
-    func didCloseTab(_ tab: _WKWebExtensionTab, windowIsClosing: Bool) {
-        extensionController.didClose(tab, windowIsClosing: windowIsClosing)
-    }
-
-    func didActivateTab(_ tab: _WKWebExtensionTab, previousActiveTab: _WKWebExtensionTab?) {
-        extensionController.didActivate(tab, previousActiveTab: previousActiveTab)
-    }
-
-    func didSelectTabs(_ tabs: [_WKWebExtensionTab]) {
-        let set = NSSet(array: tabs) as Set
-        extensionController.didSelect(set)
-    }
-
-    func didDeselectTabs(_ tabs: [_WKWebExtensionTab]) {
-        let set = NSSet(array: tabs) as Set
-        extensionController.didDeselect(set)
-    }
-
-    func didMoveTab(_ tab: _WKWebExtensionTab, from oldIndex: Int, in oldWindow: _WKWebExtensionWindow) {
-        extensionController.didMoveTab(tab, from: UInt(oldIndex), in: oldWindow)
-    }
-
-    func didReplaceTab(_ oldTab: _WKWebExtensionTab, with tab: _WKWebExtensionTab) {
-        extensionController.didReplaceTab(oldTab, with: tab)
-    }
-
-    func didChangeTabProperties(_ properties: _WKWebExtensionTabChangedProperties, for tab: _WKWebExtensionTab) {
-        extensionController.didChangeTabProperties(properties, for: tab)
     }
 
 }
@@ -366,8 +329,14 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
 extension WebExtensionManager: WebExtensionInternalSiteHandlerDataSource {
 
     func webExtensionContextForUrl(_ url: URL) -> _WKWebExtensionContext? {
-        // TODO: Adjust to support more than one loaded extension
-        return contexts.first
+        guard let context = contexts.first(where: {
+            return url.absoluteString.hasPrefix($0.baseURL.absoluteString)
+        }) else {
+            assertionFailure("No context for \(url)")
+            return nil
+        }
+
+        return context
     }
 
 }
