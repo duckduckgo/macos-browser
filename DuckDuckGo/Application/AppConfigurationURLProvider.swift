@@ -27,13 +27,19 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     internal init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
                   featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger,
-                  customPrivacyConfiguration: URL? = nil) {
+                  customPrivacyConfiguration: URL? = nil,
+                  trackerDataUrlProvider: TrackerDataURLProviding? = nil
+    ) {
         self.init(privacyConfigurationManager: privacyConfigurationManager, featureFlagger: featureFlagger)
         if let customPrivacyConfiguration {
             // Overwrite custom privacy configuration if provided
             self.customPrivacyConfiguration = customPrivacyConfiguration.absoluteString
         }
         // Otherwise use the default or already stored custom configuration
+
+        if let trackerDataUrlProvider {
+            self.trackerDataUrlProvider = trackerDataUrlProvider
+        }
     }
 
     @UserDefaultsWrapper(key: .customConfigurationUrl, defaultValue: nil)
@@ -52,8 +58,9 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     // MARK: - Main
 
-    var privacyConfigurationManager: PrivacyConfigurationManaging
-    var featureFlagger: FeatureFlagger
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let featureFlagger: FeatureFlagger
+    private var trackerDataUrlProvider: TrackerDataURLProviding
 
     public enum Constants {
         public static let baseTdsURLString = "https://staticcdn.duckduckgo.com/trackerblocking/"
@@ -65,6 +72,7 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
           featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureFlagger = featureFlagger
+        self.trackerDataUrlProvider = TrackerDataURLOverrider(privacyConfigurationManager: privacyConfigurationManager, featureFlagger: featureFlagger)
     }
 
     func url(for configuration: Configuration) -> URL {
@@ -77,100 +85,10 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .privacyConfiguration: return customPrivacyConfigurationUrl ?? Constants.defaultPrivacyConfigurationURL
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
         case .trackerDataSet:
-            return trackerDataURL()
+            return trackerDataUrlProvider.trackerDataURL ?? Constants.defaultTrackerDataURL
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
         case .remoteMessagingConfig: return RemoteMessagingClient.Constants.endpoint
         }
     }
 
-    private func trackerDataURL() -> URL {
-        for experimentType in TdsExperimentType.allCases {
-            if let cohort = featureFlagger.getCohortIfEnabled(for: experimentType.experiment) as? TdsNextExperimentFlag.Cohort,
-               let url = trackerDataURL(for: experimentType.subfeature, cohort: cohort) {
-                return url
-            }
-        }
-        return Constants.defaultTrackerDataURL
-    }
-
-    private func trackerDataURL(for subfeature: any PrivacySubfeature, cohort: TdsNextExperimentFlag.Cohort) -> URL? {
-        guard let settings = privacyConfigurationManager.privacyConfig.settings(for: subfeature),
-              let jsonData = settings.data(using: .utf8) else { return nil }
-        do {
-            if let settingsDict = try JSONSerialization.jsonObject(with: jsonData) as? [String: String],
-               let urlString = cohort == .control ? settingsDict["controlUrl"] : settingsDict["treatmentUrl"] {
-                return URL(string: Constants.baseTdsURLString + urlString)
-            }
-        } catch {
-            Logger.config.info("privacyConfiguration: Failed to parse subfeature settings JSON: \(error)")
-        }
-        return nil
-    }
-
-}
-
-public enum TdsExperimentType: Int, CaseIterable {
-    case baseline
-    case feb25
-    case mar25
-    case apr25
-    case may25
-    case jun25
-    case jul25
-    case aug25
-    case sep25
-    case oct25
-    case nov25
-    case dec25
-
-    var experiment: any FeatureFlagExperimentDescribing {
-        TdsNextExperimentFlag(subfeature: self.subfeature)
-    }
-
-    var subfeature: any PrivacySubfeature {
-        switch self {
-        case .baseline:
-            ContentBlockingSubfeature.tdsNextExperimentBaseline
-        case .feb25:
-            ContentBlockingSubfeature.tdsNextExperimentFeb25
-        case .mar25:
-            ContentBlockingSubfeature.tdsNextExperimentMar25
-        case .apr25:
-            ContentBlockingSubfeature.tdsNextExperimentApr25
-        case .may25:
-            ContentBlockingSubfeature.tdsNextExperimentMay25
-        case .jun25:
-            ContentBlockingSubfeature.tdsNextExperimentJun25
-        case .jul25:
-            ContentBlockingSubfeature.tdsNextExperimentJul25
-        case .aug25:
-            ContentBlockingSubfeature.tdsNextExperimentAug25
-        case .sep25:
-            ContentBlockingSubfeature.tdsNextExperimentSep25
-        case .oct25:
-            ContentBlockingSubfeature.tdsNextExperimentOct25
-        case .nov25:
-            ContentBlockingSubfeature.tdsNextExperimentNov25
-        case .dec25:
-            ContentBlockingSubfeature.tdsNextExperimentDec25
-        }
-    }
-
-}
-
-public struct TdsNextExperimentFlag: FeatureFlagExperimentDescribing {
-    public var rawValue: String
-    public var source: FeatureFlagSource
-
-    init(subfeature: any PrivacySubfeature) {
-        self.source = .remoteReleasable(.subfeature(subfeature))
-        self.rawValue = subfeature.rawValue
-    }
-
-    public typealias CohortType = Cohort
-
-    public enum Cohort: String, FlagCohort {
-        case control
-        case treatment
-    }
 }
