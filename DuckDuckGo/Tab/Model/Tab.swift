@@ -233,10 +233,9 @@ protocol NewWindowPolicyDecisionMaker {
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
                                                  burnerMode: burnerMode,
                                                  earlyAccessHandlers: specialPagesUserScript.map { [$0] } ?? [])
-
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
-        assert(userContentController != nil)
+//        assert(userContentController != nil)
         self.userContentController = userContentController
         self.onboardingPixelReporter = onboardingPixelReporter
         self.pageRefreshMonitor = pageRefreshMonitor
@@ -304,6 +303,10 @@ protocol NewWindowPolicyDecisionMaker {
             }
 
         addDeallocationChecks(for: webView)
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didOpenTab(self)
+        }
     }
 
 #if DEBUG
@@ -366,6 +369,10 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didCloseTab(self, windowIsClosing: false)
+        }
+
         DispatchQueue.main.asyncOrNow { [webView, userContentController] in
             // WebKit objects must be deallocated on the main thread
             webView.stopAllMedia(shouldStopLoading: true)

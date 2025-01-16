@@ -45,7 +45,9 @@ protocol WindowControllersManagerProtocol {
                        showWindow: Bool,
                        popUp: Bool,
                        lazyLoadTabs: Bool,
-                       isMiniaturized: Bool) -> MainWindow?
+                       isMiniaturized: Bool,
+                       isMaximized: Bool,
+                       isFullscreen: Bool) -> MainWindow?
     func showTab(with content: Tab.TabContent)
 }
 extension WindowControllersManagerProtocol {
@@ -57,7 +59,7 @@ extension WindowControllersManagerProtocol {
                        showWindow: Bool = true,
                        popUp: Bool = false,
                        lazyLoadTabs: Bool = false) -> MainWindow? {
-        openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: false)
+        openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: false, isMaximized: false, isFullscreen: false)
     }
 }
 
@@ -312,8 +314,10 @@ extension WindowControllersManager {
                        showWindow: Bool = true,
                        popUp: Bool = false,
                        lazyLoadTabs: Bool = false,
-                       isMiniaturized: Bool = false) -> MainWindow? {
-        WindowsManager.openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized)
+                       isMiniaturized: Bool = false,
+                       isMaximized: Bool = false,
+                       isFullscreen: Bool = false) -> MainWindow? {
+        return WindowsManager.openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized, isMaximized: isMaximized, isFullscreen: isFullscreen)
     }
 
 }
@@ -342,6 +346,12 @@ extension WindowControllersManager {
     func windowController(for tabCollectionViewModel: TabCollectionViewModel) -> MainWindowController? {
         return mainWindowControllers.first(where: {
             tabCollectionViewModel === $0.mainViewController.tabCollectionViewModel
+        })
+    }
+
+    func windowController(for tab: Tab) -> MainWindowController? {
+        return mainWindowControllers.first(where: {
+            $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.contains(tab)
         })
     }
 

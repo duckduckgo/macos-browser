@@ -55,6 +55,8 @@ final class BrowserTabViewController: NSViewController {
     private weak var webViewSnapshot: NSView?
     private var containerStackView: NSStackView
 
+    private weak var webExtensionWebView: WebView?
+
     weak var delegate: BrowserTabViewControllerDelegate?
     var tabViewModel: TabViewModel?
 
@@ -670,7 +672,7 @@ final class BrowserTabViewController: NSViewController {
              .url(_, _, source: .reload):
             return true
 
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboardingDeprecated, .onboarding, .releaseNotes, .identityTheftRestoration:
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboardingDeprecated, .onboarding, .releaseNotes, .identityTheftRestoration, .webExtensionUrl:
             return true
 
         case .none:
@@ -699,6 +701,8 @@ final class BrowserTabViewController: NSViewController {
             getView = { [weak self] in self?.bookmarksViewController?.view }
         case .dataBrokerProtection:
             getView = { [weak self] in self?.dataBrokerProtectionHomeViewController?.view }
+        case .webExtensionUrl:
+            getView = { [weak self] in self?.webExtensionWebView }
         case .none:
             getView = nil
         }
@@ -735,16 +739,17 @@ final class BrowserTabViewController: NSViewController {
         window.makeFirstResponder(contentView)
     }
 
-    func openNewTab(with content: Tab.TabContent) {
+    @discardableResult
+    func openNewTab(with content: Tab.TabContent) -> Tab? {
         guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
-            return
+            return nil
         }
 
         // shouldn't open New Tabs in PopUp window
         if view.window?.isPopUpWindow ?? true {
             // Prefer Tab's Parent
             WindowControllersManager.shared.showTab(with: content)
-            return
+            return nil
         }
 
         let tab = Tab(content: content,
@@ -753,6 +758,8 @@ final class BrowserTabViewController: NSViewController {
                       webViewSize: view.frame.size)
 
         tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
+
+        return tab
     }
 
     // MARK: - Browser Tabs
@@ -762,6 +769,8 @@ final class BrowserTabViewController: NSViewController {
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
         homePageViewController?.removeCompletely()
+        webExtensionWebView?.superview?.removeFromSuperview()
+        webExtensionWebView = nil
         dataBrokerProtectionHomeViewController?.removeCompletely()
         if includingWebView {
             self.removeWebViewFromHierarchy()
@@ -824,6 +833,17 @@ final class BrowserTabViewController: NSViewController {
             let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
             self.previouslySelectedTab = tabCollectionViewModel.selectedTab
             addAndLayoutChild(dataBrokerProtectionViewController)
+
+        case .webExtensionUrl:
+            removeAllTabContent()
+            if #available(macOS 14.4, *) {
+                if let tab = tabViewModel?.tab,
+                   let url = tab.url,
+                   let webExtensionWebView = WebExtensionManager.shared.internalSiteHandler.webViewForExtensionUrl(url) {
+                    self.webExtensionWebView = webExtensionWebView
+                    self.addWebViewToViewHierarchy(webExtensionWebView, tab: tab)
+                }
+            }
         default:
             removeAllTabContent()
         }

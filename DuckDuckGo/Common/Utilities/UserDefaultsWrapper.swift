@@ -235,6 +235,9 @@ public struct UserDefaultsWrapper<T> {
 
         case lastBrokenSiteToastShownDate = "brokenSitePrompt.last-broken-site-toast-shown-date"
         case toastDismissStreakCounter = "brokenSitePrompt.toast-dismiss-streak-counter"
+
+        // Web Extensions
+        case webExtensionPathsCache = "com.duckduckgo.web.extension.paths.cache"
     }
 
     enum RemovedKeys: String, CaseIterable {
