@@ -203,6 +203,36 @@
                ReferencedContainer = "container:LocalPackages/NetworkProtectionMac">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NewTabPageTests"
+               BuildableName = "NewTabPageTests"
+               BlueprintName = "NewTabPageTests"
+               ReferencedContainer = "container:LocalPackages/NewTabPage">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UserScriptActionsManagerTests"
+               BuildableName = "UserScriptActionsManagerTests"
+               BlueprintName = "UserScriptActionsManagerTests"
+               ReferencedContainer = "container:LocalPackages/UserScriptActionsManager">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "HistoryViewTests"
+               BuildableName = "HistoryViewTests"
+               BlueprintName = "HistoryViewTests"
+               ReferencedContainer = "container:LocalPackages/HistoryView">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
