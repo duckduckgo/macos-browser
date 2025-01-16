@@ -81,8 +81,14 @@ struct OperationPreferredDateCalculator {
             return date.now.addingTimeInterval(calculateNextRunDateOnError(schedulingConfig: schedulingConfig, historyEvents: historyEvents))
         case .optOutStarted, .scanStarted, .noMatchFound:
             return currentPreferredRunDate
-        case .optOutConfirmed, .optOutRequested:
+        case .optOutConfirmed:
             return nil
+        case .optOutRequested:
+            // Previously, opt-out jobs with `nil` preferredRunDate were never executed,
+            // but we need this following the child-to-parent-broker transition
+            // to prevent repeated scheduling of those former child broker opt-out jobs.
+            // https://app.asana.com/0/0/1208832818650310/f
+            return date.now.addingTimeInterval(schedulingConfig.hoursUntilNextOptOutAttempt.hoursToSeconds)
         }
     }
 

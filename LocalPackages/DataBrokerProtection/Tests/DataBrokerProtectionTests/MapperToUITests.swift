@@ -59,7 +59,7 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
-        XCTAssertEqual(result.scanProgress.currentScans, expected.currentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
         XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
         XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, expected.first!.name)
         XCTAssertTrue(result.resultsFound.isEmpty)
@@ -79,7 +79,7 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
-        XCTAssertEqual(result.scanProgress.currentScans, expected.currentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
         XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
         XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, expected.first!.name)
         XCTAssertTrue(result.resultsFound.isEmpty)
@@ -121,7 +121,7 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, result.scanProgress.currentScans)
         XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
-        XCTAssertEqual(result.scanProgress.currentScans, expected.currentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
         XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
         XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), expected.map(\.name))
     }
@@ -143,7 +143,7 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
         XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
-        XCTAssertEqual(result.scanProgress.currentScans, expected.currentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
         XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
         XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), expected.map(\.name))
         XCTAssertEqual(result.resultsFound.count, 1)
@@ -167,7 +167,7 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
         XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
-        XCTAssertEqual(result.scanProgress.currentScans, expected.currentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
         XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
         XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), expected.map(\.name))
         XCTAssertEqual(result.resultsFound.count, 1)
