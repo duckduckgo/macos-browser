@@ -77,15 +77,15 @@ jobs:
         SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
       run: |
         bundle exec fastlane sync_signing_ci
-  
+
     - name: Download and unzip artifact
       uses: actions/download-artifact@v4
 
     - name: Set cache key hash
       run: |
-        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
         if [[ "$has_only_tags" == "true" ]]; then
-          echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
+          echo "cache_key_hash=${{ hashFiles('DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
         else
           echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
         fi
@@ -138,8 +138,8 @@ jobs:
           -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "key" -v "CODE" \
           -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "value" -v "$CODE" \
           -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "isEnabled" -v "YES" \
-          "DuckDuckGo.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme" > updated.xcscheme
-        mv -f updated.xcscheme "DuckDuckGo.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme"
+          "DuckDuckGo-macOS.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme" > updated.xcscheme
+        mv -f updated.xcscheme "DuckDuckGo-macOS.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme"
 
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1

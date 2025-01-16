@@ -64,15 +64,15 @@ jobs:
       run: |
         bundle exec fastlane sync_signing_dmg_review
         bundle exec fastlane sync_signing_ci
-  
+
     - name: Download and unzip artifact
       uses: actions/download-artifact@v4
 
     - name: Set cache key hash
       run: |
-        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
         if [[ "$has_only_tags" == "true" ]]; then
-          echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
+          echo "cache_key_hash=${{ hashFiles('DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
         else
           echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
         fi
@@ -101,18 +101,18 @@ jobs:
         debug: true
 
     # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
-    - name: Build test runner 
+    - name: Build test runner
       run: |
         rm -rf LocalPackages
-        rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved 
-        sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
-        sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
+        rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+        sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo-macOS.xcodeproj/project.pbxproj
+        sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo-macOS.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "SyncE2EUITestsOldVersions" \
           -derivedDataPath DerivedData \
-          -configuration Review 
-    
-    - name: Unzip and Copy app to /DerivedData                         
+          -configuration Review
+
+    - name: Unzip and Copy app to /DerivedData
       run: |
         cd DuckDuckGo-review-*.app && unzip DuckDuckGo-*.zip
         cp -R "DuckDuckGo Review.app" "../DerivedData/Build/Products/Review/DuckDuckGo Review.app"
@@ -148,14 +148,14 @@ jobs:
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v4
-      if: always() 
+      if: always()
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
-      if: always() 
+      if: always()
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
