@@ -18,7 +18,7 @@
 
 import Common
 import Combine
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
 public protocol NewTabPageCustomBackgroundProviding: AnyObject {
@@ -37,15 +37,14 @@ public protocol NewTabPageCustomBackgroundProviding: AnyObject {
     func deleteImage(with imageID: String) async
 }
 
-public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
+public final class NewTabPageCustomBackgroundClient: NewTabPageUserScriptClient {
 
     let model: NewTabPageCustomBackgroundProviding
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
-
     private var cancellables: Set<AnyCancellable> = []
 
     public init(model: NewTabPageCustomBackgroundProviding) {
         self.model = model
+        super.init()
 
         model.backgroundPublisher
             .sink { [weak self] background in
@@ -91,7 +90,7 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
         case upload = "customizer_upload"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.deleteImage.rawValue: { [weak self] in try await self?.deleteImage(params: $0, original: $1) },
             MessageName.setBackground.rawValue: { [weak self] in try await self?.setBackground(params: $0, original: $1) },

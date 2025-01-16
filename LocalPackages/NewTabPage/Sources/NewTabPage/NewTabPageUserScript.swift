@@ -17,23 +17,8 @@
 //
 
 import Foundation
-import UserScript
+import UserScriptActionsManager
 import WebKit
-
-/**
- * This protocol extends `Subfeature` and allows to register message handlers from an external source.
- *
- * `NewTabPageUserScript` manages many different features that only share the same view
- * (HTML New Tab Page) and are otherwise independent of each other.
- *
- * Implementing this protocol in `NewTabPageUserScript` allows for having multiple objects
- * registered as handlers to handle feature-specific messages, e.g. a separate object
- * responsible for RMF, favorites, privacy stats, etc.
- */
-public protocol SubfeatureWithExternalMessageHandling: AnyObject, Subfeature {
-    var webView: WKWebView? { get }
-    func registerMessageHandlers(_ handlers: [String: Subfeature.Handler])
-}
 
 public final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandling {
 

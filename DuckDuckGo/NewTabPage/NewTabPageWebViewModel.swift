@@ -37,7 +37,7 @@ final class NewTabPageWebViewModel: NSObject {
     let webView: WebView
     private var windowCancellable: AnyCancellable?
 
-    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging, activeRemoteMessageModel: ActiveRemoteMessageModel) {
+    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManager, activeRemoteMessageModel: ActiveRemoteMessageModel) {
         newTabPageUserScript = NewTabPageUserScript()
         actionsManager.registerUserScript(newTabPageUserScript)
 

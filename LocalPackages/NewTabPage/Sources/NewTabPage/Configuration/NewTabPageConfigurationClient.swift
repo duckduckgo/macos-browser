@@ -20,7 +20,7 @@ import AppKit
 import Combine
 import Common
 import os.log
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
 public protocol NewTabPageSectionsVisibilityProviding: AnyObject {
@@ -35,9 +35,7 @@ public protocol NewTabPageLinkOpening {
     func openLink(_ target: NewTabPageDataModel.OpenAction.Target) async
 }
 
-public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
-
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
+public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
 
     private var cancellables = Set<AnyCancellable>()
     private let sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding
@@ -55,6 +53,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         self.customBackgroundProvider = customBackgroundProvider
         self.contextMenuPresenter = contextMenuPresenter
         self.linkOpener = linkOpener
+        super.init()
 
         Publishers.Merge(sectionsVisibilityProvider.isFavoritesVisiblePublisher, sectionsVisibilityProvider.isPrivacyStatsVisiblePublisher)
             .receive(on: DispatchQueue.main)
@@ -74,7 +73,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         case widgetsOnConfigUpdated = "widgets_onConfigUpdated"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
             MessageName.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },

@@ -44,7 +44,7 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
     private let activeRemoteMessageModel: ActiveRemoteMessageModel
-    private let newTabPageActionsManager: NewTabPageActionsManaging
+    private let newTabPageActionsManager: NewTabPageActionsManager
     private(set) lazy var newTabPageWebViewModel: NewTabPageWebViewModel = NewTabPageWebViewModel(
         featureFlagger: featureFlagger,
         actionsManager: newTabPageActionsManager,
@@ -93,7 +93,7 @@ final class BrowserTabViewController: NSViewController {
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-         newTabPageActionsManager: NewTabPageActionsManaging = NSApp.delegateTyped.newTabPageActionsManager,
+         newTabPageActionsManager: NewTabPageActionsManager = NSApp.delegateTyped.newTabPageActionsManager,
          activeRemoteMessageModel: ActiveRemoteMessageModel = NSApp.delegateTyped.activeRemoteMessageModel
     ) {
         self.tabCollectionViewModel = tabCollectionViewModel

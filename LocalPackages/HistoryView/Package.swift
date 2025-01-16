@@ -34,6 +34,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.6.1"),
         .package(path: "../WebKitExtensions"),
+        .package(path: "../UserScriptActionsManager"),
         .package(path: "../Utilities"),
     ],
     targets: [
@@ -44,6 +45,7 @@ let package = Package(
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "UserScript", package: "BrowserServicesKit"),
+                .product(name: "UserScriptActionsManager", package: "UserScriptActionsManager"),
                 .product(name: "WebKitExtensions", package: "WebKitExtensions"),
             ],
             swiftSettings: [
