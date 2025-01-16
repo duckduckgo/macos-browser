@@ -103,7 +103,7 @@ final class TabViewModel {
         case .subscription, .identityTheftRestoration, .releaseNotes:
             return true
 
-        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
+        case .newtab, .settings, .bookmarks, .history, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
             return false
         }
     }
@@ -176,6 +176,7 @@ final class TabViewModel {
                      .newtab,
                      .settings,
                      .bookmarks,
+                     .history,
                      .onboarding,
                      .onboardingDeprecated,
                      .none,
@@ -358,6 +359,8 @@ final class TabViewModel {
                 .settingsTrustedIndicator
         case .bookmarks:
                 .bookmarksTrustedIndicator
+        case .history:
+                .historyTrustedIndicator
         case .dataBrokerProtection:
                 .dbpTrustedIndicator
         case .subscription:
@@ -418,6 +421,8 @@ final class TabViewModel {
             title = UserText.tabPreferencesTitle
         case .bookmarks:
             title = UserText.tabBookmarksTitle
+        case .history:
+            title = UserText.mainMenuHistory
         case .newtab:
             if tab.burnerMode.isBurner {
                 title = UserText.burnerTabHomeTitle
@@ -462,6 +467,8 @@ final class TabViewModel {
         case .settings:
             Favicon.settings
         case .bookmarks:
+            Favicon.bookmarks
+        case .history:
             Favicon.bookmarks
         case .subscription:
             Favicon.subscription
@@ -599,6 +606,8 @@ private extension NSAttributedString {
                                                                            title: UserText.settings)
     static let bookmarksTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
                                                                             title: UserText.bookmarks)
+    static let historyTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
+                                                                          title: UserText.mainMenuHistory)
     static let dbpTrustedIndicator = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
                                                                       title: UserText.tabDataBrokerProtectionTitle)
     static let subscriptionTrustedIndicator = trustedIndicatorAttributedString(with: .privacyPro,

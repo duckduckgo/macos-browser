@@ -28,17 +28,20 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     let featureFlagger: FeatureFlagger
     let faviconManager: FaviconManagement
     let isNTPSpecialPageSupported: Bool
+    let isHistorySpecialPageSupported: Bool
     let userBackgroundImagesManager: UserBackgroundImagesManaging?
 
     init(
         featureFlagger: FeatureFlagger,
         faviconManager: FaviconManagement = FaviconManager.shared,
         isNTPSpecialPageSupported: Bool = false,
+        isHistorySpecialPageSupported: Bool = false,
         userBackgroundImagesManager: UserBackgroundImagesManaging? = NSApp.delegateTyped.homePageSettingsModel.customImagesManager
     ) {
         self.featureFlagger = featureFlagger
         self.faviconManager = faviconManager
         self.isNTPSpecialPageSupported = isNTPSpecialPageSupported
+        self.isHistorySpecialPageSupported = isHistorySpecialPageSupported
         self.userBackgroundImagesManager = userBackgroundImagesManager
     }
 
@@ -67,6 +70,8 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             default:
                 handleSpecialPages(urlSchemeTask: urlSchemeTask)
             }
+        case .history where isHistorySpecialPageSupported && featureFlagger.isFeatureOn(.historyView):
+            handleSpecialPages(urlSchemeTask: urlSchemeTask)
         default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
@@ -326,6 +331,7 @@ private extension URL {
 
     enum URLType {
         case newTab
+        case history
         case favicon
         case customBackgroundImage
         case customBackgroundImageThumbnail
@@ -354,6 +360,8 @@ private extension URL {
             return .newTab
         } else if self.isFavicon {
             return .favicon
+        } else if self.isHistory {
+            return .history
         } else {
             return nil
         }
@@ -373,6 +381,10 @@ private extension URL {
 
     var isFavicon: Bool {
         return isDuckURLScheme && host == "favicon"
+    }
+
+    var isHistory: Bool {
+        return isDuckURLScheme && host == "history"
     }
 
     var isCustomBackgroundImage: Bool {

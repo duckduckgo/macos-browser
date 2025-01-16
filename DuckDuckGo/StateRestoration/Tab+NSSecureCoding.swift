@@ -96,6 +96,7 @@ private extension Tab.TabContent {
         case identityTheftRestoration = 8
         case onboarding = 9
         case releaseNotes = 10
+        case history = 11
     }
 
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
@@ -107,6 +108,8 @@ private extension Tab.TabContent {
             self = .url(url, source: .pendingStateRestoration)
         case .bookmarks:
             self = .bookmarks
+        case .history:
+            self = .history
         case .preferences:
             self = .settings(pane: preferencePane)
         case .onboardingDeprecated:
@@ -133,6 +136,7 @@ private extension Tab.TabContent {
         switch self {
         case .url: return .url
         case .newtab: return .newtab
+        case .history: return .history
         case .bookmarks: return .bookmarks
         case .settings: return .preferences
         case .onboardingDeprecated: return .onboardingDeprecated

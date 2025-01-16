@@ -77,6 +77,9 @@ private extension NSMenuItem {
         case .bookmarks:
             image = TabViewModel.Favicon.bookmarks
             title = UserText.tabPreferencesTitle
+        case .history:
+            image = TabViewModel.Favicon.bookmarks
+            title = UserText.mainMenuHistory
         case .releaseNotes:
             image = TabViewModel.Favicon.home
             title = UserText.releaseNotesTitle
