@@ -53,7 +53,7 @@ public struct DataBrokerExecutionConfig {
     var activitySchedulerIntervalTolerance: TimeInterval {
         switch mode {
         case .normal:
-            return 30 // 10 minutes
+            return 30  // 10 minutes
         case .fastForIntegrationTests:
             return 30 // 0.5 minutes
         }
