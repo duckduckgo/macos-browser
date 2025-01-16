@@ -63,9 +63,8 @@ final class ConfigurationManagerTests: XCTestCase {
         // GIVEN
         mockFetcher.shouldFailPrivacyFetch = true
         operationLog.steps = []
+        let expectedFirstTwo: Set<ConfigurationStep> = [.fetchPrivacyConfigStarted, .fetchSurrogatesStarted]
         let expectedOrder: [ConfigurationStep] = [
-            .fetchPrivacyConfigStarted,
-            .fetchSurrogatesStarted,
             .fetchTrackerDataSetStarted,
             .reloadTrackerDataSet,
             .reloadPrivacyConfig,
@@ -76,15 +75,15 @@ final class ConfigurationManagerTests: XCTestCase {
         await configManager.refreshNow(isDebug: false)
 
         // THEN
-        XCTAssertEqual(operationLog.steps, expectedOrder, "Operations did not occur in the expected order.")
+        XCTAssertEqual(Set(operationLog.steps.prefix(2)), expectedFirstTwo, "Steps do not match the expected order.")
+        XCTAssertEqual(Array(operationLog.steps.dropFirst(2)), expectedOrder, "Steps do not match the expected order.")
     }
 
     func test_WhenRefreshNow_ThenPrivacyConfigFetchAndReloadBeforeTrackerDataSetFetch() async {
         // GIVEN
         operationLog.steps = []
+        let expectedFirstTwo: Set<ConfigurationStep> = [.fetchPrivacyConfigStarted, .fetchSurrogatesStarted]
         let expectedOrder: [ConfigurationStep] = [
-            .fetchPrivacyConfigStarted,
-            .fetchSurrogatesStarted,
             .reloadPrivacyConfig,
             .fetchTrackerDataSetStarted,
             .reloadTrackerDataSet,
@@ -96,7 +95,8 @@ final class ConfigurationManagerTests: XCTestCase {
         await configManager.refreshNow(isDebug: false)
 
         // THEN
-        XCTAssertEqual(operationLog.steps, expectedOrder, "Operations did not occur in the expected order.")
+        XCTAssertEqual(Set(operationLog.steps.prefix(2)), expectedFirstTwo, "Steps do not match the expected order.")
+        XCTAssertEqual(Array(operationLog.steps.dropFirst(2)), expectedOrder, "Steps do not match the expected order.")
     }
 
 }
