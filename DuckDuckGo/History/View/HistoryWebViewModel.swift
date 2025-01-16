@@ -77,7 +77,7 @@ extension WKWebViewConfiguration {
     func applyHistoryWebViewConfiguration(with featureFlagger: FeatureFlagger, historyViewUserScript: HistoryViewUserScript) {
         if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
             setURLSchemeHandler(
-                DuckURLSchemeHandler(featureFlagger: featureFlagger, isNTPSpecialPageSupported: true),
+                DuckURLSchemeHandler(featureFlagger: featureFlagger, isHistorySpecialPageSupported: true),
                 forURLScheme: URL.NavigationalScheme.duck.rawValue
             )
         }
