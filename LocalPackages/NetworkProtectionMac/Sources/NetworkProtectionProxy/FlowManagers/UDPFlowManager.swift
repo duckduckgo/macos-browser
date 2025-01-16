@@ -41,7 +41,7 @@ final class UDPConnectionManager {
     private let onReceive: (_ endpoint: NWEndpoint, _ result: Result<Data, Error>) async -> Void
 
     init(endpoint: NWHostEndpoint, interface: NWInterface?, onReceive: @UDPFlowActor @escaping (_ endpoint: NWEndpoint, _ result: Result<Data, Error>) async -> Void) {
-        let host = Network.NWEndpoint.Host(endpoint.hostname)
+        let host = Network.NWEndpoint.Host.name(endpoint.hostname, interface)
         let port = Network.NWEndpoint.Port(endpoint.port)!
 
         let parameters = NWParameters.udp
@@ -113,7 +113,10 @@ final class UDPConnectionManager {
             case .cancelled:
                 connection.stateUpdateHandler = nil
                 completion(.failure(RemoteConnectionError.cancelled))
-            case .failed(let error), .waiting(let error):
+            case .failed(let error):
+                connection.stateUpdateHandler = nil
+                completion(.failure(RemoteConnectionError.couldNotEstablishConnection(error)))
+            case .waiting(let error):
                 connection.stateUpdateHandler = nil
                 completion(.failure(RemoteConnectionError.couldNotEstablishConnection(error)))
             default:

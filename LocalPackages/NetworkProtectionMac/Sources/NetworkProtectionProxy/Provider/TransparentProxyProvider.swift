@@ -328,12 +328,18 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     override public func handleNewUDPFlow(_ flow: NEAppProxyUDPFlow, initialRemoteEndpoint remoteEndpoint: NWEndpoint) -> Bool {
 
-        guard let remoteEndpoint = remoteEndpoint as? NWHostEndpoint,
-              !isDnsServer(remoteEndpoint) else {
+        guard let remoteEndpoint = remoteEndpoint as? NWHostEndpoint else {
+            logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Expected a remote endpoint to work with. Ignoring flow. ")
             return false
         }
 
-        let printableRemote = remoteEndpoint.hostname
+        guard !isDnsServer(remoteEndpoint) else {
+            logger.debug("[UDP: \(String(describing: flow), privacy: .public)] We don't re-route DNS. Ignoring flow. ")
+            return false
+        }
+
+        // I've noticed in App Store builds the The flow's remoteHostname is usually the domain when available.
+        let printableRemote = flow.remoteHostname ?? remoteEndpoint.hostname
 
         logger.log(
             level: .debug,

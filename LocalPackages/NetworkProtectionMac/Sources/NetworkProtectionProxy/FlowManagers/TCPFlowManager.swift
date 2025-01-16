@@ -109,7 +109,7 @@ final class TCPFlowManager {
     }
 
     func connect(to remoteEndpoint: NWHostEndpoint, interface: NWInterface, completion: @escaping @TCPFlowActor (Result<NWConnection, Error>) -> Void) {
-        let host = Network.NWEndpoint.Host(remoteEndpoint.hostname)
+        let host = Network.NWEndpoint.Host.name(remoteEndpoint.hostname, interface)// (remoteEndpoint.hostname) //Network.NWEndpoint.Host(remoteEndpoint.hostname)
         let port = Network.NWEndpoint.Port(remoteEndpoint.port)!
 
         let parameters = NWParameters.tcp
