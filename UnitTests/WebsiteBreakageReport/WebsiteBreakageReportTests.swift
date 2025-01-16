@@ -36,7 +36,7 @@ class WebsiteBreakageReportTests: XCTestCase {
     func testReportBrokenSiteShownPixel() {
         fire(NonStandardEvent(NonStandardPixel.brokenSiteReportShown),
              frequency: .standard,
-             and: .expect(pixelName: "epbf_macos_desktop_shown"),
+             and: .expect(pixelName: "m_report-broken-site_shown"),
              file: #filePath,
              line: #line)
     }
