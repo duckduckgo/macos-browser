@@ -62,8 +62,10 @@ final class PrivacyDashboardViewController: NSViewController {
         }, keyValueStoring: UserDefaults.standard)
     }()
 
-    private let eventMapping = EventMapping<PrivacyDashboardEvents> { _, _, _, _ in }
-
+//    private func fireBrokenSiteReportShown() {
+//        PixelKit.fire(NonStandardEvent(NonStandardPixel.brokenSiteReportShown))
+//    }
+//    
     private let permissionHandler = PrivacyDashboardPermissionHandler()
     private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
@@ -72,6 +74,20 @@ final class PrivacyDashboardViewController: NSViewController {
     }
     var sizeDelegate: PrivacyDashboardViewControllerSizeDelegate?
     private weak var tabViewModel: TabViewModel?
+
+    private let privacyDashboardEvents = EventMapping<PrivacyDashboardEvents> { event, _, parameters, _ in
+        let domainEvent: NonStandardPixel
+        switch event {
+        case .showReportBrokenSite: domainEvent = .brokenSiteReportShown // TODO: Remove this?
+        case .reportBrokenSiteShown: domainEvent = .brokenSiteReportShown
+        case .reportBrokenSiteSent: domainEvent = .brokenSiteReportSent
+        }
+        if let parameters {
+            PixelKit.fire(NonStandardEvent(domainEvent), withAdditionalParameters: parameters)
+        } else {
+            PixelKit.fire(NonStandardEvent(domainEvent))
+        }
+    }
 
     init(privacyInfo: PrivacyInfo? = nil,
          entryPoint: PrivacyDashboardEntryPoint = .dashboard,
@@ -82,7 +98,7 @@ final class PrivacyDashboardViewController: NSViewController {
         self.privacyDashboardController = PrivacyDashboardController(privacyInfo: privacyInfo,
                                                                      entryPoint: entryPoint,
                                                                      toggleReportingManager: toggleReportingManager,
-                                                                     eventMapping: eventMapping)
+                                                                     eventMapping: privacyDashboardEvents)
         super.init(nibName: nil, bundle: nil)
     }
 

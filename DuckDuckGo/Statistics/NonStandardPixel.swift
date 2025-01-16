@@ -26,6 +26,8 @@ import Configuration
 enum NonStandardPixel: PixelKitEventV2 {
 
     case brokenSiteReport
+    case brokenSiteReportShown
+    case brokenSiteReportSent
     case emailEnabled
     case emailDisabled
     case emailUserPressedUseAddress
@@ -35,6 +37,8 @@ enum NonStandardPixel: PixelKitEventV2 {
     var name: String {
         switch self {
         case .brokenSiteReport: return "epbf_macos_desktop"
+        case .brokenSiteReportSent: return "epbf_macos_desktop_sent"
+        case .brokenSiteReportShown: return "epbf_macos_desktop_shown"
         case .emailEnabled: return "email_enabled_macos_desktop"
         case .emailDisabled: return "email_disabled_macos_desktop"
         case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
