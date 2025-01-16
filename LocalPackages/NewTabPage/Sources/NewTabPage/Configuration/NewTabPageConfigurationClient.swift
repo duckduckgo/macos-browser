@@ -31,20 +31,30 @@ public protocol NewTabPageSectionsVisibilityProviding: AnyObject {
     var isPrivacyStatsVisiblePublisher: AnyPublisher<Bool, Never> { get }
 }
 
+public protocol NewTabPageLinkOpening {
+    func openLink(_ target: NewTabPageDataModel.OpenAction.Target) async
+}
+
 public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables = Set<AnyCancellable>()
     private let sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding
+    private let customBackgroundProvider: NewTabPageCustomBackgroundProviding
     private let contextMenuPresenter: NewTabPageContextMenuPresenting
+    private let linkOpener: NewTabPageLinkOpening
 
     public init(
         sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding,
-        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter()
+        customBackgroundProvider: NewTabPageCustomBackgroundProviding,
+        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
+        linkOpener: NewTabPageLinkOpening
     ) {
         self.sectionsVisibilityProvider = sectionsVisibilityProvider
+        self.customBackgroundProvider = customBackgroundProvider
         self.contextMenuPresenter = contextMenuPresenter
+        self.linkOpener = linkOpener
 
         Publishers.Merge(sectionsVisibilityProvider.isFavoritesVisiblePublisher, sectionsVisibilityProvider.isPrivacyStatsVisiblePublisher)
             .receive(on: DispatchQueue.main)
@@ -57,6 +67,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     enum MessageName: String, CaseIterable {
         case contextMenu
         case initialSetup
+        case open
         case reportInitException
         case reportPageException
         case widgetsSetConfig = "widgets_setConfig"
@@ -67,6 +78,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         userScript.registerMessageHandlers([
             MessageName.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
             MessageName.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
+            MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) },
             MessageName.reportInitException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
             MessageName.reportPageException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
             MessageName.widgetsSetConfig.rawValue: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
@@ -74,7 +86,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     }
 
     private func notifyWidgetConfigsDidChange() {
-        let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
+        let widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
             .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
             .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible)
         ]
@@ -84,7 +96,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     @MainActor
     private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params: NewTabPageUserScript.ContextMenuParams = DecodableHelper.decode(from: params) else { return nil }
+        guard let params: NewTabPageDataModel.ContextMenuParams = DecodableHelper.decode(from: params) else { return nil }
 
         let menu = NSMenu()
 
@@ -115,7 +127,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     }
 
     @objc private func toggleVisibility(_ sender: NSMenuItem) {
-        switch sender.representedObject as? NewTabPageUserScript.WidgetId {
+        switch sender.representedObject as? NewTabPageDataModel.WidgetId {
         case .favorites:
             sectionsVisibilityProvider.isFavoritesVisible.toggle()
         case .privacyStats:
@@ -132,9 +144,12 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 #else
         let env = "production"
 #endif
-        return NewTabPageUserScript.NewTabPageConfiguration(
+
+        let customizerData = customBackgroundProvider.customizerData
+        let config = NewTabPageDataModel.NewTabPageConfiguration(
             widgets: [
                 .init(id: .rmf),
+                .init(id: .freemiumPIRBanner),
                 .init(id: .nextSteps),
                 .init(id: .favorites),
                 .init(id: .privacyStats)
@@ -145,13 +160,16 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
             ],
             env: env,
             locale: Bundle.main.preferredLocalizations.first ?? "en",
-            platform: .init(name: "macos")
+            platform: .init(name: "macos"),
+            settings: .init(customizerDrawer: .init(state: .enabled)),
+            customizer: customizerData
         )
+        return config
     }
 
     @MainActor
     private func widgetsSetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = DecodableHelper.decode(from: params) else {
+        guard let widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = DecodableHelper.decode(from: params) else {
             return nil
         }
         for widgetConfig in widgetConfigs {
@@ -167,62 +185,19 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         return nil
     }
 
+    private func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let openAction: NewTabPageDataModel.OpenAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        await linkOpener.openLink(openAction.target)
+        return nil
+    }
+
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let params = params as? [String: String] else { return nil }
         let message = params["message"] ?? ""
         let id = params["id"] ?? ""
         Logger.general.error("New Tab Page error: \("\(id): \(message)", privacy: .public)")
         return nil
-    }
-}
-
-extension NewTabPageUserScript {
-
-    enum WidgetId: String, Codable {
-        case rmf, nextSteps, favorites, privacyStats
-    }
-
-    struct ContextMenuParams: Codable {
-        let visibilityMenuItems: [ContextMenuItem]
-
-        struct ContextMenuItem: Codable {
-            let id: WidgetId
-            let title: String
-        }
-    }
-
-    struct NewTabPageConfiguration: Encodable {
-        var widgets: [Widget]
-        var widgetConfigs: [WidgetConfig]
-        var env: String
-        var locale: String
-        var platform: Platform
-
-        struct Widget: Encodable, Equatable {
-            public var id: WidgetId
-        }
-
-        struct WidgetConfig: Codable, Equatable {
-
-            enum WidgetVisibility: String, Codable {
-                case visible, hidden
-
-                var isVisible: Bool {
-                    self == .visible
-                }
-            }
-
-            init(id: WidgetId, isVisible: Bool) {
-                self.id = id
-                self.visibility = isVisible ? .visible : .hidden
-            }
-
-            var id: WidgetId
-            var visibility: WidgetVisibility
-        }
-
-        struct Platform: Encodable, Equatable {
-            var name: String
-        }
     }
 }

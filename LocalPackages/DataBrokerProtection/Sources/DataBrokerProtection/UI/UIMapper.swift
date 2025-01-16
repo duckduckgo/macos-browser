@@ -40,7 +40,7 @@ struct MapperToUI {
             brokerQueryGroup.scannedBrokers
         }
 
-        let scanProgress = DBPUIScanProgress(currentScans: partiallyScannedBrokers.count,
+        let scanProgress = DBPUIScanProgress(currentScans: partiallyScannedBrokers.completeBrokerScansCount,
                                              totalScans: totalScans,
                                              scannedBrokers: partiallyScannedBrokers)
 
@@ -240,7 +240,7 @@ struct MapperToUI {
             encoder.outputFormatting = .prettyPrinted
             let jsonData = try encoder.encode(metadataUI)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                Logger.dataBrokerProtection.debug("Metadata: \(jsonString, privacy: .public)")
+                Logger.dataBrokerProtection.log("Metadata: \(jsonString, privacy: .public)")
             }
         } catch {
             Logger.dataBrokerProtection.error("Error encoding struct to JSON: \(error.localizedDescription, privacy: .public)")
@@ -447,6 +447,14 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     func sortedByLastRunDate() -> Self {
         self.sorted { lhs, rhs in
             lhs.scanJobData.lastRunDate < rhs.scanJobData.lastRunDate
+        }
+    }
+}
+
+extension Array where Element == DBPUIScanProgress.ScannedBroker {
+    var completeBrokerScansCount: Int {
+        reduce(0) { accumulator, scannedBrokers in
+            scannedBrokers.status == .completed ? accumulator + 1 : accumulator
         }
     }
 }

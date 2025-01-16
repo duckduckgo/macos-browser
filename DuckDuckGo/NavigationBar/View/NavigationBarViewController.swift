@@ -338,8 +338,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func toggleNetworkProtectionPopover() {
-        guard DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
-              NetworkProtectionKeychainTokenStore().isFeatureActivated else {
+        guard NetworkProtectionKeychainTokenStore().isFeatureActivated else {
             return
         }
 

@@ -19,7 +19,7 @@
 import Foundation
 
 extension PromotionViewModel {
-    static func freemiumDBPPromotion(proceedAction: @escaping () -> Void,
+    static func freemiumDBPPromotion(proceedAction: @escaping () async -> Void,
                                      closeAction: @escaping () -> Void) -> PromotionViewModel {
 
         let title = UserText.homePagePromotionFreemiumDBPTitle
@@ -41,7 +41,7 @@ extension PromotionViewModel {
 
     static func freemiumDBPPromotionScanEngagementResults(resultCount: Int,
                                                           brokerCount: Int,
-                                                          proceedAction: @escaping () -> Void,
+                                                          proceedAction: @escaping () async -> Void,
                                                           closeAction: @escaping () -> Void) -> PromotionViewModel {
 
         var description = ""
@@ -65,7 +65,7 @@ extension PromotionViewModel {
                                   closeAction: closeAction)
     }
 
-    static func freemiumDBPPromotionScanEngagementNoResults(proceedAction: @escaping () -> Void,
+    static func freemiumDBPPromotionScanEngagementNoResults(proceedAction: @escaping () async -> Void,
                                                             closeAction: @escaping () -> Void) -> PromotionViewModel {
 
         let description = UserText.homePagePromotionFreemiumDBPPostScanEngagementNoResultsDescription

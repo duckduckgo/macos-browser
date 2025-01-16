@@ -94,7 +94,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     public func fetchProfile() throws -> DataBrokerProtectionProfile? {
         if cache.profile != nil {
-            Logger.dataBrokerProtection.debug("Returning cached profile")
+            Logger.dataBrokerProtection.log("Returning cached profile")
             return cache.profile
         }
 
@@ -114,7 +114,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
             cache.profile = profile
             return profile
         } else {
-            Logger.dataBrokerProtection.debug("No profile found")
+            Logger.dataBrokerProtection.log("No profile found")
             return nil
         }
     }
@@ -123,13 +123,13 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         if let profile = try database.fetchProfile() {
             cache.profile = profile
         } else {
-            Logger.dataBrokerProtection.debug("No profile found")
+            Logger.dataBrokerProtection.log("No profile found")
         }
     }
 
     public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) throws -> [BrokerProfileQueryData] {
         if !ignoresCache, !cache.brokerProfileQueryData.isEmpty {
-            Logger.dataBrokerProtection.debug("Returning cached brokerProfileQueryData")
+            Logger.dataBrokerProtection.log("Returning cached brokerProfileQueryData")
             return cache.brokerProfileQueryData
         }
 

@@ -146,6 +146,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerYouTubeOverlayNavigationClosed
     case duckPlayerYouTubeNavigationIdle30
 
+    // Temporary Home Page Pixels
+    case privacyFeedHistoryLinkOpened
+
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
@@ -694,6 +697,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_youtube_overlay_navigation_closed"
         case .duckPlayerYouTubeNavigationIdle30:
             return "duckplayer_youtube_overlay_idle-30"
+
+        case .privacyFeedHistoryLinkOpened:
+            return "privacy_feed_history_link_opened"
 
         case .dashboardProtectionAllowlistAdd:
             return "mp_wla"

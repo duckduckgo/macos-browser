@@ -298,13 +298,10 @@ public struct PreferencesSubscriptionView: View {
     private var helpSection: some View {
         PreferencePaneSection {
             TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle, bottomPadding: 0)
-            if !model.isROWLaunched {
-                TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
-                    .padding(.bottom, 8)
-            } else {
-                TextMenuItemCaption(UserText.preferencesSubscriptionHelpFooterCaption)
-                    .padding(.bottom, 8)
-            }
+
+            TextMenuItemCaption(UserText.preferencesSubscriptionHelpFooterCaption)
+                .padding(.bottom, 8)
+
             VStack(alignment: .leading, spacing: 16) {
                 TextButton(UserText.viewFaqsButton, weight: .semibold) { model.openFAQ() }
 

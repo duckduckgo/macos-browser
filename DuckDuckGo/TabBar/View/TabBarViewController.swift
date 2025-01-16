@@ -23,8 +23,9 @@ import Lottie
 import SwiftUI
 import WebKit
 import os.log
+import RemoteMessaging
 
-final class TabBarViewController: NSViewController {
+final class TabBarViewController: NSViewController, TabBarRemoteMessagePresenting {
 
     enum HorizontalSpace: CGFloat {
         case pinnedTabsScrollViewPadding = 76
@@ -70,10 +71,16 @@ final class TabBarViewController: NSViewController {
     private let pinnedTabsViewModel: PinnedTabsViewModel?
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
-
     private var selectionIndexCancellable: AnyCancellable?
     private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
+
+    // TabBarRemoteMessagePresentable
+    var tabBarRemoteMessageViewModel: TabBarRemoteMessageViewModel
+    var tabBarRemoteMessagePopover: NSPopover?
+    var tabBarRemoteMessagePopoverHoverTimer: Timer?
+    var feedbackBarButtonHostingController: NSHostingController<TabBarRemoteMessageView>?
+    var tabBarRemoteMessageCancellable: AnyCancellable?
 
     @IBOutlet weak var shadowView: TabShadowView!
 
@@ -86,9 +93,9 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    static func create(tabCollectionViewModel: TabCollectionViewModel) -> TabBarViewController {
+    static func create(tabCollectionViewModel: TabCollectionViewModel, activeRemoteMessageModel: ActiveRemoteMessageModel) -> TabBarViewController {
         NSStoryboard(name: "TabBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, activeRemoteMessageModel: activeRemoteMessageModel)
         }!
     }
 
@@ -96,8 +103,11 @@ final class TabBarViewController: NSViewController {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, activeRemoteMessageModel: ActiveRemoteMessageModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        let tabBarActiveRemoteMessageModel = TabBarActiveRemoteMessage(activeRemoteMessageModel: activeRemoteMessageModel)
+        self.tabBarRemoteMessageViewModel = TabBarRemoteMessageViewModel(activeRemoteMessageModel: tabBarActiveRemoteMessageModel,
+                                                                         isFireWindow: tabCollectionViewModel.isBurner)
         if !tabCollectionViewModel.isBurner, let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
             let pinnedTabsViewModel = PinnedTabsViewModel(collection: pinnedTabCollection)
             let pinnedTabsView = PinnedTabsView(model: pinnedTabsViewModel)
@@ -136,12 +146,14 @@ final class TabBarViewController: NSViewController {
         // Detect if tabs are clicked when the window is not in focus
         // https://app.asana.com/0/1177771139624306/1202033879471339
         addMouseMonitors()
+        addTabBarRemoteMessageListener()
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
         mouseDownCancellable = nil
+        tabBarRemoteMessageCancellable = nil
     }
 
     override func viewDidLayout() {

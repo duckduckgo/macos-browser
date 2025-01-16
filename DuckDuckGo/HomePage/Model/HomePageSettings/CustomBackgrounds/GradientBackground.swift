@@ -26,6 +26,7 @@ enum GradientBackground: String, Equatable, Identifiable, CaseIterable, ColorSch
 
     case gradient01
     case gradient02
+    case gradient0201 = "gradient02.01"
     case gradient03
     case gradient04
     case gradient05
@@ -46,6 +47,8 @@ enum GradientBackground: String, Equatable, Identifiable, CaseIterable, ColorSch
                 Gradient01()
             case .gradient02:
                 Gradient02()
+            case .gradient0201:
+                Gradient0201()
             case .gradient03:
                 Gradient03()
             case .gradient04:
@@ -68,6 +71,8 @@ enum GradientBackground: String, Equatable, Identifiable, CaseIterable, ColorSch
             Image(nsImage: .homePageBackgroundGradient01)
         case .gradient02:
             Image(nsImage: .homePageBackgroundGradient02)
+        case .gradient0201:
+            Image(nsImage: .homePageBackgroundGradient0201)
         case .gradient03:
             Image(nsImage: .homePageBackgroundGradient03)
         case .gradient04:
@@ -83,7 +88,7 @@ enum GradientBackground: String, Equatable, Identifiable, CaseIterable, ColorSch
 
     var colorScheme: ColorScheme {
         switch self {
-        case .gradient01, .gradient02, .gradient03:
+        case .gradient01, .gradient02, .gradient0201, .gradient03:
                 .light
         case .gradient04, .gradient05, .gradient06, .gradient07:
                 .dark
@@ -188,6 +193,35 @@ private struct Gradient02: View {
 
         }
         .background(.white)
+    }
+}
+
+@available(macOS 12.0, *)
+private struct Gradient0201: View {
+    var body: some View {
+        ZStack {
+            EllipticalGradient(
+                colors: [Color(red: 1, green: 0.8, blue: 0.2).opacity(0.8), .clear],
+                center: UnitPoint(x: 1.04, y: 1.08),
+                endRadiusFraction: 1
+            )
+
+            EllipticalGradient(
+                colors: [
+                    Color(red: 1, green: 0.84, blue: 0.36).opacity(0.7),
+                    Color(red: 1, green: 0.84, blue: 0.8).opacity(0.2)
+                ],
+                center: UnitPoint(x: 0.56, y: 0.5),
+                endRadiusFraction: 1
+            )
+
+            EllipticalGradient(
+                colors: [Color(red: 0.95, green: 0.63, blue: 0.54).opacity(0.6), .clear],
+                center: UnitPoint(x: -0.26, y: 0.5),
+                endRadiusFraction: 1
+            )
+        }
+        .background(Color(red: 1, green: 0.87, blue: 0.48))
     }
 }
 
@@ -320,6 +354,7 @@ private struct Gradient06: View {
         .background(Color(red: 0.07, green: 0.01, blue: 0.21))
     }
 }
+
 @available(macOS 12.0, *)
 private struct Gradient07: View {
     var body: some View {
@@ -357,6 +392,8 @@ private struct Gradient07: View {
         GradientBackground.gradient01.view
             .frame(width: 640, height: 400)
         GradientBackground.gradient02.view
+            .frame(width: 640, height: 400)
+        GradientBackground.gradient0201.view
             .frame(width: 640, height: 400)
         GradientBackground.gradient03.view
             .frame(width: 640, height: 400)
