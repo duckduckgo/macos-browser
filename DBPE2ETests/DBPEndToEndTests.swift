@@ -103,8 +103,15 @@ final class DBPEndToEndTests: XCTestCase {
         // Fake broker set up
         await deleteAllProfilesOnFakeBroker()
 
-        let mockUserProfile = mockFakeBrokerUserProfile()
-        let returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
+        var mockUserProfile = mockFakeBrokerUserProfile()
+        var returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
+        XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
+
+        // Try again to see if it helps the first failure
+        await deleteAllProfilesOnFakeBroker()
+
+        mockUserProfile = mockFakeBrokerUserProfile()
+        returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
         XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
 
         // When
