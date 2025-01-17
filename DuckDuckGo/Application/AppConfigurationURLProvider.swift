@@ -61,7 +61,7 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
     }
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-          featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger) {
+         featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger) {
         self.trackerDataUrlProvider = TrackerDataURLOverrider(privacyConfigurationManager: privacyConfigurationManager, featureFlagger: featureFlagger)
     }
 
