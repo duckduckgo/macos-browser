@@ -702,7 +702,9 @@ extension TabBarViewItem: NSMenuDelegate {
         // Menu Items
         // Duplicate, Pin, Mute Section
         addDuplicateMenuItem(to: menu)
-        addPinMenuItem(to: menu)
+        if !isBurner {
+            addPinMenuItem(to: menu)
+        }
         addMuteUnmuteMenuItem(to: menu)
         menu.addItem(.separator())
 

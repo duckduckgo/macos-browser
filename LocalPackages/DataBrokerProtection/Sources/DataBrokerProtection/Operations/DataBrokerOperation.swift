@@ -115,7 +115,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         }
     }
 
-    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerJobData] {
+    static func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerJobData] {
         let operationsData: [BrokerJobData]
 
         switch operationType {
@@ -152,9 +152,9 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
 
         let brokerProfileQueriesData = allBrokerProfileQueryData.filter { $0.dataBroker.id == dataBrokerID }
 
-        let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
-                                                                          operationType: operationType,
-                                                                          priorityDate: priorityDate)
+        let filteredAndSortedOperationsData = Self.filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
+                                                                               operationType: operationType,
+                                                                               priorityDate: priorityDate)
 
         Logger.dataBrokerProtection.log("filteredAndSortedOperationsData count: \(filteredAndSortedOperationsData.count, privacy: .public) for brokerID \(self.dataBrokerID, privacy: .public)")
 
@@ -215,3 +215,40 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
     }
 }
 // swiftlint:enable explicit_non_final_class
+
+extension Array where Element == BrokerJobData {
+    /// Filters jobs based on their preferred run date:
+    /// - Opt-out jobs with no preferred run date are included.
+    /// - Jobs with a preferred run date on or before the priority date are included.
+    ///
+    /// Note: Opt-out jobs without a preferred run date may be:
+    /// 1. From child brokers (will be skipped during runOptOutOperation).
+    /// 2. From former child brokers now acting as parent brokers (will be processed if extractedProfile hasn't been removed).
+    func eligibleForRun(byDate priorityDate: Date) -> [BrokerJobData] {
+        filter { jobData in
+            guard let preferredRunDate = jobData.preferredRunDate else {
+                return jobData is OptOutJobData
+            }
+
+            return preferredRunDate <= priorityDate
+        }
+    }
+
+    /// Sorts BrokerJobData array based on their preferred run dates.
+    /// - Jobs with non-nil preferred run dates are sorted in ascending order (earliest date first).
+    /// - Opt-out jobs with nil preferred run dates come last, maintaining their original relative order.
+    func sortedByPreferredRunDate() -> [BrokerJobData] {
+        sorted { lhs, rhs in
+            switch (lhs.preferredRunDate, rhs.preferredRunDate) {
+            case (nil, nil):
+                return false
+            case (_, nil):
+                return true
+            case (nil, _):
+                return false
+            case (let lhsRunDate?, let rhsRunDate?):
+                return lhsRunDate < rhsRunDate
+            }
+        }
+    }
+}

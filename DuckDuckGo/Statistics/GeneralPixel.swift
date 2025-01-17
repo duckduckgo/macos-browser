@@ -252,6 +252,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case autocompleteClickBookmark(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteClickFavorite(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteClickHistory(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickOpenTab(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteToggledOff
     case autocompleteToggledOn
 
@@ -471,7 +472,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
     var name: String {
         switch self {
-
         case .crash:
             return "m_mac_crash"
 
@@ -839,6 +839,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autocompleteClickBookmark: return "m_mac_autocomplete_click_bookmark"
         case .autocompleteClickFavorite: return "m_mac_autocomplete_click_favorite"
         case .autocompleteClickHistory: return "m_mac_autocomplete_click_history"
+        case .autocompleteClickOpenTab: return "m_mac_autocomplete_click_opentab"
         case .autocompleteToggledOff: return "m_mac_autocomplete_toggled_off"
         case .autocompleteToggledOn: return "m_mac_autocomplete_toggled_on"
 
@@ -1339,7 +1340,8 @@ enum GeneralPixel: PixelKitEventV2 {
                 .autocompleteClickWebsite(let from, let cohort, let onboardingCohort),
                 .autocompleteClickBookmark(let from, let cohort, let onboardingCohort),
                 .autocompleteClickFavorite(let from, let cohort, let onboardingCohort),
-                .autocompleteClickHistory(let from, let cohort, let onboardingCohort):
+                .autocompleteClickHistory(let from, let cohort, let onboardingCohort),
+                .autocompleteClickOpenTab(let from, let cohort, let onboardingCohort):
             var parameters: [String: String] = [:]
             if let from {
                 parameters[NewTabSearchBoxExperimentPixel.Parameters.from] = from.rawValue
