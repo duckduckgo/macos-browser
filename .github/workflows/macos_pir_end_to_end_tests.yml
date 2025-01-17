@@ -1,11 +1,11 @@
-name: PIR E2E Tests
+name: macOS - PIR E2E Tests
 
 on:
   workflow_dispatch:
   schedule:
      - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
   pull_request:
-      
+
 jobs:
   pir-e2e-tests:
     name: PIR e2e tests
@@ -48,11 +48,11 @@ jobs:
 
     - name: Start PIR Fake Broker
       run: |
-        cd pir-fake-broker 
+        cd pir-fake-broker
         cd scripts
         ./install-prerequisites.sh
         ./setup-ci.sh
-        cd .. 
+        cd ..
         pnpm start:all &
 
     - name: Check out the code
@@ -65,7 +65,7 @@ jobs:
       run: |
         cd main
         bundle install
-  
+
     - name: Sync code signing assets
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
@@ -130,7 +130,7 @@ jobs:
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v4
-      if: always() 
+      if: always()
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: pir-e2e-tests.xml

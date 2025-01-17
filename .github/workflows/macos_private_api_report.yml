@@ -1,4 +1,4 @@
-name: Private API Usage Report
+name: macOS - Private API Usage Report
 
 on:
   workflow_call:

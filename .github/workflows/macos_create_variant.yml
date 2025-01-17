@@ -1,4 +1,4 @@
-name: Create DMG Variant
+name: macOS - Create DMG Variant
 
 on:
   workflow_dispatch:
@@ -40,7 +40,7 @@ on:
 jobs:
 
   create-dmg-variant:
-    
+
     name: Create DMG Variant
 
     env:
@@ -69,7 +69,7 @@ jobs:
 
     - name: Set up fastlane
       run: bundle install
-    
+
     - name: Sync code signing assets
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
