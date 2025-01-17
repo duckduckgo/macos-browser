@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit",
         "state": {
           "branch": null,
-          "revision": "58efae813cae03d71af87aab863af5c25a3a8a6e",
-          "version": "224.6.1"
+          "revision": "20e6eaf0b1e423d9a270e2d460cae284c08f73d8",
+          "version": "225.0.0"
         }
       },
       {
@@ -159,8 +159,8 @@
         "repositoryURL": "https://github.com/duckduckgo/sync_crypto",
         "state": {
           "branch": null,
-          "revision": "0c8bf3c0e75591bc366407b9d7a73a9fcfc7736f",
-          "version": "0.3.0"
+          "revision": "cc726cebb67367466bc31ced4784e16d44ac68d1",
+          "version": "0.4.0"
         }
       },
       {
