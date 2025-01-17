@@ -24,22 +24,16 @@ import os.log
 struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     // MARK: - Debug
-
     internal init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
                   featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger,
-                  customPrivacyConfiguration: URL? = nil,
-                  trackerDataUrlProvider: TrackerDataURLProviding? = nil
-    ) {
-        self.init(privacyConfigurationManager: privacyConfigurationManager, featureFlagger: featureFlagger)
+                  customPrivacyConfiguration: URL? = nil) {
+        let trackerDataUrlProvider = TrackerDataURLOverrider(privacyConfigurationManager: privacyConfigurationManager, featureFlagger: featureFlagger)
+        self.init(trackerDataUrlProvider: trackerDataUrlProvider)
         if let customPrivacyConfiguration {
             // Overwrite custom privacy configuration if provided
             self.customPrivacyConfiguration = customPrivacyConfiguration.absoluteString
         }
         // Otherwise use the default or already stored custom configuration
-
-        if let trackerDataUrlProvider {
-            self.trackerDataUrlProvider = trackerDataUrlProvider
-        }
     }
 
     @UserDefaultsWrapper(key: .customConfigurationUrl, defaultValue: nil)
@@ -58,8 +52,6 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     // MARK: - Main
 
-    private let privacyConfigurationManager: PrivacyConfigurationManaging
-    private let featureFlagger: FeatureFlagger
     private var trackerDataUrlProvider: TrackerDataURLProviding
 
     public enum Constants {
@@ -70,9 +62,11 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     init (privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
           featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger) {
-        self.privacyConfigurationManager = privacyConfigurationManager
-        self.featureFlagger = featureFlagger
         self.trackerDataUrlProvider = TrackerDataURLOverrider(privacyConfigurationManager: privacyConfigurationManager, featureFlagger: featureFlagger)
+    }
+
+    init(trackerDataUrlProvider: TrackerDataURLProviding) {
+        self.trackerDataUrlProvider = trackerDataUrlProvider
     }
 
     func url(for configuration: Configuration) -> URL {
