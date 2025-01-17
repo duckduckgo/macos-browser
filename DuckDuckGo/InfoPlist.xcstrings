@@ -308,55 +308,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright © 2024 DuckDuckGo. Alle Rechte vorbehalten."
+            "value" : "Copyright © 2025 DuckDuckGo. Alle Rechte vorbehalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Copyright © 2024 DuckDuckGo. All rights reserved."
+            "value" : "Copyright © 2025 DuckDuckGo. All rights reserved."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright © 2024 DuckDuckGo. Todos los derechos reservados."
+            "value" : "Copyright © 2025 DuckDuckGo. Todos los derechos reservados."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright © 2024 DuckDuckGo. Tous droits réservés."
+            "value" : "Copyright © 2025 DuckDuckGo. Tous droits réservés."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright © 2024 DuckDuckGo. Tutti i diritti riservati."
+            "value" : "Copyright © 2025 DuckDuckGo. Tutti i diritti riservati."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright © 2024 DuckDuckGo. Alle rechten voorbehouden."
+            "value" : "Copyright © 2025 DuckDuckGo. Alle rechten voorbehouden."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright © 2024 DuckDuckGo. Wszelkie prawa zastrzeżone."
+            "value" : "Copyright © 2025 DuckDuckGo. Wszelkie prawa zastrzeżone."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright © 2024 DuckDuckGo. Todos os direitos reservados."
+            "value" : "Copyright © 2025 DuckDuckGo. Todos os direitos reservados."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "© 2024 DuckDuckGo. Все права защищены."
+            "value" : "© 2025 DuckDuckGo. Все права защищены."
           }
         }
       }
