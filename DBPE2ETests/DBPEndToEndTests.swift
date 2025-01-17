@@ -92,6 +92,7 @@ final class DBPEndToEndTests: XCTestCase {
      */
     func testWhenProfileIsSaved_ThenEachStepHappensInSequence() async throws {
         // Given
+        sleep(600)
 
         // Local state set up
         let dataManager = pirProtectionManager.dataManager
@@ -105,13 +106,6 @@ final class DBPEndToEndTests: XCTestCase {
 
         var mockUserProfile = mockFakeBrokerUserProfile()
         var returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
-        XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
-
-        // Try again to see if it helps the first failure
-        await deleteAllProfilesOnFakeBroker()
-
-        mockUserProfile = mockFakeBrokerUserProfile()
-        returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
         XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
 
         // When
@@ -276,19 +270,6 @@ final class DBPEndToEndTests: XCTestCase {
          pixelKit.clearFrequencyHistoryForAllPixels()
          */
         print("Stages 6-8 skipped: Fake broker doesn't support sending emails")
-
-        print("Try everything again")
-
-        
-        //try database.deleteProfileData()
-
-        // Fake broker set up
-        await deleteAllProfilesOnFakeBroker()
-
-        var mockUserProfile2 = mockFakeBrokerUserProfile()
-        var returnedUserProfile2 = await createProfileOnFakeBroker(mockUserProfile2)
-        XCTAssertEqual(mockUserProfile2.firstName, returnedUserProfile2.firstName)
-
 
         /*
         9/ We confirm the opt out through a scan
