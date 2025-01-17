@@ -231,6 +231,10 @@ final class PrivacyConfigurationMock: PrivacyConfiguration {
         [String: Any]()
     }
 
+    func settings(for subfeature: any BrowserServicesKit.PrivacySubfeature) -> PrivacyConfigurationData.PrivacyFeature.SubfeatureSettings? {
+        return nil
+    }
+
     func userEnabledProtection(forDomain: String) {
 
     }
