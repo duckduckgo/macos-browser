@@ -110,7 +110,7 @@ final class ZoomPopover: NSPopover {
 
     private weak var addressBar: NSView?
 
-    /// prefferred bounding box for the popover positioning
+    /// preferred bounding box for the popover positioning
     override var boundingFrame: NSRect {
         guard let addressBar,
               let window = addressBar.window else { return .infinite }

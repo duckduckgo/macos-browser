@@ -27,7 +27,7 @@ final class WebViewContainerView: NSView {
     override var constraints: [NSLayoutConstraint] {
         // return nothing to WKFullScreenWindowController which will keep the constraints
         // and crash after trying to reactivate them as the ContainerView will be gone by the moment
-        // and NSLayouConstraint has unsafe/unowned references to its views
+        // and NSLayoutConstraint has unsafe/unowned references to its views
         return []
     }
 
