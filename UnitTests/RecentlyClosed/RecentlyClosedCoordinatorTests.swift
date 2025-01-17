@@ -88,6 +88,8 @@ private extension RecentlyClosedWindow {
 }
 
 final class WindowControllersManagerMock: WindowControllersManagerProtocol {
+    var mainWindowControllers: [DuckDuckGo_Privacy_Browser.MainWindowController] = []
+
     var pinnedTabsManager = PinnedTabsManager(tabCollection: .init())
 
     var didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()

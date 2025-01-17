@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/customizer",
-        "revision" : "ad8b96d7dcb3f5522f509fcf47705b179faa046a"
+        "revision" : "b951930902a499af162f985fbe408949bd0cb599"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "branch" : "pr-releases/pr-1386",
-        "revision" : "f57d3f1740e4e8cfd274189d0c3d0c71cb25d91f"
+        "revision" : "0ac30560ec969a321caea321f95537120416c323",
+        "version" : "7.7.0"
       }
     },
     {
@@ -167,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/sync_crypto",
       "state" : {
-        "revision" : "0c8bf3c0e75591bc366407b9d7a73a9fcfc7736f",
-        "version" : "0.3.0"
+        "revision" : "cc726cebb67367466bc31ced4784e16d44ac68d1",
+        "version" : "0.4.0"
       }
     },
     {

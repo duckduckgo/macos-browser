@@ -25,6 +25,13 @@ struct DataBrokerScheduleConfig: Codable {
     let confirmOptOutScan: Int
     let maintenanceScan: Int
     let maxAttempts: Int
+
+    // Used when scheduling the subsequent opt-out attempt following a successful opt-out request submission
+    // This value should be less than `confirmOptOutScan` to ensure the next attempt occurs before
+    // the confirmation scan.
+    var hoursUntilNextOptOutAttempt: Int {
+        maintenanceScan
+    }
 }
 
 extension Int {
