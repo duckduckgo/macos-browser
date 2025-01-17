@@ -13,7 +13,7 @@ let package = Package(
             targets: ["SubscriptionUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "mgurgel/improved-breakage-form"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "mgurgel/improved-breakage-form-pixel"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../FeatureFlags")
     ],
