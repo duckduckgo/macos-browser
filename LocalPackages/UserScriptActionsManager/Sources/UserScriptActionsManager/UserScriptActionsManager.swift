@@ -48,17 +48,6 @@ public protocol SubfeatureWithExternalMessageHandling: AnyObject, Subfeature {
 }
 
 /**
- * This protocol describes type that can provide an array of user scripts.
- *
- * It's conformed to by `UserScriptActionsManager` (via `UserScriptActionsManaging`).
- */
-public protocol UserScriptsSource: AnyObject {
-    associatedtype Script: SubfeatureWithExternalMessageHandling
-
-    var userScripts: [Script] { get }
-}
-
-/**
  * This protocol describes a feature or a set of features that use the user script and handle its messages.
  *
  * A class implementing this protocol can register handlers for a subset of
@@ -67,16 +56,16 @@ public protocol UserScriptsSource: AnyObject {
  * `UserScriptClient` supports being connected to multiple user scripts (of the same type),
  * in case one data source should control multiple script instances (in multiple webViews).
  *
- * Objects implementing this protocol are kept in `UserScriptActionsManager`.
+ * Objects implementing this protocol, together with user script instances,
+ * are kept in `UserScriptActionsManager`.
  */
 public protocol UserScriptClient: AnyObject {
     associatedtype Script: SubfeatureWithExternalMessageHandling
 
     /**
-     * Handle to the object that returns the list of all living user script instances.
-     *
+     * Handle to the actions manager, that contains the list of all living user script instances.
      */
-    var userScriptsSource: (any UserScriptsSource)? { get set }
+    var actionsManager: (any UserScriptActionsManaging)? { get set }
 
     /**
      * This function should be implemented to add all message handlers to the provided `userScript`.
@@ -87,10 +76,10 @@ public protocol UserScriptClient: AnyObject {
 public extension UserScriptClient {
     /**
      * Convenience method to push a message with specific parameters to all user scripts
-     * currently registered with the `userScriptsSource`.
+     * currently registered with the `actionsManager`.
      */
     func pushMessage(named method: String, params: Encodable?) {
-        userScriptsSource?.userScripts.forEach { userScript in
+        actionsManager?.userScripts.forEach { userScript in
             guard let webView = userScript.webView else {
                 return
             }
@@ -103,7 +92,7 @@ public extension UserScriptClient {
      * associated with the given `webView`.
      */
     func pushMessage(named method: String, params: Encodable?, to webView: WKWebView) {
-        guard let userScript = userScriptsSource?.userScripts.first(where: { $0.webView === webView }) else {
+        guard let userScript = actionsManager?.userScripts.first(where: { $0.webView === webView }) else {
             return
         }
         userScript.broker?.push(method: method, params: params, for: userScript, into: webView)
@@ -113,7 +102,11 @@ public extension UserScriptClient {
 /**
  * This protocol defines API to aggregate user scripts of the same type.
  */
-public protocol UserScriptActionsManaging: AnyObject, UserScriptsSource {
+public protocol UserScriptActionsManaging: AnyObject {
+    associatedtype Script: SubfeatureWithExternalMessageHandling
+
+    var userScripts: [Script] { get }
+
     /**
      * Allows to register a user script with the actions manager.
      */
@@ -140,7 +133,7 @@ open class UserScriptActionsManager<Script, ScriptClient>: UserScriptActionsMana
 
     public init(scriptClients: [ScriptClient]) {
         userScriptClients = scriptClients
-        userScriptClients.forEach { $0.userScriptsSource = self }
+        userScriptClients.forEach { $0.actionsManager = self }
     }
 
     public var userScripts: [Script] {

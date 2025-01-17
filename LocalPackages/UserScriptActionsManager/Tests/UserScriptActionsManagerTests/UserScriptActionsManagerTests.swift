@@ -35,7 +35,7 @@ final class MockUserScript: SubfeatureWithExternalMessageHandling, Equatable {
 
 final class MockUserScriptClient: UserScriptClient {
     typealias Script = MockUserScript
-    var userScriptsSource: (any UserScriptsSource)?
+    var actionsManager: (any UserScriptActionsManaging)?
 
     func registerMessageHandlers(for userScript: MockUserScript) {
         registerMessageHandlersCalls.append(userScript)
