@@ -32,7 +32,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "mgurgel/improved-breakage-form"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "mgurgel/improved-breakage-form-pixel"),
         .package(path: "../AppKitExtensions")
     ],
     targets: [

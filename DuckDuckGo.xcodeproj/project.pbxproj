@@ -15385,7 +15385,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "mgurgel/improved-breakage-form";
+				branch = "mgurgel/improved-breakage-form-pixel";
 				kind = branch;
 			};
 		};
