@@ -531,6 +531,11 @@ final class PasswordManagementViewController: NSViewController {
         itemContainer.addSubview(view)
         itemContainer.wantsLayer = true
         itemContainer.layer?.masksToBounds = false
+
+        // MainWindow sets autorecalculatesKeyViewLoop to false, so need to call recalculateKeyViewLoop() when view changes.
+        DispatchQueue.main.async {
+            view.window?.recalculateKeyViewLoop()
+        }
     }
 
     private func doSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
