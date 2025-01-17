@@ -18,7 +18,7 @@
 
 import Combine
 import RemoteMessaging
-import TestUtils
+import PersistenceTestingUtils
 import XCTest
 @testable import NewTabPage
 

@@ -20,7 +20,8 @@ import BrowserServicesKit
 import Combine
 import Foundation
 import MaliciousSiteProtection
-import TestUtils
+import PersistenceTestingUtils
+import NetworkingTestingUtils
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser

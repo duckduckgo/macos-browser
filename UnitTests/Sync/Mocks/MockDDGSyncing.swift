@@ -18,7 +18,7 @@
 
 import Foundation
 import Combine
-import TestUtils
+import PersistenceTestingUtils
 @testable import DuckDuckGo_Privacy_Browser
 @testable import DDGSync
 

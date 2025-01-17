@@ -21,7 +21,7 @@ import Combine
 import Persistence
 import SyncUI
 import XCTest
-import TestUtils
+import PersistenceTestingUtils
 @testable import BrowserServicesKit
 @testable import DDGSync
 @testable import DuckDuckGo_Privacy_Browser
