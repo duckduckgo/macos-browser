@@ -1,4 +1,4 @@
-name: Update Phishing Detection Datasets
+name: macOS - Update Phishing Detection Datasets
 on:
   schedule:
     - cron: '0 0 * * 0'  # Midnight UTC every Sunday
