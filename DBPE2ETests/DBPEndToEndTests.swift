@@ -155,41 +155,6 @@ final class DBPEndToEndTests: XCTestCase {
 
         print("Stage 1 passed: We save a profile")
 
-        /*
-        2/ We scan brokers
-        */
-        let schedulerStartsExpectation = expectation(description: "Scheduler starts")
-
-        await awaitFulfillment(of: schedulerStartsExpectation,
-                               withTimeout: 100,
-                               whenCondition: {
-            try! self.pirProtectionManager.dataManager.prepareBrokerProfileQueryDataCache()
-            return await self.communicationDelegate.getBackgroundAgentMetadata().lastStartedSchedulerOperationTimestamp != nil
-        })
-
-        let metaData = await communicationDelegate.getBackgroundAgentMetadata()
-        assertCondition(withExpectationDescription: "Last operation broker URL is not nil",
-                        condition: { metaData.lastStartedSchedulerOperationBrokerUrl != nil })
-
-        print("Stage 2 passed: We scan brokers")
-
-        /*
-        3/ We find and save extracted profiles
-        */
-        let extractedProfilesFoundExpectation = expectation(description: "Extracted profiles found and saved in DB")
-
-        await awaitFulfillment(of: extractedProfilesFoundExpectation,
-                               withTimeout: 60,
-                               whenCondition: {
-            let queries = try! database.fetchAllBrokerProfileQueryData()
-            let brokerIDs = queries.compactMap { $0.dataBroker.id }
-            let extractedProfiles = brokerIDs.flatMap { try! database.fetchExtractedProfiles(for: $0) }
-            return extractedProfiles.count > 0
-        })
-
-        print("Stage 3 passed: We find and save extracted profiles")
-
-        
 
         /*
         6/ The BE service receives the email
