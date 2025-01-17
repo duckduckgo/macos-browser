@@ -21,7 +21,7 @@ import UserScriptActionsManager
 open class HistoryViewUserScriptClient: UserScriptClient {
     public typealias Script = HistoryViewUserScript
 
-    public weak var userScriptsSource: (any UserScriptsSource)?
+    public weak var actionsManager: (any UserScriptActionsManaging)?
 
     public func registerMessageHandlers(for userScript: HistoryViewUserScript) {
     }

@@ -19,7 +19,7 @@
 import UserScriptActionsManager
 
 open class NewTabPageUserScriptClient: UserScriptClient {
-    public weak var userScriptsSource: (any UserScriptsSource)?
+    public weak var actionsManager: (any UserScriptActionsManaging)?
     
     public func registerMessageHandlers(for userScript: NewTabPageUserScript) {
     }
