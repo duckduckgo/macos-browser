@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sabrina/tds-override",
-        "revision" : "5b93a7add801527ee0a8d77313c45899dd7be1e3"
+        "revision" : "20e6eaf0b1e423d9a270e2d460cae284c08f73d8",
+        "version" : "225.0.0"
       }
     },
     {
