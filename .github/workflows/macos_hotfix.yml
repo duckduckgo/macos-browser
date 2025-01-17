@@ -1,4 +1,4 @@
-name: Set Up Hotfix Release Branch
+name: macOS - Set Up Hotfix Release Branch
 
 on:
   workflow_dispatch:

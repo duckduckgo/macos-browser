@@ -394,7 +394,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
 
     func testWhenClickActionRuns_thenStageIsSetToSubmit() async {
         let mockStageCalculator = MockStageDurationCalculator()
-        let clickAction = ClickAction(id: "1", actionType: .click, elements: [PageElement](), dataSource: nil)
+        let clickAction = ClickAction(id: "1", actionType: .click, elements: [PageElement](), dataSource: nil, choices: nil, default: nil, hasDefault: false)
         let sut = OptOutJob(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,

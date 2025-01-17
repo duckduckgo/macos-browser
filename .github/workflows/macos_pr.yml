@@ -1,6 +1,6 @@
-name: PR Checks
+name: macOS - PR Checks
 
-on: 
+on:
   push:
     branches: [ main, "release/**" ]
   pull_request:
@@ -156,7 +156,7 @@ jobs:
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
       run: bundle exec fastlane sync_signing_ci
-  
+
     - name: Set cache key hash
       run: |
         has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
@@ -305,7 +305,7 @@ jobs:
     name: Private API Report
     needs: tests
     if: ${{ success() || needs.tests.outputs.private-api-check-report }}
-    uses: ./.github/workflows/private_api_report.yml
+    uses: ./.github/workflows/macos_private_api_report.yml
     with:
       report: ${{ needs.tests.outputs.private-api-check-report }}
 
