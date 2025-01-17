@@ -1,8 +1,7 @@
 {
   "name": "backgroundcheck.run",
   "url": "backgroundcheck.run",
-  "version": "0.4.0",
-  "parent": "verecor.com",
+  "version": "0.5.0",
   "addedDatetime": 1677736800000,
   "optOutUrl": "https://backgroundcheck.run/ng/control/privacy",
   "steps": [
@@ -51,8 +50,70 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://backgroundcheck.run/ng/control/privacy",
+          "id": "fa29793c-3f85-4f01-a5fe-4ffcc26c197c"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#name"
+            },
+            {
+              "type": "email",
+              "selector": "#email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "71be571c-ce0c-43cb-afad-ae6547d44726"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "e8794659-162d-4de7-9845-bbd140c54a00"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "6ab596e2-3642-4dba-97f0-1270d8feefd1"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "9431f4e4-140a-4ade-8e74-3b7917b6ab2b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "92e1c4ff-4466-42e7-b2dd-70a319af48da"
+        }
+      ]
     }
   ],
   "schedulingConfig": {

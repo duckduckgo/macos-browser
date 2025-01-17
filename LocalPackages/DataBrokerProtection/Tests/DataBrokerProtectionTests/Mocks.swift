@@ -117,6 +117,13 @@ extension BrokerProfileQueryData {
         return [broker1Data, broker2Data, broker3Data]
     }
 
+    static func createOptOutJobData(extractedProfileId: Int64, brokerId: Int64, profileQueryId: Int64, preferredRunDate: Date?) -> OptOutJobData {
+
+        let extractedProfile = ExtractedProfile(id: extractedProfileId)
+
+        return OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: .now, preferredRunDate: preferredRunDate, historyEvents: [], attemptCount: 0, extractedProfile: extractedProfile)
+    }
+
     static func createOptOutJobData(extractedProfileId: Int64, brokerId: Int64, profileQueryId: Int64, startEventHoursAgo: Int, requestEventHoursAgo: Int, jobCreatedHoursAgo: Int) -> OptOutJobData {
 
         let extractedProfile = ExtractedProfile(id: extractedProfileId)
@@ -222,6 +229,10 @@ final class PrivacyConfigurationMock: PrivacyConfiguration {
 
     func settings(for feature: BrowserServicesKit.PrivacyFeature) -> BrowserServicesKit.PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
         [String: Any]()
+    }
+
+    func settings(for subfeature: any BrowserServicesKit.PrivacySubfeature) -> PrivacyConfigurationData.PrivacyFeature.SubfeatureSettings? {
+        return nil
     }
 
     func userEnabledProtection(forDomain: String) {

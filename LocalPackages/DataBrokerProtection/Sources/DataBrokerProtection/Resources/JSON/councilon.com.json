@@ -1,8 +1,7 @@
 {
   "name": "Councilon",
   "url": "councilon.com",
-  "version": "0.4.0",
-  "parent": "verecor.com",
+  "version": "0.5.0",
   "addedDatetime": 1702965600000,
   "optOutUrl": "https://councilon.com/ex/control/privacy",
   "steps": [
@@ -63,8 +62,80 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://councilon.com/ex/control/privacy",
+          "id": "9f4ef020-811e-4d02-8622-ebe7a714a0d0"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "8e7adf0a-58fb-4e57-b3b3-79cd99eeb395"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "c80c3e5c-fa66-45c8-816b-bb320a247777"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "30cfa92e-627c-4b00-9fd1-032952338468"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "1d3fe64a-d23d-448c-bf34-aeccf32beb87"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "e6840eae-b334-431d-bbb8-94189e09023d"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "8983034c-211a-4d98-8f31-bdf28a4e5011"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "ffb143e1-a408-456b-9e27-d5b199cd0b52"
+        }
+      ]
     }
   ],
   "schedulingConfig": {
