@@ -103,6 +103,7 @@ let package = Package(
             name: "NetworkProtectionUI",
             dependencies: [
                 "VPNPixels",
+                "NetworkProtectionProxy",
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),

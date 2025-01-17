@@ -56,8 +56,7 @@ public struct TunnelControllerView: View {
             featureToggleRow()
 
             if #available(macOS 14.0, *),
-               tipsModel.canShowTips,
-               case .invalidated = tipsModel.domainExclusionsTip.status {
+               tipsModel.canShowAutoconnectTip {
 
                 TipView(tipsModel.autoconnectTip, action: tipsModel.autoconnectTipActionHandler)
                     .tipImageSize(VPNTipsModel.imageSize)
@@ -86,8 +85,7 @@ public struct TunnelControllerView: View {
                 .padding(.top, 5)
 
             if #available(macOS 14.0, *),
-               tipsModel.canShowTips,
-               case .invalidated = tipsModel.geoswitchingTip.status {
+               tipsModel.canShowDomainExclusionsTip {
 
                 TipView(tipsModel.domainExclusionsTip)
                     .tipImageSize(VPNTipsModel.imageSize)

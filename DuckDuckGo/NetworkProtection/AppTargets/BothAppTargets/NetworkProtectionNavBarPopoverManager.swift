@@ -191,6 +191,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                          activeSitePublisher: activeSitePublisher,
                                          forMenuApp: false,
                                          vpnSettings: vpnSettings,
+                                         proxySettings: proxySettings,
                                          logger: Logger(subsystem: "DuckDuckGo", category: "TipKit"))
 
             let popover = NetworkProtectionPopover(
