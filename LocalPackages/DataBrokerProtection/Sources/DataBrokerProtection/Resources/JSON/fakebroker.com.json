@@ -87,7 +87,7 @@
     }
   ],
   "schedulingConfig": {
-    "retryError": 0,
+    "retryError": 48,
     "confirmOptOutScan": 0,
     "maintenanceScan": 0,
     "maxAttempts": -1
