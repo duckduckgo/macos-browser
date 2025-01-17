@@ -41,6 +41,14 @@ class WebsiteBreakageReportTests: XCTestCase {
              line: #line)
     }
 
+    func testReportBrokenSiteSentPixel() {
+        fire(NonStandardEvent(NonStandardPixel.brokenSiteReportSent),
+             frequency: .standard,
+             and: .expect(pixelName: "m_report-broken-site_sent"),
+             file: #filePath,
+             line: #line)
+    }
+
     func testCommonSetOfFields() throws {
         let breakage = BrokenSiteReport(
             siteUrl: URL(string: "https://example.test/")!,

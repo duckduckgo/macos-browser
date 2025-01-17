@@ -74,7 +74,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private let privacyDashboardEvents = EventMapping<PrivacyDashboardEvents> { event, _, parameters, _ in
         let domainEvent: NonStandardPixel
         switch event {
-        case .showReportBrokenSite: domainEvent = .brokenSiteReportShown // TODO: Remove this?
+        case .showReportBrokenSite: domainEvent = .brokenSiteReportShown
         case .reportBrokenSiteShown: domainEvent = .brokenSiteReportShown
         case .reportBrokenSiteSent: domainEvent = .brokenSiteReportSent
         }
