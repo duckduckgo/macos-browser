@@ -271,9 +271,11 @@ final class DBPEndToEndTests: XCTestCase {
         print("Stages 6-8 skipped: Fake broker doesn't support sending emails")
 
         print("test")
+        /*
         loginItemsManager = LoginItemsManager()
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent])
+        */
 
         /*
         9/ We confirm the opt out through a scan
