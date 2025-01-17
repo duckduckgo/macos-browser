@@ -747,10 +747,12 @@ final class AddressBarButtonsViewController: NSViewController {
             imageButton.image = .web
         case .browsing:
             imageButton.image = tabViewModel.favicon
-        case .editing(isUrl: true):
+        case .editing(.url):
             imageButton.image = .web
-        case .editing(isUrl: false):
+        case .editing(.text):
             imageButton.image = .search
+        case .editing(.openTabSuggestion):
+            imageButton.image = .openTabSuggestion
         default:
             imageButton.image = nil
         }
