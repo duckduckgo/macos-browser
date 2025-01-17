@@ -131,7 +131,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
 
         if let priorityDate = priorityDate {
             filteredAndSortedOperationsData = operationsData
-                .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
+                //.filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
                 .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
         } else {
             filteredAndSortedOperationsData = operationsData
