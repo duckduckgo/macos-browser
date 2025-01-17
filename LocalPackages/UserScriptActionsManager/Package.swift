@@ -32,9 +32,7 @@ let package = Package(
             targets: ["UserScriptActionsManager"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.6.1"),
-        .package(path: "../WebKitExtensions"),
-        .package(path: "../Utilities"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.6.1")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

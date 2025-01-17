@@ -24,22 +24,33 @@ import WebKit
 /**
  * This protocol extends `Subfeature` and allows to register message handlers from an external source.
  *
- * `NewTabPageUserScript` manages many different features that only share the same view
- * (HTML New Tab Page) and are otherwise independent of each other.
+ * If a user script handles many different features that share the same view
+ * and are otherwise independent of each other, it can implement this protocol
+ * to allow for having multiple objects registered as handlers to handle
+ * feature-specific messages.
  *
- * Implementing this protocol in `NewTabPageUserScript` allows for having multiple objects
- * registered as handlers to handle feature-specific messages, e.g. a separate object
+ * An example of this is HTML New Tab Page, where `NewTabPageUserScript` uses
+ * separate classes to handle feature-specific messages, e.g. a separate object
  * responsible for RMF, favorites, privacy stats, etc.
  */
 public protocol SubfeatureWithExternalMessageHandling: AnyObject, Subfeature {
+
+    /**
+     * A handle to the webView the user script is loaded into.
+     */
     var webView: WKWebView? { get }
+
+    /**
+     * This function should register message handlers provided in the `handlers` array
+     * to handle messages
+     */
     func registerMessageHandlers(_ handlers: [String: Subfeature.Handler])
 }
 
 /**
  * This protocol describes type that can provide an array of user scripts.
  *
- * It's conformed to by `NewTabPageActionsManager` (via `UserScriptActionsManaging`).
+ * It's conformed to by `UserScriptActionsManager` (via `UserScriptActionsManaging`).
  */
 public protocol UserScriptsSource: AnyObject {
     associatedtype Script: SubfeatureWithExternalMessageHandling
@@ -48,20 +59,22 @@ public protocol UserScriptsSource: AnyObject {
 }
 
 /**
- * This protocol describes a feature or set of features that use HTML New Tab Page.
+ * This protocol describes a feature or a set of features that use the user script and handle its messages.
  *
  * A class implementing this protocol can register handlers for a subset of
- * `NewTabPageUserScript`'s messages, allowing for better separation of concerns
- * by having e.g. a class responsible for handling Favorites messages, a class responsible
- * for handling RMF messages, etc.
+ * `Script`'s messages, allowing for better separation of concerns.
  *
- * Objects implementing this protocol are added to `NewTabPageActionsManager`.
+ * `UserScriptClient` supports being connected to multiple user scripts (of the same type),
+ * in case one data source should control multiple script instances (in multiple webViews).
+ *
+ * Objects implementing this protocol are kept in `UserScriptActionsManager`.
  */
 public protocol UserScriptClient: AnyObject {
     associatedtype Script: SubfeatureWithExternalMessageHandling
 
     /**
-     * Handle to the object that returns the list of all living `NewTabPageUserScript` instances.
+     * Handle to the object that returns the list of all living user script instances.
+     *
      */
     var userScriptsSource: (any UserScriptsSource)? { get set }
 
@@ -74,7 +87,7 @@ public protocol UserScriptClient: AnyObject {
 public extension UserScriptClient {
     /**
      * Convenience method to push a message with specific parameters to all user scripts
-     * currently registered with `userScriptsSource`.
+     * currently registered with the `userScriptsSource`.
      */
     func pushMessage(named method: String, params: Encodable?) {
         userScriptsSource?.userScripts.forEach { userScript in
@@ -98,30 +111,37 @@ public extension UserScriptClient {
 }
 
 /**
- * This protocol describes the API of `NewTabPageActionsManager`.
+ * This protocol defines API to aggregate user scripts of the same type.
  */
 public protocol UserScriptActionsManaging: AnyObject, UserScriptsSource {
+    /**
+     * Allows to register a user script with the actions manager.
+     */
     func registerUserScript(_ userScript: Script)
 }
 
 /**
- * This class serves as an aggregator of feature-specific `NewTabPageUserScriptClient`s.
+ * This class serves as an aggregator of instances of a specific user script and
+ * that user script's feature-specific clients.
  *
- * The browser uses 1 New Tab Page (and 1 NTP User Script) per window. In order to
+ * This class helps orchestrate messaging between native data source and multiple
+ * user script instances (in multiple web views) that need to stay in sync. It keeps
+ * track of all living user scripts and makes user script clients' message handlers are
+ * registered with all user scripts.
+ *
+ * The example usage of UserScriptActionsManager is HTML New Tab Page. The browser uses
+ * 1 New Tab Page (and 1 NTP User Script) per window. Using actions manager allows to
  * broadcast updates to all windows that show New Tab Page, and to not duplicate the logic
- * of NTP data sources, this class keeps track of all living NTP user scripts and makes sure
- * script clients' message handlers are registered with all user scripts.
+ * of NTP data sources.
  */
-open class UserScriptActionsManager<Script, ScriptClient>: UserScriptActionsManaging, UserScriptsSource where Script: SubfeatureWithExternalMessageHandling,
-                                                                                                                      ScriptClient: UserScriptClient,
-                                                                                                                      ScriptClient.Script == Script {
-    private let userScriptClients: [ScriptClient]
+open class UserScriptActionsManager<Script, ScriptClient>: UserScriptActionsManaging where Script: SubfeatureWithExternalMessageHandling,
+                                                                                           ScriptClient: UserScriptClient,
+                                                                                           ScriptClient.Script == Script {
 
-    /**
-     * This hash table holds weak references to user scripts,
-     * ensuring that no user script belonging to a closed window is ever contained within.
-     */
-    private let userScriptsHandles = NSHashTable<Script>.weakObjects()
+    public init(scriptClients: [ScriptClient]) {
+        userScriptClients = scriptClients
+        userScriptClients.forEach { $0.userScriptsSource = self }
+    }
 
     public var userScripts: [Script] {
         userScriptsHandles.allObjects
@@ -136,8 +156,10 @@ open class UserScriptActionsManager<Script, ScriptClient>: UserScriptActionsMana
         userScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
     }
 
-    public init(scriptClients: [ScriptClient]) {
-        userScriptClients = scriptClients
-        userScriptClients.forEach { $0.userScriptsSource = self }
-    }
+    /**
+     * This hash table holds weak references to user scripts,
+     * ensuring that no user script belonging to a closed window is ever contained within.
+     */
+    private let userScriptsHandles = NSHashTable<Script>.weakObjects()
+    private let userScriptClients: [ScriptClient]
 }
