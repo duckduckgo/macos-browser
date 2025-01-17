@@ -130,7 +130,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         let filteredAndSortedOperationsData: [BrokerJobData]
 
         if let priorityDate = priorityDate {
-            let date = Calendar.current.date(byAdding: .hour, value: 12, to: priorityDate)!
+            let date = Calendar.current.date(byAdding: .hour, value: 40, to: priorityDate)!
             filteredAndSortedOperationsData = operationsData
                 .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= date }
                 .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
