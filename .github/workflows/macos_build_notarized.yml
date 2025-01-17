@@ -1,6 +1,6 @@
-name: Make Notarized DMG Release
+name: macOS - Make Notarized DMG Release
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       release-type:
@@ -181,7 +181,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
         DSYM_BUCKET_NAME: ${{ vars.DSYM_BUCKET_NAME }}
-        DSYM_BUCKET_PREFIX: ${{ vars.DSYM_BUCKET_PREFIX }}
+        DSYM_BUCKET_PREFIX: ${{ vars.MACOS_DSYM_BUCKET_PREFIX }}
         DSYM_NAME: ${{ steps.set-outputs.outputs.dsym-name }}
         DSYM_LOCAL_PATH: "${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}"
       run: |
@@ -383,7 +383,7 @@ jobs:
             Gemfile
             Gemfile.lock
             fastlane
-          
+
       - name: Set up fastlane
         run: bundle install
 

@@ -22,6 +22,7 @@ import Combine
 import Common
 import LoginItems
 import NetworkProtection
+import NetworkProtectionProxy
 import os.log
 import SwiftUI
 
@@ -159,6 +160,7 @@ public final class StatusBarMenu: NSObject {
                                          activeSitePublisher: activeSitePublisher,
                                          forMenuApp: true,
                                          vpnSettings: VPNSettings(defaults: userDefaults),
+                                         proxySettings: TransparentProxySettings(defaults: userDefaults),
                                          logger: Logger(subsystem: "DuckDuckGo", category: "TipKit"))
 
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)

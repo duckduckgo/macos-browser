@@ -38,6 +38,9 @@ public enum FeatureFlag: String, CaseIterable {
 
     case credentialsImportPromotionForExistingUsers
 
+    /// https://app.asana.com/0/0/1209150117333883/f
+    case networkProtectionAppExclusions
+
     /// https://app.asana.com/0/72649045549333/1208231259093710/f
     case networkProtectionUserTips
 
@@ -48,6 +51,7 @@ public enum FeatureFlag: String, CaseIterable {
     case htmlNewTabPage
 
     case autofillPartialFormSaves
+    case autcompleteTabs
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -58,6 +62,10 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .maliciousSiteProtection:
             return true
         case .autofillPartialFormSaves:
+            return true
+        case .autcompleteTabs:
+            return true
+        case .networkProtectionAppExclusions:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -90,6 +98,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
             return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
+        case .networkProtectionAppExclusions:
+            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.appExclusions))
         case .networkProtectionUserTips:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
         case .networkProtectionEnforceRoutes:
@@ -98,6 +108,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .disabled
         case .autofillPartialFormSaves:
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
+        case .autcompleteTabs:
+            return .remoteReleasable(.feature(.autocompleteTabs))
         }
     }
 }
