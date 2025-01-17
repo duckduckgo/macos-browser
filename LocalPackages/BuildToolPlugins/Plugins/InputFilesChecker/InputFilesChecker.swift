@@ -47,8 +47,6 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo Privacy Browser App Store": [],
 
-    "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,
-
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
         .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
@@ -92,8 +90,6 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
         context.xcodeProject.targets.forEach { target in
             switch target.product?.kind {
             case .application where target.displayName.starts(with: "DuckDuckGo Privacy Browser"):
-                appTargets.append(target)
-            case .application where target.displayName == "DuckDuckGo Privacy Pro": // To be removed after the target is deleted
                 appTargets.append(target)
             case .other("com.apple.product-type.bundle.unit-test"):
                 if target.displayName.starts(with: "Unit Tests") {
