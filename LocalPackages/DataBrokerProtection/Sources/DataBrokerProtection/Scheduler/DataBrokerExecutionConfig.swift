@@ -44,16 +44,16 @@ public struct DataBrokerExecutionConfig {
     var activitySchedulerTriggerInterval: TimeInterval {
         switch mode {
         case .normal:
-            return 1 * 60 // 20 minutes
+            return 20 * 60 // 20 minutes
         case .fastForIntegrationTests:
-            return 1 * 60 // 1 minute
+            return 7 * 60 // 1 minute
         }
     }
 
     var activitySchedulerIntervalTolerance: TimeInterval {
         switch mode {
         case .normal:
-            return 30  // 10 minutes
+            return 10 * 60 // 10 minutes
         case .fastForIntegrationTests:
             return 30 // 0.5 minutes
         }
