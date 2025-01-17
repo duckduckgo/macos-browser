@@ -62,10 +62,6 @@ final class PrivacyDashboardViewController: NSViewController {
         }, keyValueStoring: UserDefaults.standard)
     }()
 
-//    private func fireBrokenSiteReportShown() {
-//        PixelKit.fire(NonStandardEvent(NonStandardPixel.brokenSiteReportShown))
-//    }
-//    
     private let permissionHandler = PrivacyDashboardPermissionHandler()
     private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
