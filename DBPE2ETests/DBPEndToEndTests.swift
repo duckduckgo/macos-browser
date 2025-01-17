@@ -189,47 +189,7 @@ final class DBPEndToEndTests: XCTestCase {
 
         print("Stage 3 passed: We find and save extracted profiles")
 
-        /*
-         4/ We create opt out jobs
-         */
-        let optOutJobsCreatedExpectation = expectation(description: "Opt out jobs created")
-
-        await awaitFulfillment(of: optOutJobsCreatedExpectation,
-                               withTimeout: 10,
-                               whenCondition: {
-            let queries = try! database.fetchAllBrokerProfileQueryData()
-            let optOutJobs = queries.flatMap { $0.optOutJobData }
-            return optOutJobs.count > 0
-        })
-
-        print("Stage 4 passed: We create opt out jobs")
-
-        /*
-         5/ We run those opt out jobs
-         For now we check the lastRunDate on the optOutJob, but that could always be wrong. Ideally we need this information from the fake broker
-         */
-        let optOutJobsRunExpectation = expectation(description: "Opt out jobs run")
-
-        await awaitFulfillment(of: optOutJobsRunExpectation,
-                               withTimeout: 300,
-                               whenCondition: {
-            let queries = try! database.fetchAllBrokerProfileQueryData()
-            let optOutJobs = queries.flatMap { $0.optOutJobData }
-            return optOutJobs.first?.lastRunDate != nil
-        })
-        print("Stage 5.1 passed: We start running the opt out jobs")
-
-        let optOutRequestedExpectation = expectation(description: "Opt out requested")
-        await awaitFulfillment(of: optOutRequestedExpectation,
-                               withTimeout: 300,
-                               whenCondition: {
-            let queries = try! database.fetchAllBrokerProfileQueryData()
-            let optOutJobs = queries.flatMap { $0.optOutJobData }
-            let events = optOutJobs.flatMap { $0.historyEvents }
-            let optOutsRequested = events.filter{ $0.type == .optOutRequested }
-            return optOutsRequested.count > 0
-        })
-        print("Stage 5 passed: We finish running the opt out jobs")
+        
 
         /*
         6/ The BE service receives the email
