@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "3f58e008d4e9d1b56ab12dbb95bd891045cf2758",
-        "version" : "8.0.0"
+        "branch" : "pr-releases/pr-302",
+        "revision" : "05d04de7505117b32949b2007e5a56ba2d39469b"
       }
     },
     {
@@ -167,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/sync_crypto",
       "state" : {
-        "revision" : "cc726cebb67367466bc31ced4784e16d44ac68d1",
-        "version" : "0.4.0"
+        "revision" : "0c8bf3c0e75591bc366407b9d7a73a9fcfc7736f",
+        "version" : "0.3.0"
       }
     },
     {
