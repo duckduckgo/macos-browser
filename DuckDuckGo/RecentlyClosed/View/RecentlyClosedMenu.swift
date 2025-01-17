@@ -78,7 +78,10 @@ private extension NSMenuItem {
             image = TabViewModel.Favicon.bookmarks
             title = UserText.tabPreferencesTitle
         case .history:
-            image = TabViewModel.Favicon.bookmarks
+            guard NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) else {
+                return nil
+            }
+            image = TabViewModel.Favicon.history
             title = UserText.mainMenuHistory
         case .releaseNotes:
             image = TabViewModel.Favicon.home
