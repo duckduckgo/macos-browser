@@ -367,13 +367,13 @@ struct UserText {
 
     static let aiChatShowInToolbarToggle = NSLocalizedString("duckai.show-in-toolbar.toggle", value: "Show Duck.ai shortcut in browser toolbar", comment: "Show AI Chat in toolbar")
 
-    static let aiChatShowInApplicationMenuToggle = NSLocalizedString("duckai.show-in-application-menu.toggle", value: "Show “New Duck.ai Chat” in File and application menus", comment: "Show Duck.ai in application menus")
+    static let aiChatShowInApplicationMenuToggle = NSLocalizedString("duckai.show-in-application-menu.toggle", value: "Show “New AI Chat” in File and application menus", comment: "Show Duck.ai in application menus")
 
-    static let aiChatPreferencesCaption = NSLocalizedString("duckai.preferences.caption.link.fallback", value: "Duck.ai is an optional feature that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models.", comment: "Ai Chat preferences explanation")
+    static let aiChatPreferencesCaption = NSLocalizedString("duckai.preferences.caption.link.fallback", value: "Duck.ai is an optional feature that lets you chat anonymously with popular 3rd-party AI chat models. Your chats are not used to train AI.", comment: "Ai Chat preferences explanation")
 
     static let aiChatPreferencesLearnMoreButton = NSLocalizedString("ai-chat.preferences.learn-more", value: "Learn More", comment: "AI Chat preferences button to learn more about it")
 
-    static let newAIChatMenuItem = NSLocalizedString("chat.menu.new", value: "New Chat", comment: "Menu item to launch AI Chat")
+    static let newAIChatMenuItem = NSLocalizedString("chat.menu.new", value: "New AI Chat", comment: "Menu item to launch AI Chat")
 
     // Duck Player Preferences
     static let duckPlayerSettingsTitle = NSLocalizedString("duck-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")

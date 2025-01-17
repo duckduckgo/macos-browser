@@ -1464,7 +1464,7 @@
     },
     "ai-chat.menu.new" : {
       "comment" : "Menu item to launch AI Chat",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1584,7 +1584,7 @@
     },
     "ai-chat.onboarding.popover.confirmation" : {
       "comment" : "Confirmation for accepting the AI Chat onboarding popover",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1704,7 +1704,7 @@
     },
     "ai-chat.onboarding.popover.message-markdown" : {
       "comment" : "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1824,7 +1824,7 @@
     },
     "ai-chat.onboarding.popover.title" : {
       "comment" : "AI Chat onboarding popover title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1884,7 +1884,7 @@
     },
     "ai-chat.preferences.caption" : {
       "comment" : "Ai Chat preferences explanation",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1944,7 +1944,7 @@
     },
     "ai-chat.preferences.caption.link.fallback" : {
       "comment" : "Ai Chat preferences explanation",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2004,7 +2004,7 @@
     },
     "ai-chat.preferences.caption.link.markdown" : {
       "comment" : "Ai Chat preferences explanation with a markdown link. Do not translate what's inside [] and ()",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2124,7 +2124,7 @@
     },
     "ai-chat.show-in-application-menu.toggle" : {
       "comment" : "Show AI Chat in application menus",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2184,7 +2184,7 @@
     },
     "ai-chat.show-in-toolbar.toggle" : {
       "comment" : "Show AI Chat in toolbar",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -13496,6 +13496,18 @@
         }
       }
     },
+    "chat.menu.new" : {
+      "comment" : "Menu item to launch AI Chat",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New AI Chat"
+          }
+        }
+      }
+    },
     "check.allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -22028,6 +22040,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки видео"
+          }
+        }
+      }
+    },
+    "duck.ai.onboarding.popover.message-markdown" : {
+      "comment" : "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can adjust this and other Duck.ai features in **Settings** > **Duck.ai**."
+          }
+        }
+      }
+    },
+    "duckai.onboarding.popover.confirmation" : {
+      "comment" : "Confirmation for accepting the AI Chat onboarding popover",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck.ai shortcut added!"
+          }
+        }
+      }
+    },
+    "duckai.onboarding.popover.title" : {
+      "comment" : "AI Chat onboarding popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Launch Duck.ai directly from your toolbar"
+          }
+        }
+      }
+    },
+    "duckai.preferences.caption.link.fallback" : {
+      "comment" : "Ai Chat preferences explanation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck.ai is an optional feature that lets you chat anonymously with popular 3rd-party AI chat models. Your chats are not used to train AI."
+          }
+        }
+      }
+    },
+    "duckai.show-in-application-menu.toggle" : {
+      "comment" : "Show Duck.ai in application menus",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show “New AI Chat” in File and application menus"
+          }
+        }
+      }
+    },
+    "duckai.show-in-toolbar.toggle" : {
+      "comment" : "Show AI Chat in toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Duck.ai shortcut in browser toolbar"
           }
         }
       }
@@ -47328,7 +47412,7 @@
     },
     "pinning.hide-aichat-shortcut" : {
       "comment" : "Menu item for hiding the AI Chat shortcut",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47566,6 +47650,18 @@
         }
       }
     },
+    "pinning.hide-duckai-shortcut" : {
+      "comment" : "Menu item for hiding the AI Chat shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide Duck.ai Shortcut"
+          }
+        }
+      }
+    },
     "pinning.hide-netp-shortcut" : {
       "comment" : "Menu item for hiding the NetP shortcut",
       "extractionState" : "extracted_with_value",
@@ -47628,7 +47724,7 @@
     },
     "pinning.show-aichat-shortcut" : {
       "comment" : "Menu item for showing the AI Chat shortcut",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47862,6 +47958,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать ярлык для загрузок"
+          }
+        }
+      }
+    },
+    "pinning.show-duckai-shortcut" : {
+      "comment" : "Menu item for showing the AI Chat shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Duck.ai Shortcut"
           }
         }
       }
@@ -56140,7 +56248,7 @@
     },
     "preferences.ai-chat" : {
       "comment" : "Title of the option to show AI Chat in preferences",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -57454,6 +57562,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проигрыватель Duck Player"
+          }
+        }
+      }
+    },
+    "preferences.duckai" : {
+      "comment" : "Title of the option to show Duck.ai in preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck.ai"
           }
         }
       }
