@@ -73,10 +73,11 @@ extension BookmarkDialogStackedContentView {
 
 // MARK: - Preview
 
+@available(macOS 14.0, *)
 #Preview {
-    @State var name: String = "DuckDuckGo"
-    @State var url: String = "https://www.duckduckgo.com"
-    @State var selectedFolder: BookmarkFolder?
+    @Previewable @State var name: String = "DuckDuckGo"
+    @Previewable @State var url: String = "https://www.duckduckgo.com"
+    @Previewable @State var selectedFolder: BookmarkFolder?
 
     return BookmarkDialogStackedContentView(
         .init(

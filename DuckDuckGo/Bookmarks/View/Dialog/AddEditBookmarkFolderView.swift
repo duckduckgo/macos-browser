@@ -93,9 +93,10 @@ private extension BookmarkDialogButtonsView.ViewState {
     }
 }
 
+@available(macOS 14.0, *)
 #Preview("Compressed") {
-    @State var folderName = ""
-    @State var selectedFolder: BookmarkFolder?
+    @Previewable @State var folderName = ""
+    @Previewable @State var selectedFolder: BookmarkFolder?
 
     return AddEditBookmarkFolderView(
         title: "Test Title",
@@ -112,9 +113,10 @@ private extension BookmarkDialogButtonsView.ViewState {
     )
 }
 
+@available(macOS 14.0, *)
 #Preview("Expanded") {
-    @State var folderName = ""
-    @State var selectedFolder: BookmarkFolder?
+    @Previewable @State var folderName = ""
+    @Previewable @State var selectedFolder: BookmarkFolder?
 
     return AddEditBookmarkFolderView(
         title: "Test Title",
