@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
+import FeatureFlags
 import MaliciousSiteProtection
 import PrivacyDashboard
 import WebKit
@@ -32,6 +33,7 @@ final class TabViewModel {
         static let burnerHome = NSImage.burnerTabFavicon
         static let settings = NSImage.settingsMulticolor16
         static let bookmarks = NSImage.bookmarksFolder
+        static let history = NSImage.bookmarksFolder // temporary
         static let emailProtection = NSImage.emailProtectionIcon
         static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
         static let subscription = NSImage.privacyPro
@@ -360,7 +362,7 @@ final class TabViewModel {
         case .bookmarks:
                 .bookmarksTrustedIndicator
         case .history:
-                .historyTrustedIndicator
+            NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) ? .historyTrustedIndicator : .init()
         case .dataBrokerProtection:
                 .dbpTrustedIndicator
         case .subscription:
@@ -469,7 +471,7 @@ final class TabViewModel {
         case .bookmarks:
             Favicon.bookmarks
         case .history:
-            Favicon.bookmarks
+            NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) ? Favicon.history : nil
         case .subscription:
             Favicon.subscription
         case .identityTheftRestoration:
