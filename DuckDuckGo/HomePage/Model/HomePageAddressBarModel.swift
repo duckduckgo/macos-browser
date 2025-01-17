@@ -105,7 +105,7 @@ extension HomePage.Models {
             }
         }
 
-        let tabCollectionViewModel: TabCollectionViewModel
+        private weak var tabCollectionViewModel: TabCollectionViewModel?
 
         private var isExperimentActive: Bool = false {
             didSet {
@@ -140,9 +140,7 @@ extension HomePage.Models {
             let storyboard = NSStoryboard(name: "NavigationBar", bundle: .main)
             let viewController: AddressBarViewController = storyboard
                 .instantiateController(identifier: "AddressBarViewController") { [weak self] coder in
-                    guard let self else {
-                        return nil
-                    }
+                    guard let self, let tabCollectionViewModel else { return nil }
                     return AddressBarViewController(
                         coder: coder,
                         tabCollectionViewModel: tabCollectionViewModel,
@@ -170,7 +168,7 @@ extension HomePage.Models {
         }
 
         private func subscribeToCustomBackground(_ viewController: AddressBarViewController) {
-            guard !tabCollectionViewModel.isBurner else {
+            guard let tabCollectionViewModel, !tabCollectionViewModel.isBurner else {
                 return
             }
 

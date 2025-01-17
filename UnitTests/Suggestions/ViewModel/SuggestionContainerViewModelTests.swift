@@ -300,6 +300,28 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         waitForMainQueueToFlush(for: 1)
     }
 
+    @MainActor
+    func testWhenSuggestionLoadingDataSourceOpenTabsRequested_ThenOpenTabsProviderIsCalled() {
+        // Setup open tabs with matching URLs and titles
+        let openTabs = [
+            OpenTab(title: "DuckDuckGo", url: URL(string: "http://duckduckgo.com")!),
+            OpenTab(title: "Duck Tales", url: URL(string: "http://ducktales.com")!),
+        ]
+
+        // Mock the open tabs provider to return the defined open tabs
+        suggestionContainer = SuggestionContainer(openTabsProvider: { openTabs },
+                                                  suggestionLoading: suggestionLoadingMock,
+                                                  historyCoordinating: historyCoordinatingMock,
+                                                  bookmarkManager: LocalBookmarkManager.shared,
+                                                  burnerMode: .regular)
+        suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
+
+        suggestionContainer.getSuggestions(for: "Duck")
+
+        let openTabsResult = suggestionLoadingMock.dataSource!.openTabs(for: suggestionLoadingMock) as! [OpenTab]
+        XCTAssertEqual(openTabsResult, openTabs)
+    }
+
 }
 
 extension SuggestionContainerViewModel {

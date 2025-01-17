@@ -129,7 +129,7 @@ final class SuggestionContainer {
 
 }
 
-struct OpenTab: BrowserTab {
+struct OpenTab: BrowserTab, Hashable {
 
     let title: String
     let url: URL

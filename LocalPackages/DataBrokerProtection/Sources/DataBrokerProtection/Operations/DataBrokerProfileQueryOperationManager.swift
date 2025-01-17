@@ -291,11 +291,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         guard extractedProfile.removedDate == nil else {
-            Logger.dataBrokerProtection.log("Profile already extracted, skipping...")
+            Logger.dataBrokerProtection.log("Profile already removed, skipping...")
             return
         }
 
-        guard let optOutStep = brokerProfileQueryData.dataBroker.optOutStep(), optOutStep.optOutType != .parentSiteOptOut else {
+        guard !brokerProfileQueryData.dataBroker.performsOptOutWithinParent() else {
             Logger.dataBrokerProtection.log("Broker opts out in parent, skipping...")
             return
         }

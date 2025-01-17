@@ -1,8 +1,7 @@
 {
   "name": "Veriforia",
   "url": "veriforia.com",
-  "version": "0.4.0",
-  "parent": "verecor.com",
+  "version": "0.5.0",
   "addedDatetime": 1677736800000,
   "optOutUrl": "https://veriforia.com/ng/control/privacy",
   "steps": [
@@ -60,8 +59,80 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://veriforia.com/ng/control/privacy",
+          "id": "943c387c-9cb2-42d6-afd5-a48cf4c2cf3d"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "cf78bb16-b608-4a50-975b-844dad3db1db"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "4c0b8064-1e2b-4598-92a9-e832e73726db"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "c53bc12e-0cf6-4628-b99f-3219cb0f0c1a"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "0aaae970-81d9-4d63-86d0-da4d0a3f5cf4"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "9b6fad42-babc-4777-92af-d415ea9aef5b"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "d0d5f4d0-7183-40f5-b476-4315c751bcc5"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "434d001d-f6cb-4df9-acf3-e62dc821a25a"
+        }
+      ]
     }
   ],
   "schedulingConfig": {

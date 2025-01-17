@@ -26,6 +26,8 @@ import BrowserServicesKit
 protocol WindowControllersManagerProtocol {
 
     var mainWindowControllers: [MainWindowController] { get }
+    var selectedTab: Tab? { get }
+    var allTabCollectionViewModels: [TabCollectionViewModel] { get }
 
     var lastKeyMainWindowController: MainWindowController? { get }
     var pinnedTabsManager: PinnedTabsManager { get }
