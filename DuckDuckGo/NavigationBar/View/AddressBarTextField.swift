@@ -374,7 +374,7 @@ final class AddressBarTextField: NSTextField {
 
         if case .internalPage(title: let title, url: let url) = suggestion,
            url == .bookmarks || url.isSettingsURL {
-            // when choosing an internal page suggestion preffer already open matching tab
+            // when choosing an internal page suggestion prefer already open tab
             switchTo(OpenTab(title: title, url: url))
         } else if case .openTab(let title, url: let url) = suggestion {
             switchTo(OpenTab(title: title, url: url))
