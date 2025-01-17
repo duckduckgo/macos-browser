@@ -26,17 +26,14 @@ let package = Package(
         .macOS("11.4")
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "UserScriptActionsManager",
             targets: ["UserScriptActionsManager"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "224.6.1")
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "225.0.0")
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "UserScriptActionsManager",
             dependencies: [
