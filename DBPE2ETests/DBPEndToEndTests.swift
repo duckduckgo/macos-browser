@@ -107,13 +107,6 @@ final class DBPEndToEndTests: XCTestCase {
         var returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
         XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
 
-        // Try again to see if it helps the first failure
-        await deleteAllProfilesOnFakeBroker()
-
-        mockUserProfile = mockFakeBrokerUserProfile()
-        returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
-        XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
-
         // When
         /*
          1/ We save a profile
