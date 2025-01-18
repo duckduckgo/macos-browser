@@ -41,7 +41,7 @@ final class NewTabPageCustomBackgroundClientTests: XCTestCase {
 
     // MARK: - contextMenu
 
-    func testThatContextMenuActionForIsForwardedToTheModel() async throws {
+    func testThatContextMenuActionIsForwardedToTheModel() async throws {
         let action = NewTabPageDataModel.UserImageContextMenu(target: .userImage, id: "abcd.jpg")
         try await messageHelper.handleMessageExpectingNilResponse(named: .contextMenu, parameters: action)
         XCTAssertEqual(model.showContextMenuCalls, ["abcd.jpg"])
