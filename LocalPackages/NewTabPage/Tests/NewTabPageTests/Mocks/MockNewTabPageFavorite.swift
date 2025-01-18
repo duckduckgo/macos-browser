@@ -26,4 +26,6 @@ struct MockNewTabPageFavorite: NewTabPageFavorite, Equatable {
     var urlObject: URL? {
         URL(string: url)
     }
+
+    var etldPlusOne: String?
 }

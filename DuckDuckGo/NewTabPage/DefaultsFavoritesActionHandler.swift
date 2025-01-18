@@ -73,11 +73,6 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     }
 
     @MainActor
-    func onFaviconMissing() {
-        faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
-    }
-
-    @MainActor
     private var window: NSWindow? {
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.view.window
     }
@@ -86,14 +81,17 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     private var tabCollectionViewModel: TabCollectionViewModel? {
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
     }
-
-    private lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
-        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
-            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
-            return nil
-        }
-        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
-    }()
 }
 
-extension Bookmark: NewTabPageFavorite {}
+extension Bookmark: NewTabPageFavorite {
+    private enum Const {
+        static let wwwPrefix = "www."
+    }
+
+    var etldPlusOne: String? {
+        guard let domain = urlObject?.host else {
+            return nil
+        }
+        return ContentBlocking.shared.tld.eTLDplus1(domain)?.dropping(prefix: Const.wwwPrefix)
+    }
+}

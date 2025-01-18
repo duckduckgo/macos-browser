@@ -53,6 +53,11 @@ final class CapturingNewTabPageCustomBackgroundProvider: NewTabPageCustomBackgro
         deleteImageCalls.append(imageID)
     }
 
+    func showContextMenu(for imageID: String, using presenter: any NewTabPage.NewTabPageContextMenuPresenting) async {
+        showContextMenuCalls.append(imageID)
+    }
+
     var presentUploadDialogCallsCount: Int = 0
     var deleteImageCalls: [String] = []
+    var showContextMenuCalls: [String] = []
 }

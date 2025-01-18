@@ -127,11 +127,6 @@ public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObje
         actionsHandler.addNewFavorite()
     }
 
-    @MainActor
-    func onFaviconMissing() {
-        actionsHandler.onFaviconMissing()
-    }
-
     // MARK: Context Menu
 
     @MainActor

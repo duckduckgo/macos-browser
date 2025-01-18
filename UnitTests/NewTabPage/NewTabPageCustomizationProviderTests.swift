@@ -249,6 +249,26 @@ final class NewTabPageCustomizationProviderTests: XCTestCase {
         XCTAssertEqual(userBackgroundImagesManager.deleteImageCallCount, 0)
     }
 
+    @MainActor
+    func testThatShowContextMenuPresentsTheMenuForTheSpecifiedImageID() async throws {
+
+        final class CapturingNewTabPageContextMenuPresenter: NewTabPageContextMenuPresenting {
+            func showContextMenu(_ menu: NSMenu) {
+                showContextMenuCalls.append(menu)
+            }
+            var showContextMenuCalls: [NSMenu] = []
+        }
+
+        let contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
+        await provider.showContextMenu(for: "abcd.jpg", using: contextMenuPresenter)
+
+        let menu = try XCTUnwrap(contextMenuPresenter.showContextMenuCalls.first)
+
+        let deleteBackgroundItem = try XCTUnwrap(menu.item(at: 0))
+        let imageID = try XCTUnwrap(deleteBackgroundItem.representedObject as? String)
+        XCTAssertEqual(imageID, "abcd.jpg")
+    }
+
     // MARK: - Helpers
 
     /**

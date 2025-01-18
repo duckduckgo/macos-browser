@@ -89,6 +89,25 @@ final class NewTabPageCustomizationProvider: NewTabPageCustomBackgroundProviding
         }
         homePageSettingsModel.customImagesManager?.deleteImage(image)
     }
+
+    @MainActor
+    func showContextMenu(for imageID: String, using presenter: any NewTabPageContextMenuPresenting) async {
+        let menu = NSMenu()
+
+        menu.buildItems {
+            NSMenuItem(title: UserText.deleteBackground, action: #selector(deleteBackground(_:)), target: self, representedObject: imageID)
+                .withAccessibilityIdentifier("HomePage.Views.deleteBackground")
+        }
+
+        presenter.showContextMenu(menu)
+    }
+
+    @objc public func deleteBackground(_ sender: NSMenuItem) {
+        Task {
+            guard let imageID = sender.representedObject as? String else { return }
+            await deleteImage(with: imageID)
+        }
+    }
 }
 
 extension NewTabPageDataModel.Background {

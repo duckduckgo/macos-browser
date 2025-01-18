@@ -99,7 +99,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let favorites = favoritesModel.favorites.map {
-            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize, onFaviconMissing: favoritesModel.onFaviconMissing)
+            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize)
         }
         return NewTabPageDataModel.FavoritesData(favorites: favorites)
     }
@@ -107,7 +107,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     private func notifyDataUpdated(_ favorites: [NewTabPageFavorite]) {
         let favorites = favoritesModel.favorites.map {
-            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize, onFaviconMissing: favoritesModel.onFaviconMissing)
+            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize)
         }
         pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageDataModel.FavoritesData(favorites: favorites))
     }
