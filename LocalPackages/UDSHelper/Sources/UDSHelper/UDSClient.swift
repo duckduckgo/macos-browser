@@ -24,9 +24,33 @@ public actor UDSClient {
 
     public typealias PayloadHandler = (Data) async throws -> Void
 
-    enum ConnectionError: Error {
+    enum ConnectionError: CustomNSError {
         case cancelled
         case failure(_ error: Error)
+
+        /// This means there's either no peer to connect to, or the connection timed out.
+        ///
+        /// For our local UDS connection either is a clear problem.
+        ///
+        case timeout(_ error: Error)
+
+        var errorCode: Int {
+            switch self {
+            case .cancelled: return 1
+            case .failure: return 2
+            case .timeout: return 3
+            }
+        }
+
+        var errorUserInfo: [String: Any] {
+            switch self {
+            case .cancelled:
+                return [:]
+            case .failure(let error),
+                    .timeout(let error):
+                return [NSUnderlyingErrorKey: error as NSError]
+            }
+        }
     }
 
     private var internalConnection: NWConnection?
@@ -71,7 +95,9 @@ public actor UDSClient {
     ///
     private func connect() async throws -> NWConnection {
         let endpoint = NWEndpoint.unix(path: socketFileURL.path)
-        let parameters = NWParameters.tcp
+        let options = NWProtocolTCP.Options()
+        options.connectionTimeout = 5
+        let parameters = NWParameters(tls: nil, tcp: options)
         let connection = NWConnection(to: endpoint, using: parameters)
 
         connection.stateUpdateHandler = { state in
@@ -91,6 +117,8 @@ public actor UDSClient {
                 throw ConnectionError.cancelled
             case .failed(let error):
                 throw ConnectionError.failure(error)
+            case .waiting(let error):
+                throw ConnectionError.timeout(error)
             default:
                 try await Task.sleep(nanoseconds: 200 * MSEC_PER_SEC)
             }
