@@ -127,7 +127,10 @@ extension ContextMenuManager {
         if isCurrentWindowBurner || !isWebViewSupportedScheme {
             menu.removeItem(at: index)
         } else {
-            menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
+            let newWindowItem = self.openLinkInNewWindowMenuItem(from: item)
+            let newFireWindowItem = self.openLinkInNewFireWindowMenuItem(from: item, alternate: true)
+            menu.replaceItem(at: index, with: newWindowItem)
+            menu.insertItem(newFireWindowItem, at: index + 1)
         }
     }
 
@@ -253,6 +256,15 @@ private extension ContextMenuManager {
 
     func openLinkInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
         makeMenuItem(withTitle: item.title, action: #selector(openLinkInNewWindow), from: item, with: .openLinkInNewWindow)
+    }
+
+    func openLinkInNewFireWindowMenuItem(from item: NSMenuItem, alternate: Bool) -> NSMenuItem {
+        let menuItem = makeMenuItem(withTitle: UserText.openLinkInNewBurnerWindow, action: #selector(openLinkInNewFireWindow), from: item, with: .openLinkInNewWindow)
+        if alternate {
+            menuItem.isAlternate = alternate
+            menuItem.keyEquivalentModifierMask = .option
+        }
+        return menuItem
     }
 
     func openFrameInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
@@ -381,6 +393,13 @@ private extension ContextMenuManager {
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
+        openLinkInNewWindowCommon(sender, burner: false)
+    }
+    func openLinkInNewFireWindow(_ sender: NSMenuItem) {
+        openLinkInNewWindowCommon(sender, burner: true)
+    }
+
+    func openLinkInNewWindowCommon(_ sender: NSMenuItem, burner: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openLinkInNewWindow,
@@ -390,8 +409,13 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in
-            .allow(.window(active: true, burner: false))
+        onNewWindow = { navigationAction in
+            if burner {
+                WindowsManager.openNewWindow(with: navigationAction?.request.url ?? .blankPage, source: .link, isBurner: true)
+                return .cancel
+            } else {
+                return .allow(.window(active: true, burner: false))
+            }
         }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
