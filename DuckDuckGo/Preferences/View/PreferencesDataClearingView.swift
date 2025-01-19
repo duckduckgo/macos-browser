@@ -28,7 +28,7 @@ extension Preferences {
         var body: some View {
             PreferencePane(UserText.dataClearing) {
 
-                // SECTION 1: Automatically Clear Data
+                // SECTION: Automatically Clear Data
                 PreferencePaneSection(UserText.autoClear) {
 
                     PreferencePaneSubSection {
@@ -41,7 +41,19 @@ extension Preferences {
 
                 }
 
-                // SECTION 2: Fireproof Site
+                // SECTION: Fire Window
+                PreferencePaneSection(UserText.dataClearing) {
+
+                    PreferencePaneSubSection {
+                        ToggleMenuItem("One-click Fire button", isOn: $model.oneClickFireButton)
+                        VStack(alignment: .leading, spacing: 1) {
+                            TextMenuItemCaption("When active hitting the Fire Button will clear data with no extra dialogs")
+                        }
+                    }
+
+                }
+
+                // SECTION: Fireproof Site
                 PreferencePaneSection(UserText.fireproofSites) {
 
                     PreferencePaneSubSection {
@@ -63,5 +75,12 @@ extension Preferences {
 
             }
         }
+    }
+}
+
+#Preview {
+    ScrollView {
+        Preferences.DataClearingView(model: .shared)
+            .padding()
     }
 }

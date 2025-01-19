@@ -24,6 +24,7 @@ class MockFireButtonPreferencesPersistor: FireButtonPreferencesPersistor {
     var autoClearEnabled: Bool = false
     var warnBeforeClearingEnabled: Bool = false
     var loginDetectionEnabled: Bool = false
+    var oneClickFireButton: Bool = false
 
 }
 
