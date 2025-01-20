@@ -20,6 +20,15 @@
 @MainActor
 extension Tab: @preconcurrency _WKWebExtensionTab {
 
+    enum WebExtensionTabError: Error {
+        case notSupported
+        case tabNotFound
+        case alreadyPinned
+        case notPinned
+        case alreadyMuted
+        case notMuted
+    }
+
     private var tabCollectionViewModel: TabCollectionViewModel? {
         let mainWindowController = WindowControllersManager.shared.windowController(for: self)
         let mainViewController = mainWindowController?.mainViewController
@@ -42,6 +51,7 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
 
     func setParent(_ parentTab: (any _WKWebExtensionTab)?, for context: _WKWebExtensionContext) async throws {
         assertionFailure("not supported yet")
+        throw WebExtensionTabError.notSupported
     }
 
     func mainWebView(for context: _WKWebExtensionContext) -> WKWebView? {
@@ -57,11 +67,33 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
     }
 
     func pin(for context: _WKWebExtensionContext) async throws {
-        assertionFailure("not supported yet")
+        guard let tabIndex = tabCollectionViewModel?.indexInAllTabs(of: self) else {
+            assertionFailure("Tab not found")
+            throw WebExtensionTabError.tabNotFound
+        }
+
+        switch tabIndex {
+        case .pinned:
+            assertionFailure("Tab is already pinned")
+            throw WebExtensionTabError.alreadyPinned
+        case .unpinned(let index):
+            tabCollectionViewModel?.pinTab(at: index)
+        }
     }
 
     func unpin(for context: _WKWebExtensionContext) async throws {
-        assertionFailure("not supported yet")
+        guard let tabIndex = tabCollectionViewModel?.indexInAllTabs(of: self) else {
+            assertionFailure("Tab not found")
+            throw WebExtensionTabError.tabNotFound
+        }
+
+        switch tabIndex {
+        case .pinned(let index):
+            tabCollectionViewModel?.unpinTab(at: index)
+        case .unpinned:
+            assertionFailure("Tab is not pinned")
+            throw WebExtensionTabError.notPinned
+        }
     }
 
     func isReaderModeAvailable(for context: _WKWebExtensionContext) -> Bool {
@@ -74,6 +106,7 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
 
     func toggleReaderMode(for context: _WKWebExtensionContext) async throws {
         assertionFailure("not supported yet")
+        throw WebExtensionTabError.notSupported
     }
 
     func isAudible(for context: _WKWebExtensionContext) -> Bool {
@@ -85,11 +118,21 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
     }
 
     func mute(for context: _WKWebExtensionContext) async throws {
-        assertionFailure("not supported yet")
+        guard audioState.isMuted else {
+            assertionFailure("Tab is muted")
+            throw WebExtensionTabError.alreadyMuted
+        }
+
+        muteUnmuteTab()
     }
 
     func unmute(for context: _WKWebExtensionContext) async throws {
-        assertionFailure("not supported yet")
+        guard !audioState.isMuted else {
+            assertionFailure("Tab is not muted")
+            throw WebExtensionTabError.notMuted
+        }
+
+        muteUnmuteTab()
     }
 
     func size(for context: _WKWebExtensionContext) -> CGSize {
@@ -122,7 +165,7 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
 
     func captureVisibleWebpage(for context: _WKWebExtensionContext) async throws -> NSImage? {
         assertionFailure("not supported yet")
-        return nil
+        throw WebExtensionTabError.notSupported
     }
 
     func load(_ url: URL, for context: _WKWebExtensionContext) async throws {
@@ -160,18 +203,19 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
 
     func deselect(for context: _WKWebExtensionContext) async throws {
         assertionFailure("not supported yet")
+        throw WebExtensionTabError.notSupported
     }
 
     func duplicate(for context: _WKWebExtensionContext, with options: _WKWebExtensionTabCreationOptions) async throws -> (any _WKWebExtensionTab)? {
         assertionFailure("not supported yet")
-        return nil
+        throw WebExtensionTabError.notSupported
     }
 
     func close(for context: _WKWebExtensionContext) async throws {
         if let index = tabCollectionViewModel?.indexInAllTabs(of: self) {
             tabCollectionViewModel?.remove(at: index)
         } else {
-            assertionFailure("Tab not found")
+            throw WebExtensionTabError.tabNotFound
         }
     }
 
