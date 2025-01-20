@@ -478,7 +478,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
             Logger.networkProtection.log("Subscription Entitlements check...")
-            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureActive(.networkProtection)
+            let isNetworkProtectionEnabled = await subscriptionManager.isFeatureAvailableForUser(.networkProtection)
             Logger.networkProtection.log("Network protection is \( isNetworkProtectionEnabled ? "🟢 Enabled" : "⚫️ Disabled", privacy: .public)")
             return .success(isNetworkProtectionEnabled)
         }

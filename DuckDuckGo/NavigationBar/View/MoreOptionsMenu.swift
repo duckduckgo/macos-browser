@@ -970,10 +970,10 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
         let itrgFeature = features.first { $0.entitlement == .identityTheftRestorationGlobal }
 
         Task { @MainActor in
-            self.networkProtectionItem.isEnabled = vpnFeature?.enabled ?? false
-            self.dataBrokerProtectionItem.isEnabled = dbpFeature?.enabled ?? false
-            let hasIdentityTheftRestoration = itrFeature?.enabled ?? false
-            let hasIdentityTheftRestorationGlobal = itrgFeature?.enabled ?? false
+            self.networkProtectionItem.isEnabled = vpnFeature?.availableForUser ?? false
+            self.dataBrokerProtectionItem.isEnabled = dbpFeature?.availableForUser ?? false
+            let hasIdentityTheftRestoration = itrFeature?.availableForUser ?? false
+            let hasIdentityTheftRestorationGlobal = itrgFeature?.availableForUser ?? false
             self.identityTheftRestorationItem.isEnabled = hasIdentityTheftRestoration || hasIdentityTheftRestorationGlobal
         }
     }

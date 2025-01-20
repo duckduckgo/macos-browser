@@ -390,9 +390,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             shouldShowITR = itrFeature != nil || itrgFeature != nil
 
             // is active/enabled
-            hasAccessToVPN = vpnFeature?.enabled ?? false
-            hasAccessToDBP = dbpFeature?.enabled ?? false
-            hasAccessToITR = itrFeature?.enabled ?? false || itrgFeature?.enabled ?? false
+            hasAccessToVPN = vpnFeature?.availableForUser ?? false
+            hasAccessToDBP = dbpFeature?.availableForUser ?? false
+            hasAccessToITR = itrFeature?.availableForUser ?? false || itrgFeature?.availableForUser ?? false
         }
     }
 

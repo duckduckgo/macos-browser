@@ -90,7 +90,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         let isAuthenticated = subscriptionManager.isUserAuthenticated
         if !isAuthenticated && freemiumDBPUserStateManager.didActivate { return true }
 
-        let hasEntitlements = await subscriptionManager.isFeatureActive(.dataBrokerProtection)
+        let hasEntitlements = await subscriptionManager.isFeatureAvailableForUser(.dataBrokerProtection)
         firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: hasEntitlements, isAuthenticatedResult: isAuthenticated)
         return hasEntitlements && isAuthenticated
     }

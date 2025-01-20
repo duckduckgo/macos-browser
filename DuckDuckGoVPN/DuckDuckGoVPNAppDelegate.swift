@@ -441,7 +441,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
             Logger.networkProtection.log("Subscription Entitlements check...")
-            let isNetworkProtectionEnabled = await self.subscriptionManager.isFeatureActive(.networkProtection)
+            let isNetworkProtectionEnabled = await self.subscriptionManager.isFeatureAvailableForUser(.networkProtection)
             Logger.networkProtection.log("Network protection is \( isNetworkProtectionEnabled ? "🟢 Enabled" : "⚫️ Disabled", privacy: .public)")
             return .success(isNetworkProtectionEnabled)
         }
