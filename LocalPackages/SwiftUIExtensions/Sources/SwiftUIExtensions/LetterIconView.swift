@@ -26,14 +26,14 @@ public struct LetterIconView: View {
     public var characterCount: Int
     private var paddingModifier: CGFloat
     private var font: Font
-    private static let wwwPreffix = "www."
+    private static let wwwPrefix = "www."
 
     private var characters: String {
         if let prefferedFirstCharacters = prefferedFirstCharacters,
            prefferedFirstCharacters != "" {
             return String(prefferedFirstCharacters.prefix(characterCount))
         }
-        return String(title.replacingOccurrences(of: Self.wwwPreffix, with: "").prefix(characterCount))
+        return String(title.replacingOccurrences(of: Self.wwwPrefix, with: "").prefix(characterCount))
     }
 
     /// Initializes a `LetterIconView`
