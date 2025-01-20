@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "fcappelli/subscription_oauth_api_v2",
-        "revision" : "8bed092b8ca59d0d947b4a5b4da6daf2386cf3d5"
+        "revision" : "72b6b9208c8d24a7b45540fca5ed6474e7132a86"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "7958ddab724c26326333cae13fe81478290607fa",
-        "version" : "7.6.0"
+        "revision" : "0ac30560ec969a321caea321f95537120416c323",
+        "version" : "7.7.0"
       }
     },
     {
