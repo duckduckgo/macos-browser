@@ -47,16 +47,11 @@ final class NativeMessagingHandler {
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, sendMessage message: Any, to applicationIdentifier: String?, for extensionContext: _WKWebExtensionContext) async throws -> Any? {
-        //TODO: Handle browser.runtime.sendNativeMessage()
+        // Handle browser.runtime.sendNativeMessage()
         return nil
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, connectUsingMessagePort port: _WKWebExtension.MessagePort, for extensionContext: _WKWebExtensionContext) async throws {
-        guard let applicationId = port.applicationIdentifier else {
-            assertionFailure("No application id")
-            return
-        }
-
         port.disconnectHandler = { [weak self] error in
             if let error {
                 Logger.webExtensions.log(("Message port disconnected: \(error)"))
@@ -93,8 +88,8 @@ final class NativeMessagingHandler {
             connection.communicator.send(messageData: jsonData)
         }
 
-        //TODO: App path and arguments for Safari extensions
-        let communicator = NativeMessagingCommunicator(appPath: "/Users/tom19911991/Developer/macos/macos-browser/DuckDuckGo/WebExtensions/native-messaging/app/ping_pong.py", arguments: [])
+        // In future, detect the application path from the appropriate extension file
+        let communicator = NativeMessagingCommunicator(appPath: "", arguments: [])
         communicator.delegate = self
         let connection = NativeMessagingConnection(port: port,
                                                    communicator: communicator)

@@ -37,11 +37,13 @@ final class NativeMessagingConnection {
         self.port = port
         self.communicator = communicator
 
-        do {
-            try communicator.runProxyProcess()
-        } catch {
-            Logger.webExtensions.error("NativeMessagingConnection: Running proxy process failed")
-            delegate?.nativeMessagingConnectionProcessDidFail(self)
-        }
+        // Enable running proxy process when the application path in native messaging
+        // communicator is corrrect
+//        do {
+//            try communicator.runProxyProcess()
+//        } catch {
+//            Logger.webExtensions.error("NativeMessagingConnection: Running proxy process failed")
+//            delegate?.nativeMessagingConnectionProcessDidFail(self)
+//        }
     }
 }
