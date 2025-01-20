@@ -1,19 +1,18 @@
-name: Sync End-to-End tests
+name: macOS - Sync-End-to-End tests MacOS11/12
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 5 * * *' # run at 5 AM UTC
+  # schedule:
+  #   - cron: '0 4 * * *' # run at 4 AM UTC
 
 jobs:
   create-notarized-app:
-    name: Build Notarized Review app
-    uses: ./.github/workflows/build_notarized.yml
+    name: Prepare DMG Release
+    uses: ./.github/workflows/macos_build_notarized.yml
     with:
       release-type: review
       create-dmg: false
-      branch: ${{ github.sha }}
-      skip-notify: true
+      branch: ${{ github.ref_name }}
     secrets:
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -28,33 +27,20 @@ jobs:
       MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
       SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
-  sync-end-to-end-tests:
-    name: Sync End-to-End Tests
+  sync-end-to-end-tests-older-macos:
+    name: Sync E2E tests
     needs: create-notarized-app
+    env:
+      app-version: ${{ needs.create-notarized-app.outputs.app-version }}
+
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-13-xlarge, macos-14-xlarge, macos-15-xlarge]
-        include:
-          - xcode-version: "15.2"
-            runner: macos-13-xlarge
-          - xcode-version: "15.4"
-            runner: macos-14-xlarge
-          - xcode-version: "16.2"
-            runner: macos-15-xlarge
+        runner: [ macos-11, macos-12-large ]
 
     timeout-minutes: 60
-
     steps:
-    - name: Install screenresolution
-      if: matrix.runner == 'macos-15-xlarge'
-      run: brew install screenresolution
-
-    - name: Change screen resolution
-      if: matrix.runner == 'macos-15-xlarge'
-      run: screenresolution set 1920x1080x32@60
-
     - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.9.0
       with:
@@ -76,6 +62,7 @@ jobs:
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
       run: |
+        bundle exec fastlane sync_signing_dmg_review
         bundle exec fastlane sync_signing_ci
 
     - name: Download and unzip artifact
@@ -99,11 +86,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-spm-
 
-    - name: Select Xcode
-      run: |
-        # Override .xcode_version because 15.4 is not available on macos 13
-        echo "${{ matrix.xcode-version }}" > .xcode-version
-        sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+    - name: Select Xcode 14.2 for macOS 12
+      if: matrix.runner == 'macos-12-large'
+      run: sudo xcode-select -s /Applications/Xcode_14.2.app/Contents/Developer
+
+    - name: Select Xcode 13.2.1 for macOS 11
+      if: matrix.runner == 'macos-11'
+      run: sudo xcode-select -s /Applications/Xcode_13.2.1.app/Contents/Developer
 
     - name: Create test account for Sync and return the recovery code
       uses: duckduckgo/sync_crypto/action@main
@@ -111,64 +100,62 @@ jobs:
       with:
         debug: true
 
-    - name: Build Sync e2e tests
+    # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
+    - name: Build test runner
       run: |
+        rm -rf LocalPackages
+        rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+        sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
+        sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
-          -scheme "Sync End-to-End UI Tests CI" \
+          -scheme "SyncE2EUITestsOldVersions" \
           -derivedDataPath DerivedData \
-          -skipPackagePluginValidation \
-          -skipMacroValidation \
-        | tee xcodebuild.log \
-        | xcbeautify
+          -configuration Review
 
     - name: Unzip and Copy app to /DerivedData
       run: |
         cd DuckDuckGo-review-*.app && unzip DuckDuckGo-*.zip
-        mv -f "DuckDuckGo Review.app" "../DerivedData/Build/Products/Review/DuckDuckGo Review.app"
+        cp -R "DuckDuckGo Review.app" "../DerivedData/Build/Products/Review/DuckDuckGo Review.app"
 
-    - name: Run UI Tests
+    - name: Run tests
       env:
         CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
-        # Set CODE environment variable in the scheme definition, since Xcode 15.4 doesn't
-        # seem to recognize global environment variables otherwise.
-        # We use xmlstarlet to edit the scheme XML file.
-        brew install xmlstarlet
-        xmlstarlet ed -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t elem -n "EnvironmentVariable" \
-          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "key" -v "CODE" \
-          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "value" -v "$CODE" \
-          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "isEnabled" -v "YES" \
-          "DuckDuckGo-macOS.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme" > updated.xcscheme
-        mv -f updated.xcscheme "DuckDuckGo-macOS.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme"
-
-        defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
-        set -o pipefail && xcodebuild test-without-building \
-          -scheme "Sync End-to-End UI Tests CI" \
+        defaults write com.duckduckgo.macos.browser.review sync.environment Development
+        defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
+        set -o pipefail && xcodebuild test \
+          -scheme "SyncE2EUITestsOldVersions" \
           -derivedDataPath DerivedData \
-          -skipPackagePluginValidation \
-          -skipMacroValidation \
+          -configuration Review \
           -test-iterations 2 \
           -retry-tests-on-failure \
-        | tee -a xcodebuild.log \
-        | tee ui-tests.log
+        | tee xcodebuild.log \
+        | (if [ "${{ matrix.runner }}" = "macos-11" ]; then
+            xcpretty --report junit --output ui-tests.xml
+          else
+            xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
+          fi)
 
-    - name: Prepare test report
-      if: always()
-      run: |
-        xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml < ui-tests.log
+ #   - name: Create Asana task when workflow failed
+ #     if: ${{ failure() }} && github.ref == 'refs/heads/main'
+ #     run: |
+ #       curl -s "https://app.asana.com/api/1.0/tasks" \
+ #          --header "Accept: application/json" \
+ #          --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
+ #          --header "Content-Type: application/json" \
+ #          --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v4
-      if: always() # always run even if the previous step fails
+      if: always()
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
-        check_retries: true
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
-      if: failure() || cancelled()
+      if: always()
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
@@ -176,19 +163,3 @@ jobs:
           DerivedData/Logs/Test/*.xcresult
           ~/Library/Logs/DiagnosticReports/*
         retention-days: 7
-
-  notify-failure:
-    name: Notify on failure
-    if: ${{ always() && github.event_name == 'schedule' && (needs.sync-end-to-end-tests.result == 'failure' || needs.sync-end-to-end-tests.result == 'cancelled') }}
-    needs: [sync-end-to-end-tests]
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Create Asana task when workflow failed
-      uses: duckduckgo/native-github-asana-sync@v1.1
-      with:
-        action: create-asana-task
-        asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
-        asana-task-name: GH Workflow Failure - Sync End-to-End Tests
-        asana-task-description: The Sync end-to-end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

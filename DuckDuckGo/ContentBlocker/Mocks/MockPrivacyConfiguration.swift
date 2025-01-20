@@ -44,6 +44,7 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
                                                                             state: PrivacyConfigurationData.State.enabled)
     var exceptionsList: (PrivacyFeature) -> [String] = { _ in [] }
     var featureSettings: PrivacyConfigurationData.PrivacyFeature.FeatureSettings = [:]
+    var subfeatureSettings: PrivacyConfigurationData.PrivacyFeature.SubfeatureSettings = ""
 
     func exceptionsList(forFeature featureKey: PrivacyFeature) -> [String] { exceptionsList(featureKey) }
     var isFeatureKeyEnabled: ((PrivacyFeature, AppVersionProvider) -> Bool)?
@@ -76,6 +77,9 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
     func isInExceptionList(domain: String?, forFeature featureKey: PrivacyFeature) -> Bool { false }
     func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
         featureSettings }
+    func settings(for subfeature: any BrowserServicesKit.PrivacySubfeature) -> PrivacyConfigurationData.PrivacyFeature.SubfeatureSettings? {
+        subfeatureSettings
+    }
     func userEnabledProtection(forDomain: String) {}
     func userDisabledProtection(forDomain: String) {}
 }

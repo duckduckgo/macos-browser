@@ -1,4 +1,4 @@
-name: PIR E2E Tests
+name: macOS - PIR E2E Tests
 
 on:
   workflow_dispatch:

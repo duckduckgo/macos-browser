@@ -1,4 +1,4 @@
-name: PR Checks
+name: macOS - PR Checks
 
 on:
   push:
@@ -305,7 +305,7 @@ jobs:
     name: Private API Report
     needs: tests
     if: ${{ success() || needs.tests.outputs.private-api-check-report }}
-    uses: ./.github/workflows/private_api_report.yml
+    uses: ./.github/workflows/macos_private_api_report.yml
     with:
       report: ${{ needs.tests.outputs.private-api-check-report }}
 

@@ -51,6 +51,7 @@ public enum FeatureFlag: String, CaseIterable {
     case htmlNewTabPage
 
     case autofillPartialFormSaves
+    case autcompleteTabs
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -61,6 +62,8 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .maliciousSiteProtection:
             return true
         case .autofillPartialFormSaves:
+            return true
+        case .autcompleteTabs:
             return true
         case .networkProtectionAppExclusions:
             return true
@@ -105,6 +108,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .disabled
         case .autofillPartialFormSaves:
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
+        case .autcompleteTabs:
+            return .remoteReleasable(.feature(.autocompleteTabs))
         }
     }
 }

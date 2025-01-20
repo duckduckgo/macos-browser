@@ -128,6 +128,7 @@ extension NetworkProtectionStatusView {
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
                                                                   statusReporter: statusReporter,
                                                                   vpnSettings: .init(defaults: userDefaults),
+                                                                  proxySettings: .init(defaults: userDefaults),
                                                                   locationFormatter: locationFormatter,
                                                                   uiActionHandler: uiActionHandler)
 

@@ -1,6 +1,6 @@
-name: Prepare Release
+name: macOS - Prepare Release
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       asana-task-url:
@@ -11,7 +11,7 @@ on:
         description: "Skip App Store release and only make a DMG build"
         default: false
         type: boolean
-      destination: 
+      destination:
         description: "Upload destination (TestFlight or App Store)"
         required: false
         default: testflight
@@ -30,7 +30,7 @@ on:
         description: "Skip App Store release and only make a DMG build"
         default: false
         type: boolean
-      destination: 
+      destination:
         description: "Upload destination (TestFlight or App Store)"
         required: false
         default: testflight
@@ -65,7 +65,7 @@ jobs:
 
   dmg-release:
     name: Prepare DMG Release
-    uses: ./.github/workflows/build_notarized.yml
+    uses: ./.github/workflows/macos_build_notarized.yml
     with:
       release-type: release
       create-dmg: true
@@ -90,7 +90,7 @@ jobs:
 
     if: inputs.skip-appstore != 'true'
 
-    uses: ./.github/workflows/build_appstore.yml
+    uses: ./.github/workflows/macos_build_appstore.yml
     with:
       destination: ${{ inputs.destination }}
       asana-task-url: ${{ inputs.asana-task-url }}
