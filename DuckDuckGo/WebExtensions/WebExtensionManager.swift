@@ -118,16 +118,14 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     private func makeContext(for webExtension: _WKWebExtension) -> _WKWebExtensionContext {
         let context = _WKWebExtensionContext(for: webExtension)
 
-        // TODO: Temporary fix to have the same state on multiple browser sessions
+        // Temporary fix to have the same state on multiple browser sessions
         context.uniqueIdentifier = UUID(uuidString: "36dbd1f8-27c7-43fd-a206-726958a1018d")!.uuidString
 
-        // TODO: We should consult what the extension requests to decide what to grant.
+        // In future, we should grant only what the extension requests.
         let matchPatterns = context.webExtension.allRequestedMatchPatterns
         for pattern in matchPatterns {
             context.setPermissionStatus(.grantedExplicitly, for: pattern, expirationDate: nil)
         }
-
-        // TODO: Grant only what the extension requests.
         let permissions: [String] = ["activeTab", "alarms", "clipboardWrite", "contextMenus", "cookies", "declarativeNetRequest", "declarativeNetRequestFeedback", "declarativeNetRequestWithHostAccess", "menus", "nativeMessaging", "notifications", "scripting", "sidePanel", "storage", "tabs", "unlimitedStorage", "webNavigation", "webRequest"]
         for permission in permissions {
             context.setPermissionStatus(.grantedExplicitly, for: permission, expirationDate: nil)
