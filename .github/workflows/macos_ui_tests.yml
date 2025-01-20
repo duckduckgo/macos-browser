@@ -1,4 +1,4 @@
-name: UI Tests
+name: macOS - UI Tests
 
 on:
   workflow_dispatch:
@@ -8,11 +8,11 @@ on:
     branches:
       - hotfix/*
       - release/*
-      
+
 jobs:
   create-notarized-app:
     name: Build Notarized Review app
-    uses: ./.github/workflows/build_notarized.yml
+    uses: ./.github/workflows/macos_build_notarized.yml
     with:
       release-type: review
       create-dmg: false
@@ -78,7 +78,7 @@ jobs:
 
     - name: Create Default Keychain
       run: bundle exec fastlane create_keychain_ui_tests
-  
+
     - name: Sync code signing assets
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
@@ -151,7 +151,7 @@ jobs:
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v4
-      if: always() 
+      if: always()
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml

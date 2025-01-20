@@ -25,6 +25,10 @@ import BrowserServicesKit
 @MainActor
 protocol WindowControllersManagerProtocol {
 
+    var mainWindowControllers: [MainWindowController] { get }
+    var selectedTab: Tab? { get }
+    var allTabCollectionViewModels: [TabCollectionViewModel] { get }
+
     var lastKeyMainWindowController: MainWindowController? { get }
     var pinnedTabsManager: PinnedTabsManager { get }
 
@@ -92,18 +96,6 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
                 didChangeKeyWindowController.send(lastKeyMainWindowController)
             }
         }
-    }
-
-    private var mainWindowController: MainWindowController? {
-        return mainWindowControllers.first(where: {
-            let isMain = $0.window?.isMainWindow ?? false
-            let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-            return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
-        })
-    }
-
-    var selectedTab: Tab? {
-        return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
     }
 
     let didChangeKeyWindowController = PassthroughSubject<MainWindowController?, Never>()
@@ -192,6 +184,28 @@ extension WindowControllersManager {
             // If there is any non-popup window available, open the URL in it
             ?? nonPopupMainWindowControllers.first {
 
+            let tabCollectionViewModel = windowController.mainViewController.tabCollectionViewModel
+            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
+            let selectionIndex = tabCollectionViewModel.selectionIndex
+
+            // Switch to already open tab if present
+            if [.appOpenUrl, .switchToOpenTab].contains(source),
+               let url, switchToOpenTab(with: url, preferring: windowController) == true {
+
+                if let selectedTabViewModel, let selectionIndex,
+                   case .newtab = selectedTabViewModel.tab.content {
+                    // close tab with "new tab" page open
+                    tabCollectionViewModel.remove(at: selectionIndex)
+
+                    // close the window if no more non-pinned tabs are open
+                    if tabCollectionViewModel.tabs.isEmpty, let window = windowController.window, window.isVisible,
+                       mainWindowController?.mainViewController.tabCollectionViewModel.selectedTabIndex?.isPinnedTab != true {
+                        window.performClose(nil)
+                    }
+                }
+                return
+            }
+
             show(url: url, in: windowController, source: source, newTab: newTab)
             return
         }
@@ -202,6 +216,28 @@ extension WindowControllersManager {
         } else {
             WindowsManager.openNewWindow(burnerMode: .regular)
         }
+    }
+
+    private func switchToOpenTab(with url: URL, preferring mainWindowController: MainWindowController) -> Bool {
+        for (windowIdx, windowController) in ([mainWindowController] + mainWindowControllers).enumerated() {
+            // prefer current main window
+            guard windowIdx == 0 || windowController !== mainWindowController else { continue }
+            let tabCollectionViewModel = windowController.mainViewController.tabCollectionViewModel
+            guard let index = tabCollectionViewModel.indexInAllTabs(where: {
+                $0.content.urlForWebView == url || (url.isSettingsURL && $0.content.urlForWebView?.isSettingsURL == true)
+            }) else { continue }
+
+            windowController.window?.makeKeyAndOrderFront(self)
+            tabCollectionViewModel.select(at: index)
+            if let tab = tabCollectionViewModel.tabViewModel(at: index)?.tab,
+               tab.content.urlForWebView != url {
+                // navigate to another settings pane
+                tab.setContent(.contentFromURL(url, source: .switchToOpenTab))
+            }
+
+            return true
+        }
+        return false
     }
 
     private func show(url: URL?, in windowController: MainWindowController, source: Tab.TabContent.URLSource, newTab: Bool) {
@@ -325,7 +361,19 @@ extension Tab {
 }
 
 // MARK: - Accessing all TabCollectionViewModels
-extension WindowControllersManager {
+extension WindowControllersManagerProtocol {
+
+    var mainWindowController: MainWindowController? {
+        return mainWindowControllers.first(where: {
+            let isMain = $0.window?.isMainWindow ?? false
+            let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
+            return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
+        })
+    }
+
+    var selectedTab: Tab? {
+        return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
+    }
 
     var allTabCollectionViewModels: [TabCollectionViewModel] {
         return mainWindowControllers.map {
@@ -335,8 +383,22 @@ extension WindowControllersManager {
 
     var allTabViewModels: [TabViewModel] {
         return allTabCollectionViewModels.flatMap {
-            Array($0.tabViewModels.values)
+            $0.tabViewModels.values
         }
+    }
+
+    func allTabViewModels(for burnerMode: BurnerMode, includingPinnedTabs: Bool = false) -> [TabViewModel] {
+        var result = allTabCollectionViewModels
+            .filter { tabCollectionViewModel in
+                tabCollectionViewModel.burnerMode == burnerMode
+            }
+            .flatMap {
+                $0.tabViewModels.values
+            }
+        if includingPinnedTabs {
+            result += pinnedTabsManager.tabViewModels.values
+        }
+        return result
     }
 
     func windowController(for tabCollectionViewModel: TabCollectionViewModel) -> MainWindowController? {

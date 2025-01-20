@@ -1,4 +1,4 @@
-name: Sync-End-to-End tests MacOS11/12
+name: macOS - Sync-End-to-End tests MacOS11/12
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
 jobs:
   create-notarized-app:
     name: Prepare DMG Release
-    uses: ./.github/workflows/build_notarized.yml
+    uses: ./.github/workflows/macos_build_notarized.yml
     with:
       release-type: review
       create-dmg: false
@@ -64,7 +64,7 @@ jobs:
       run: |
         bundle exec fastlane sync_signing_dmg_review
         bundle exec fastlane sync_signing_ci
-  
+
     - name: Download and unzip artifact
       uses: actions/download-artifact@v4
 
@@ -101,18 +101,18 @@ jobs:
         debug: true
 
     # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
-    - name: Build test runner 
+    - name: Build test runner
       run: |
         rm -rf LocalPackages
-        rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved 
+        rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
         sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "SyncE2EUITestsOldVersions" \
           -derivedDataPath DerivedData \
-          -configuration Review 
-    
-    - name: Unzip and Copy app to /DerivedData                         
+          -configuration Review
+
+    - name: Unzip and Copy app to /DerivedData
       run: |
         cd DuckDuckGo-review-*.app && unzip DuckDuckGo-*.zip
         cp -R "DuckDuckGo Review.app" "../DerivedData/Build/Products/Review/DuckDuckGo Review.app"
@@ -148,14 +148,14 @@ jobs:
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v4
-      if: always() 
+      if: always()
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
-      if: always() 
+      if: always()
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |

@@ -41,6 +41,7 @@ final class FreemiumDBPPresenterTests: XCTestCase {
 }
 
 private final class MockWindowControllerManager: WindowControllersManagerProtocol {
+    var mainWindowControllers: [DuckDuckGo_Privacy_Browser.MainWindowController] = []
 
     var lastKeyMainWindowController: DuckDuckGo_Privacy_Browser.MainWindowController?
 

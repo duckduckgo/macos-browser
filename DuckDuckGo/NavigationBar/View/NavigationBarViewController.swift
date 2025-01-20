@@ -85,7 +85,7 @@ final class NavigationBarViewController: NSViewController {
     var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
-    private let isBurner: Bool
+    private var burnerMode: BurnerMode { tabCollectionViewModel.burnerMode }
 
     // swiftlint:disable weak_delegate
     private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
@@ -123,7 +123,6 @@ final class NavigationBarViewController: NSViewController {
     private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
 
     static func create(tabCollectionViewModel: TabCollectionViewModel,
-                       isBurner: Bool,
                        downloadListCoordinator: DownloadListCoordinator = .shared,
                        dragDropManager: BookmarkDragDropManager = .shared,
                        networkProtectionPopoverManager: NetPPopoverManager,
@@ -132,8 +131,8 @@ final class NavigationBarViewController: NSViewController {
                        aiChatMenuConfig: AIChatMenuVisibilityConfigurable,
                        brokenSitePromptLimiter: BrokenSitePromptLimiter) -> NavigationBarViewController {
         NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel,
-                      isBurner: isBurner,
+            self.init(coder: coder,
+                      tabCollectionViewModel: tabCollectionViewModel,
                       downloadListCoordinator: downloadListCoordinator,
                       dragDropManager: dragDropManager,
                       networkProtectionPopoverManager: networkProtectionPopoverManager,
@@ -144,8 +143,8 @@ final class NavigationBarViewController: NSViewController {
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel,
-          isBurner: Bool,
+    init?(coder: NSCoder,
+          tabCollectionViewModel: TabCollectionViewModel,
           downloadListCoordinator: DownloadListCoordinator,
           dragDropManager: BookmarkDragDropManager,
           networkProtectionPopoverManager: NetPPopoverManager,
@@ -154,10 +153,9 @@ final class NavigationBarViewController: NSViewController {
           aiChatMenuConfig: AIChatMenuVisibilityConfigurable,
           brokenSitePromptLimiter: BrokenSitePromptLimiter) {
 
-        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: isBurner)
+        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: tabCollectionViewModel.isBurner)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager, statusReporter: networkProtectionStatusReporter)
-        self.isBurner = isBurner
         self.downloadListCoordinator = downloadListCoordinator
         self.dragDropManager = dragDropManager
         self.aiChatMenuConfig = aiChatMenuConfig
@@ -246,7 +244,7 @@ final class NavigationBarViewController: NSViewController {
         let onboardingPixelReporter = OnboardingPixelReporter()
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel,
-                                                                      isBurner: isBurner,
+                                                                      burnerMode: burnerMode,
                                                                       popovers: popovers,
                                                                       onboardingPixelReporter: onboardingPixelReporter) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")

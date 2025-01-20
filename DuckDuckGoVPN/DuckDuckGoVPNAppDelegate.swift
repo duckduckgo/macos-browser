@@ -167,7 +167,17 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private let tunnelSettings: VPNSettings
     private lazy var userDefaults = UserDefaults.netP
-    private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
+    private lazy var proxySettings: TransparentProxySettings = {
+        let settings = TransparentProxySettings(defaults: .netP)
+
+#if APPSTORE
+        settings.proxyAvailable = false
+#else
+        settings.proxyAvailable = true
+#endif
+
+        return settings
+    }()
 
     @MainActor
     private lazy var vpnProxyLauncher = VPNProxyLauncher(

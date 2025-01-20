@@ -1229,6 +1229,66 @@
         }
       }
     },
+    "address.bar.search.open.tab.suffix" : {
+      "comment" : "Suffix of DuckDuckGo Search open tab suggestion. Example: cats – DuckDuckGo Search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo-Suche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo Search"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Búsqueda de DuckDuckGo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche DuckDuckGo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricerca DuckDuckGo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoeken met DuckDuckGo"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyszukiwanie DuckDuckGo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisa DuckDuckGo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск DuckDuckGo"
+          }
+        }
+      }
+    },
     "address.bar.search.suffix" : {
       "comment" : "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo",
       "extractionState" : "extracted_with_value",
@@ -33732,7 +33792,7 @@
     },
     "letsmove.alert.message" : {
       "comment" : "Message of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -33792,7 +33852,7 @@
     },
     "letsmove.alert.title" : {
       "comment" : "Title of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -33852,7 +33912,7 @@
     },
     "letsmove.could.not.move" : {
       "comment" : "Error message when moving the app to the /Applications folder failed",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -33912,7 +33972,7 @@
     },
     "letsmove.dont.move.button" : {
       "comment" : "Do Not Move to the /Applications folder button title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -33972,7 +34032,7 @@
     },
     "letsmove.move.button" : {
       "comment" : "Move the /Applications folder button title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -63951,6 +64011,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки подписки"
+          }
+        }
+      }
+    },
+    "switch.to.tab" : {
+      "comment" : "Suggestion to switch to an open tab button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Tab wechseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Switch to Tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar a Pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer à l'onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passa alla scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overschakelen naar tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przełącz na kartę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mudar para separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти на вкладку"
           }
         }
       }
