@@ -196,6 +196,10 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 @MainActor
 extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate {
 
+    enum WKWebExtensionControllerDelegateError: Error {
+        case notSupported
+    }
+
     func webExtensionController(_ controller: _WKWebExtensionController, openWindowsFor extensionContext: _WKWebExtensionContext) -> [any _WKWebExtensionWindow] {
         var windows = WindowControllersManager.shared.mainWindowControllers
         if let focusedWindow = WindowControllersManager.shared.lastKeyMainWindowController {
@@ -273,6 +277,7 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
 
     func webExtensionController(_ controller: _WKWebExtensionController, openOptionsPageFor extensionContext: _WKWebExtensionContext) async throws {
         assertionFailure("not supported yet")
+        throw WKWebExtensionControllerDelegateError.notSupported
     }
 
     private func webExtensionController(_ controller: _WKWebExtensionController, promptForPermissions permissions: Set<_WKWebExtensionPermission>, in tab: (any _WKWebExtensionTab)?, for extensionContext: _WKWebExtensionContext) async -> (Set<_WKWebExtensionPermission>, Date?) {
