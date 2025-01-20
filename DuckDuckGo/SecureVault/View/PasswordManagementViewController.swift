@@ -462,7 +462,7 @@ final class PasswordManagementViewController: NSViewController {
 
         self.itemModel = itemModel
 
-        let view = NSHostingView(rootView: PasswordManagementLoginItemView().environmentObject(itemModel))
+        let view = AutoRecalculatingKeyViewHostingView(rootView: PasswordManagementLoginItemView().environmentObject(itemModel))
         replaceItemContainerChildView(with: view)
     }
 
@@ -478,7 +478,7 @@ final class PasswordManagementViewController: NSViewController {
 
         self.itemModel = itemModel
 
-        let view = NSHostingView(rootView: PasswordManagementIdentityItemView().environmentObject(itemModel))
+        let view = AutoRecalculatingKeyViewHostingView(rootView: PasswordManagementIdentityItemView().environmentObject(itemModel))
         replaceItemContainerChildView(with: view)
     }
 
@@ -494,7 +494,7 @@ final class PasswordManagementViewController: NSViewController {
 
         self.itemModel = itemModel
 
-        let view = NSHostingView(rootView: PasswordManagementNoteItemView().environmentObject(itemModel))
+        let view = AutoRecalculatingKeyViewHostingView(rootView: PasswordManagementNoteItemView().environmentObject(itemModel))
         replaceItemContainerChildView(with: view)
     }
 
@@ -510,7 +510,7 @@ final class PasswordManagementViewController: NSViewController {
 
         self.itemModel = itemModel
 
-        let view = NSHostingView(rootView: PasswordManagementCreditCardItemView().environmentObject(itemModel))
+        let view = AutoRecalculatingKeyViewHostingView(rootView: PasswordManagementCreditCardItemView().environmentObject(itemModel))
         replaceItemContainerChildView(with: view)
     }
 
@@ -531,11 +531,6 @@ final class PasswordManagementViewController: NSViewController {
         itemContainer.addSubview(view)
         itemContainer.wantsLayer = true
         itemContainer.layer?.masksToBounds = false
-
-        // MainWindow sets autorecalculatesKeyViewLoop to false, so need to call recalculateKeyViewLoop() when view changes.
-        DispatchQueue.main.async {
-            view.window?.recalculateKeyViewLoop()
-        }
     }
 
     private func doSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
