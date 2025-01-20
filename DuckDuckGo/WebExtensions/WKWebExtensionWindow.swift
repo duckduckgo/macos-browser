@@ -20,6 +20,10 @@
 @MainActor
 extension MainWindowController: @preconcurrency _WKWebExtensionWindow {
 
+    enum WebExtensionWindowError: Error {
+        case notSupported
+    }
+
     func tabs(for context: _WKWebExtensionContext) -> [any _WKWebExtensionTab] {
         return mainViewController.tabCollectionViewModel.tabs
     }
@@ -50,13 +54,16 @@ extension MainWindowController: @preconcurrency _WKWebExtensionWindow {
 
     func setFrame(_ frame: CGRect, for context: _WKWebExtensionContext) async throws {
         assertionFailure("not supported yet")
+        throw WebExtensionWindowError.notSupported
     }
 
     func focus(for context: _WKWebExtensionContext) async throws {
         assertionFailure("not supported yet")
+        throw WebExtensionWindowError.notSupported
     }
+
     func close(for context: _WKWebExtensionContext) async throws {
-        assertionFailure("not supported yet")
+        close()
     }
 
 }
