@@ -540,6 +540,7 @@ class ChallangeSender: URLAuthenticationChallengeSender {
 class MockFeatureFlagger: FeatureFlagger {
     var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: MockInternalUserStoring())
     var localOverrides: FeatureFlagLocalOverriding?
+    var cohort: (any FlagCohort)?
 
     var isFeatureOn = true
     func isFeatureOn<Flag: FeatureFlagDescribing>(for featureFlag: Flag, allowOverride: Bool) -> Bool {
@@ -551,7 +552,7 @@ class MockFeatureFlagger: FeatureFlagger {
     }
 
     func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
-        return nil
+        return cohort
     }
 
     func getAllActiveExperiments() -> Experiments {
