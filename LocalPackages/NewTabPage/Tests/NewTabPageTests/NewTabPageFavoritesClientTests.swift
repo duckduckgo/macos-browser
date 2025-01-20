@@ -102,11 +102,11 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
         ]
         let data: NewTabPageDataModel.FavoritesData = try await messageHelper.handleMessage(named: .getData)
         XCTAssertEqual(data.favorites, [
-            .init(id: "1", title: "A", url: "https://a.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//a.com")),
-            .init(id: "10", title: "B", url: "https://b.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//b.com")),
-            .init(id: "5", title: "C", url: "https://c.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//c.com")),
-            .init(id: "2", title: "D", url: "https://d.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//d.com")),
-            .init(id: "3", title: "E", url: "https://e.com", favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//e.com"))
+            .init(id: "1", title: "A", url: "https://a.com", etldPlusOne: nil, favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//a.com")),
+            .init(id: "10", title: "B", url: "https://b.com", etldPlusOne: nil, favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//b.com")),
+            .init(id: "5", title: "C", url: "https://c.com", etldPlusOne: nil, favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//c.com")),
+            .init(id: "2", title: "D", url: "https://d.com", etldPlusOne: nil, favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//d.com")),
+            .init(id: "3", title: "E", url: "https://e.com", etldPlusOne: nil, favicon: .init(maxAvailableSize: 100, src: "duck://favicon/https%3A//e.com"))
         ])
     }
 
