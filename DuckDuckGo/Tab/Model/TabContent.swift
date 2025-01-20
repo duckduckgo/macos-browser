@@ -53,6 +53,7 @@ extension TabContent {
         case link
         case appOpenUrl
         case reload
+        case switchToOpenTab
 
         case webViewUpdated
 
@@ -72,7 +73,7 @@ extension TabContent {
             switch self {
             case .userEntered(_, downloadRequested: true):
                 .custom(.userRequestedPageDownload)
-            case .userEntered:
+            case .userEntered, .switchToOpenTab /* fallback */:
                 .custom(.userEnteredUrl)
             case .pendingStateRestoration:
                 .sessionRestoration
@@ -101,7 +102,7 @@ extension TabContent {
                 .returnCacheDataElseLoad
             case .reload, .loadedByStateRestoration:
                 .reloadIgnoringCacheData
-            case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
+            case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated, .switchToOpenTab:
                 .useProtocolCachePolicy
             }
         }
@@ -266,8 +267,7 @@ extension TabContent {
         switch self {
         case .url(_, _, source: let source):
             return source
-        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .releaseNotes, .dataBrokerProtection,
-                .subscription, .identityTheftRestoration, .webExtensionUrl, .none:
+        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .releaseNotes, .dataBrokerProtection, .subscription, .identityTheftRestoration, .webExtensionUrl, .none:
             return .ui
         }
     }

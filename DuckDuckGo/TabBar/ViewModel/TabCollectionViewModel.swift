@@ -798,6 +798,16 @@ extension TabCollectionViewModel {
         return nil
     }
 
+    func indexInAllTabs(where condition: (Tab) -> Bool) -> TabIndex? {
+        if let index = pinnedTabsCollection?.tabs.firstIndex(where: condition) {
+            return .pinned(index)
+        }
+        if let index = tabCollection.tabs.firstIndex(where: condition) {
+            return .unpinned(index)
+        }
+        return nil
+    }
+
     private func tab(at tabIndex: TabIndex) -> Tab? {
         switch tabIndex {
         case .pinned(let index):

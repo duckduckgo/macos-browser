@@ -1104,7 +1104,8 @@ extension MainViewController: NSMenuItemValidation {
         // Pin Tab
         case #selector(MainViewController.pinOrUnpinTab(_:)):
             guard getActiveTabAndIndex()?.tab.isUrl == true,
-                  tabCollectionViewModel.pinnedTabsManager != nil
+                  tabCollectionViewModel.pinnedTabsManager != nil,
+                  !isBurner
             else {
                 return false
             }
