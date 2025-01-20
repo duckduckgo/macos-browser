@@ -173,23 +173,6 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         return button
     }
 
-    // MARK: - Internal
-
-    private func setBackgroundWebViewUserAgent() {
-        guard let controller else {
-            assertionFailure("No controller")
-            return
-        }
-
-        for context in controller.extensionContexts {
-            if let backgroundWebView = context._backgroundWebView {
-                if backgroundWebView.customUserAgent != UserAgent.safari {
-                    backgroundWebView.customUserAgent = UserAgent.safari
-                }
-            }
-        }
-    }
-
 }
 
 @available(macOS 14.4, *)
@@ -305,10 +288,6 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
         }
 
         popupWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-        popupWebView.customUserAgent = UserAgent.safari
-
-        //TODO: Temporary
-        setBackgroundWebViewUserAgent()
 
         popupPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
 
