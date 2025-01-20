@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1736531050802,
+    "version": 1737129345760,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -642,6 +642,18 @@
                     "domain": "collectcheckout.com"
                 },
                 {
+                    "domain": "sbid.org"
+                },
+                {
+                    "domain": "wunderground.com"
+                },
+                {
+                    "domain": "lecreuset.co.uk"
+                },
+                {
+                    "domain": "sueddeutsche.de"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -652,9 +664,6 @@
                 },
                 {
                     "domain": "flexmls.com"
-                },
-                {
-                    "domain": "sueddeutsche.de"
                 },
                 {
                     "domain": "instructure.com"
@@ -792,7 +801,11 @@
                     "google.rs",
                     "google.ru",
                     "google.se",
-                    "google.sk"
+                    "google.sk",
+                    "sachsen-netze.de",
+                    "alpharunning.co.uk",
+                    "lecreuset.co.uk",
+                    "sueddeutsche.de"
                 ]
             },
             "state": "enabled",
@@ -801,7 +814,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "d528bbee567806eee09603f757d4f20c"
+            "hash": "fbd77f789ae02d1795a7a001b75f2096"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -1606,6 +1619,9 @@
                     "domain": "tinder.com"
                 },
                 {
+                    "domain": "zoosk.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
@@ -1625,7 +1641,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "1.93.0",
-            "hash": "81933e08c573f41c7a7e1620de3e2dbd"
+            "hash": "325c52e24b4455e63f1d84089408d8f2"
         },
         "clickToPlay": {
             "exceptions": [
@@ -3738,6 +3754,14 @@
                                 "type": "hide"
                             },
                             {
+                                "selector": "div:has(> iframe[src*='prid=19044504'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19031729'])",
+                                "type": "hide"
+                            },
+                            {
                                 "selector": "[aria-labelledby='promo-header']",
                                 "type": "hide"
                             },
@@ -4661,6 +4685,14 @@
                         "domain": "realtor.com",
                         "rules": [
                             {
+                                "selector": ".ad-wrapper",
+                                "type": "override"
+                            },
+                            {
+                                "selector": ".lb1-ad",
+                                "type": "hide-empty"
+                            },
+                            {
                                 "selector": ".ads_container",
                                 "type": "hide"
                             }
@@ -5514,7 +5546,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "cb87fa6271457116f952dc4577cd35f3"
+            "hash": "9f867188e8214064a3eb65344e619fae"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6116,14 +6148,14 @@
             "hash": "c292bb627849854515cebbded288ef5a"
         },
         "htmlNewTabPage": {
-            "state": "internal",
+            "state": "disabled",
             "exceptions": [],
             "features": {
                 "isLaunched": {
-                    "state": "internal"
+                    "state": "disabled"
                 }
             },
-            "hash": "78bcafbbe5e4868ccfde559de5dbd803"
+            "hash": "8400a35feab96ad28d974fc04e895d88"
         },
         "https": {
             "state": "enabled",
@@ -6282,11 +6314,14 @@
                 },
                 "enforceRoutes": {
                     "state": "enabled"
+                },
+                "appExclusions": {
+                    "state": "enabled"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.57.1",
-            "hash": "ea1fe9850a4436bd65e4d2c80732da80"
+            "hash": "a989cefea7c549442afa51e6359a153a"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
@@ -6624,6 +6659,11 @@
             "state": "disabled",
             "hash": "be6751fe0307a7e1b9476f4d8b8d0aaf"
         },
+        "settingsPage": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "showOnAppLaunch": {
             "exceptions": [
                 {
@@ -6708,6 +6748,11 @@
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
             "hash": "0a35f748d63fc61a777ea5e712728fa3"
+        },
+        "tabManager": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "textZoom": {
             "exceptions": [],
@@ -10336,30 +10381,6 @@
             "minSupportedVersion": "0.22.3",
             "hash": "009e36025b3a532522f65bf0c19fa0d8"
         },
-        "userAgentRotation": {
-            "settings": {
-                "agentExcludePatterns": []
-            },
-            "exceptions": [
-                {
-                    "domain": "marvel.com"
-                },
-                {
-                    "domain": "sundancecatalog.com"
-                },
-                {
-                    "domain": "noaprints.com"
-                },
-                {
-                    "domain": "flexmls.com"
-                },
-                {
-                    "domain": "instructure.com"
-                }
-            ],
-            "state": "disabled",
-            "hash": "9225b8785d6973db37abde99d81d219c"
-        },
         "voiceSearch": {
             "exceptions": [],
             "state": "disabled",
@@ -10388,222 +10409,6 @@
                     "domain": "lastpass.com"
                 },
                 {
-                    "domain": "forums.swift.org"
-                },
-                {
-                    "domain": "twittercommunity.com"
-                },
-                {
-                    "domain": "forum.asana.com"
-                },
-                {
-                    "domain": "community.developer.atlassian.com"
-                },
-                {
-                    "domain": "meta.discourse.org"
-                },
-                {
-                    "domain": "community.smartthings.com"
-                },
-                {
-                    "domain": "forum.figma.com"
-                },
-                {
-                    "domain": "bbs.boingboing.net"
-                },
-                {
-                    "domain": "devforum.zoom.us"
-                },
-                {
-                    "domain": "forum.uipath.com"
-                },
-                {
-                    "domain": "discuss.elastic.co"
-                },
-                {
-                    "domain": "forums.envato.com"
-                },
-                {
-                    "domain": "discuss.newrelic.com"
-                },
-                {
-                    "domain": "community.wd.com"
-                },
-                {
-                    "domain": "forums.wyzecam.com"
-                },
-                {
-                    "domain": "community.anker.com"
-                },
-                {
-                    "domain": "www.trainerroad.com"
-                },
-                {
-                    "domain": "www.sitepoint.com"
-                },
-                {
-                    "domain": "comunidade.nubank.com.br"
-                },
-                {
-                    "domain": "community.monzo.com"
-                },
-                {
-                    "domain": "community.wirexapp.com"
-                },
-                {
-                    "domain": "community.freetrade.io"
-                },
-                {
-                    "domain": "forums.unrealengine.com"
-                },
-                {
-                    "domain": "forums.funcom.com"
-                },
-                {
-                    "domain": "community.infiniteflight.com"
-                },
-                {
-                    "domain": "forums.eveonline.com"
-                },
-                {
-                    "domain": "community.metamask.io"
-                },
-                {
-                    "domain": "forum.algorand.org"
-                },
-                {
-                    "domain": "forum.cardano.org"
-                },
-                {
-                    "domain": "forums.solana.com"
-                },
-                {
-                    "domain": "developers.chia.net"
-                },
-                {
-                    "domain": "community.cartalk.com"
-                },
-                {
-                    "domain": "www.thefantasyfootballers.com"
-                },
-                {
-                    "domain": "www.twit.community"
-                },
-                {
-                    "domain": "commons.commondreams.org"
-                },
-                {
-                    "domain": "boards.straightdope.com"
-                },
-                {
-                    "domain": "forum.gitlab.com"
-                },
-                {
-                    "domain": "discuss.rubyonrails.org"
-                },
-                {
-                    "domain": "forums.docker.com"
-                },
-                {
-                    "domain": "community.brave.com"
-                },
-                {
-                    "domain": "discuss.emberjs.com"
-                },
-                {
-                    "domain": "forum.glamour.de"
-                },
-                {
-                    "domain": "forums.cfl.ca"
-                },
-                {
-                    "domain": "soaps.sheknows.com"
-                },
-                {
-                    "domain": "forum.mssociety.org.uk"
-                },
-                {
-                    "domain": "forum.schizophrenia.com"
-                },
-                {
-                    "domain": "forum.octopus.energy"
-                },
-                {
-                    "domain": "forum.level1techs.com"
-                },
-                {
-                    "domain": "forums.zwift.com"
-                },
-                {
-                    "domain": "forums.plex.tv"
-                },
-                {
-                    "domain": "forum.arduino.cc"
-                },
-                {
-                    "domain": "forum.restic.net"
-                },
-                {
-                    "domain": "forum.openwrt.org"
-                },
-                {
-                    "domain": "www.horlogeforum.nl"
-                },
-                {
-                    "domain": "forum.infinityfree.net"
-                },
-                {
-                    "domain": "forum.manjaro.org"
-                },
-                {
-                    "domain": "forum.projectpanoptes.org"
-                },
-                {
-                    "domain": "forum.obsidian.md"
-                },
-                {
-                    "domain": "us.forums.blizzard.com"
-                },
-                {
-                    "domain": "community.home-assistant.io"
-                },
-                {
-                    "domain": "community.openfl.org"
-                },
-                {
-                    "domain": "community.sonarsource.com"
-                },
-                {
-                    "domain": "ubuntu-mate.community"
-                },
-                {
-                    "domain": "community.letsencrypt.org"
-                },
-                {
-                    "domain": "community.naimaudio.com"
-                },
-                {
-                    "domain": "community.ipfire.org"
-                },
-                {
-                    "domain": "community.squirrelsquadron.com"
-                },
-                {
-                    "domain": "community.signalusers.org"
-                },
-                {
-                    "domain": "community.haxe.org"
-                },
-                {
-                    "domain": "community.grafana.com"
-                },
-                {
-                    "domain": "community.octoprint.org"
-                },
-                {
-                    "domain": "community.bitwarden.com"
-                },
-                {
                     "domain": "instructure.com"
                 }
             ],
@@ -10628,6 +10433,16 @@
                 },
                 "domains": [
                     {
+                        "domain": "docs.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/windowSizing",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "www.cbsnews.com",
                         "patchSettings": [
                             {
@@ -10649,7 +10464,7 @@
                     }
                 ]
             },
-            "hash": "d1b128e9ff49486fb7122c70fef0ff51"
+            "hash": "99b098daaea40136ae60aec41f52467e"
         },
         "webViewBlobDownload": {
             "exceptions": [],
