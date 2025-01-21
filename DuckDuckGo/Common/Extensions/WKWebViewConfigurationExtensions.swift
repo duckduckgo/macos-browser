@@ -67,7 +67,7 @@ extension WKWebViewConfiguration {
             }
         }
 
-        if #available(macOS 14.4, *) {
+        if #available(macOS 14.4, *), WebExtensionManager.shared.areExtenstionsEnabled {
             self._webExtensionController = WebExtensionManager.shared.controller
         }
 
