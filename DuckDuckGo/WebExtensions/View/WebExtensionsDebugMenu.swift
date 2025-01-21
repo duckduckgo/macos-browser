@@ -21,7 +21,7 @@ final class WebExtensionsDebugMenu: NSMenu {
 
     private let webExtensionManager: WebExtensionManaging
 
-    private let selectAndLoadMenuItem = NSMenuItem(title: "Load web extension...", action: #selector(WebExtensionsDebugMenu.selectAndLoadWebExtension))
+    private let selectAndLoadMenuItem = NSMenuItem(title: "Install web extension...", action: #selector(WebExtensionsDebugMenu.selectAndLoadWebExtension))
 
     init(webExtensionManager: WebExtensionManaging = WebExtensionManager.shared) {
         self.webExtensionManager = webExtensionManager
@@ -96,7 +96,7 @@ final class WebExtensionSubMenu: NSMenu {
         super.init(title: "")
 
         buildItems {
-            NSMenuItem(title: "Unload the extension", action: #selector(unloadWebExtension), target: self)
+            NSMenuItem(title: "Remove the extension", action: #selector(unloadWebExtension), target: self)
         }
     }
 
