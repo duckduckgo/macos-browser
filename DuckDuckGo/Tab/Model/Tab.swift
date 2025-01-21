@@ -235,7 +235,7 @@ protocol NewWindowPolicyDecisionMaker {
                                                  earlyAccessHandlers: specialPagesUserScript.map { [$0] } ?? [])
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
-//        assert(userContentController != nil)
+        assert(userContentController != nil)
         self.userContentController = userContentController
         self.onboardingPixelReporter = onboardingPixelReporter
         self.pageRefreshMonitor = pageRefreshMonitor

@@ -71,12 +71,11 @@ extension WKWebViewConfiguration {
             self._webExtensionController = WebExtensionManager.shared.controller
         }
 
-//TODO: Resolve conflict with user content controller by refactoring removeAllUserScripts() from UserContentController
-//        let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
-//                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager,
-//                                                          earlyAccessHandlers: earlyAccessHandlers)
+        let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
+                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager,
+                                                          earlyAccessHandlers: earlyAccessHandlers)
 
-//        self.userContentController = userContentController
+        self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
 
         _=NSPopover.swizzleShowRelativeToRectOnce
