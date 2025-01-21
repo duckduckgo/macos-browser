@@ -47,9 +47,11 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     static let shared = WebExtensionManager()
 
     init(webExtensionPathsCache: WebExtensionPathsCaching = WebExtensionPathsCache(),
-         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
+         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider,
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.webExtensionPathsCache = webExtensionPathsCache
         self.internalUserDecider = internalUserDecider
+        self.featureFlagger = featureFlagger
         super.init()
 
         internalSiteHandler.dataSource = self
@@ -62,9 +64,10 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
 
     private let internalUserDecider: InternalUserDecider
+    private let featureFlagger: FeatureFlagger
 
     var areExtenstionsEnabled: Bool {
-        internalUserDecider.isInternalUser
+        internalUserDecider.isInternalUser && featureFlagger.isFeatureOn(.webExtensions)
     }
 
     // Caches paths to selected web extensions

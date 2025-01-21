@@ -52,20 +52,14 @@ public enum FeatureFlag: String, CaseIterable {
 
     case autofillPartialFormSaves
     case autcompleteTabs
+
+    case webExtensions
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .htmlNewTabPage:
-            return true
-        case .maliciousSiteProtection:
-            return true
-        case .autofillPartialFormSaves:
-            return true
-        case .autcompleteTabs:
-            return true
-        case .networkProtectionAppExclusions:
+        case .htmlNewTabPage, .maliciousSiteProtection, .autofillPartialFormSaves, .autcompleteTabs, .networkProtectionAppExclusions, .webExtensions:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -110,6 +104,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         case .autcompleteTabs:
             return .remoteReleasable(.feature(.autocompleteTabs))
+        case .webExtensions:
+            return .internalOnly()
         }
     }
 }
