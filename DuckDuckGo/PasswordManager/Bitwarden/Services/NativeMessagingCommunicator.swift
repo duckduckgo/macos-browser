@@ -22,8 +22,7 @@ import os.log
 
 protocol NativeMessagingCommunicatorDelegate: AnyObject {
 
-    func nativeMessagingCommunicator(_ nativeMessagingCommunicator: NativeMessagingCommunication,
-                               didReceiveMessageData messageData: Data)
+    func nativeMessagingCommunicator(_ nativeMessagingCommunicator: NativeMessagingCommunication, didReceiveMessageData messageData: Data)
     func nativeMessagingCommunicatorProcessDidTerminate(_ nativeMessagingCommunicator: NativeMessagingCommunication)
 
 }
@@ -54,7 +53,6 @@ final class NativeMessagingCommunicator: NSObject, NativeMessagingCommunication 
     }
 
     private var process: ProcessWrapper?
-
 
     init(appPath: String, arguments: [String]) {
         self.appPath = appPath

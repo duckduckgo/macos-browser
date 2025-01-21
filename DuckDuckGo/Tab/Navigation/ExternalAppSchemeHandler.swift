@@ -53,6 +53,7 @@ final class ExternalAppSchemeHandler {
 
 extension ExternalAppSchemeHandler: NavigationResponder {
 
+    // swiftlint:disable cyclomatic_complexity
     @MainActor func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let externalUrl = navigationAction.url
         // only proceed with non-external-scheme navigations
@@ -132,6 +133,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         }
         return .cancel
     }
+    // swiftlint:enable cyclomatic_complexity
 
     func navigationDidFinish(_ navigation: Navigation) {
         lastUserEnteredValue = nil
