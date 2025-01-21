@@ -28,15 +28,18 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     let featureFlagger: FeatureFlagger
     let faviconManager: FaviconManagement
     let isNTPSpecialPageSupported: Bool
+    let userBackgroundImagesManager: UserBackgroundImagesManaging?
 
     init(
         featureFlagger: FeatureFlagger,
         faviconManager: FaviconManagement = FaviconManager.shared,
-        isNTPSpecialPageSupported: Bool = false
+        isNTPSpecialPageSupported: Bool = false,
+        userBackgroundImagesManager: UserBackgroundImagesManaging? = NSApp.delegateTyped.homePageSettingsModel.customImagesManager
     ) {
         self.featureFlagger = featureFlagger
         self.faviconManager = faviconManager
         self.isNTPSpecialPageSupported = isNTPSpecialPageSupported
+        self.userBackgroundImagesManager = userBackgroundImagesManager
     }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
@@ -50,13 +53,18 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         case .onboarding, .releaseNotes:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
-            handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
+            handleDuckPlayer(requestURL: webViewURL, urlSchemeTask: urlSchemeTask, webView: webView)
         case .error:
             handleErrorPage(urlSchemeTask: urlSchemeTask)
         case .newTab where isNTPSpecialPageSupported && featureFlagger.isFeatureOn(.htmlNewTabPage):
-            if requestURL.type == .favicon {
+            switch requestURL.type {
+            case .favicon:
                 handleFavicon(urlSchemeTask: urlSchemeTask)
-            } else {
+            case .customBackgroundImage:
+                handleCustomBackgroundImage(urlSchemeTask: urlSchemeTask)
+            case .customBackgroundImageThumbnail:
+                handleCustomBackgroundImage(urlSchemeTask: urlSchemeTask, isThumbnail: true)
+            default:
                 handleSpecialPages(urlSchemeTask: urlSchemeTask)
             }
         default:
@@ -65,6 +73,14 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+
+    private lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 }
 
 // MARK: - Native UI Paged
@@ -169,10 +185,58 @@ private extension DuckURLSchemeHandler {
             guard let response = HTTPURLResponse(url: requestURL, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil) else {
                 return nil
             }
+            onFaviconMissing()
             return (response, Data())
         }
         let response = URLResponse(url: requestURL, mimeType: "image/png", expectedContentLength: imagePNGData.count, textEncodingName: nil)
         return (response, imagePNGData)
+    }
+
+    private func onFaviconMissing() {
+        faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
+    }
+}
+
+// MARK: - Custom Background Images
+
+private extension DuckURLSchemeHandler {
+    /**
+     * This handler supports Duck custom background image URL and uses `UserBackgroundImagesManager`
+     * to return an image in response, based on the image ID (file name) that's the last component of the URL path.
+
+     * Custom Background image has the format of `duck://new-tab/background/images/<file_name>`.
+     * Custom Background image thumbnail has the format of `duck://new-tab/background/thumbnails/<file_name>`.
+     *
+     * If an image is not found, an `HTTP 404` response is returned.
+     */
+    func handleCustomBackgroundImage(urlSchemeTask: WKURLSchemeTask, isThumbnail: Bool = false) {
+        guard let requestURL = urlSchemeTask.request.url else {
+            assertionFailure("No URL for Favicon scheme handler")
+            return
+        }
+
+        let fileName = requestURL.lastPathComponent
+
+        guard let (response, data) = response(for: requestURL, withFileName: fileName, isThumbnail: isThumbnail) else { return }
+        urlSchemeTask.didReceive(response)
+        urlSchemeTask.didReceive(data)
+        urlSchemeTask.didFinish()
+    }
+
+    func response(for requestURL: URL, withFileName fileName: String, isThumbnail: Bool) -> (URLResponse, Data)? {
+        guard let userBackgroundImagesManager,
+              let userBackgroundImage = userBackgroundImagesManager.availableImages.first(where: { $0.fileName == fileName }),
+              let image = isThumbnail ? userBackgroundImagesManager.thumbnailImage(for: userBackgroundImage) : userBackgroundImagesManager.image(for: userBackgroundImage),
+              let imageJPEGData = image.jpegData
+        else {
+            guard let response = HTTPURLResponse(url: requestURL, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil) else {
+                return nil
+            }
+            return (response, Data())
+        }
+
+        let response = URLResponse(url: requestURL, mimeType: "image/jpeg", expectedContentLength: imageJPEGData.count, textEncodingName: nil)
+        return (response, imageJPEGData)
     }
 }
 
@@ -276,6 +340,8 @@ private extension URL {
     enum URLType {
         case newTab
         case favicon
+        case customBackgroundImage
+        case customBackgroundImageThumbnail
         case onboarding
         case duckPlayer
         case releaseNotes
@@ -292,6 +358,12 @@ private extension URL {
         } else if self.isReleaseNotes {
             return .releaseNotes
         } else if self.isNewTabPage {
+            if self.isCustomBackgroundImage {
+                return .customBackgroundImage
+            }
+            if self.isCustomBackgroundImageThumbnail {
+                return .customBackgroundImageThumbnail
+            }
             return .newTab
         } else if self.isFavicon {
             return .favicon
@@ -314,6 +386,14 @@ private extension URL {
 
     var isFavicon: Bool {
         return isDuckURLScheme && host == "favicon"
+    }
+
+    var isCustomBackgroundImage: Bool {
+        return isNewTabPage && pathComponents.prefix(3) == ["/", "background", "images"]
+    }
+
+    var isCustomBackgroundImageThumbnail: Bool {
+        return isNewTabPage && pathComponents.prefix(3) == ["/", "background", "thumbnails"]
     }
 
 }

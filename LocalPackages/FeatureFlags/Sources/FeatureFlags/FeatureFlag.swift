@@ -38,6 +38,9 @@ public enum FeatureFlag: String, CaseIterable {
 
     case credentialsImportPromotionForExistingUsers
 
+    /// https://app.asana.com/0/0/1209150117333883/f
+    case networkProtectionAppExclusions
+
     /// https://app.asana.com/0/72649045549333/1208231259093710/f
     case networkProtectionUserTips
 
@@ -47,21 +50,22 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/0/72649045549333/1208241266421040/f
     case htmlNewTabPage
 
-    case isPrivacyProLaunchedROW
-    case isPrivacyProLaunchedROWOverride
-
     case autofillPartialFormSaves
+    case autcompleteTabs
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .htmlNewTabPage,
-             .isPrivacyProLaunchedROWOverride:
+        case .htmlNewTabPage:
             return true
         case .maliciousSiteProtection:
             return true
         case .autofillPartialFormSaves:
+            return true
+        case .autcompleteTabs:
+            return true
+        case .networkProtectionAppExclusions:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -71,8 +75,7 @@ extension FeatureFlag: FeatureFlagDescribing {
              .unknownUsernameCategorization,
              .credentialsImportPromotionForExistingUsers,
              .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes,
-             .isPrivacyProLaunchedROW:
+             .networkProtectionEnforceRoutes:
             return false
         }
     }
@@ -95,18 +98,18 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
             return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
+        case .networkProtectionAppExclusions:
+            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.appExclusions))
         case .networkProtectionUserTips:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
         case .networkProtectionEnforceRoutes:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
-            return .disabled
-        case .isPrivacyProLaunchedROW:
-            return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROW))
-        case .isPrivacyProLaunchedROWOverride:
-            return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROWOverride))
+            return .remoteReleasable(.subfeature(HTMLNewTabPageSubfeature.isLaunched))
         case .autofillPartialFormSaves:
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
+        case .autcompleteTabs:
+            return .remoteReleasable(.feature(.autocompleteTabs))
         }
     }
 }

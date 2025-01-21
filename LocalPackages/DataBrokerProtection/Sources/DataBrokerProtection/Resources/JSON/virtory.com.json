@@ -1,8 +1,7 @@
 {
   "name": "Virtory",
   "url": "virtory.com",
-  "version": "0.4.0",
-  "parent": "verecor.com",
+  "version": "0.5.0",
   "addedDatetime": 1703052000000,
   "optOutUrl": "https://virtory.com/prvt/control/privacy",
   "steps": [
@@ -63,8 +62,80 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://virtory.com/prvt/control/privacy",
+          "id": "ef272fd4-f284-47ca-aa0c-b4589a85bd81"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "3eb2431f-0c00-440c-8a80-b6d95e0b5ee0"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "2a7550ed-6b80-4d32-adc1-20c96107afcb"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "d7c8d9eb-7239-42d1-9323-566ef1cf4665"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "d4072304-d8c9-47ac-8c47-591a417c15b3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "c17b21dd-25cf-43ad-9836-01de7f2138cd"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "a3ea0213-bd64-4221-add5-58b517f78223"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "d4d7d0c6-3bba-470a-9fe7-6a154aa07751"
+        }
+      ]
     }
   ],
   "schedulingConfig": {

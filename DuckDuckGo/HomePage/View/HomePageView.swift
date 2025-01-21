@@ -183,7 +183,9 @@ extension HomePage.Views {
 
         @ViewBuilder
         func remoteMessage() -> some View {
-            if let remoteMessage = activeRemoteMessageModel.remoteMessage, let modelType = remoteMessage.content, modelType.isSupported {
+            if let remoteMessage = activeRemoteMessageModel.newTabPageRemoteMessage,
+               let modelType = remoteMessage.content,
+               modelType.isSupported {
                 ZStack {
                     RemoteMessageView(viewModel: .init(
                         messageId: remoteMessage.id,

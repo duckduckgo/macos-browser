@@ -87,7 +87,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
 
     func load(url: URL) async throws {
         webView?.load(url)
-        Logger.action.debug("Loading URL: \(String(describing: url.absoluteString))")
+        Logger.action.log("Loading URL: \(String(describing: url.absoluteString))")
         try await waitForWebViewLoad()
     }
 
@@ -98,11 +98,11 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func finish() {
-        Logger.action.debug("WebViewHandler finished")
+        Logger.action.log("WebViewHandler finished")
         webView?.stopLoading()
         userContentController?.cleanUpBeforeClosing()
         WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache], modifiedSince: Date(timeIntervalSince1970: 0)) {
-            Logger.action.debug("WKWebView data store deleted correctly")
+            Logger.action.log("WKWebView data store deleted correctly")
         }
 
         stopTimer()
@@ -114,7 +114,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     deinit {
-        Logger.action.debug("WebViewHandler Deinit")
+        Logger.action.log("WebViewHandler Deinit")
     }
 
     func waitForWebViewLoad() async throws {
@@ -124,7 +124,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func execute(action: Action, data: CCFRequestData) {
-        Logger.action.debug("Executing action: \(String(describing: action.actionType.rawValue), privacy: .public)")
+        Logger.action.log("Executing action: \(String(describing: action.actionType.rawValue), privacy: .public)")
 
         userContentController?.dataBrokerUserScripts?.dataBrokerFeature.pushAction(
             method: .onActionReceived,
@@ -225,7 +225,7 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        Logger.action.debug("WebViewHandler didFinish")
+        Logger.action.log("WebViewHandler didFinish")
 
         self.activeContinuation?.resume()
         self.activeContinuation = nil
@@ -250,7 +250,7 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
         }
 
         if statusCode >= 400 {
-            Logger.action.debug("WebViewHandler failed with status code: \(String(describing: statusCode), privacy: .public)")
+            Logger.action.log("WebViewHandler failed with status code: \(String(describing: statusCode), privacy: .public)")
             self.activeContinuation?.resume(throwing: DataBrokerProtectionError.httpError(code: statusCode))
             self.activeContinuation = nil
         }
@@ -289,6 +289,6 @@ private class WebView: WKWebView {
 
     deinit {
         configuration.userContentController.removeAllUserScripts()
-        Logger.action.debug("DBP WebView Deinit")
+        Logger.action.log("DBP WebView Deinit")
     }
 }

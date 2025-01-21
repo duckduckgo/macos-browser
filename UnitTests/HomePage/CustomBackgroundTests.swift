@@ -62,6 +62,7 @@ final class CustomBackgroundTests: XCTestCase {
 
     func testDescriptionInitializer() {
         XCTAssertEqual(CustomBackground("gradient|gradient03"), .gradient(.gradient03))
+        XCTAssertEqual(CustomBackground("gradient|gradient02.01"), .gradient(.gradient0201))
         XCTAssertEqual(CustomBackground("solidColor|color02"), .solidColor(.color02))
         XCTAssertEqual(CustomBackground("solidColor|#FEFC4B"), .solidColor(.init(color: NSColor(hex: "#FEFC4B")!)))
 

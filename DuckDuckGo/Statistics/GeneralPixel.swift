@@ -26,6 +26,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case crash
     case crashOnCrashHandlersSetUp
+    case crashReportingSubmissionFailed
+    case crashReportCRCIDMissing
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
     case launch(isDefault: Bool)
@@ -144,6 +146,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerYouTubeOverlayNavigationClosed
     case duckPlayerYouTubeNavigationIdle30
 
+    // Temporary Home Page Pixels
+    case privacyFeedHistoryLinkOpened
+
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
@@ -247,6 +252,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case autocompleteClickBookmark(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteClickFavorite(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteClickHistory(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickOpenTab(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteToggledOff
     case autocompleteToggledOn
 
@@ -466,12 +472,17 @@ enum GeneralPixel: PixelKitEventV2 {
 
     var name: String {
         switch self {
-
         case .crash:
             return "m_mac_crash"
 
         case .crashOnCrashHandlersSetUp:
             return "m_mac_crash_on_handlers_setup"
+
+        case .crashReportCRCIDMissing:
+            return "m_mac_crashreporting_crcid-missing"
+
+        case .crashReportingSubmissionFailed:
+            return "m_mac_crashreporting_submission-failed"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
@@ -687,6 +698,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .duckPlayerYouTubeNavigationIdle30:
             return "duckplayer_youtube_overlay_idle-30"
 
+        case .privacyFeedHistoryLinkOpened:
+            return "privacy_feed_history_link_opened"
+
         case .dashboardProtectionAllowlistAdd:
             return "mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -825,6 +839,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autocompleteClickBookmark: return "m_mac_autocomplete_click_bookmark"
         case .autocompleteClickFavorite: return "m_mac_autocomplete_click_favorite"
         case .autocompleteClickHistory: return "m_mac_autocomplete_click_history"
+        case .autocompleteClickOpenTab: return "m_mac_autocomplete_click_opentab"
         case .autocompleteToggledOff: return "m_mac_autocomplete_toggled_off"
         case .autocompleteToggledOn: return "m_mac_autocomplete_toggled_on"
 
@@ -1325,7 +1340,8 @@ enum GeneralPixel: PixelKitEventV2 {
                 .autocompleteClickWebsite(let from, let cohort, let onboardingCohort),
                 .autocompleteClickBookmark(let from, let cohort, let onboardingCohort),
                 .autocompleteClickFavorite(let from, let cohort, let onboardingCohort),
-                .autocompleteClickHistory(let from, let cohort, let onboardingCohort):
+                .autocompleteClickHistory(let from, let cohort, let onboardingCohort),
+                .autocompleteClickOpenTab(let from, let cohort, let onboardingCohort):
             var parameters: [String: String] = [:]
             if let from {
                 parameters[NewTabSearchBoxExperimentPixel.Parameters.from] = from.rawValue

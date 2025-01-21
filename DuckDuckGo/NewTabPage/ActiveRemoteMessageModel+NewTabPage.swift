@@ -21,8 +21,10 @@ import NewTabPage
 import RemoteMessaging
 
 extension ActiveRemoteMessageModel: NewTabPageActiveRemoteMessageProviding {
-    var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
-        $remoteMessage.dropFirst().eraseToAnyPublisher()
+    var newTabPageRemoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
+        $newTabPageRemoteMessage
+            .dropFirst()
+            .eraseToAnyPublisher()
     }
 
     func isMessageSupported(_ message: RemoteMessageModel) -> Bool {

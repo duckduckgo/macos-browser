@@ -667,6 +667,7 @@ final class BrowserTabViewController: NSViewController {
              .url(_, _, source: .ui),
              .url(_, _, source: .link),
              .url(_, _, source: .appOpenUrl),
+             .url(_, _, source: .switchToOpenTab),
              .url(_, _, source: .reload):
             return true
 
@@ -811,7 +812,8 @@ final class BrowserTabViewController: NSViewController {
             updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
-            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
+            // We only use HTML New Tab Page in regular windows for now
+            if featureFlagger.isFeatureOn(.htmlNewTabPage) && !tabCollectionViewModel.isBurner {
                 updateTabIfNeeded(tabViewModel: tabViewModel)
             } else {
                 removeAllTabContent()

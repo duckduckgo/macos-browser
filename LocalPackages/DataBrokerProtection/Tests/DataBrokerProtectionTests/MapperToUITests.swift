@@ -52,11 +52,16 @@ final class MapperToUITests: XCTestCase {
             .mock(dataBrokerName: "Broker #2")
         ]
 
+        let expected: [DBPUIScanProgress.ScannedBroker] = [
+            .mock("Broker #1", status: .completed),
+        ]
+
         let result = sut.initialScanState(brokerProfileQueryData)
 
-        XCTAssertEqual(result.scanProgress.currentScans, 1)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #1")
+        XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, expected.first!.name)
         XCTAssertTrue(result.resultsFound.isEmpty)
     }
 
@@ -67,11 +72,16 @@ final class MapperToUITests: XCTestCase {
             .mock(dataBrokerName: "Broker #2")
         ]
 
+        let expected: [DBPUIScanProgress.ScannedBroker] = [
+            .mock("Broker #1", status: .inProgress),
+        ]
+
         let result = sut.initialScanState(brokerProfileQueryData)
 
-        XCTAssertEqual(result.scanProgress.currentScans, 1)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #1")
+        XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, expected.first!.name)
         XCTAssertTrue(result.resultsFound.isEmpty)
     }
 
@@ -102,12 +112,18 @@ final class MapperToUITests: XCTestCase {
             .mock(dataBrokerName: "Broker #2", lastRunDate: Date())
         ]
 
+        let expected: [DBPUIScanProgress.ScannedBroker] = [
+            .mock("Broker #1", status: .completed),
+            .mock("Broker #2", status: .completed),
+        ]
+
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.totalScans, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.currentScans, 2)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
+        XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), expected.map(\.name))
     }
 
     func testWhenScansHaveDeprecatedProfileQueries_thenThoseAreNotTakenIntoAccount() {
@@ -118,12 +134,18 @@ final class MapperToUITests: XCTestCase {
             .mock(dataBrokerName: "Broker #3", lastRunDate: Date(), extractedProfile: .mockWithRemovedDate, deprecated: true)
         ]
 
+        let expected: [DBPUIScanProgress.ScannedBroker] = [
+            .mock("Broker #1", status: .completed),
+            .mock("Broker #2", status: .completed),
+        ]
+
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
-        XCTAssertEqual(result.scanProgress.currentScans, 2)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
+        XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), expected.map(\.name))
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
@@ -136,12 +158,18 @@ final class MapperToUITests: XCTestCase {
             .mock(dataBrokerName: "Broker #3", lastRunDate: Date(), extractedProfile: .mockWithRemovedDate, deprecated: true)
         ]
 
+        let expected: [DBPUIScanProgress.ScannedBroker] = [
+            .mock("Broker #1", status: .completed),
+            .mock("Broker #2", status: .completed),
+        ]
+
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
-        XCTAssertEqual(result.scanProgress.currentScans, 2)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
+        XCTAssertEqual(result.scanProgress.currentScans, brokerProfileQueryData.legacyCurrentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, expected.completeBrokerScansCount)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, expected.count)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), expected.map(\.name))
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
@@ -390,7 +418,7 @@ final class MapperToUITests: XCTestCase {
 
         let result = sut.initialScanState(brokerProfileQueryData)
 
-        XCTAssertEqual(result.scanProgress.currentScans, 5)
+        XCTAssertEqual(result.scanProgress.currentScans, 3)
         XCTAssertEqual(result.scanProgress.scannedBrokers, expected)
     }
 
@@ -466,6 +494,34 @@ final class MapperToUITests: XCTestCase {
 extension DBPUIScanProgress.ScannedBroker {
     static func mock(_ name: String, status: Self.Status) -> DBPUIScanProgress.ScannedBroker {
         .init(name: name, url: "test.com", status: status)
+    }
+}
+
+extension Array where Element == BrokerProfileQueryData {
+    /// Number of completed broker scans, the way it was calculated prior to the introduction of scannedBrokers (1.94.0)
+    fileprivate var legacyCurrentScans: Int {
+        filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+            return accumulator + element.value.currentScans
+        }
+    }
+
+    private var filteredProfileQueriesGroupedByBroker: [String: [BrokerProfileQueryData]] {
+        let profileQueriesGroupedByBroker = Dictionary(grouping: self, by: { $0.dataBroker.name })
+        return profileQueriesGroupedByBroker.mapValues { queries in
+            queries.filter { !$0.profileQuery.deprecated }
+        }
+    }
+
+    private var currentScans: Int {
+        guard let broker = self.first?.dataBroker else { return 0 }
+
+        let didAllQueriesFinished = allSatisfy { $0.scanJobData.lastRunDate != nil }
+
+        if !didAllQueriesFinished {
+            return 0
+        } else {
+            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+        }
     }
 }
 

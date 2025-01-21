@@ -41,7 +41,9 @@ internal class ColorView: NSView {
 
     @IBInspectable var backgroundColor: NSColor? = NSColor.clear {
         didSet {
-            layer?.backgroundColor = backgroundColor?.cgColor
+            NSAppearance.withAppAppearance {
+                layer?.backgroundColor = backgroundColor?.cgColor
+            }
         }
     }
 
@@ -54,7 +56,9 @@ internal class ColorView: NSView {
 
     @IBInspectable var borderColor: NSColor? {
         didSet {
-            layer!.borderColor = borderColor?.cgColor
+            NSAppearance.withAppAppearance {
+                layer!.borderColor = borderColor?.cgColor
+            }
         }
     }
 
@@ -72,8 +76,10 @@ internal class ColorView: NSView {
 
     override func updateLayer() {
         super.updateLayer()
-        layer?.backgroundColor = backgroundColor?.cgColor
-        layer?.borderColor = borderColor?.cgColor
+        NSAppearance.withAppAppearance {
+            layer?.backgroundColor = backgroundColor?.cgColor
+            layer?.borderColor = borderColor?.cgColor
+        }
     }
 
     // MARK: - Click Event Interception

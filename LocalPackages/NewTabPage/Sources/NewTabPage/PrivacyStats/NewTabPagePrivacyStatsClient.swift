@@ -111,24 +111,3 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         return nil
     }
 }
-
-extension NewTabPagePrivacyStatsClient {
-
-    struct PrivacyStatsData: Encodable, Equatable {
-        let totalCount: Int64
-        let trackerCompanies: [TrackerCompany]
-
-        static func == (lhs: PrivacyStatsData, rhs: PrivacyStatsData) -> Bool {
-            lhs.totalCount == rhs.totalCount && Set(lhs.trackerCompanies) == Set(rhs.trackerCompanies)
-        }
-    }
-
-    struct TrackerCompany: Encodable, Equatable, Hashable {
-        let count: Int64
-        let displayName: String
-
-        static func otherCompanies(count: Int64) -> TrackerCompany {
-            TrackerCompany(count: count, displayName: "__other__")
-        }
-    }
-}

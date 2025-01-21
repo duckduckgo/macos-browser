@@ -99,17 +99,17 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let favorites = favoritesModel.favorites.map {
-            NewTabPageFavoritesClient.Favorite($0, preferredFaviconSize: preferredFaviconSize, onFaviconMissing: favoritesModel.onFaviconMissing)
+            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize)
         }
-        return NewTabPageFavoritesClient.FavoritesData(favorites: favorites)
+        return NewTabPageDataModel.FavoritesData(favorites: favorites)
     }
 
     @MainActor
     private func notifyDataUpdated(_ favorites: [NewTabPageFavorite]) {
         let favorites = favoritesModel.favorites.map {
-            NewTabPageFavoritesClient.Favorite($0, preferredFaviconSize: preferredFaviconSize, onFaviconMissing: favoritesModel.onFaviconMissing)
+            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize)
         }
-        pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageFavoritesClient.FavoritesData(favorites: favorites))
+        pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageDataModel.FavoritesData(favorites: favorites))
     }
 
     @MainActor
@@ -121,7 +121,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
 
     @MainActor
     private func move(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let action: NewTabPageFavoritesClient.FavoritesMoveAction = DecodableHelper.decode(from: params) else {
+        guard let action: NewTabPageDataModel.FavoritesMoveAction = DecodableHelper.decode(from: params) else {
             return nil
         }
         favoritesModel.moveFavorite(withID: action.id, fromIndex: action.fromIndex, toIndex: action.targetIndex)
@@ -130,7 +130,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
 
     @MainActor
     private func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let action: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
+        guard let action: NewTabPageDataModel.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
             return nil
         }
         favoritesModel.openFavorite(withURL: action.url)
@@ -139,79 +139,11 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
 
     @MainActor
     private func openContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let contextMenuAction: NewTabPageFavoritesClient.FavoritesContextMenuAction = DecodableHelper.decode(from: params) else {
+        guard let contextMenuAction: NewTabPageDataModel.FavoritesContextMenuAction = DecodableHelper.decode(from: params) else {
             return nil
         }
         favoritesModel.showContextMenu(for: contextMenuAction.id)
         return nil
-    }
-}
-
-public extension NewTabPageFavoritesClient {
-
-    struct FavoritesContextMenuAction: Codable {
-        let id: String
-    }
-
-    struct FavoritesOpenAction: Codable {
-        let id: String
-        let url: String
-    }
-
-    struct FavoritesMoveAction: Codable {
-        let id: String
-        let fromIndex: Int
-        let targetIndex: Int
-    }
-
-    struct FavoritesConfig: Codable {
-        let expansion: Expansion
-
-        enum Expansion: String, Codable {
-            case expanded, collapsed
-        }
-    }
-
-    struct FavoritesData: Encodable {
-        let favorites: [Favorite]
-    }
-
-    struct Favorite: Encodable, Equatable {
-        let favicon: FavoriteFavicon?
-        let id: String
-        let title: String
-        let url: String
-
-        init(id: String, title: String, url: String, favicon: NewTabPageFavoritesClient.FavoriteFavicon? = nil) {
-            self.id = id
-            self.title = title
-            self.url = url
-            self.favicon = favicon
-        }
-
-        @MainActor
-        init(_ bookmark: NewTabPageFavorite, preferredFaviconSize: Int, onFaviconMissing: () -> Void) {
-            id = bookmark.id
-            title = bookmark.title
-            url = bookmark.url
-
-            if let url = bookmark.urlObject, let duckFaviconURL = URL.duckFavicon(for: url) {
-                favicon = FavoriteFavicon(maxAvailableSize: preferredFaviconSize, src: duckFaviconURL.absoluteString)
-            } else {
-                onFaviconMissing()
-                favicon = nil
-            }
-        }
-    }
-
-    struct FavoriteFavicon: Encodable, Equatable {
-        let maxAvailableSize: Int
-        let src: String
-
-        init(maxAvailableSize: Int, src: String) {
-            self.maxAvailableSize = maxAvailableSize
-            self.src = src
-        }
     }
 }
 

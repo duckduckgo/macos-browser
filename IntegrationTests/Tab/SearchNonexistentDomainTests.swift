@@ -238,7 +238,11 @@ final class SearchNonexistentDomainTests: XCTestCase {
         addressBar.stringValue = enteredString
 
         let suggestionLoadingMock = SuggestionLoadingMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock, historyCoordinating: HistoryCoordinator.shared, bookmarkManager: LocalBookmarkManager.shared)
+        let suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
+                                                      suggestionLoading: suggestionLoadingMock,
+                                                      historyCoordinating: HistoryCoordinator.shared,
+                                                      bookmarkManager: LocalBookmarkManager.shared,
+                                                      burnerMode: .regular)
         addressBar.suggestionContainerViewModel = SuggestionContainerViewModel(isHomePage: true, isBurner: false, suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: enteredString)

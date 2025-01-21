@@ -1229,6 +1229,66 @@
         }
       }
     },
+    "address.bar.search.open.tab.suffix" : {
+      "comment" : "Suffix of DuckDuckGo Search open tab suggestion. Example: cats – DuckDuckGo Search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo-Suche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo Search"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Búsqueda de DuckDuckGo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche DuckDuckGo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricerca DuckDuckGo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoeken met DuckDuckGo"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyszukiwanie DuckDuckGo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisa DuckDuckGo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск DuckDuckGo"
+          }
+        }
+      }
+    },
     "address.bar.search.suffix" : {
       "comment" : "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo",
       "extractionState" : "extracted_with_value",
@@ -1464,7 +1524,7 @@
     },
     "ai-chat.menu.new" : {
       "comment" : "Menu item to launch AI Chat",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1584,7 +1644,7 @@
     },
     "ai-chat.onboarding.popover.confirmation" : {
       "comment" : "Confirmation for accepting the AI Chat onboarding popover",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1704,7 +1764,7 @@
     },
     "ai-chat.onboarding.popover.message-markdown" : {
       "comment" : "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1824,7 +1884,7 @@
     },
     "ai-chat.onboarding.popover.title" : {
       "comment" : "AI Chat onboarding popover title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1884,7 +1944,7 @@
     },
     "ai-chat.preferences.caption" : {
       "comment" : "Ai Chat preferences explanation",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1944,7 +2004,7 @@
     },
     "ai-chat.preferences.caption.link.fallback" : {
       "comment" : "Ai Chat preferences explanation",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2004,7 +2064,7 @@
     },
     "ai-chat.preferences.caption.link.markdown" : {
       "comment" : "Ai Chat preferences explanation with a markdown link. Do not translate what's inside [] and ()",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2124,7 +2184,7 @@
     },
     "ai-chat.show-in-application-menu.toggle" : {
       "comment" : "Show AI Chat in application menus",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2184,7 +2244,7 @@
     },
     "ai-chat.show-in-toolbar.toggle" : {
       "comment" : "Show AI Chat in toolbar",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10577,66 +10637,6 @@
         }
       }
     },
-    "bookmarks.bar.prompt.message" : {
-      "comment" : "Message show for bookmarks bar prompt",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeige die Lesezeichenleiste an, um schnell auf deine neuen Lesezeichen zugreifen zu können."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show the Bookmarks Bar for quick access to your new bookmarks."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muestra la barra de marcadores para acceder rápidamente a tus nuevos marcadores."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Affichez la barre des signets pour accéder rapidement à vos nouveaux signets."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra la barra dei segnalibri per accedere rapidamente ai nuovi segnalibri."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Laat de bladwijzerbalk zien voor snelle toegang tot je nieuwe bladwijzers."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pokaż pasek zakładek, aby mieć szybki dostęp do nowych zakładek."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra a barra de marcadores para teres acesso rápido aos teus novos marcadores."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Показывает панель для быстрого доступа к новым закладкам."
-          }
-        }
-      }
-    },
     "bookmarks.bar.prompt.message1" : {
       "comment" : " message show for bookmarks bar prompt\n message with markdown show for bookmarks bar prompt, make sure to keep the ** ** for the translated words Settings and Appearance",
       "extractionState" : "extracted_with_value",
@@ -16118,126 +16118,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "утята"
-          }
-        }
-      }
-    },
-    "contextual.onboarding.try-search.surprise-me-english" : {
-      "comment" : "Browser Search query for chocolate chip cookie recipes",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rezepte für Schokoladenkekse"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "chocolate chip cookie recipes"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "recetas de galletas con pepitas de chocolate"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "recettes de cookies aux pépites de chocolat"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ricette di biscotti con gocce di cioccolato"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recepten voor chocoladekoekjes"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "przepisy na ciastka z kawałkami czekolady"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "receitas de biscoitos de chocolate"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "рецепты печенья с шоколадной крошкой"
-          }
-        }
-      }
-    },
-    "contextual.onboarding.try-search.surprise-me-international" : {
-      "comment" : "Browser Search query for dinner recipes",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dinner-Rezepte"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "dinner recipes"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "recetas para la cena"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "recettes pour le dîner"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ricette per la cena"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "recepten voor het avondeten"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "przepisy na obiad"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "receitas de jantar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "рецепты на ужин"
           }
         }
       }
@@ -22208,6 +22088,426 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки видео"
+          }
+        }
+      }
+    },
+    "duck.ai.onboarding.popover.message-markdown" : {
+      "comment" : "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst diese und andere Duck.ai-Funktionen in **Einstellungen** > **Duck.ai** anpassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can adjust this and other Duck.ai features in **Settings** > **Duck.ai**."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes ajustar esta y otras funciones de Duck.ai en **Ajustes** > **Duch.ai**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez ajuster cela et d'autres fonctionnalités de Duck.ai dans **Réglages** > **Duck.ai**."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puoi regolare questa e altre funzionalità di Duck.ai in **Impostazioni** > **Duck.ai**."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt deze en andere Duck.ai-functies aanpassen in **Instellingen** > **Duck.ai**."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możesz dostosować tę i inne funkcje Duck.ai, wybierając kolejno **Ustawienia** > **Duck.ai**."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podes ajustar esta e outras funcionalidades do Duck.ai em **Definições** > **Duck.ai**."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эту и другие функции Duck.ai можно отрегулировать в разделе **Настройки > Duck.ai**."
+          }
+        }
+      }
+    },
+    "duckai.menu.new" : {
+      "comment" : "Menu item to launch AI Chat",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer AI Chat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New AI Chat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo AI Chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvel AI Chat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova AI Chat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwe AI Chat"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowy AI Chat"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novo AI Chat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запустить AI Chat"
+          }
+        }
+      }
+    },
+    "duckai.onboarding.popover.confirmation" : {
+      "comment" : "Confirmation for accepting the AI Chat onboarding popover",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai-Shortcut hinzugefügt!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck.ai shortcut added!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Se ha añadido un acceso directo a Duck.ai!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci Duck.ai ajouté !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoia Duck.ai aggiunta."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling naar Duck.ai toegevoegd!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodano skrót do Duck.ai!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atalho do Duck.ai adicionado!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык Duck.ai добавлен!"
+          }
+        }
+      }
+    },
+    "duckai.onboarding.popover.title" : {
+      "comment" : "AI Chat onboarding popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte Duck.ai direkt von deiner Symbolleiste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Launch Duck.ai directly from your toolbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia Duck.ai directamente desde la barra de herramientas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lancez Duck.ai directement depuis votre barre d'outils"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvia Duck.ai direttamente dalla barra degli strumenti"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Duck.ai rechtstreeks vanuit je werkbalk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uruchom Duck.ai bezpośrednio z paska narzędzi"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia o Duck.ai diretamente a partir da tua barra de ferramentas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запуск Duck.ai прямо с панели инструментов"
+          }
+        }
+      }
+    },
+    "duckai.preferences.caption" : {
+      "comment" : "Ai Chat preferences explanation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai ist eine optionale Funktion, mit der du anonym mit beliebten KI-Chatmodellen von Drittanbietern chatten kannst. Deine Chats werden nicht zum Trainieren von KI verwendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck.ai is an optional feature that lets you chat anonymously with popular 3rd-party AI chat models. Your chats are not used to train AI."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai es una función opcional que te permite chatear de forma anónima con modelos populares de chat de IA de terceros. Tus chats no se utilizan para entrenar a la IA."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai est une fonctionnalité optionnelle qui vous permet de discuter anonymement avec des modèles de chat IA tiers populaires. Vos discussions ne servent pas à entraîner l’IA."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai è una funzionalità opzionale che consente di chattare in forma anonima con i più diffusi modelli di chat AI di terze parti. Le chat non vengono usate per addestrare l'IA."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai is een optionele functie waarmee je anoniem kunt chatten met populaire AI-chatmodellen van derden. Je chats worden niet gebruikt om AI te trainen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai to opcjonalna funkcja, która umożliwia prowadzenie anonimowych rozmów z popularnymi modelami czatu AI innych firm. Twoje czaty nie są używane do trenowania AI."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Duck.ai é uma funcionalidade opcional que te permite conversar anonimamente com modelos de chat com IA populares de terceiros. As tuas conversas não são utilizadas para treinar a IA."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai — дополнительная функция, позволяющая анонимно беседовать с популярными сторонними чат-моделями на базе искусственного интеллекта. Содержимое чатов не применяется для обучения ИИ."
+          }
+        }
+      }
+    },
+    "duckai.show-in-application-menu.toggle-setting" : {
+      "comment" : "Show Duck.ai in application menus",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Neuer AI Chat“ in den Datei- und Anwendungsmenüs anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show “New AI Chat” in File and application menus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar «Nuevo AI Chat» en los menús Archivo y Aplicación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher « Nouvel AI Chat » dans les menus Fichier et Application"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra \"AI Chat\" nel menu File e in quello delle applicazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "'Nieuwe AI Chat' toevoegen aan de menu's 'Bestand' en 'Toepassing'"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż „Nowy AI Chat” w menu plików i aplikacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar “Novo AI Chat” nos menus de ficheiro e aplicação"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать опцию «Запустить AI Chat» в меню «Файл» и меню приложения"
+          }
+        }
+      }
+    },
+    "duckai.show-in-toolbar.toggle" : {
+      "comment" : "Show AI Chat in toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai-Shortcut in der Browser-Symbolleiste anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Duck.ai shortcut in browser toolbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el acceso directo a Duck.ai en la barra de herramientas del navegador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le raccourci Duck.ai dans la barre d'outils du navigateur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la scorciatoia Duck.ai nella barra degli strumenti del browser"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling naar Duck.ai weergeven op browserwerkbalk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż skrót Duck.ai na pasku narzędzi przeglądarki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar atalho do Duck.ai na barra de ferramentas do navegador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать ярлык Duck.ai на панели инструментов браузера"
           }
         }
       }
@@ -31111,6 +31411,66 @@
         }
       }
     },
+    "import.csv.instructions.safari.macos15-2" : {
+      "comment" : "Instructions to import Passwords as CSV from Safari zip file on >= macOS 15.2.\n%N$d - step number\n%5$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Öffne **Safari**\n%2$d Öffne das Menü **Datei → Browserdaten in Datei exportieren ...**\n%3$d Wähle **Passwörter** und speichere die Datei an einem Ort, an dem du sie wiederfindest (z. B. Desktop)\n%4$d Doppelklicke auf die .zip-Datei, um sie zu entpacken\n%5$d %6$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **Safari**\n%2$d Open the **File menu → Export Browsing Data to File...**\n%3$d Select **passwords** and save the file someplace you can find it (e.g., Desktop)\n%4$d Double click the .zip file to unzip it\n%5$d %6$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Abre **Safari**\n%2$d Abre el menú **Archivo → Exportar datos de navegación a archivo...**\n%3$d Selecciona **contraseñas** y guarda el archivo en algún lugar donde puedas encontrarlo (por ejemplo, en el escritorio)\n%4$d Haz doble clic en el archivo .zip para descomprimirlo\n%5$d %6$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Ouvrez **Safari**\n%2$d Ouvrez le **menu Fichier → Exporter les données de navigation vers le fichier…**\n%3$d Sélectionnez **mots de passe** et enregistrez le fichier à un endroit où le trouver facilement (par exemple, sur le bureau)\n%4$d Double-cliquez sur le fichier .zip pour le décompresser\n%5$d %6$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Apri **Safari**\n%2$d Apri il menu **File → Esporta i dati di navigazione in un file...**\n%3$d Seleziona **password** e salva il file in una posizione che ti consenta di trovarlo (ad esempio, sul desktop)\n%4$d Fai doppio clic sul file .zip per decomprimerlo\n%5$d %6$@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Open **Safari**\n%2$d Open het menu **Bestand → Browsergegevens exporteren naar bestand...**\n%3$d Selecteer **wachtwoorden** en sla het bestand op een plek op waar je het kunt vinden (bijv. je bureaublad)\n%4$d Dubbelklik op het .zip-bestand om het uit te pakken\n%5$d %6$@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Otwórz **Safari**\n%2$d Otwórz menu **Plik → Eksportuj dane przeglądania do pliku...**\n%3$d Wybierz **hasła** i zapisz plik w łatwo dostępnym miejscu (np. na biurku)\n%4$d Kliknij dwukrotnie plik .zip w celu jego rozpakowania\n%5$d %6$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Abre o **Safari**\n%2$d Abre o menu **Ficheiro → Exportar dados de navegação para ficheiro...**\n%3$d Seleciona **palavras-passe** e guarda o ficheiro num local onde o possas encontrar (por exemplo, no ambiente de trabalho)\n%4$d Clica duas vezes no ficheiro .zip para o descomprimir\n%5$d %6$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d Запустите **Safari**\n%2$d Откройте меню **Файл → Экспортировать данные просмотров в файл...**\n%3$d Выберите **пароли** и сохраните файл там, где вы легко его найдете (например, на рабочем столе)\n%4$d Дважды нажмите мышью файл .zip, чтобы распаковать его\n%5$d %6$@"
+          }
+        }
+      }
+    },
     "import.csv.instructions.vivaldi" : {
       "comment" : "Instructions to import Passwords exported as CSV from Vivaldi browser.\n%N$d - step number\n%2$s - browser name (Vivaldi)\n%5$@ - menu button icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
@@ -37013,10 +37373,58 @@
       "comment" : "Title shown in an error page tab that warn users of security risks on a website that has been flagged as Malware.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnung: Website ist möglicherweise bösartig"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Warning: Site May Be Malicious"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertencia: el sitio puede ser malicioso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement : le site est peut-être malveillant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attenzione: il sito potrebbe essere dannoso"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opgelet: Deze website kan schadelijk zijn"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzeżenie: witryna może być złośliwa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: o site pode ser malicioso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внимание! Потенциально вредоносный сайт"
           }
         }
       }
@@ -47104,8 +47512,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Erlaube DuckDuckGo, dich zu warnen, bevor eine Webseite geladen wird, die als bösartig oder betrügerisch gekennzeichnet wurde."
+            "state" : "translated",
+            "value" : "Warne mich auf Websites, die als Phishing- oder Malware-Websites gekennzeichnet sind."
           }
         },
         "en" : {
@@ -47116,44 +47524,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Permite que DuckDuckGo te avise antes de cargar una página web que se haya marcado como maliciosa o fraudulenta."
+            "state" : "translated",
+            "value" : "Avisarme sobre sitios marcados como phishing o malware."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Autorisez DuckDuckGo à vous avertir avant de charger une page Web signalée comme malveillante ou frauduleuse."
+            "state" : "translated",
+            "value" : "Mettez-moi en garde contre les sites signalés pour hameçonnage ou comme étant des logiciels malveillants."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Consenti a DuckDuckGo di avvisarti prima di caricare una pagina web contrassegnata come dannosa o fraudolenta."
+            "state" : "translated",
+            "value" : "Avvisami sui siti contrassegnati per phishing o malware."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Laat DuckDuckGo je waarschuwen voordat je een webpagina laadt die als kwaadaardig of frauduleus is gemarkeerd."
+            "state" : "translated",
+            "value" : "Waarschuw me op websites die zijn aangeduid als phishing of malware."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zezwól DuckDuckGo na ostrzeganie przed załadowaniem strony internetowej, która została oznaczona jako złośliwa lub jako oszustwo."
+            "state" : "translated",
+            "value" : "Ostrzegaj mnie przed witrynami oznaczonymi jako wyłudzanie informacji lub złośliwe oprogramowanie."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Permitir que o DuckDuckGo te avise antes de carregar uma página que foi sinalizada como maliciosa ou fraudulenta."
+            "state" : "translated",
+            "value" : "Avisar-me sobre sites sinalizados como phishing ou malware."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Разрешить DuckDuckGo предупреждать вас о потенциально вредоносных или мошеннических сайтах перед загрузкой страницы."
+            "state" : "translated",
+            "value" : "Предупреждать о вредоносных и фишинговых сайтах"
           }
         }
       }
@@ -47224,8 +47632,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Das Deaktivieren dieser Funktion kann deine persönlichen Daten gefährden. Wenn du dir über die damit verbundenen Risiken im Klaren bist, kannst du trotzdem fortfahren."
+            "state" : "translated",
+            "value" : "Das Deaktivieren dieser Funktion kann deine persönlichen Daten gefährden."
           }
         },
         "en" : {
@@ -47236,44 +47644,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Desactivar esta función puede poner en riesgo tu información personal. Hazlo solo si entiendes completamente el riesgo que implica."
+            "state" : "translated",
+            "value" : "Desactivar esta función puede poner en riesgo tu información personal."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "La désactivation de cette fonctionnalité peut mettre vos informations personnelles en danger. Faites-le uniquement si vous comprenez parfaitement les risques encourus."
+            "state" : "translated",
+            "value" : "La désactivation de cette fonctionnalité peut mettre vos informations personnelles en danger."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Disabilitando questa funzione, potresti mettere a rischio i tuoi dati personali. Fallo solo se comprendi appieno il rischio che comporta."
+            "state" : "translated",
+            "value" : "Disabilitando questa funzione, potresti mettere a rischio i tuoi dati personali."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Als je deze functie uitschakelt, kunnen je persoonlijke gegevens in gevaar komen. Doe dit alleen als je het risico volledig begrijpt."
+            "state" : "translated",
+            "value" : "Als je deze functie uitschakelt, kunnen je persoonlijke gegevens in gevaar komen."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wyłączenie tej funkcji może narazić Twoje dane osobowe na ryzyko. Rób to tylko wtedy, gdy rozumiesz związane z tym zagrożenie."
+            "state" : "translated",
+            "value" : "Wyłączenie tej funkcji może narazić Twoje dane osobowe na ryzyko."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Desativar esta funcionalidade pode pôr em risco as tuas informações pessoais. Não desatives a menos que compreendas os riscos."
+            "state" : "translated",
+            "value" : "Desativar esta funcionalidade pode pôr em risco as tuas informações pessoais."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "При отключении этой функции ваши личные данные могут оказаться под угрозой. Эту функцию следует деактивировать только в том случае, если вы осознаете связанные с этим риски."
+            "state" : "translated",
+            "value" : "При отключении этой функции ваши личные данные могут оказаться под угрозой."
           }
         }
       }
@@ -47400,7 +47808,7 @@
     },
     "pinning.hide-aichat-shortcut" : {
       "comment" : "Menu item for hiding the AI Chat shortcut",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47638,6 +48046,66 @@
         }
       }
     },
+    "pinning.hide-duckai-shortcut" : {
+      "comment" : "Menu item for hiding the AI Chat shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai-Shortcut ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide Duck.ai Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar acceso directo a Duck.ai"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer le raccourci Duck.ai"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi scorciatoia Duck.ai"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling voor Duck.ai verbergen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryj skrót Duck.ai"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar atalho do Duck.ai"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть ярлык Duck.ai"
+          }
+        }
+      }
+    },
     "pinning.hide-netp-shortcut" : {
       "comment" : "Menu item for hiding the NetP shortcut",
       "extractionState" : "extracted_with_value",
@@ -47700,7 +48168,7 @@
     },
     "pinning.show-aichat-shortcut" : {
       "comment" : "Menu item for showing the AI Chat shortcut",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47934,6 +48402,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать ярлык для загрузок"
+          }
+        }
+      }
+    },
+    "pinning.show-duckai-shortcut" : {
+      "comment" : "Menu item for showing the AI Chat shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai-Shortcut anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Duck.ai Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el acceso directo de Duck.ai"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le raccourci Duck.ai"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra scorciatoia Duck.ai"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling voor Duck.ai weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż skrót Duck.ai"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar atalho Duck.ai"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать ярлык Duck.ai"
           }
         }
       }
@@ -55910,66 +56438,6 @@
         }
       }
     },
-    "preferences.about.privacy-simplified" : {
-      "comment" : "About screen",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Datenschutz leicht gemacht."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy, simplified."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacidad, simplificada."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La confidentialité, simplifiée."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La privacy, semplificata."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy, vereenvoudigd."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prywatność — jeszcze prostsza."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacidade, simplificada."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Максимум конфиденциальности, минимум усилий."
-          }
-        }
-      }
-    },
     "preferences.about.send-feedback" : {
       "comment" : "Feedback button in the about preferences page",
       "extractionState" : "extracted_with_value",
@@ -56272,7 +56740,7 @@
     },
     "preferences.ai-chat" : {
       "comment" : "Title of the option to show AI Chat in preferences",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -57586,6 +58054,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проигрыватель Duck Player"
+          }
+        }
+      }
+    },
+    "preferences.duckai" : {
+      "comment" : "Title of the option to show Duck.ai in preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck.ai"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck.ai"
           }
         }
       }
@@ -60729,60 +61257,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбрать папку %@..."
-          }
-        }
-      }
-    },
-    "Select Data to Import:" : {
-      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu importierende Daten auswählen:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecciona los datos a importar:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sélectionner les données à importer :"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleziona i dati da importare:"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecteer gegevens om te importeren:"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wybierz dane do zaimportowania:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecionar dados para importar:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выберите данные для импорта:"
           }
         }
       }
@@ -64137,6 +64611,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки подписки"
+          }
+        }
+      }
+    },
+    "switch.to.tab" : {
+      "comment" : "Suggestion to switch to an open tab button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Tab wechseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Switch to Tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar a Pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer à l'onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passa alla scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overschakelen naar tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przełącz na kartę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mudar para separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти на вкладку"
           }
         }
       }

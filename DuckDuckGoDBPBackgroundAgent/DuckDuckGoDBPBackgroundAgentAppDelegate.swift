@@ -33,7 +33,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let subscriptionManager: SubscriptionManager
 
     override init() {
-        Logger.dbpBackgroundAgent.info("🟢 Starting: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
+        Logger.dbpBackgroundAgent.log("🟢 Starting: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
 
         let dryRun: Bool
 #if DEBUG
@@ -97,7 +97,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        Logger.dbpBackgroundAgent.info("DuckDuckGoAgent started")
+        Logger.dbpBackgroundAgent.log("DuckDuckGoAgent started")
 
         let redeemUseCase = RedeemUseCase(authenticationService: AuthenticationService(),
                                           authenticationRepository: KeychainAuthenticationData())

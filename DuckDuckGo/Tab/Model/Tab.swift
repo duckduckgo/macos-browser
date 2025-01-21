@@ -795,12 +795,7 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 #endif
-
-        if PixelExperiment.cohort == .newOnboarding {
-            setContent(.onboarding)
-        } else {
-            setContent(.onboardingDeprecated)
-        }
+        setContent(PixelExperiment.cohort == .newOnboarding ? .onboarding : .onboardingDeprecated)
     }
 
     @MainActor(unsafe)

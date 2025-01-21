@@ -1,8 +1,7 @@
 {
   "name": "Clubset",
   "url": "clubset.com",
-  "version": "0.4.0",
-  "parent": "verecor.com",
+  "version": "0.5.0",
   "addedDatetime": 1702965600000,
   "optOutUrl": "https://clubset.com/private/control/privacy",
   "steps": [
@@ -63,8 +62,80 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://clubset.com/private/control/privacy",
+          "id": "87fb7e0b-87ea-413d-847a-e88b3d023776"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "48c3acd8-61fc-4680-9811-77dc5ba9c9a6"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "47d8cf16-354f-4359-ac37-05c617d5f03e"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "eb5e43df-d4dd-45e8-8192-bfcb3e814ed5"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "2521002e-f825-4a93-aa6e-966f499096d1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "f72634ca-60c3-450f-9656-52d924d8361f"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "075640a6-f010-4135-9b46-25655e5eadd1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "96a083a1-f84b-42df-89bd-b5d0601468b2"
+        }
+      ]
     }
   ],
   "schedulingConfig": {

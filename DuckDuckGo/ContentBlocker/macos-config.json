@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1734119755860,
+    "version": 1737129345760,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -181,6 +181,9 @@
             "exceptions": [
                 {
                     "domain": "allocine.fr"
+                },
+                {
+                    "domain": "barmer.de"
                 },
                 {
                     "domain": "bild.de"
@@ -432,189 +435,6 @@
                     "domain": "manoloblahnik.com"
                 },
                 {
-                    "domain": "skyscanner.net"
-                },
-                {
-                    "domain": "skyscanner.ru"
-                },
-                {
-                    "domain": "skyscanner.fi"
-                },
-                {
-                    "domain": "skyscanner.no"
-                },
-                {
-                    "domain": "skyscanner.nl"
-                },
-                {
-                    "domain": "skyscanner.ro"
-                },
-                {
-                    "domain": "skyscanner.com.ni"
-                },
-                {
-                    "domain": "skyscanner.at"
-                },
-                {
-                    "domain": "skyscanner.com.sg"
-                },
-                {
-                    "domain": "skyscanner.es"
-                },
-                {
-                    "domain": "skyscanner.co.nz"
-                },
-                {
-                    "domain": "skyscanner.com.sa"
-                },
-                {
-                    "domain": "skyscanner.com.bo"
-                },
-                {
-                    "domain": "skyscanner.com.br"
-                },
-                {
-                    "domain": "skyscanner.mx"
-                },
-                {
-                    "domain": "skyscanner.it"
-                },
-                {
-                    "domain": "skyscanner.ae"
-                },
-                {
-                    "domain": "skyscanner.in"
-                },
-                {
-                    "domain": "skyscanner.com.sv"
-                },
-                {
-                    "domain": "skyscanner.ie"
-                },
-                {
-                    "domain": "skyscanner.co.kr"
-                },
-                {
-                    "domain": "skyscanner.com.pe"
-                },
-                {
-                    "domain": "skyscanner.com.ph"
-                },
-                {
-                    "domain": "skyscanner.com.pa"
-                },
-                {
-                    "domain": "skyscanner.hu"
-                },
-                {
-                    "domain": "skyscanner.com.gt"
-                },
-                {
-                    "domain": "skyscanner.com.co"
-                },
-                {
-                    "domain": "skyscanner.dk"
-                },
-                {
-                    "domain": "skyscanner.co.th"
-                },
-                {
-                    "domain": "skyscanner.com.hn"
-                },
-                {
-                    "domain": "skyscanner.pt"
-                },
-                {
-                    "domain": "skyscanner.tw"
-                },
-                {
-                    "domain": "skyscanner.de"
-                },
-                {
-                    "domain": "skyscanner.com.hk"
-                },
-                {
-                    "domain": "skyscanner.com.tw"
-                },
-                {
-                    "domain": "skyscanner.pl"
-                },
-                {
-                    "domain": "skyscanner.com.tr"
-                },
-                {
-                    "domain": "skyscanner.cz"
-                },
-                {
-                    "domain": "skyscanner.com"
-                },
-                {
-                    "domain": "skyscanner.cr"
-                },
-                {
-                    "domain": "skyscanner.com.py"
-                },
-                {
-                    "domain": "skyscanner.cl"
-                },
-                {
-                    "domain": "skyscanner.com.ua"
-                },
-                {
-                    "domain": "skyscanner.com.do"
-                },
-                {
-                    "domain": "skyscanner.kr"
-                },
-                {
-                    "domain": "skyscanner.co.id"
-                },
-                {
-                    "domain": "skyscanner.ch"
-                },
-                {
-                    "domain": "skyscanner.gg"
-                },
-                {
-                    "domain": "skyscanner.ca"
-                },
-                {
-                    "domain": "skyscanner.com.uy"
-                },
-                {
-                    "domain": "skyscanner.com.ec"
-                },
-                {
-                    "domain": "skyscanner.co.il"
-                },
-                {
-                    "domain": "skyscanner.co.in"
-                },
-                {
-                    "domain": "skyscanner.com.vn"
-                },
-                {
-                    "domain": "skyscanner.se"
-                },
-                {
-                    "domain": "skyscanner.com.ar"
-                },
-                {
-                    "domain": "skyscanner.com.au"
-                },
-                {
-                    "domain": "skyscanner.fr"
-                },
-                {
-                    "domain": "skyscanner.jp"
-                },
-                {
-                    "domain": "skyscanner.com.my"
-                },
-                {
-                    "domain": "skyscanner.com.mx"
-                },
-                {
                     "domain": "outlet46.de"
                 },
                 {
@@ -819,6 +639,21 @@
                     "domain": "wetransfer.com"
                 },
                 {
+                    "domain": "collectcheckout.com"
+                },
+                {
+                    "domain": "sbid.org"
+                },
+                {
+                    "domain": "wunderground.com"
+                },
+                {
+                    "domain": "lecreuset.co.uk"
+                },
+                {
+                    "domain": "sueddeutsche.de"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -831,16 +666,146 @@
                     "domain": "flexmls.com"
                 },
                 {
-                    "domain": "sueddeutsche.de"
-                },
-                {
                     "domain": "instructure.com"
                 }
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media",
-                    "bing.com"
+                    "healthline-media"
+                ],
+                "filterlistExceptions": [
+                    "google.ae",
+                    "google.at",
+                    "google.be",
+                    "google.bg",
+                    "google.by",
+                    "google.ca",
+                    "google.ch",
+                    "google.cl",
+                    "google.co.id",
+                    "google.co.il",
+                    "google.co.in",
+                    "google.co.jp",
+                    "google.co.ke",
+                    "google.co.kr",
+                    "google.co.nz",
+                    "google.co.th",
+                    "google.co.uk",
+                    "google.co.ve",
+                    "google.co.za",
+                    "google.com",
+                    "google.com.ar",
+                    "google.com.au",
+                    "google.com.br",
+                    "google.com.co",
+                    "google.com.ec",
+                    "google.com.eg",
+                    "google.com.hk",
+                    "google.com.mx",
+                    "google.com.my",
+                    "google.com.pe",
+                    "google.com.ph",
+                    "google.com.pk",
+                    "google.com.py",
+                    "google.com.sa",
+                    "google.com.sg",
+                    "google.com.tr",
+                    "google.com.tw",
+                    "google.com.ua",
+                    "google.com.uy",
+                    "google.com.vn",
+                    "google.cz",
+                    "google.de",
+                    "google.dk",
+                    "google.dz",
+                    "google.ee",
+                    "google.es",
+                    "google.fi",
+                    "google.fr",
+                    "google.gr",
+                    "google.hr",
+                    "google.hu",
+                    "google.ie",
+                    "google.it",
+                    "google.lt",
+                    "google.lv",
+                    "google.nl",
+                    "google.no",
+                    "google.pl",
+                    "google.pt",
+                    "google.ro",
+                    "google.rs",
+                    "google.ru",
+                    "google.se",
+                    "google.sk",
+                    "google.ae",
+                    "google.at",
+                    "google.be",
+                    "google.bg",
+                    "google.by",
+                    "google.ca",
+                    "google.ch",
+                    "google.cl",
+                    "google.co.id",
+                    "google.co.il",
+                    "google.co.in",
+                    "google.co.jp",
+                    "google.co.ke",
+                    "google.co.kr",
+                    "google.co.nz",
+                    "google.co.th",
+                    "google.co.uk",
+                    "google.co.ve",
+                    "google.co.za",
+                    "google.com",
+                    "google.com.ar",
+                    "google.com.au",
+                    "google.com.br",
+                    "google.com.co",
+                    "google.com.ec",
+                    "google.com.eg",
+                    "google.com.hk",
+                    "google.com.mx",
+                    "google.com.my",
+                    "google.com.pe",
+                    "google.com.ph",
+                    "google.com.pk",
+                    "google.com.py",
+                    "google.com.sa",
+                    "google.com.sg",
+                    "google.com.tr",
+                    "google.com.tw",
+                    "google.com.ua",
+                    "google.com.uy",
+                    "google.com.vn",
+                    "google.cz",
+                    "google.de",
+                    "google.dk",
+                    "google.dz",
+                    "google.ee",
+                    "google.es",
+                    "google.fi",
+                    "google.fr",
+                    "google.gr",
+                    "google.hr",
+                    "google.hu",
+                    "google.ie",
+                    "google.it",
+                    "google.lt",
+                    "google.lv",
+                    "google.nl",
+                    "google.no",
+                    "google.pl",
+                    "google.pt",
+                    "google.ro",
+                    "google.rs",
+                    "google.ru",
+                    "google.se",
+                    "google.sk",
+                    "sachsen-netze.de",
+                    "alpharunning.co.uk",
+                    "lecreuset.co.uk",
+                    "sueddeutsche.de"
                 ]
             },
             "state": "enabled",
@@ -849,7 +814,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "a692694898bc7afebeb0747632e834b3"
+            "hash": "fbd77f789ae02d1795a7a001b75f2096"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -918,6 +883,11 @@
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "bookmarksSorting": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "bookmarks": {
             "state": "enabled",
@@ -1649,6 +1619,9 @@
                     "domain": "tinder.com"
                 },
                 {
+                    "domain": "zoosk.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
@@ -1668,7 +1641,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "1.93.0",
-            "hash": "81933e08c573f41c7a7e1620de3e2dbd"
+            "hash": "325c52e24b4455e63f1d84089408d8f2"
         },
         "clickToPlay": {
             "exceptions": [
@@ -3255,7 +3228,14 @@
                         ]
                     },
                     {
-                        "domain": "ebay.com",
+                        "domain": [
+                            "ebay.com",
+                            "ebay.ca",
+                            "ebay.co.uk",
+                            "ebay.de",
+                            "ebay.fr",
+                            "ebay.com.au"
+                        ],
                         "rules": [
                             {
                                 "selector": "#g-yolo-overlay-holder",
@@ -3664,7 +3644,26 @@
                         ]
                     },
                     {
-                        "domain": "google.com",
+                        "domain": [
+                            "google.com",
+                            "google.ca",
+                            "google.de",
+                            "google.dk",
+                            "google.es",
+                            "google.fr",
+                            "google.ie",
+                            "google.it",
+                            "google.nl",
+                            "google.pl",
+                            "google.se",
+                            "google.com.au",
+                            "google.com.br",
+                            "google.com.mx",
+                            "google.co.in",
+                            "google.co.jp",
+                            "google.co.nz",
+                            "google.co.uk"
+                        ],
                         "rules": [
                             {
                                 "selector": "div:has(> iframe[src*='prid=19026802'])",
@@ -3748,6 +3747,18 @@
                             },
                             {
                                 "selector": "div:has(> iframe[src*='prid=19044636'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19046163'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19044504'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19031729'])",
                                 "type": "hide"
                             },
                             {
@@ -3924,6 +3935,10 @@
                                 "type": "hide-empty"
                             },
                             {
+                                "selector": "[data-ad-unit-path]",
+                                "type": "closest-empty"
+                            },
+                            {
                                 "selector": "#stickyFooterRoot",
                                 "type": "hide"
                             }
@@ -3986,6 +4001,14 @@
                             {
                                 "selector": "[advertisementtext='Advertisement']",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "kamus.net",
+                        "rules": [
+                            {
+                                "type": "disable-default"
                             }
                         ]
                     },
@@ -4662,6 +4685,14 @@
                         "domain": "realtor.com",
                         "rules": [
                             {
+                                "selector": ".ad-wrapper",
+                                "type": "override"
+                            },
+                            {
+                                "selector": ".lb1-ad",
+                                "type": "hide-empty"
+                            },
+                            {
                                 "selector": ".ads_container",
                                 "type": "hide"
                             }
@@ -5330,6 +5361,22 @@
                             {
                                 "selector": "[class*='sdaContainer']",
                                 "type": "hide"
+                            },
+                            {
+                                "selector": "#sda-Horizon-viewer",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='mrt-node-Lead']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='mrt-node-Secondary']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='rrvkqH1']",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -5499,7 +5546,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "ea1628129c6ec998632537745212250e"
+            "hash": "9f867188e8214064a3eb65344e619fae"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5728,9 +5775,6 @@
                     "domain": "secureserver.net"
                 },
                 {
-                    "domain": "hyatt.com"
-                },
-                {
                     "domain": "proton.me"
                 },
                 {
@@ -5798,7 +5842,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "04e4f97a4ad60cd13663ac5d486d3ac4"
+            "hash": "53cc82526eaeeaa1490c8538b78fdb35"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -5830,9 +5874,6 @@
                     "domain": "godaddy.com"
                 },
                 {
-                    "domain": "hyatt.com"
-                },
-                {
                     "domain": "litebluesso.usps.gov"
                 },
                 {
@@ -5855,7 +5896,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "9c9c85ea83b8e7c6d07c20d1539a000f"
+            "hash": "a26b20181df02a3dc1cce0945d6e0ccb"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [
@@ -5886,6 +5927,11 @@
             ],
             "state": "disabled",
             "hash": "2dc4c0ade2e385d208695d770002c725"
+        },
+        "fullScreenMode": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "googleRejected": {
             "exceptions": [
@@ -5945,6 +5991,12 @@
                     "domain": "madewell.com"
                 },
                 {
+                    "domain": "visible.com"
+                },
+                {
+                    "domain": "flyfrontier.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -5969,7 +6021,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "cc0c0adfc06919bb973a7636b59b2430"
+            "hash": "fdb3180769d77fd3cedfc8601e184dcd"
         },
         "harmfulApis": {
             "settings": {
@@ -6095,6 +6147,16 @@
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
         },
+        "htmlNewTabPage": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "isLaunched": {
+                    "state": "disabled"
+                }
+            },
+            "hash": "8400a35feab96ad28d974fc04e895d88"
+        },
         "https": {
             "state": "enabled",
             "exceptions": [
@@ -6154,13 +6216,17 @@
             "hash": "39a36ca9002bd5aea4dd7b6bdb5b79d4"
         },
         "maliciousSiteProtection": {
-            "state": "internal",
-            "exceptions": [],
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "broken.third-party.site"
+                }
+            ],
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "hash": "ca9942379aea7619f878337a2debdee8"
+            "hash": "c5507786c7bd5326356357f2291fa536"
         },
         "marketplaceAdPostback": {
             "state": "disabled",
@@ -6248,11 +6314,14 @@
                 },
                 "enforceRoutes": {
                     "state": "enabled"
+                },
+                "appExclusions": {
+                    "state": "enabled"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.57.1",
-            "hash": "ea1fe9850a4436bd65e4d2c80732da80"
+            "hash": "a989cefea7c549442afa51e6359a153a"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
@@ -6401,6 +6470,23 @@
                 "isLaunchedOverride": {
                     "state": "disabled"
                 },
+                "isLaunchedROW": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.118.1"
+                },
                 "allowPurchase": {
                     "state": "enabled"
                 },
@@ -6435,7 +6521,7 @@
                     "minSupportedVersion": "1.113.0"
                 },
                 "setAccessTokenCookieForSubscriptionDomains": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -6449,7 +6535,7 @@
                     "minSupportedVersion": "1.116.0"
                 }
             },
-            "hash": "f6cdbdef4f1a09ae58e791e1d1a6bfa4"
+            "hash": "9738cff7f6a81e78fa9a0dfbd1dc99d6"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
@@ -6573,6 +6659,11 @@
             "state": "disabled",
             "hash": "be6751fe0307a7e1b9476f4d8b8d0aaf"
         },
+        "settingsPage": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "showOnAppLaunch": {
             "exceptions": [
                 {
@@ -6657,6 +6748,11 @@
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
             "hash": "0a35f748d63fc61a777ea5e712728fa3"
+        },
+        "tabManager": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "textZoom": {
             "exceptions": [],
@@ -8015,6 +8111,7 @@
                             {
                                 "rule": "google-analytics.com/analytics.js",
                                 "domains": [
+                                    "bswift.com",
                                     "doterra.com",
                                     "easyjet.com",
                                     "edx.org",
@@ -8188,6 +8285,7 @@
                                     "eatroyo.com",
                                     "experian.com",
                                     "ljsilvers.com",
+                                    "tesla.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
                                     "vanguardplan.com",
@@ -8878,6 +8976,16 @@
                                 "rule": "cdn.accounts.nintendo.com/account/js/common.js",
                                 "domains": [
                                     "nintendo.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "nitropay.com": {
+                        "rules": [
+                            {
+                                "rule": "nitropay.com/ads",
+                                "domains": [
+                                    "maxroll.gg"
                                 ]
                             }
                         ]
@@ -10154,7 +10262,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "b97838ac43243028e26d0b2e1d73c12a"
+            "hash": "2d19877231df04e21e86f3c271e10f28"
         },
         "trackingCookies1p": {
             "settings": {
@@ -10273,30 +10381,6 @@
             "minSupportedVersion": "0.22.3",
             "hash": "009e36025b3a532522f65bf0c19fa0d8"
         },
-        "userAgentRotation": {
-            "settings": {
-                "agentExcludePatterns": []
-            },
-            "exceptions": [
-                {
-                    "domain": "marvel.com"
-                },
-                {
-                    "domain": "sundancecatalog.com"
-                },
-                {
-                    "domain": "noaprints.com"
-                },
-                {
-                    "domain": "flexmls.com"
-                },
-                {
-                    "domain": "instructure.com"
-                }
-            ],
-            "state": "disabled",
-            "hash": "9225b8785d6973db37abde99d81d219c"
-        },
         "voiceSearch": {
             "exceptions": [],
             "state": "disabled",
@@ -10325,222 +10409,6 @@
                     "domain": "lastpass.com"
                 },
                 {
-                    "domain": "forums.swift.org"
-                },
-                {
-                    "domain": "twittercommunity.com"
-                },
-                {
-                    "domain": "forum.asana.com"
-                },
-                {
-                    "domain": "community.developer.atlassian.com"
-                },
-                {
-                    "domain": "meta.discourse.org"
-                },
-                {
-                    "domain": "community.smartthings.com"
-                },
-                {
-                    "domain": "forum.figma.com"
-                },
-                {
-                    "domain": "bbs.boingboing.net"
-                },
-                {
-                    "domain": "devforum.zoom.us"
-                },
-                {
-                    "domain": "forum.uipath.com"
-                },
-                {
-                    "domain": "discuss.elastic.co"
-                },
-                {
-                    "domain": "forums.envato.com"
-                },
-                {
-                    "domain": "discuss.newrelic.com"
-                },
-                {
-                    "domain": "community.wd.com"
-                },
-                {
-                    "domain": "forums.wyzecam.com"
-                },
-                {
-                    "domain": "community.anker.com"
-                },
-                {
-                    "domain": "www.trainerroad.com"
-                },
-                {
-                    "domain": "www.sitepoint.com"
-                },
-                {
-                    "domain": "comunidade.nubank.com.br"
-                },
-                {
-                    "domain": "community.monzo.com"
-                },
-                {
-                    "domain": "community.wirexapp.com"
-                },
-                {
-                    "domain": "community.freetrade.io"
-                },
-                {
-                    "domain": "forums.unrealengine.com"
-                },
-                {
-                    "domain": "forums.funcom.com"
-                },
-                {
-                    "domain": "community.infiniteflight.com"
-                },
-                {
-                    "domain": "forums.eveonline.com"
-                },
-                {
-                    "domain": "community.metamask.io"
-                },
-                {
-                    "domain": "forum.algorand.org"
-                },
-                {
-                    "domain": "forum.cardano.org"
-                },
-                {
-                    "domain": "forums.solana.com"
-                },
-                {
-                    "domain": "developers.chia.net"
-                },
-                {
-                    "domain": "community.cartalk.com"
-                },
-                {
-                    "domain": "www.thefantasyfootballers.com"
-                },
-                {
-                    "domain": "www.twit.community"
-                },
-                {
-                    "domain": "commons.commondreams.org"
-                },
-                {
-                    "domain": "boards.straightdope.com"
-                },
-                {
-                    "domain": "forum.gitlab.com"
-                },
-                {
-                    "domain": "discuss.rubyonrails.org"
-                },
-                {
-                    "domain": "forums.docker.com"
-                },
-                {
-                    "domain": "community.brave.com"
-                },
-                {
-                    "domain": "discuss.emberjs.com"
-                },
-                {
-                    "domain": "forum.glamour.de"
-                },
-                {
-                    "domain": "forums.cfl.ca"
-                },
-                {
-                    "domain": "soaps.sheknows.com"
-                },
-                {
-                    "domain": "forum.mssociety.org.uk"
-                },
-                {
-                    "domain": "forum.schizophrenia.com"
-                },
-                {
-                    "domain": "forum.octopus.energy"
-                },
-                {
-                    "domain": "forum.level1techs.com"
-                },
-                {
-                    "domain": "forums.zwift.com"
-                },
-                {
-                    "domain": "forums.plex.tv"
-                },
-                {
-                    "domain": "forum.arduino.cc"
-                },
-                {
-                    "domain": "forum.restic.net"
-                },
-                {
-                    "domain": "forum.openwrt.org"
-                },
-                {
-                    "domain": "www.horlogeforum.nl"
-                },
-                {
-                    "domain": "forum.infinityfree.net"
-                },
-                {
-                    "domain": "forum.manjaro.org"
-                },
-                {
-                    "domain": "forum.projectpanoptes.org"
-                },
-                {
-                    "domain": "forum.obsidian.md"
-                },
-                {
-                    "domain": "us.forums.blizzard.com"
-                },
-                {
-                    "domain": "community.home-assistant.io"
-                },
-                {
-                    "domain": "community.openfl.org"
-                },
-                {
-                    "domain": "community.sonarsource.com"
-                },
-                {
-                    "domain": "ubuntu-mate.community"
-                },
-                {
-                    "domain": "community.letsencrypt.org"
-                },
-                {
-                    "domain": "community.naimaudio.com"
-                },
-                {
-                    "domain": "community.ipfire.org"
-                },
-                {
-                    "domain": "community.squirrelsquadron.com"
-                },
-                {
-                    "domain": "community.signalusers.org"
-                },
-                {
-                    "domain": "community.haxe.org"
-                },
-                {
-                    "domain": "community.grafana.com"
-                },
-                {
-                    "domain": "community.octoprint.org"
-                },
-                {
-                    "domain": "community.bitwarden.com"
-                },
-                {
                     "domain": "instructure.com"
                 }
             ],
@@ -10565,6 +10433,16 @@
                 },
                 "domains": [
                     {
+                        "domain": "docs.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/windowSizing",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "www.cbsnews.com",
                         "patchSettings": [
                             {
@@ -10586,7 +10464,7 @@
                     }
                 ]
             },
-            "hash": "d1b128e9ff49486fb7122c70fef0ff51"
+            "hash": "99b098daaea40136ae60aec41f52467e"
         },
         "webViewBlobDownload": {
             "exceptions": [],

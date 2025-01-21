@@ -35,7 +35,9 @@ import os.log
  */
 final class ActiveRemoteMessageModel: ObservableObject {
 
-    @Published var remoteMessage: RemoteMessageModel?
+    @Published private var remoteMessage: RemoteMessageModel?
+    @Published var newTabPageRemoteMessage: RemoteMessageModel?
+    @Published var tabBarRemoteMessage: RemoteMessageModel?
     @Published var isViewOnScreen: Bool = false
 
     /**
@@ -91,6 +93,21 @@ final class ActiveRemoteMessageModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateRemoteMessage()
+            }
+            .store(in: &cancellables)
+
+        $remoteMessage
+            .sink { [weak self] newMessage in
+                if let newMessage = newMessage {
+                    if newMessage.isForTabBar {
+                        self?.tabBarRemoteMessage = newMessage
+                    } else {
+                        self?.newTabPageRemoteMessage = newMessage
+                    }
+                } else {
+                    self?.newTabPageRemoteMessage = nil
+                    self?.tabBarRemoteMessage = nil
+                }
             }
             .store(in: &cancellables)
 
@@ -183,5 +200,12 @@ extension RemoteMessageModelType {
         default:
             return true
         }
+    }
+}
+
+private extension RemoteMessageModel {
+
+    var isForTabBar: Bool {
+        return id == TabBarRemoteMessage.tabBarPermanentSurveyRemoteMessageId
     }
 }

@@ -43,7 +43,7 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
             openURLHandler: { _ in }
         )
 
-        XCTAssertNil(model.remoteMessage)
+        XCTAssertNil(model.newTabPageRemoteMessage)
     }
 
     func testWhenMessageIsScheduledThenItIsLoadedToModel() throws {
@@ -54,7 +54,7 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
             openURLHandler: { _ in }
         )
 
-        XCTAssertEqual(model.remoteMessage, message)
+        XCTAssertEqual(model.newTabPageRemoteMessage, message)
     }
 
     func testWhenMessageIsDismissedThenItIsClearedFromModel() async throws {
@@ -66,7 +66,7 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         )
         await model.dismissRemoteMessage(with: .close)
 
-        XCTAssertNil(model.remoteMessage)
+        XCTAssertNil(model.newTabPageRemoteMessage)
     }
 
     func testWhenMessageIsMarkedAsShownThenShownFlagIsSavedInStore() async throws {
@@ -80,5 +80,40 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         XCTAssertFalse(store.hasShownRemoteMessage(withID: message.id))
         await model.markRemoteMessageAsShown()
         XCTAssertTrue(store.hasShownRemoteMessage(withID: message.id))
+    }
+
+    func testWhenMessageIsForTabBar_thenCorrectPublisherIsSet() {
+        let tabBarRemoteMessage = RemoteMessageModel(
+            id: TabBarRemoteMessage.tabBarPermanentSurveyRemoteMessageId,
+            content: .bigSingleAction(titleText: "Help Us Improve!",
+                                      descriptionText: "Description",
+                                      placeholder: .announce,
+                                      primaryActionText: "Test",
+                                      primaryAction: .survey(value: "www.survey.com")),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: false
+        )
+        store.scheduledRemoteMessage = tabBarRemoteMessage
+        model = ActiveRemoteMessageModel(
+            remoteMessagingStore: self.store,
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider(),
+            openURLHandler: { _ in }
+        )
+
+        XCTAssertNotNil(model.tabBarRemoteMessage)
+        XCTAssertNil(model.newTabPageRemoteMessage)
+    }
+
+    func testWhenMessageIsForNewTabPage_thenCorrectPublisherIsSet() {
+        store.scheduledRemoteMessage = message
+        model = ActiveRemoteMessageModel(
+            remoteMessagingStore: self.store,
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider(),
+            openURLHandler: { _ in }
+        )
+
+        XCTAssertNil(model.tabBarRemoteMessage)
+        XCTAssertNotNil(model.newTabPageRemoteMessage)
     }
 }
