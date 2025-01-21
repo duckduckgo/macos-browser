@@ -21,12 +21,17 @@ final class WebExtensionsDebugMenu: NSMenu {
 
     private let webExtensionManager: WebExtensionManaging
 
+    private let selectAndLoadMenuItem = NSMenuItem(title: "Load web extension...", action: #selector(WebExtensionsDebugMenu.selectAndLoadWebExtension))
+
     init(webExtensionManager: WebExtensionManaging = WebExtensionManager.shared) {
         self.webExtensionManager = webExtensionManager
         super.init(title: "")
 
+        selectAndLoadMenuItem.target = self
+        selectAndLoadMenuItem.isEnabled = webExtensionManager.areExtenstionsEnabled
+
         buildItems {
-            NSMenuItem(title: "Load web extension...", action: #selector(selectAndLoadWebExtension), target: self)
+            selectAndLoadMenuItem
         }
 
         if !webExtensionManager.webExtensionPaths.isEmpty {
@@ -39,6 +44,12 @@ final class WebExtensionsDebugMenu: NSMenu {
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func update() {
+        super.update()
+
+        selectAndLoadMenuItem.isEnabled = webExtensionManager.areExtenstionsEnabled
     }
 
     @objc func selectAndLoadWebExtension() {

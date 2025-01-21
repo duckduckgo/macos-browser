@@ -97,7 +97,6 @@ final class MainMenu: NSMenu {
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
     let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: nil)
     let autofillDebugScriptMenuItem = NSMenuItem(title: "Autofill Debug Script", action: #selector(MainMenu.toggleAutofillScriptDebugSettingsAction))
-    let webExtensionsMenuItem = NSMenuItem(title: "Web Extensions", action: nil)
 
     // MARK: Help
 
@@ -448,7 +447,6 @@ final class MainMenu: NSMenu {
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
         updateAutofillDebugScriptMenuItem()
-        updateWebExtensionsMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -738,14 +736,12 @@ final class MainMenu: NSMenu {
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
-        }
 
-        if #available(macOS 14.4, *) {
-            webExtensionsMenuItem.submenu = WebExtensionsDebugMenu()
-            debugMenu.addItem(.separator())
-            debugMenu.addItem(webExtensionsMenuItem)
-            debugMenu.addItem(.separator())
-            webExtensionsMenuItem.isEnabled = NSApp.delegateTyped.internalUserDecider.isInternalUser
+            if #available(macOS 14.4, *) {
+                NSMenuItem.separator()
+                NSMenuItem(title: "Web Extensions").submenu(WebExtensionsDebugMenu())
+                NSMenuItem.separator()
+            }
         }
 
         debugMenu.addItem(internalUserItem)
@@ -792,13 +788,6 @@ final class MainMenu: NSMenu {
         }
         configurationDateAndTimeMenuItem.title = dateString
         customConfigurationUrlMenuItem.title = "Configuration URL:  \(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString)"
-    }
-
-    private func updateWebExtensionsMenuItem() {
-        if #available(macOS 14.4, *) {
-            webExtensionsMenuItem.isEnabled = NSApp.delegateTyped.internalUserDecider.isInternalUser
-            webExtensionsMenuItem.submenu = WebExtensionsDebugMenu()
-        }
     }
 
     @objc private func toggleAutofillScriptDebugSettingsAction(_ sender: NSMenuItem) {

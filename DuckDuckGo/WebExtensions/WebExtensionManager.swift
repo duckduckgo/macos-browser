@@ -20,9 +20,12 @@ import Foundation
 import Common
 import WebKit
 import os.log
+import BrowserServicesKit
 
 @available(macOS 14.4, *)
 protocol WebExtensionManaging {
+
+    var areExtenstionsEnabled: Bool { get }
 
     // Adding and removing extensions
     var webExtensionPaths: [String] { get }
@@ -43,8 +46,10 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 
     static let shared = WebExtensionManager()
 
-    init(webExtensionPathsCache: WebExtensionPathsCaching = WebExtensionPathsCache()) {
+    init(webExtensionPathsCache: WebExtensionPathsCaching = WebExtensionPathsCache(),
+         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
         self.webExtensionPathsCache = webExtensionPathsCache
+        self.internalUserDecider = internalUserDecider
         super.init()
 
         internalSiteHandler.dataSource = self
@@ -54,6 +59,12 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         } catch {
             assertionFailure("Failed to load web extensions")
         }
+    }
+
+    private let internalUserDecider: InternalUserDecider
+
+    var areExtenstionsEnabled: Bool {
+        internalUserDecider.isInternalUser
     }
 
     // Caches paths to selected web extensions
@@ -96,6 +107,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     // MARK: - Lifecycle
 
     private func loadWebExtensions() throws {
+        guard areExtenstionsEnabled else { return }
+
         // Load extensions
         extensions = loader.loadWebExtensions(from: webExtensionPathsCache.cache)
 
