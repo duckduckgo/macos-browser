@@ -409,11 +409,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             self.connector?.stopPolling()
             self.connector = nil
 
-            guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
-                assertionFailure("window or sheet parent not present")
-                return
+            Task { @MainActor in
+                guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
+                    assertionFailure("window or sheet parent not present")
+                    return
+                }
+                sheetParent.endSheet(window)
             }
-            sheetParent.endSheet(window)
         }
 
         parentWindowController.window?.beginSheet(syncWindow)
