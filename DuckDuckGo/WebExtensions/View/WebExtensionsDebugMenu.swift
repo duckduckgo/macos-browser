@@ -49,6 +49,8 @@ final class WebExtensionsDebugMenu: NSMenu {
               let url = panel.url else { return }
 
         webExtensionManager.addExtension(path: url.absoluteString)
+
+        NSAlert.extensionAlert().runModal()
     }
 
 }
@@ -89,6 +91,21 @@ final class WebExtensionSubMenu: NSMenu {
 
     @objc func unloadWebExtension() {
         webExtensionManager.removeExtension(path: webExtensionPath)
+
+        NSAlert.extensionAlert().runModal()
+    }
+
+}
+
+extension NSAlert {
+
+    static func extensionAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Restart required"
+        alert.informativeText = "Please restart your browser manually to apply changes to extensions."
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: UserText.ok)
+        return alert
     }
 
 }
