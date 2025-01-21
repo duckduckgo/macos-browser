@@ -16,13 +16,12 @@
 //  limitations under the License.
 //
 
+import XCTest
 import Subscription
 import SubscriptionTestingUtilities
-import XCTest
-
+import NetworkingTestingUtils
 @testable import DuckDuckGo_Privacy_Browser
 @testable import Networking
-@testable import TestUtils
 
 final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     enum Error: String, Swift.Error {

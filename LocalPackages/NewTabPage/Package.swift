@@ -45,7 +45,7 @@ let package = Package(
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "PrivacyStats", package: "BrowserServicesKit"),
                 .product(name: "RemoteMessaging", package: "BrowserServicesKit"),
-                .product(name: "TestUtils", package: "BrowserServicesKit"),
+                .product(name: "PersistenceTestingUtils", package: "BrowserServicesKit"),
                 .product(name: "WebKitExtensions", package: "WebKitExtensions"),
             ],
             swiftSettings: [

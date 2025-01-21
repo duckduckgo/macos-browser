@@ -26,6 +26,7 @@ import PixelKit
 import os.log
 import Freemium
 import DataBrokerProtection
+import Networking
 
 /// Use Subscription sub-feature
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
@@ -96,6 +97,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
+        Logger.subscription.debug("WebView handler: \(methodName)")
+
         switch methodName {
         case Handlers.getSubscription: return getSubscription
         case Handlers.setSubscription: return setSubscription
@@ -150,14 +153,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
         }
 
-        return nil
-    }
+            return nil
+        }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         if let accessToken = accountManager.accessToken,
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
-        }
+    }
 
         DispatchQueue.main.async { [weak self] in
             self?.notificationCenter.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
