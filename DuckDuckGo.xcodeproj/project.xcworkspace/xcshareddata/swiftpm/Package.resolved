@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "d1275238d88f25cd31a29be2b4f20bbba5de9aa1",
-        "version" : "226.0.0"
+        "branch" : "sabrina/tds-experiment-metrics",
+        "revision" : "b3994633bb53e0e244411e1b94b63d4ba30d0a6d"
       }
     },
     {

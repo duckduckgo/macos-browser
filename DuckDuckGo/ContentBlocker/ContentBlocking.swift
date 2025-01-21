@@ -22,6 +22,7 @@ import Combine
 import BrowserServicesKit
 import Common
 import PixelKit
+import PixelExperimentKit
 
 protocol ContentBlockingProtocol {
 
@@ -56,6 +57,11 @@ final class AppContentBlocking {
 
     private let contentBlockerRulesSource: ContentBlockerRulesLists
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
+
+    struct Constants {
+        static let experimentNameParameterName = "experimentName"
+        static let etagParameterName = "etag"
+    }
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
     @MainActor
@@ -99,9 +105,14 @@ final class AppContentBlocking {
         guard NSApp.runType.requiresEnvironment else { return }
 
         let domainEvent: GeneralPixel
+        var finalParameters = parameters ?? [:]
         switch event {
         case .trackerDataParseFailed:
             domainEvent = .trackerDataParseFailed
+            if let experimentName = TDSOverrideExperimentMetrics.activeTDSExperimentNameWithCohort {
+                finalParameters[Constants.experimentNameParameterName] = experimentName
+                finalParameters[Constants.etagParameterName] = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
+            }
 
         case .trackerDataReloadFailed:
             domainEvent = .trackerDataReloadFailed
@@ -153,9 +164,13 @@ final class AppContentBlocking {
             let timeBucket = GeneralPixel.CompileTimeBucketAggregation(number: timeBucketAggregation)
             domainEvent = .contentBlockingCompilationTaskPerformance(iterationCount: iterationCount,
                                                                      timeBucketAggregation: timeBucket)
+            if let experimentName = TDSOverrideExperimentMetrics.activeTDSExperimentNameWithCohort {
+                finalParameters[Constants.experimentNameParameterName] = experimentName
+                finalParameters[Constants.etagParameterName] = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
+            }
         }
 
-        PixelKit.fire(DebugEvent(domainEvent, error: error), withAdditionalParameters: parameters) { _, error in
+        PixelKit.fire(DebugEvent(domainEvent, error: error), withAdditionalParameters: finalParameters) { _, error in
             onComplete(error)
         }
     }
