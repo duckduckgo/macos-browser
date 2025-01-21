@@ -23,6 +23,7 @@ import FeatureFlags
 import Foundation
 import MaliciousSiteProtection
 import Networking
+import os.log
 import PixelKit
 
 extension MaliciousSiteProtectionManager {
@@ -120,8 +121,17 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         self.setupBindings()
     }
 
-    private static let debugEvents = EventMapping<MaliciousSiteProtection.Event> {event, _, _, _ in
-        PixelKit.fire(event)
+    private static let debugEvents = EventMapping<MaliciousSiteProtection.Event> { event, _, _, _ in
+        switch event {
+        case .errorPageShown,
+             .visitSite,
+             .iframeLoaded,
+             .settingToggled,
+             .matchesApiTimeout:
+            PixelKit.fire(event)
+        case .matchesApiFailure(let error):
+            Logger.maliciousSiteProtection.error("Error fetching matches from API: \(error)")
+        }
     }
 
     private func setupBindings() {

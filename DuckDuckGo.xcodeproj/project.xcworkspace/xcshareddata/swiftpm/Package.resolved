@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "d1275238d88f25cd31a29be2b4f20bbba5de9aa1",
-        "version" : "226.0.0"
+        "branch" : "alex/malsite-timeout-pixel",
+        "revision" : "82f7e36c751c649d48e85a6eb667d1f4aa6c4e28"
       }
     },
     {
