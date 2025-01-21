@@ -99,7 +99,7 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .networkProtectionEnforceRoutes:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
-            return .disabled
+            return .remoteReleasable(.subfeature(HTMLNewTabPageSubfeature.isLaunched))
         case .autofillPartialFormSaves:
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         case .autcompleteTabs:
