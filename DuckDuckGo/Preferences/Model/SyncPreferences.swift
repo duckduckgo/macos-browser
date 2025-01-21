@@ -781,7 +781,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         }
         Task {
             await switchAccounts(recoveryKey: recoveryKey)
-            managementDialogModel.endFlow()
+            await managementDialogModel.endFlow()
         }
     }
 

@@ -59,6 +59,7 @@ public final class ManagementDialogModel: ObservableObject {
             }
     }
 
+    @MainActor
     public func endFlow() {
         if shouldShowSwitchAccountsMessage {
             delegate?.switchAccountsCancelled()
@@ -66,10 +67,12 @@ public final class ManagementDialogModel: ObservableObject {
         doEndFlow()
     }
 
+    @MainActor
     public func userConfirmedSwitchAccounts(recoveryCode: String) {
         delegate?.userConfirmedSwitchAccounts(recoveryCode: recoveryCode)
     }
 
+    @MainActor
     private func doEndFlow() {
         syncErrorMessage?.type.onButtonPressed(delegate: delegate)
         syncErrorMessage = nil
