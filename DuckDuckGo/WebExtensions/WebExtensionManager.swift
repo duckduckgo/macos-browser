@@ -32,6 +32,9 @@ protocol WebExtensionManaging {
     func addExtension(path: String)
     func removeExtension(path: String)
 
+    // Provides the extension name for the extension resource base path
+    func extensionName(from path: String) -> String?
+
     // Controller for tabs
     var controller: _WKWebExtensionController? { get }
 
@@ -105,6 +108,13 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 
     func removeExtension(path: String) {
         webExtensionPathsCache.remove(path)
+    }
+
+    func extensionName(from path: String) -> String? {
+        if let extensionURL = URL(string: path) {
+            return try? _WKWebExtension(resourceBaseURL: extensionURL).displayName
+        }
+        return nil
     }
 
     // MARK: - Lifecycle

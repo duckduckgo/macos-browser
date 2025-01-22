@@ -40,7 +40,9 @@ final class WebExtensionsDebugMenu: NSMenu {
         if !webExtensionManager.webExtensionPaths.isEmpty {
             addItem(.separator())
             for webExtensionPath in webExtensionManager.webExtensionPaths {
-                self.addItem(WebExtensionMenuItem(webExtensionPath: webExtensionPath))
+                let name = webExtensionManager.extensionName(from: webExtensionPath)
+                self.addItem(WebExtensionMenuItem(webExtensionPath: webExtensionPath,
+                                                  webExtensionName: name))
             }
         }
     }
@@ -78,8 +80,10 @@ final class WebExtensionMenuItem: NSMenuItem {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(webExtensionPath: String) {
-        super.init(title: webExtensionPath, action: nil, keyEquivalent: "")
+    init(webExtensionPath: String, webExtensionName: String?) {
+        super.init(title: webExtensionName ?? webExtensionPath,
+                   action: nil,
+                   keyEquivalent: "")
         submenu = WebExtensionSubMenu(webExtensionPath: webExtensionPath)
     }
 
