@@ -30,12 +30,15 @@ final class WebExtensionsDebugMenu: NSMenu {
         selectAndLoadMenuItem.target = self
         selectAndLoadMenuItem.isEnabled = webExtensionManager.areExtenstionsEnabled
 
-        buildItems {
-            selectAndLoadMenuItem
-        }
+        addItems()
+    }
 
+    private func addItems() {
+        removeAllItems()
+
+        addItem(selectAndLoadMenuItem)
         if !webExtensionManager.webExtensionPaths.isEmpty {
-            self.addItem(.separator())
+            addItem(.separator())
             for webExtensionPath in webExtensionManager.webExtensionPaths {
                 self.addItem(WebExtensionMenuItem(webExtensionPath: webExtensionPath))
             }
@@ -48,6 +51,8 @@ final class WebExtensionsDebugMenu: NSMenu {
 
     override func update() {
         super.update()
+
+        addItems()
 
         selectAndLoadMenuItem.isEnabled = webExtensionManager.areExtenstionsEnabled
     }
