@@ -1278,10 +1278,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
         ])
 
-        if case.url(let url, _, _) = content {
-            self.error = error
+        let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
 
-            loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+        if isInternalUser {
+            recoverFromCrash()
+        } else {
+            shouldShowTabCrashedPage(with: error)
         }
 
         Task {
@@ -1306,6 +1308,32 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
     }
 
+    @MainActor
+    private func shouldShowTabCrashedPage(with error: WKError) {
+        if case.url(let url, _, _) = content {
+            self.error = error
+
+            loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+        }
+    }
+
+    /// This function will reload the web view when a crash occurs. If we check that a form is in the site,
+    /// we will not reload it. The reason is that it is a bad experience because users will lose all the data.
+    @MainActor
+    private func recoverFromCrash() {
+        webView.evaluateJavaScript("document.forms.length > 0") { (result, error) in
+            // Reload the web view if there's an error or if the result is not a boolean
+            guard error == nil, let hasForms = result as? Bool else {
+                self.webView.reload()
+                return
+            }
+
+            // Reload only if there are no forms
+            if !hasForms {
+                self.webView.reload()
+            }
+        }
+    }
 }
 
 extension Tab: NewWindowPolicyDecisionMaker {
