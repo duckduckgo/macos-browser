@@ -84,8 +84,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     private let detector: MaliciousSiteDetecting
     private let updateManager: MaliciousSiteProtection.UpdateManager
     private let detectionPreferences: MaliciousSiteProtectionPreferences
-    private let featureFlagger: FeatureFlagger
-    private let configManager: PrivacyConfigurationManaging
+    private let featureFlags: MaliciousSiteProtectionFeatureFlagger
 
     private var featureFlagsCancellable: AnyCancellable?
     private var detectionPreferencesEnabledCancellable: AnyCancellable?
@@ -99,12 +98,11 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         dataManager: MaliciousSiteProtection.DataManager? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
         detectionPreferences: MaliciousSiteProtectionPreferences = MaliciousSiteProtectionPreferences.shared,
-        featureFlagger: FeatureFlagger? = nil,
+        featureFlags: MaliciousSiteProtectionFeatureFlagger? = nil,
         configManager: PrivacyConfigurationManaging? = nil,
         updateIntervalProvider: UpdateManager.UpdateIntervalProvider? = nil
     ) {
-        self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
-        self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        self.featureFlags = featureFlags ?? NSApp.delegateTyped.featureFlagger.maliciousSiteProtectionFeatureFlags()
 
         let embeddedDataProvider = embeddedDataProvider ?? EmbeddedDataProvider()
         let dataManager = dataManager ?? {
@@ -125,23 +123,8 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     }
 
     private func setupBindings() {
-        if featureFlagger.isFeatureOn(.maliciousSiteProtection) {
-            subscribeToDetectionPreferences()
-            return
-        }
-
-        guard let overridesHandler = featureFlagger.localOverrides?.actionHandler as? FeatureFlagOverridesPublishingHandler<FeatureFlag> else { return }
-        featureFlagsCancellable = overridesHandler.flagDidChangePublisher
-            .filter { $0.0 == .maliciousSiteProtection }
-            .sink { [weak self] change in
-                guard let self else { return }
-                if change.1 {
-                    subscribeToDetectionPreferences()
-                } else {
-                    detectionPreferencesEnabledCancellable = nil
-                    stopUpdateTasks()
-                }
-            }
+        guard featureFlags.isMaliciousSiteProtectionEnabled else { return }
+        subscribeToDetectionPreferences()
     }
 
     private func subscribeToDetectionPreferences() {
@@ -171,10 +154,18 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     // MARK: - Public
 
     public func evaluate(_ url: URL) async -> ThreatKind? {
-        guard configManager.privacyConfig.isFeature(.maliciousSiteProtection, enabledForDomain: url.host),
-              detectionPreferences.isEnabled else { return .none }
+        guard detectionPreferences.isEnabled,
+              featureFlags.shouldDetectMaliciousThreat(forDomain: url.host) else { return .none }
 
         return await detector.evaluate(url)
     }
 
+}
+
+extension FeatureFlagger {
+    func maliciousSiteProtectionFeatureFlags(configManager: PrivacyConfigurationManaging? = nil) -> MaliciousSiteProtectionFeatureFlags {
+        let configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        return .init(privacyConfigManager: configManager,
+                     isMaliciousSiteProtectionEnabled: { self.isFeatureOn(.maliciousSiteProtection) })
+    }
 }

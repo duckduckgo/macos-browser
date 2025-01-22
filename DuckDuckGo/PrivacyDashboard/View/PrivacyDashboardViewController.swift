@@ -81,7 +81,6 @@ final class PrivacyDashboardViewController: NSViewController {
         let toggleReportingManager = ToggleReportingManager(feature: toggleReportingFeature)
         self.privacyDashboardController = PrivacyDashboardController(privacyInfo: privacyInfo,
                                                                      entryPoint: entryPoint,
-                                                                     variant: .control,
                                                                      toggleReportingManager: toggleReportingManager,
                                                                      eventMapping: eventMapping)
         super.init(nibName: nil, bundle: nil)
