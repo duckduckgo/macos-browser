@@ -4151,6 +4151,7 @@
 		7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNProxyLauncher.swift; sourceTree = "<group>"; };
 		7B09CBA72BA4BE7000CF245B /* NetworkProtectionPixelEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionPixelEventTests.swift; sourceTree = "<group>"; };
+		7B0BB3B72D40253400B93BEB /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = SOURCE_ROOT; };
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
@@ -6017,6 +6018,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
+				7B0BB3B72D40253400B93BEB /* BrowserServicesKit */,
 				9D9DE5712C63A96400D20B15 /* AppKitExtensions */,
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,

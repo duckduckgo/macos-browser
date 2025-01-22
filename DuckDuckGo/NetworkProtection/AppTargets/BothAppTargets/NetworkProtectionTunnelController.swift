@@ -258,6 +258,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     private func handleSettingsChange(_ change: VPNSettings.Change) async throws {
         switch change {
+        case .setDNSSettings:
+            await restart()
         case .setIncludeAllNetworks(let includeAllNetworks):
             try await handleSetIncludeAllNetworks(includeAllNetworks)
         case .setEnforceRoutes(let enforceRoutes):
@@ -270,7 +272,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 .setSelectedServer,
                 .setSelectedEnvironment,
                 .setSelectedLocation,
-                .setDNSSettings,
                 .setShowInMenuBar,
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
