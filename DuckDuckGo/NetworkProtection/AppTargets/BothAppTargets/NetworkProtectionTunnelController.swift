@@ -806,7 +806,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             Logger.networkProtection.error("TunnelController found no token")
             return nil
         }
-        }
+    }
 
     private static func adaptAccessTokenForVPN(_ token: String) -> String {
         "ddg:\(token)"
