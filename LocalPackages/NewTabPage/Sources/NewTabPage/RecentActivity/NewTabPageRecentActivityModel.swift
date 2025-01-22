@@ -1,0 +1,98 @@
+//
+//  NewTabPageRecentActivityModel.swift
+//
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Combine
+import Common
+import Foundation
+import os.log
+import Persistence
+import PrivacyStats
+
+public protocol NewTabPageRecentActivitySettingsPersistor: AnyObject {
+    var isViewExpanded: Bool { get set }
+}
+
+final class UserDefaultsNewTabPageRecentActivitySettingsPersistor: NewTabPagePrivacyStatsSettingsPersistor {
+    enum Keys {
+        static let isViewExpanded = "new-tab-page.recent-activity.is-view-expanded"
+    }
+
+    private let keyValueStore: KeyValueStoring
+
+    init(_ keyValueStore: KeyValueStoring = UserDefaults.standard, getLegacySetting: @autoclosure () -> Bool?) {
+        self.keyValueStore = keyValueStore
+        migrateFromLegacyHomePageSettings(using: getLegacySetting)
+    }
+
+    var isViewExpanded: Bool {
+        get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
+        set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
+    }
+
+    private func migrateFromLegacyHomePageSettings(using getLegacySetting: () -> Bool?) {
+        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil, let legacySetting = getLegacySetting() else {
+            return
+        }
+        isViewExpanded = legacySetting
+    }
+}
+
+public final class NewTabPageRecentActivityModel {
+
+    let privacyStats: PrivacyStatsCollecting
+    let statsUpdatePublisher: AnyPublisher<Void, Never>
+
+    @Published var isViewExpanded: Bool {
+        didSet {
+            settingsPersistor.isViewExpanded = self.isViewExpanded
+        }
+    }
+
+    private let settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
+    private let statsUpdateSubject = PassthroughSubject<Void, Never>()
+    private var cancellables: Set<AnyCancellable> = []
+
+    public convenience init(
+        privacyStats: PrivacyStatsCollecting,
+        keyValueStore: KeyValueStoring = UserDefaults.standard,
+        getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
+    ) {
+        self.init(
+            privacyStats: privacyStats,
+            settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
+        )
+    }
+
+    init(
+        privacyStats: PrivacyStatsCollecting,
+        settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
+    ) {
+        self.privacyStats = privacyStats
+        self.settingsPersistor = settingsPersistor
+
+        isViewExpanded = settingsPersistor.isViewExpanded
+        statsUpdatePublisher = statsUpdateSubject.eraseToAnyPublisher()
+
+        privacyStats.statsUpdatePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.statsUpdateSubject.send()
+            }
+            .store(in: &cancellables)
+    }
+}

@@ -27,12 +27,7 @@ extension NewTabPageActionsManager {
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         privacyStats: PrivacyStatsCollecting
     ) {
-        let privacyStatsModel = NewTabPagePrivacyStatsModel(
-            privacyStats: privacyStats,
-            trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared),
-            eventMapping: NewTabPagePrivacyStatsEventHandler(),
-            getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
-        )
+        let newUserDecider = NewTabPageNewUserDecider()
 
         let favoritesPublisher = LocalBookmarkManager.shared.listPublisher.map({ $0?.favoriteBookmarks ?? [] }).eraseToAnyPublisher()
         let favoritesModel = NewTabPageFavoritesModel(
@@ -44,7 +39,7 @@ extension NewTabPageActionsManager {
         let customizationProvider = NewTabPageCustomizationProvider(homePageSettingsModel: NSApp.delegateTyped.homePageSettingsModel)
         let freemiumDBPBannerProvider = NewTabPageFreemiumDBPBannerProvider(model: NSApp.delegateTyped.freemiumDBPPromotionViewCoordinator)
 
-        self.init(scriptClients: [
+        var scriptClients: [NewTabPageUserScriptClient] = [
             NewTabPageConfigurationClient(
                 sectionsVisibilityProvider: appearancePreferences,
                 customBackgroundProvider: customizationProvider,
@@ -54,9 +49,31 @@ extension NewTabPageActionsManager {
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel),
             NewTabPageFreemiumDBPClient(provider: freemiumDBPBannerProvider),
             NewTabPageNextStepsCardsClient(model: NewTabPageNextStepsCardsProvider(continueSetUpModel: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener()))),
-            NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: Int(Favicon.SizeCategory.medium.rawValue)),
-            NewTabPagePrivacyStatsClient(model: privacyStatsModel)
-        ])
+            NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: Int(Favicon.SizeCategory.medium.rawValue))
+        ]
+
+        if newUserDecider.isNewUser {
+
+            let privacyStatsModel = NewTabPagePrivacyStatsModel(
+                privacyStats: privacyStats,
+                trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared),
+                eventMapping: NewTabPagePrivacyStatsEventHandler(),
+                getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
+            )
+
+            scriptClients.append(NewTabPagePrivacyStatsClient(model: privacyStatsModel))
+
+        } else {
+
+            let recentActivityModel = NewTabPageRecentActivityModel(
+                privacyStats: privacyStats,
+                getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
+            )
+
+            scriptClients.append(NewTabPageRecentActivityClient(model: recentActivityModel))
+        }
+
+        self.init(scriptClients: scriptClients)
     }
 }
 

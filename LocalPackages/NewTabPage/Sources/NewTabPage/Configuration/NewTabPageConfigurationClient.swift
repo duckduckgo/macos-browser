@@ -26,9 +26,11 @@ import WebKit
 public protocol NewTabPageSectionsVisibilityProviding: AnyObject {
     var isFavoritesVisible: Bool { get set }
     var isPrivacyStatsVisible: Bool { get set }
+    var isRecentActivityVisible: Bool { get set }
 
     var isFavoritesVisiblePublisher: AnyPublisher<Bool, Never> { get }
     var isPrivacyStatsVisiblePublisher: AnyPublisher<Bool, Never> { get }
+    var isRecentActivityVisiblePublisher: AnyPublisher<Bool, Never> { get }
 }
 
 public protocol NewTabPageLinkOpening {
@@ -87,7 +89,8 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
     private func notifyWidgetConfigsDidChange() {
         let widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
             .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
-            .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible)
+            .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible),
+            .init(id: .recentActivity, isVisible: sectionsVisibilityProvider.isRecentActivityVisible)
         ]
 
         pushMessage(named: MessageName.widgetsOnConfigUpdated.rawValue, params: widgetConfigs)
@@ -151,11 +154,13 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
                 .init(id: .freemiumPIRBanner),
                 .init(id: .nextSteps),
                 .init(id: .favorites),
-                .init(id: .privacyStats)
+//                .init(id: .privacyStats),
+                .init(id: .recentActivity)
             ],
             widgetConfigs: [
                 .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
-                .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible)
+//                .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible),
+                .init(id: .recentActivity, isVisible: sectionsVisibilityProvider.isRecentActivityVisible)
             ],
             env: env,
             locale: Bundle.main.preferredLocalizations.first ?? "en",
@@ -177,6 +182,8 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
                 sectionsVisibilityProvider.isFavoritesVisible = widgetConfig.visibility.isVisible
             case .privacyStats:
                 sectionsVisibilityProvider.isPrivacyStatsVisible = widgetConfig.visibility.isVisible
+            case .recentActivity:
+                sectionsVisibilityProvider.isRecentActivityVisible = widgetConfig.visibility.isVisible
             default:
                 break
             }

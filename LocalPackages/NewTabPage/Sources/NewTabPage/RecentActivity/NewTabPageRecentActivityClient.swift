@@ -1,0 +1,133 @@
+//
+//  NewTabPageRecentActivityClient.swift
+//
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Combine
+import Common
+import os.log
+import UserScriptActionsManager
+import WebKit
+
+public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
+
+    private let model: NewTabPageRecentActivityModel
+    private var cancellables: Set<AnyCancellable> = []
+
+    enum MessageName: String, CaseIterable {
+        case getConfig = "activity_getConfig"
+        case getData = "activity_getData"
+        case onConfigUpdate = "activity_onConfigUpdate"
+        case onDataUpdate = "activity_onDataUpdate"
+        case setConfig = "activity_setConfig"
+        case addFavorite = "activity_addFavorite"
+        case removeFavorite = "activity_removeFavorite"
+        case removeItem = "activity_removeItem"
+        case burn = "activity_burn"
+        case open = "activity_open"
+    }
+
+    public init(model: NewTabPageRecentActivityModel) {
+        self.model = model
+        super.init()
+
+        //        model.$isViewExpanded.dropFirst()
+        //            .sink { [weak self] isExpanded in
+        //                Task { @MainActor in
+        //                    self?.notifyConfigUpdated(isExpanded)
+        //                }
+        //            }
+        //            .store(in: &cancellables)
+        //
+        //        model.statsUpdatePublisher
+        //            .sink { [weak self] in
+        //                Task { @MainActor in
+        //                    await self?.notifyDataUpdated()
+        //                }
+        //            }
+        //            .store(in: &cancellables)
+    }
+
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
+        userScript.registerMessageHandlers([
+            MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
+            MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
+            MessageName.setConfig.rawValue: { [weak self] in try await self?.setConfig(params: $0, original: $1) },
+            MessageName.addFavorite.rawValue: { [weak self] in try await self?.addFavorite(params: $0, original: $1) },
+            MessageName.removeFavorite.rawValue: { [weak self] in try await self?.removeFavorite(params: $0, original: $1) },
+            MessageName.removeItem.rawValue: { [weak self] in try await self?.removeItem(params: $0, original: $1) },
+            MessageName.burn.rawValue: { [weak self] in try await self?.burn(params: $0, original: $1) },
+            MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) }
+        ])
+    }
+
+    private func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = model.isViewExpanded ? .expanded : .collapsed
+        return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+    }
+
+    @MainActor
+    private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return NewTabPageDataModel.ActivityData(activity: [])
+    }
+
+    @MainActor
+    private func notifyConfigUpdated(_ isViewExpanded: Bool) {
+        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = isViewExpanded ? .expanded : .collapsed
+        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
+    }
+
+    @MainActor
+    private func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        //        model.isViewExpanded = config.expansion == .expanded
+        return nil
+    }
+
+    @MainActor
+    private func notifyDataUpdated() async {
+        //        pushMessage(named: MessageName.onDataUpdate.rawValue, params: await model.calculatePrivacyStats())
+    }
+
+    @MainActor
+    private func addFavorite(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    @MainActor
+    private func removeFavorite(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    @MainActor
+    private func removeItem(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    @MainActor
+    private func burn(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    @MainActor
+    private func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+}
+

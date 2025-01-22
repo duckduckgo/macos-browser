@@ -20,6 +20,7 @@ import Combine
 import NewTabPage
 
 extension AppearancePreferences: NewTabPageSectionsVisibilityProviding {
+
     var isFavoritesVisible: Bool {
         get {
             isFavoriteVisible
@@ -43,6 +44,10 @@ extension AppearancePreferences: NewTabPageSectionsVisibilityProviding {
     }
 
     var isPrivacyStatsVisiblePublisher: AnyPublisher<Bool, Never> {
+        $isRecentActivityVisible.dropFirst().removeDuplicates().eraseToAnyPublisher()
+    }
+
+    var isRecentActivityVisiblePublisher: AnyPublisher<Bool, Never> {
         $isRecentActivityVisible.dropFirst().removeDuplicates().eraseToAnyPublisher()
     }
 }
