@@ -64,18 +64,22 @@ public final class NewTabPageRecentActivityModel {
         }
     }
 
+    @Published var activity: [NewTabPageDataModel.DomainActivity] = []
+
     private let settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     private let statsUpdateSubject = PassthroughSubject<Void, Never>()
     private var cancellables: Set<AnyCancellable> = []
 
     public convenience init(
         privacyStats: PrivacyStatsCollecting,
+        activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never>,
         actionsHandler: RecentActivityActionsHandling,
         keyValueStore: KeyValueStoring = UserDefaults.standard,
         getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
     ) {
         self.init(
             privacyStats: privacyStats,
+            activityPublisher: activityPublisher,
             actionsHandler: actionsHandler,
             settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
         )
@@ -83,6 +87,7 @@ public final class NewTabPageRecentActivityModel {
 
     init(
         privacyStats: PrivacyStatsCollecting,
+        activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never>,
         actionsHandler: RecentActivityActionsHandling,
         settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     ) {
@@ -92,6 +97,13 @@ public final class NewTabPageRecentActivityModel {
 
         isViewExpanded = settingsPersistor.isViewExpanded
         statsUpdatePublisher = statsUpdateSubject.eraseToAnyPublisher()
+
+        activityPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] activity in
+                self?.activity = activity
+            }
+            .store(in: &cancellables)
 
         privacyStats.statsUpdatePublisher
             .receive(on: DispatchQueue.main)

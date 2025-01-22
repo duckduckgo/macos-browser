@@ -25,30 +25,56 @@ public extension NewTabPageDataModel {
     }
 
     struct DomainActivity: Encodable, Equatable {
-        let id: String
-        let title: String
-        let url: String
-        let etldPlusOne: String?
-        let favicon: String?
-        let favorite: Bool
-        let trackingStatus: TrackingStatus
-        let history: [HistoryEntry]
+        public var id: String
+        public var title: String
+        public var url: String
+        public var etldPlusOne: String?
+        public var favicon: String?
+        public var favorite: Bool
+        public var trackingStatus: TrackingStatus
+        public var history: [HistoryEntry]
+
+        public init(id: String, title: String, url: String, etldPlusOne: String?, favicon: String?, favorite: Bool, trackingStatus: TrackingStatus, history: [HistoryEntry]) {
+            self.id = id
+            self.title = title
+            self.url = url
+            self.etldPlusOne = etldPlusOne
+            self.favicon = favicon
+            self.favorite = favorite
+            self.trackingStatus = trackingStatus
+            self.history = history
+        }
     }
 
     struct TrackingStatus: Encodable, Equatable {
-        let totalCount: Int64
-        let trackerCompanies: [TrackerCompany]
+        public var totalCount: Int64
+        public var trackerCompanies: [TrackerCompany]
 
-        struct TrackerCompany: Encodable, Equatable {
-            let displayName: String
+        public init(totalCount: Int64, trackerCompanies: [TrackerCompany]) {
+            self.totalCount = totalCount
+            self.trackerCompanies = trackerCompanies
+        }
+
+        public struct TrackerCompany: Encodable, Equatable, Hashable {
+            public let displayName: String
+
+            public init(displayName: String) {
+                self.displayName = displayName
+            }
         }
     }
 
     struct HistoryEntry: Encodable, Equatable {
-        let relativeTime: String
+        public var relativeTime: String
         /// This is the displayed name, which on macOS is equal to the relative URL path, e.g. '/users/settings', '/v2/api/analytics'
-        let title: String
-        let url: String
+        public var title: String
+        public var url: String
+
+        public init(relativeTime: String, title: String, url: String) {
+            self.relativeTime = relativeTime
+            self.title = title
+            self.url = url
+        }
     }
 }
 

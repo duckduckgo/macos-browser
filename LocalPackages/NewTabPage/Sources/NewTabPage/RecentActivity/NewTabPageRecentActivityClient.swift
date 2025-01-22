@@ -51,6 +51,14 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
                 }
             }
             .store(in: &cancellables)
+
+        model.$activity.dropFirst()
+            .sink { [weak self] activity in
+                Task { @MainActor in
+                    self?.notifyDataUpdated(activity)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
@@ -60,7 +68,6 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
             MessageName.setConfig.rawValue: { [weak self] in try await self?.setConfig(params: $0, original: $1) },
             MessageName.addFavorite.rawValue: { [weak self] in try await self?.addFavorite(params: $0, original: $1) },
             MessageName.removeFavorite.rawValue: { [weak self] in try await self?.removeFavorite(params: $0, original: $1) },
-            MessageName.removeItem.rawValue: { [weak self] in try await self?.removeItem(params: $0, original: $1) },
             MessageName.burn.rawValue: { [weak self] in try await self?.burn(params: $0, original: $1) },
             MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) }
         ])
@@ -73,26 +80,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
 
     @MainActor
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        return NewTabPageDataModel.ActivityData(
-            activity: [
-                .init(
-                    id: "abcd",
-                    title: "Example Dot Com",
-                    url: "https://example.com",
-                    etldPlusOne: "example.com",
-                    favicon: nil,
-                    favorite: false,
-                    trackingStatus: .init(totalCount: 100, trackerCompanies: [.init(displayName: "Facebook")]),
-                    history: [
-                        .init(
-                            relativeTime: "Just now",
-                            title: "/index.html",
-                            url: "https://example.com/index.html"
-                        )
-                    ]
-                )
-            ]
-        )
+        return NewTabPageDataModel.ActivityData(activity: model.activity)
     }
 
     @MainActor
@@ -112,8 +100,8 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
     }
 
     @MainActor
-    private func notifyDataUpdated() async {
-        //        pushMessage(named: MessageName.onDataUpdate.rawValue, params: await model.calculatePrivacyStats())
+    private func notifyDataUpdated(_ activity: [NewTabPageDataModel.DomainActivity]) {
+        pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageDataModel.ActivityData(activity: activity))
     }
 
     @MainActor
@@ -123,11 +111,6 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
 
     @MainActor
     private func removeFavorite(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        return nil
-    }
-
-    @MainActor
-    private func removeItem(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         return nil
     }
 
@@ -145,4 +128,3 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
         return nil
     }
 }
-

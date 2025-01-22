@@ -147,7 +147,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     }
 }
 
-extension URL {
+public extension URL {
     static func duckFavicon(for faviconURL: URL) -> URL? {
         let encodedURL = faviconURL.absoluteString.percentEncoded(withAllowedCharacters: .urlPathAllowed)
         return URL(string: "duck://favicon/\(encodedURL)")
