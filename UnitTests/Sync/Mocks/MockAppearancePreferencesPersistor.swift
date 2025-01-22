@@ -20,7 +20,6 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
-
     var homeButtonPosition: HomeButtonPosition = .hidden
 
     var homePageCustomBackground: String?
@@ -57,5 +56,5 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var didDismissHomePagePromotion = true
 
-    var hideToolbarsOnFullScreen: Bool = false
+    var showTabsAndBookmarksBarOnFullScreen: Bool = false
 }
