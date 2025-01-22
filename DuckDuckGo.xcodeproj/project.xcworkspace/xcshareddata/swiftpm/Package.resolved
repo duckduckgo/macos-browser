@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "alex/malsite-auth-header",
-        "revision" : "9422c6e3613cfcbf232562cda43c39ad7419207b"
+        "revision" : "2e8bf01c4102113c19cf5986af21ac4d4ef42f4c"
       }
     },
     {
