@@ -153,14 +153,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
         }
 
-            return nil
-        }
+        return nil
+    }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         if let accessToken = accountManager.accessToken,
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
-    }
+        }
 
         DispatchQueue.main.async { [weak self] in
             self?.notificationCenter.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
@@ -540,7 +540,7 @@ private extension SubscriptionPagesUseSubscriptionFeature {
      `notificationCenter`.
 
      - Important: The notification will only be posted if `didActivate` is `true`.
-    */
+     */
     func sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated() {
         if freemiumDBPUserStateManager.didActivate {
             notificationCenter.post(name: .subscriptionUpgradeFromFreemium, object: nil)
