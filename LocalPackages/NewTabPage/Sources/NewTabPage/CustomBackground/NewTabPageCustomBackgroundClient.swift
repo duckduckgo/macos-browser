@@ -43,7 +43,6 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageUserScriptClient 
 
     let model: NewTabPageCustomBackgroundProviding
     let contextMenuPresenter: NewTabPageContextMenuPresenting
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables: Set<AnyCancellable> = []
 
