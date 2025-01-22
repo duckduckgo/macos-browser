@@ -101,7 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) lazy var newTabPageActionsManager: NewTabPageActionsManager = NewTabPageActionsManager(
         appearancePreferences: .shared,
         activeRemoteMessageModel: activeRemoteMessageModel,
-        historyCoordinating: HistoryCoordinator.shared,
+        historyCoordinator: HistoryCoordinator.shared,
         privacyStats: privacyStats
     )
     let privacyStats: PrivacyStatsCollecting
