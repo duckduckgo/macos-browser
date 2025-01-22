@@ -44,21 +44,13 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
         self.model = model
         super.init()
 
-        //        model.$isViewExpanded.dropFirst()
-        //            .sink { [weak self] isExpanded in
-        //                Task { @MainActor in
-        //                    self?.notifyConfigUpdated(isExpanded)
-        //                }
-        //            }
-        //            .store(in: &cancellables)
-        //
-        //        model.statsUpdatePublisher
-        //            .sink { [weak self] in
-        //                Task { @MainActor in
-        //                    await self?.notifyDataUpdated()
-        //                }
-        //            }
-        //            .store(in: &cancellables)
+        model.$isViewExpanded.dropFirst()
+            .sink { [weak self] isExpanded in
+                Task { @MainActor in
+                    self?.notifyConfigUpdated(isExpanded)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
@@ -81,7 +73,26 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
 
     @MainActor
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        return NewTabPageDataModel.ActivityData(activity: [])
+        return NewTabPageDataModel.ActivityData(
+            activity: [
+                .init(
+                    id: "abcd",
+                    title: "Example Dot Com",
+                    url: "https://example.com",
+                    etldPlusOne: "example.com",
+                    favicon: nil,
+                    favorite: false,
+                    trackingStatus: .init(totalCount: 100, trackerCompanies: [.init(displayName: "Facebook")]),
+                    history: [
+                        .init(
+                            relativeTime: "Just now",
+                            title: "/index.html",
+                            url: "https://example.com/index.html"
+                        )
+                    ]
+                )
+            ]
+        )
     }
 
     @MainActor
@@ -96,7 +107,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
         guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
             return nil
         }
-        //        model.isViewExpanded = config.expansion == .expanded
+        model.isViewExpanded = config.expansion == .expanded
         return nil
     }
 
@@ -127,6 +138,10 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
 
     @MainActor
     private func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let openAction: NewTabPageDataModel.ActivityOpenAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        model.open(openAction.url, target: .init(openAction.target))
         return nil
     }
 }

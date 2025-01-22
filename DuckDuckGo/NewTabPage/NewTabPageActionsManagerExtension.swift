@@ -67,6 +67,7 @@ extension NewTabPageActionsManager {
 
             let recentActivityModel = NewTabPageRecentActivityModel(
                 privacyStats: privacyStats,
+                actionsHandler: DefaultRecentActivityActionsHandler(),
                 getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
             )
 

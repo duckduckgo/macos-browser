@@ -1197,6 +1197,8 @@
 		376E2D282942843D001CD31B /* privacy-reference-tests in Resources */ = {isa = PBXBuildFile; fileRef = 31E163BF293A581900963C10 /* privacy-reference-tests */; };
 		376E8C172D4102CC00D5D2EC /* NewTabPageNewUserDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C162D4102C800D5D2EC /* NewTabPageNewUserDecider.swift */; };
 		376E8C182D4102CC00D5D2EC /* NewTabPageNewUserDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C162D4102C800D5D2EC /* NewTabPageNewUserDecider.swift */; };
+		376E8C1A2D41186B00D5D2EC /* DefaultRecentActivityActionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */; };
+		376E8C1B2D41186B00D5D2EC /* DefaultRecentActivityActionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */; };
 		37716D8029707E5D00A9FC6D /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		3772BEDD2D019CE90019B9EF /* DefaultsFavoritesActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3772BEDC2D019CDF0019B9EF /* DefaultsFavoritesActionHandler.swift */; };
 		3772BEDE2D019CE90019B9EF /* DefaultsFavoritesActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3772BEDC2D019CDF0019B9EF /* DefaultsFavoritesActionHandler.swift */; };
@@ -3739,6 +3741,7 @@
 		376E708D2BD686260082B7EB /* UI Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "UI Tests.xctestplan"; sourceTree = "<group>"; };
 		376E8C152D40DD5900D5D2EC /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../content-scope-scripts"; sourceTree = SOURCE_ROOT; };
 		376E8C162D4102C800D5D2EC /* NewTabPageNewUserDecider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageNewUserDecider.swift; sourceTree = "<group>"; };
+		376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRecentActivityActionsHandler.swift; sourceTree = "<group>"; };
 		37717E66296B5A20002FAEDF /* Global.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Global.xcconfig; sourceTree = "<group>"; };
 		3772BEDC2D019CDF0019B9EF /* DefaultsFavoritesActionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsFavoritesActionHandler.swift; sourceTree = "<group>"; };
 		3772BEDF2D01A1400019B9EF /* Utilities */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Utilities; sourceTree = "<group>"; };
@@ -5902,6 +5905,7 @@
 		376788092CECCAD900F59D83 /* NewTabPage */ = {
 			isa = PBXGroup;
 			children = (
+				376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */,
 				37F9AEB02D1316FE007FD19B /* DefaultHomePageSettingsModelNavigator+NewTabPageLinkOpening.swift */,
 				3758A38B2D108229001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift */,
 				371E1D662D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift */,
@@ -11555,6 +11559,7 @@
 				3706FEBC293F6EFF00E42796 /* BWResponse.swift in Sources */,
 				B65C7DFC2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift in Sources */,
 				3706FAF4293F65D500E42796 /* SafariBookmarksReader.swift in Sources */,
+				376E8C1B2D41186B00D5D2EC /* DefaultRecentActivityActionsHandler.swift in Sources */,
 				31C9ADE62AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */,
 				566B736D2BECC3C600FF1959 /* SyncPausedStateManaging.swift in Sources */,
 				B65211262B29A42E00B30633 /* BookmarkStoreMock.swift in Sources */,
@@ -13410,6 +13415,7 @@
 				4B9DB0442A983B24000927DB /* WaitlistModalViewController.swift in Sources */,
 				4B0AACAE28BC6FD0001038AC /* SafariFaviconsReader.swift in Sources */,
 				B60293E62BA19ECD0033186B /* NetPPopoverManagerMock.swift in Sources */,
+				376E8C1A2D41186B00D5D2EC /* DefaultRecentActivityActionsHandler.swift in Sources */,
 				B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */,
 				B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */,
 				31ECDA112BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,

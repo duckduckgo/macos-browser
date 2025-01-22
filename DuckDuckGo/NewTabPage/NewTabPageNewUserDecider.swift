@@ -42,9 +42,13 @@ final class NewTabPageNewUserDecider: NewTabPageNewUserDeciding {
     }
 
     private func initializeStorageIfNeeded() {
+#if DEBUG
+        isNewUser = false
+#else
         guard keyValueStore.object(forKey: Keys.isNewUser) == nil else {
             return
         }
         isNewUser = UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false).wrappedValue
+#endif
     }
 }

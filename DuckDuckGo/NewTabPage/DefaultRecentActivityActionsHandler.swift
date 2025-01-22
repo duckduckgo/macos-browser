@@ -1,7 +1,7 @@
 //
-//  DefaultsFavoritesActionHandler.swift
+//  DefaultRecentActivityActionsHandler.swift
 //
-//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,25 +16,16 @@
 //  limitations under the License.
 //
 
-import Combine
+import Foundation
 import NewTabPage
 
-final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
-    typealias Favorite = Bookmark
-
-    let bookmarkManager: BookmarkManager
-
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-        self.bookmarkManager = bookmarkManager
-    }
+final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
     @MainActor
     func open(_ url: URL, target: LinkOpenTarget) {
         guard let tabCollectionViewModel else {
             return
         }
-
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
 
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
             WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: tabCollectionViewModel.isBurner)
@@ -47,31 +38,6 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
         }
     }
 
-    func removeFavorite(_ favorite: Bookmark) {
-        favorite.isFavorite = false
-        bookmarkManager.update(bookmark: favorite)
-    }
-
-    func deleteBookmark(for favorite: Bookmark) {
-        bookmarkManager.remove(bookmark: favorite, undoManager: nil)
-    }
-
-    @MainActor
-    func addNewFavorite() {
-        guard let window else { return }
-        BookmarksDialogViewFactory.makeAddFavoriteView().show(in: window)
-    }
-
-    @MainActor
-    func edit(_ favorite: Bookmark) {
-        guard let window else { return }
-        BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: favorite).show(in: window)
-    }
-
-    func move(_ bookmarkID: String, toIndex index: Int) {
-        bookmarkManager.moveFavorites(with: [bookmarkID], toIndex: index) { _ in }
-    }
-
     @MainActor
     private var window: NSWindow? {
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.view.window
@@ -80,18 +46,5 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     @MainActor
     private var tabCollectionViewModel: TabCollectionViewModel? {
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
-    }
-}
-
-extension Bookmark: NewTabPageFavorite {
-    private enum Const {
-        static let wwwPrefix = "www."
-    }
-
-    var etldPlusOne: String? {
-        guard let domain = urlObject?.host else {
-            return nil
-        }
-        return ContentBlocking.shared.tld.eTLDplus1(domain)?.dropping(prefix: Const.wwwPrefix)
     }
 }

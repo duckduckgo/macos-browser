@@ -20,6 +20,17 @@ import Combine
 import NewTabPage
 
 extension AppearancePreferences: NewTabPageSectionsVisibilityProviding {
+    var isFavoritesAvailable: Bool {
+        true
+    }
+
+    var isPrivacyStatsAvailable: Bool {
+        NewTabPageNewUserDecider().isNewUser
+    }
+
+    var isRecentActivityAvailable: Bool {
+        !isPrivacyStatsAvailable
+    }
 
     var isFavoritesVisible: Bool {
         get {

@@ -55,6 +55,7 @@ final class UserDefaultsNewTabPageRecentActivitySettingsPersistor: NewTabPagePri
 public final class NewTabPageRecentActivityModel {
 
     let privacyStats: PrivacyStatsCollecting
+    let actionsHandler: RecentActivityActionsHandling
     let statsUpdatePublisher: AnyPublisher<Void, Never>
 
     @Published var isViewExpanded: Bool {
@@ -69,20 +70,24 @@ public final class NewTabPageRecentActivityModel {
 
     public convenience init(
         privacyStats: PrivacyStatsCollecting,
+        actionsHandler: RecentActivityActionsHandling,
         keyValueStore: KeyValueStoring = UserDefaults.standard,
         getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
     ) {
         self.init(
             privacyStats: privacyStats,
+            actionsHandler: actionsHandler,
             settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
         )
     }
 
     init(
         privacyStats: PrivacyStatsCollecting,
+        actionsHandler: RecentActivityActionsHandling,
         settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     ) {
         self.privacyStats = privacyStats
+        self.actionsHandler = actionsHandler
         self.settingsPersistor = settingsPersistor
 
         isViewExpanded = settingsPersistor.isViewExpanded
@@ -94,5 +99,13 @@ public final class NewTabPageRecentActivityModel {
                 self?.statsUpdateSubject.send()
             }
             .store(in: &cancellables)
+    }
+
+    // MARK: - Actions
+
+    @MainActor
+    func open(_ url: String, target: LinkOpenTarget) {
+        guard let url = URL(string: url), url.isValid else { return }
+        actionsHandler.open(url, target: target)
     }
 }

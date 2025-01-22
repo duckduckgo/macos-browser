@@ -24,6 +24,10 @@ import UserScriptActionsManager
 import WebKit
 
 public protocol NewTabPageSectionsVisibilityProviding: AnyObject {
+    var isFavoritesAvailable: Bool { get }
+    var isPrivacyStatsAvailable: Bool { get }
+    var isRecentActivityAvailable: Bool { get }
+
     var isFavoritesVisible: Bool { get set }
     var isPrivacyStatsVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
@@ -86,13 +90,40 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
         ])
     }
 
-    private func notifyWidgetConfigsDidChange() {
-        let widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
-            .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
-            .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible),
-            .init(id: .recentActivity, isVisible: sectionsVisibilityProvider.isRecentActivityVisible)
+    private func fetchWidgets() -> [NewTabPageDataModel.NewTabPageConfiguration.Widget] {
+        var widgets: [NewTabPageDataModel.NewTabPageConfiguration.Widget] = [
+            .init(id: .rmf),
+            .init(id: .freemiumPIRBanner),
+            .init(id: .nextSteps),
+            .init(id: .favorites),
         ]
+        if sectionsVisibilityProvider.isPrivacyStatsAvailable {
+            widgets.append(.init(id: .privacyStats))
+        }
+        if sectionsVisibilityProvider.isRecentActivityAvailable {
+            widgets.append(.init(id: .recentActivity))
+        }
 
+        return widgets
+    }
+
+    private func fetchWidgetConfigs() -> [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] {
+        var widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = []
+        if sectionsVisibilityProvider.isFavoritesAvailable {
+            widgetConfigs.append(.init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible))
+        }
+        if sectionsVisibilityProvider.isPrivacyStatsAvailable {
+            widgetConfigs.append(.init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible))
+        }
+        if sectionsVisibilityProvider.isRecentActivityAvailable {
+            widgetConfigs.append(.init(id: .recentActivity, isVisible: sectionsVisibilityProvider.isRecentActivityVisible))
+        }
+
+        return widgetConfigs
+    }
+
+    private func notifyWidgetConfigsDidChange() {
+        let widgetConfigs = fetchWidgetConfigs()
         pushMessage(named: MessageName.widgetsOnConfigUpdated.rawValue, params: widgetConfigs)
     }
 
@@ -116,6 +147,12 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
                 item.representedObject = menuItem.id
                 item.state = sectionsVisibilityProvider.isPrivacyStatsVisible ? .on : .off
                 menu.addItem(item)
+            case .recentActivity:
+                let item = NSMenuItem(title: menuItem.title, action: #selector(self.toggleVisibility(_:)), keyEquivalent: "")
+                item.target = self
+                item.representedObject = menuItem.id
+                item.state = sectionsVisibilityProvider.isRecentActivityVisible ? .on : .off
+                menu.addItem(item)
             default:
                 break
             }
@@ -134,6 +171,8 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
             sectionsVisibilityProvider.isFavoritesVisible.toggle()
         case .privacyStats:
             sectionsVisibilityProvider.isPrivacyStatsVisible.toggle()
+        case .recentActivity:
+            sectionsVisibilityProvider.isRecentActivityVisible.toggle()
         default:
             break
         }
@@ -147,21 +186,12 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
         let env = "production"
 #endif
 
+        let widgets = fetchWidgets()
+        let widgetConfigs = fetchWidgetConfigs()
         let customizerData = customBackgroundProvider.customizerData
         let config = NewTabPageDataModel.NewTabPageConfiguration(
-            widgets: [
-                .init(id: .rmf),
-                .init(id: .freemiumPIRBanner),
-                .init(id: .nextSteps),
-                .init(id: .favorites),
-//                .init(id: .privacyStats),
-                .init(id: .recentActivity)
-            ],
-            widgetConfigs: [
-                .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
-//                .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible),
-                .init(id: .recentActivity, isVisible: sectionsVisibilityProvider.isRecentActivityVisible)
-            ],
+            widgets: widgets,
+            widgetConfigs: widgetConfigs,
             env: env,
             locale: Bundle.main.preferredLocalizations.first ?? "en",
             platform: .init(name: "macos"),

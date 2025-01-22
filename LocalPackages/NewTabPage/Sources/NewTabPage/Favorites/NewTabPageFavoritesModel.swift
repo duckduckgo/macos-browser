@@ -50,10 +50,6 @@ final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavorite
     }
 }
 
-public enum FavoriteOpenTarget {
-    case current, newTab, newWindow
-}
-
 public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObject where FavoriteType: NewTabPageFavorite,
                                                                                          ActionHandler: FavoritesActionsHandling,
                                                                                          ActionHandler.FavoriteType == FavoriteType {

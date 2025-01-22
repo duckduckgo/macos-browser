@@ -1,7 +1,7 @@
 //
-//  NewTabPageFavoritesActionsHandler.swift
+//  NewTabPageRecentActivityActionsHandling.swift
 //
-//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,22 +18,7 @@
 
 import Foundation
 
-public protocol NewTabPageFavorite {
-    var id: String { get }
-    var title: String { get }
-    var url: String { get }
-    var urlObject: URL? { get }
-    var etldPlusOne: String? { get }
-}
-
-public protocol FavoritesActionsHandling {
-    associatedtype FavoriteType: NewTabPageFavorite
+public protocol RecentActivityActionsHandling {
 
     @MainActor func open(_ url: URL, target: LinkOpenTarget)
-    @MainActor func addNewFavorite()
-    @MainActor func edit(_ favorite: FavoriteType)
-
-    func removeFavorite(_ favorite: FavoriteType)
-    func deleteBookmark(for favorite: FavoriteType)
-    func move(_ favoriteID: String, toIndex: Int)
 }

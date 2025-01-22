@@ -25,14 +25,14 @@ public extension NewTabPageDataModel {
     }
 
     struct DomainActivity: Encodable, Equatable {
+        let id: String
+        let title: String
+        let url: String
         let etldPlusOne: String?
         let favicon: String?
         let favorite: Bool
-        let history: [HistoryEntry]
-        let id: String
-        let title: String
         let trackingStatus: TrackingStatus
-        let url: String
+        let history: [HistoryEntry]
     }
 
     struct TrackingStatus: Encodable, Equatable {
@@ -49,5 +49,20 @@ public extension NewTabPageDataModel {
         /// This is the displayed name, which on macOS is equal to the relative URL path, e.g. '/users/settings', '/v2/api/analytics'
         let title: String
         let url: String
+    }
+}
+
+extension NewTabPageDataModel {
+
+    struct ActivityOpenAction: Decodable, Equatable {
+        let id: String?
+        let target: OpenTarget
+        let url: String
+
+        enum OpenTarget: String, Decodable {
+            case sameTab = "same-tab"
+            case newTab = "new-tab"
+            case newWindow = "new-window"
+        }
     }
 }
