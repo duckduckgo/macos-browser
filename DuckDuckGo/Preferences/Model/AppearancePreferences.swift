@@ -346,7 +346,6 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-
     var isContinueSetUpAvailable: Bool {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
 
