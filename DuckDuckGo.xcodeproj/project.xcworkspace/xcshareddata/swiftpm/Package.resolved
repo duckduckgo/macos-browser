@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "alex/malsite-auth-header",
-        "revision" : "2e8bf01c4102113c19cf5986af21ac4d4ef42f4c"
+        "revision" : "423ff3aaa526abd0e7d658ed88e48209b015e86b",
+        "version" : "227.2.0"
       }
     },
     {
