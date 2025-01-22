@@ -3766,7 +3766,6 @@
 		379230982D3856500019E130 /* HistoryWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryWebViewModel.swift; sourceTree = "<group>"; };
 		3797C79F2C61806500DA77FB /* HomePageSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageSettingsView.swift; sourceTree = "<group>"; };
 		3797C7A22C62C38800DA77FB /* HomePageSettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageSettingsModel.swift; sourceTree = "<group>"; };
-		379D7A412D3848B800E6E1CC /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../content-scope-scripts"; sourceTree = SOURCE_ROOT; };
 		379D7A422D384E4F00E6E1CC /* HistoryView */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HistoryView; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
 		379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCleanupErrorHandling.swift; sourceTree = "<group>"; };
@@ -7961,7 +7960,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				379D7A412D3848B800E6E1CC /* content-scope-scripts */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -15417,8 +15415,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 225.1.0;
+				branch = "dominik/html-history";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

@@ -1249,7 +1249,7 @@ extension MainViewController: FindInPageDelegate {
 extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
 
     func privacyDashboardViewControllerDidChange(size: NSSize) {
-        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: true)
+        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: false)
     }
 }
 

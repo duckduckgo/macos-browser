@@ -45,6 +45,7 @@ public final class HistoryViewDataClient: HistoryViewUserScriptClient {
     private func query(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let query: HistoryViewDataModel.HistoryViewQuery = DecodableHelper.decode(from: params) else { return nil }
 
+        /// This is a placeholder implementation, to be updated.
         return HistoryViewDataModel.HistoryViewQueryResponse(
             info: .init(finished: true, term: query.term),
             value: [

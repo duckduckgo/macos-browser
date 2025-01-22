@@ -98,6 +98,9 @@
                   Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
                </Test>
                <Test
+                  Identifier = "BrowserTabViewControllerOnboardingTests/testWhenNavigationCompletedAndNoDialogTypeThenOnlyWebViewVisible()">
+               </Test>
+               <Test
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
