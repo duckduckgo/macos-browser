@@ -28,4 +28,3 @@ open class HistoryViewUserScriptClient: UserScriptClient {
 }
 
 public final class HistoryViewActionsManager: UserScriptActionsManager<HistoryViewUserScript, HistoryViewUserScriptClient> {}
-

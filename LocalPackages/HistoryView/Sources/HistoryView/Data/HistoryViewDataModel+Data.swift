@@ -26,7 +26,6 @@ extension HistoryViewDataModel {
         let term: String
     }
 
-
     struct HistoryViewQueryResponse: Codable, Equatable {
         let info: HistoryViewQueryInfo
         let value: [HistoryItem]

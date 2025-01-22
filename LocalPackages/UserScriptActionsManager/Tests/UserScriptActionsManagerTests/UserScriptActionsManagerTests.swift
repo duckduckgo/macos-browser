@@ -24,9 +24,9 @@ final class MockUserScript: SubfeatureWithExternalMessageHandling, Equatable {
     static func == (lhs: MockUserScript, rhs: MockUserScript) -> Bool {
         lhs === rhs
     }
-    
+
     var webView: WKWebView?
-    func registerMessageHandlers(_ handlers: [String : (Any, WKScriptMessage) async throws -> (any Encodable)?]) {}
+    func registerMessageHandlers(_ handlers: [String: (Any, WKScriptMessage) async throws -> (any Encodable)?]) {}
     func handler(forMethodNamed methodName: String) -> Handler? { return nil }
     var messageOriginPolicy: MessageOriginPolicy = .all
     var featureName: String = "mock"
