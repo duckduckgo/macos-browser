@@ -91,4 +91,9 @@ extension NewTabPageDataModel {
             case newWindow = "new-window"
         }
     }
+
+    struct ActivityItemAction: Decodable, Equatable {
+        let id: String
+        let url: String
+    }
 }

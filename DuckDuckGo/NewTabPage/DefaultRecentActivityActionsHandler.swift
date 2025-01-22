@@ -16,10 +16,48 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import NewTabPage
 
 final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
+
+    let bookmarkManager: BookmarkManager
+    let fire: () async -> Fire
+    let tld: TLD
+
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, fire: (() async -> (Fire))? = nil, tld: TLD = ContentBlocking.shared.tld) {
+        self.bookmarkManager = bookmarkManager
+        self.fire = fire ?? { @MainActor in FireCoordinator.fireViewModel.fire }
+        self.tld = tld
+    }
+
+    @MainActor
+    func addFavorite(_ url: URL) {
+        guard let favorite = bookmarkManager.getBookmark(for: url), !favorite.isFavorite else {
+            return
+        }
+        favorite.isFavorite = true
+        bookmarkManager.update(bookmark: favorite)
+    }
+
+    @MainActor
+    func removeFavorite(_ url: URL) {
+        guard let favorite = bookmarkManager.getBookmark(for: url), favorite.isFavorite else {
+            return
+        }
+        favorite.isFavorite = false
+        bookmarkManager.update(bookmark: favorite)
+    }
+
+    @MainActor
+    func burn(_ url: URL) async {
+        guard let domain = url.host?.droppingWwwPrefix() else {
+            return
+        }
+        let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
+        await fire().burnEntity(entity: .none(selectedDomains: domains))
+    }
 
     @MainActor
     func open(_ url: URL, target: LinkOpenTarget) {

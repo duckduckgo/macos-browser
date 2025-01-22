@@ -20,5 +20,8 @@ import Foundation
 
 public protocol RecentActivityActionsHandling {
 
-    @MainActor func open(_ url: URL, target: LinkOpenTarget)
+    @MainActor func open(_ url: URL, target: LinkOpenTarget) async
+    @MainActor func addFavorite(_ url: URL) async
+    @MainActor func removeFavorite(_ url: URL) async
+    @MainActor func burn(_ url: URL) async
 }

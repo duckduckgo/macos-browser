@@ -115,9 +115,24 @@ public final class NewTabPageRecentActivityModel {
 
     // MARK: - Actions
 
-    @MainActor
-    func open(_ url: String, target: LinkOpenTarget) {
+    @MainActor func addFavorite(_ url: String) async {
         guard let url = URL(string: url), url.isValid else { return }
-        actionsHandler.open(url, target: target)
+        await actionsHandler.addFavorite(url)
+    }
+
+    @MainActor func removeFavorite(_ url: String) async {
+        guard let url = URL(string: url), url.isValid else { return }
+        await actionsHandler.removeFavorite(url)
+    }
+
+    @MainActor func burn(_ url: String) async {
+        guard let url = URL(string: url), url.isValid else { return }
+        await actionsHandler.burn(url)
+    }
+
+    @MainActor
+    func open(_ url: String, target: LinkOpenTarget) async {
+        guard let url = URL(string: url), url.isValid else { return }
+        await actionsHandler.open(url, target: target)
     }
 }

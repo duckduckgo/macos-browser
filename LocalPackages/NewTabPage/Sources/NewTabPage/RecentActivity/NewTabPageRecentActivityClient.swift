@@ -106,16 +106,28 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
 
     @MainActor
     private func addFavorite(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let action: NewTabPageDataModel.ActivityItemAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        await model.addFavorite(action.url)
         return nil
     }
 
     @MainActor
     private func removeFavorite(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let action: NewTabPageDataModel.ActivityItemAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        await model.removeFavorite(action.url)
         return nil
     }
 
     @MainActor
     private func burn(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let action: NewTabPageDataModel.ActivityItemAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        await model.burn(action.url)
         return nil
     }
 
@@ -124,7 +136,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
         guard let openAction: NewTabPageDataModel.ActivityOpenAction = DecodableHelper.decode(from: params) else {
             return nil
         }
-        model.open(openAction.url, target: .init(openAction.target))
+        await model.open(openAction.url, target: .init(openAction.target))
         return nil
     }
 }
