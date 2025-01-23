@@ -74,7 +74,6 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-
     var appExclusionsFeatureEnabled: Bool {
         featureFlagger.isFeatureOn(.networkProtectionAppExclusions)
     }
