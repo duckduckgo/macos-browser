@@ -1,0 +1,10 @@
+# Ignore comments in Swift files
+*.swift diff=swift-comments
+
+# Ignore non-Swift files from PR stats
+*.svg linguist-documentation
+*.storyboard linguist-documentation
+*.xib linguist-documentation
+*.pbxproj linguist-documentation
+*.xcscheme linguist-documentation
+*.xcassets/** linguist-documentation
