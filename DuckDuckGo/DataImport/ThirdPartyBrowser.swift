@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import BrowserServicesKit
 
 private struct BundleIdentifiers {
     let production: String
