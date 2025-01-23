@@ -30,7 +30,9 @@ final class NewTabPageNewUserDecider: NewTabPageNewUserDeciding {
     }
 
     var isNewUser: Bool {
-        get { return keyValueStore.object(forKey: Keys.isNewUser) as? Bool ?? false }
+        get {
+            return keyValueStore.object(forKey: Keys.isNewUser) as? Bool ?? false
+        }
         set { keyValueStore.set(newValue, forKey: Keys.isNewUser) }
     }
 

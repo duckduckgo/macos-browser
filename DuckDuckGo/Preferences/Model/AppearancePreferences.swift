@@ -35,6 +35,7 @@ protocol AppearancePreferencesPersistor {
     var continueSetUpCardsNumberOfDaysDemonstrated: Int { get set }
     var continueSetUpCardsClosed: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
+    var isPrivacyStatsVisible: Bool { get set }
     var isSearchBarVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
@@ -70,6 +71,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
+
+    @UserDefaultsWrapper(key: .homePageIsPrivacyStatsVisible, defaultValue: true)
+    var isPrivacyStatsVisible: Bool
 
     @UserDefaultsWrapper(key: .homePageIsSearchBarVisible, defaultValue: true)
     var isSearchBarVisible: Bool
@@ -288,6 +292,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var isPrivacyStatsVisible: Bool {
+        didSet {
+            persistor.isPrivacyStatsVisible = isPrivacyStatsVisible
+        }
+    }
+
     @Published var isSearchBarVisible: Bool {
         didSet {
             persistor.isSearchBarVisible = isSearchBarVisible
@@ -363,6 +373,7 @@ final class AppearancePreferences: ObservableObject {
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
+        isPrivacyStatsVisible = persistor.isPrivacyStatsVisible
         isSearchBarVisible = persistor.isSearchBarVisible
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance

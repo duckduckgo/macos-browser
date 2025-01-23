@@ -1,187 +1,194 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "AppleToolbox",
-        "repositoryURL": "https://github.com/duckduckgo/apple-toolbox.git",
-        "state": {
-          "branch": null,
-          "revision": "0c13c5f056805f2d403618ccc3bfb833c303c68d",
-          "version": "3.1.2"
-        }
-      },
-      {
-        "package": "BareBonesBrowserKit",
-        "repositoryURL": "https://github.com/duckduckgo/BareBonesBrowser.git",
-        "state": {
-          "branch": null,
-          "revision": "31e5bfedc3c2ca005640c4bf2b6959d69b0e18b9",
-          "version": "0.1.0"
-        }
-      },
-      {
-        "package": "BloomFilter",
-        "repositoryURL": "https://github.com/duckduckgo/bloom_cpp.git",
-        "state": {
-          "branch": null,
-          "revision": "8076199456290b61b4544bf2f4caf296759906a0",
-          "version": "3.0.0"
-        }
-      },
-      {
-        "package": "BrowserServicesKit",
-        "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit",
-        "state": {
-          "branch": null,
-          "revision": "b103a2a05dff415102978e0c1a2e5fbd6b86e813",
-          "version": "227.3.0"
-        }
-      },
-      {
-        "package": "Autofill",
-        "repositoryURL": "https://github.com/duckduckgo/duckduckgo-autofill.git",
-        "state": {
-          "branch": null,
-          "revision": "47c26dc32b94cdbcef3e6157497147917678c25c",
-          "version": "16.1.0"
-        }
-      },
-      {
-        "package": "GRDB",
-        "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
-        "state": {
-          "branch": null,
-          "revision": "5b2f6a81099d26ae0f9e38788f51490cd6a4b202",
-          "version": "2.4.2"
-        }
-      },
-      {
-        "package": "Gzip",
-        "repositoryURL": "https://github.com/1024jp/GzipSwift.git",
-        "state": {
-          "branch": null,
-          "revision": "731037f6cc2be2ec01562f6597c1d0aa3fe6fd05",
-          "version": "6.0.1"
-        }
-      },
-      {
-        "package": "Lottie",
-        "repositoryURL": "https://github.com/airbnb/lottie-spm.git",
-        "state": {
-          "branch": null,
-          "revision": "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
-          "version": "4.4.3"
-        }
-      },
-      {
-        "package": "OHHTTPStubs",
-        "repositoryURL": "https://github.com/AliSoftware/OHHTTPStubs.git",
-        "state": {
-          "branch": null,
-          "revision": "12f19662426d0434d6c330c6974d53e2eb10ecd9",
-          "version": "9.1.0"
-        }
-      },
-      {
-        "package": "OpenSSL",
-        "repositoryURL": "https://github.com/duckduckgo/OpenSSL-XCFramework",
-        "state": {
-          "branch": null,
-          "revision": "71d303cbfa150e1fac99ffc7b4f67aad9c7a5002",
-          "version": "3.1.5004"
-        }
-      },
-      {
-        "package": "PrivacyDashboardResources",
-        "repositoryURL": "https://github.com/duckduckgo/privacy-dashboard",
-        "state": {
-          "branch": null,
-          "revision": "c52bd5d851b1f8f0482e82b8720852670f525497",
-          "version": "8.1.0"
-        }
-      },
-      {
-        "package": "Punycode",
-        "repositoryURL": "https://github.com/gumob/PunycodeSwift.git",
-        "state": {
-          "branch": null,
-          "revision": "30a462bdb4398ea835a3585472229e0d74b36ba5",
-          "version": "3.0.0"
-        }
-      },
-      {
-        "package": "Sparkle",
-        "repositoryURL": "https://github.com/sparkle-project/Sparkle.git",
-        "state": {
-          "branch": null,
-          "revision": "b456fd404954a9e13f55aa0c88cd5a40b8399638",
-          "version": "2.6.3"
-        }
-      },
-      {
-        "package": "swift-argument-parser",
-        "repositoryURL": "https://github.com/apple/swift-argument-parser.git",
-        "state": {
-          "branch": null,
-          "revision": "0fbc8848e389af3bb55c182bc19ca9d5dc2f255b",
-          "version": "1.4.0"
-        }
-      },
-      {
-        "package": "swift-snapshot-testing",
-        "repositoryURL": "https://github.com/pointfreeco/swift-snapshot-testing",
-        "state": {
-          "branch": null,
-          "revision": "5b0c434778f2c1a4c9b5ebdb8682b28e84dd69bd",
-          "version": "1.15.4"
-        }
-      },
-      {
-        "package": "swift-syntax",
-        "repositoryURL": "https://github.com/apple/swift-syntax",
-        "state": {
-          "branch": null,
-          "revision": "64889f0c732f210a935a0ad7cda38f77f876262d",
-          "version": "509.1.1"
-        }
-      },
-      {
-        "package": "Swifter",
-        "repositoryURL": "https://github.com/httpswift/swifter.git",
-        "state": {
-          "branch": null,
-          "revision": "9483a5d459b45c3ffd059f7b55f9638e268632fd",
-          "version": "1.5.0"
-        }
-      },
-      {
-        "package": "DDGSyncCrypto",
-        "repositoryURL": "https://github.com/duckduckgo/sync_crypto",
-        "state": {
-          "branch": null,
-          "revision": "cc726cebb67367466bc31ced4784e16d44ac68d1",
-          "version": "0.4.0"
-        }
-      },
-      {
-        "package": "TrackerRadarKit",
-        "repositoryURL": "https://github.com/duckduckgo/TrackerRadarKit",
-        "state": {
-          "branch": null,
-          "revision": "5de0a610a7927b638a5fd463a53032c9934a2c3b",
-          "version": "3.0.0"
-        }
-      },
-      {
-        "package": "WireGuardKit",
-        "repositoryURL": "https://github.com/duckduckgo/wireguard-apple",
-        "state": {
-          "branch": null,
-          "revision": "13fd026384b1af11048451061cc1b21434990668",
-          "version": "1.1.3"
-        }
+  "pins" : [
+    {
+      "identity" : "apple-toolbox",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/apple-toolbox.git",
+      "state" : {
+        "revision" : "0c13c5f056805f2d403618ccc3bfb833c303c68d",
+        "version" : "3.1.2"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "barebonesbrowser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/BareBonesBrowser.git",
+      "state" : {
+        "revision" : "31e5bfedc3c2ca005640c4bf2b6959d69b0e18b9",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "bloom_cpp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/bloom_cpp.git",
+      "state" : {
+        "revision" : "8076199456290b61b4544bf2f4caf296759906a0",
+        "version" : "3.0.0"
+      }
+    },
+    {
+      "identity" : "browserserviceskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
+      "state" : {
+        "branch" : "dominik/htmlntp-recent-activity",
+        "revision" : "90274bfa606c0065ef6c03ccd310cccf7eb051cb"
+      }
+    },
+    {
+      "identity" : "content-scope-scripts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/content-scope-scripts",
+      "state" : {
+        "branch" : "pr-releases/pr-1419",
+        "revision" : "322663a25534d162c6fa5d9dabb37246db2866a1"
+      }
+    },
+    {
+      "identity" : "duckduckgo-autofill",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
+      "state" : {
+        "revision" : "47c26dc32b94cdbcef3e6157497147917678c25c",
+        "version" : "16.1.0"
+      }
+    },
+    {
+      "identity" : "grdb.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/GRDB.swift.git",
+      "state" : {
+        "revision" : "5b2f6a81099d26ae0f9e38788f51490cd6a4b202",
+        "version" : "2.4.2"
+      }
+    },
+    {
+      "identity" : "gzipswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/1024jp/GzipSwift.git",
+      "state" : {
+        "revision" : "731037f6cc2be2ec01562f6597c1d0aa3fe6fd05",
+        "version" : "6.0.1"
+      }
+    },
+    {
+      "identity" : "lottie-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airbnb/lottie-spm.git",
+      "state" : {
+        "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
+        "version" : "4.4.3"
+      }
+    },
+    {
+      "identity" : "ohhttpstubs",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AliSoftware/OHHTTPStubs.git",
+      "state" : {
+        "revision" : "12f19662426d0434d6c330c6974d53e2eb10ecd9",
+        "version" : "9.1.0"
+      }
+    },
+    {
+      "identity" : "openssl-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
+      "state" : {
+        "revision" : "71d303cbfa150e1fac99ffc7b4f67aad9c7a5002",
+        "version" : "3.1.5004"
+      }
+    },
+    {
+      "identity" : "privacy-dashboard",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/privacy-dashboard",
+      "state" : {
+        "revision" : "c52bd5d851b1f8f0482e82b8720852670f525497",
+        "version" : "8.1.0"
+      }
+    },
+    {
+      "identity" : "punycodeswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gumob/PunycodeSwift.git",
+      "state" : {
+        "revision" : "30a462bdb4398ea835a3585472229e0d74b36ba5",
+        "version" : "3.0.0"
+      }
+    },
+    {
+      "identity" : "sparkle",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sparkle-project/Sparkle.git",
+      "state" : {
+        "revision" : "b456fd404954a9e13f55aa0c88cd5a40b8399638",
+        "version" : "2.6.3"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "0fbc8848e389af3bb55c182bc19ca9d5dc2f255b",
+        "version" : "1.4.0"
+      }
+    },
+    {
+      "identity" : "swift-snapshot-testing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
+      "state" : {
+        "revision" : "5b0c434778f2c1a4c9b5ebdb8682b28e84dd69bd",
+        "version" : "1.15.4"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-syntax",
+      "state" : {
+        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
+        "version" : "509.1.1"
+      }
+    },
+    {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/httpswift/swifter.git",
+      "state" : {
+        "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "sync_crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/sync_crypto",
+      "state" : {
+        "revision" : "cc726cebb67367466bc31ced4784e16d44ac68d1",
+        "version" : "0.4.0"
+      }
+    },
+    {
+      "identity" : "trackerradarkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "state" : {
+        "revision" : "5de0a610a7927b638a5fd463a53032c9934a2c3b",
+        "version" : "3.0.0"
+      }
+    },
+    {
+      "identity" : "wireguard-apple",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/wireguard-apple",
+      "state" : {
+        "revision" : "13fd026384b1af11048451061cc1b21434990668",
+        "version" : "1.1.3"
+      }
+    }
+  ],
+  "version" : 2
 }

@@ -41,21 +41,12 @@ extension AppearancePreferences: NewTabPageSectionsVisibilityProviding {
         }
     }
 
-    var isPrivacyStatsVisible: Bool {
-        get {
-            isRecentActivityVisible
-        }
-        set {
-            isRecentActivityVisible = newValue
-        }
-    }
-
     var isFavoritesVisiblePublisher: AnyPublisher<Bool, Never> {
         $isFavoriteVisible.dropFirst().removeDuplicates().eraseToAnyPublisher()
     }
 
     var isPrivacyStatsVisiblePublisher: AnyPublisher<Bool, Never> {
-        $isRecentActivityVisible.dropFirst().removeDuplicates().eraseToAnyPublisher()
+        $isPrivacyStatsVisible.dropFirst().removeDuplicates().eraseToAnyPublisher()
     }
 
     var isRecentActivityVisiblePublisher: AnyPublisher<Bool, Never> {
