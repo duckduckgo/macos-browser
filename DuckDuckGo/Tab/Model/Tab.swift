@@ -121,8 +121,7 @@ protocol NewWindowPolicyDecisionMaker {
                      maliciousSiteDetector: MaliciousSiteDetecting = MaliciousSiteProtectionManager.shared,
                      tabsPreferences: TabsPreferences = TabsPreferences.shared,
                      onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter(),
-                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern,
-                                                                                    store: PageRefreshStore())
+                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern)
     ) {
 
         let duckPlayer = duckPlayer
