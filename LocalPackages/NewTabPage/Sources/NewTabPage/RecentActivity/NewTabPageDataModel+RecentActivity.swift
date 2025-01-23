@@ -93,7 +93,6 @@ extension NewTabPageDataModel {
     }
 
     struct ActivityItemAction: Decodable, Equatable {
-        let id: String
         let url: String
     }
 }

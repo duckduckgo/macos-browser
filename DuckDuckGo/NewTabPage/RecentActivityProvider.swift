@@ -110,7 +110,7 @@ extension NewTabPageDataModel.DomainActivity {
         self.init(
             id: historyEntry.identifier.uuidString,
             title: host,
-            url: host,
+            url: historyEntry.url.absoluteString,
             etldPlusOne: historyEntry.etldPlusOne,
             favicon: URL.duckFavicon(for: historyEntry.url)?.absoluteString,
             favorite: bookmarkManager.isUrlFavorited(url: historyEntry.url),
