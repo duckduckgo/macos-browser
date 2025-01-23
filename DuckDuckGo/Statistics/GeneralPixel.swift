@@ -898,7 +898,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .trackerDataReloadFailed:
             return "tds_r"
         case .trackerDataCouldNotBeLoaded:
-            return "m_d_tracker_data_could_not_be_loaded"
+            return "tracker_data_could_not_be_loaded"
 
         case .privacyConfigurationParseFailed:
             return "pcf_p"
