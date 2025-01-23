@@ -39,8 +39,12 @@ extension NewTabPageModeDeciding {
     }
 }
 
+extension Notification.Name {
+    static var newTabPageModeDidChange = Notification.Name(rawValue: "newTabPageModeDidChange")
+}
+
 final class NewTabPageModeDecider: NewTabPageModeDeciding, NewTabPageSectionsAvailabilityProviding {
-    
+
     var isPrivacyStatsAvailable: Bool {
         effectiveMode == .privacyStats
     }
@@ -67,6 +71,7 @@ final class NewTabPageModeDecider: NewTabPageModeDeciding, NewTabPageSectionsAva
         }
         set {
             keyValueStore.set(newValue?.rawValue, forKey: Keys.modeOverride)
+            NotificationCenter.default.post(name: .newTabPageModeDidChange, object: nil)
         }
     }
 
