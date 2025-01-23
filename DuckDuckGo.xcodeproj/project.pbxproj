@@ -2909,8 +2909,8 @@
 		BB9BDD4A2D09BAA80069E9EF /* TabBarRemoteMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9BDD482D09BA9D0069E9EF /* TabBarRemoteMessageViewModel.swift */; };
 		BBB881882C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */; };
 		BBB881892C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */; };
-		BBB9314D2D1F0F1F00D50AC1 /* ShowToolbarsOnFullScreenMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuFactory.swift */; };
-		BBB9314E2D1F0F1F00D50AC1 /* ShowToolbarsOnFullScreenMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuFactory.swift */; };
+		BBB9314D2D1F0F1F00D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift */; };
+		BBB9314E2D1F0F1F00D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift */; };
 		BBBB65402C77BB9400E69AC6 /* BookmarkSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB653F2C77BB9400E69AC6 /* BookmarkSearchTests.swift */; };
 		BBBEE1BF2C4FF63600035ABA /* SortBookmarksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */; };
 		BBBEE1C02C4FF63600035ABA /* SortBookmarksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */; };
@@ -4897,7 +4897,7 @@
 		BB9BA2282D10C0A3009229F3 /* TabBarActiveRemoteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarActiveRemoteMessage.swift; sourceTree = "<group>"; };
 		BB9BDD482D09BA9D0069E9EF /* TabBarRemoteMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarRemoteMessageViewModel.swift; sourceTree = "<group>"; };
 		BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerSearchDataSource.swift; sourceTree = "<group>"; };
-		BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowToolbarsOnFullScreenMenuFactory.swift; sourceTree = "<group>"; };
+		BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowToolbarsOnFullScreenMenuCoordinator.swift; sourceTree = "<group>"; };
 		BBBB653F2C77BB9400E69AC6 /* BookmarkSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkSearchTests.swift; sourceTree = "<group>"; };
 		BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortBookmarksViewModelTests.swift; sourceTree = "<group>"; };
 		BBC063E72C5A9E4B007BDC18 /* BookmarkManagementDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManagementDetailViewModelTests.swift; sourceTree = "<group>"; };
@@ -8440,7 +8440,7 @@
 		AA86491624D8339A001BABEE /* View */ = {
 			isa = PBXGroup;
 			children = (
-				BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuFactory.swift */,
+				BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift */,
 				AA7EB6EE27E880EA00036718 /* Animations */,
 				AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */,
 				AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */,
@@ -11755,7 +11755,7 @@
 				987799F42999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
 				3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */,
-				BBB9314D2D1F0F1F00D50AC1 /* ShowToolbarsOnFullScreenMenuFactory.swift in Sources */,
+				BBB9314D2D1F0F1F00D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift in Sources */,
 				3706FB7C293F65D500E42796 /* KeySetDictionary.swift in Sources */,
 				B6F7127F29F6779000594A45 /* QRSharingService.swift in Sources */,
 				3706FB7E293F65D500E42796 /* FireCoordinator.swift in Sources */,
@@ -13610,7 +13610,7 @@
 				4B8D9062276D1D880078DB17 /* LocaleExtension.swift in Sources */,
 				4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */,
 				1D2DC009290167A0008083A1 /* BWStatus.swift in Sources */,
-				BBB9314E2D1F0F1F00D50AC1 /* ShowToolbarsOnFullScreenMenuFactory.swift in Sources */,
+				BBB9314E2D1F0F1F00D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift in Sources */,
 				AAFE068326C7082D005434CC /* WebKitVersionProvider.swift in Sources */,
 				9FEE98692B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */,
 				B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */,

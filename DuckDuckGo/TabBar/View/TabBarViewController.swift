@@ -72,7 +72,7 @@ final class TabBarViewController: NSViewController, TabBarRemoteMessagePresentin
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
 
-    var disableTabPreviews: Bool = false
+    var shouldDisplayTabPreviews: Bool = true
     private var selectionIndexCancellable: AnyCancellable?
     private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -633,7 +633,7 @@ final class TabBarViewController: NSViewController, TabBarRemoteMessagePresentin
     private func showTabPreview(
         for tabViewModel: TabViewModel,
         from xPosition: CGFloat) {
-            if disableTabPreviews { return }
+            if !shouldDisplayTabPreviews { return }
 
             let isSelected = tabCollectionViewModel.selectedTabViewModel === tabViewModel
             tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel,

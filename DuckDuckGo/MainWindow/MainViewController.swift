@@ -258,11 +258,11 @@ final class MainViewController: NSViewController {
     }
 
     func disableTabPreviews() {
-        tabBarViewController.disableTabPreviews = true
+        tabBarViewController.shouldDisplayTabPreviews = false
     }
 
     func enableTabPreviews() {
-        tabBarViewController.disableTabPreviews = false
+        tabBarViewController.shouldDisplayTabPreviews = true
     }
 
     func toggleBookmarksBarVisibility() {

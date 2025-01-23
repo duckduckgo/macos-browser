@@ -1,5 +1,5 @@
 //
-//  ShowToolbarsOnFullScreenMenuFactory.swift
+//  ShowToolbarsOnFullScreenMenuCoordinator.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import AppKit
 
-struct ShowToolbarsOnFullScreenMenuFactory {
+struct ShowToolbarsOnFullScreenMenuCoordinator {
 
     static func replace(_ menuItem: NSMenuItem, _ prefs: AppearancePreferences = .shared) -> NSMenuItem? {
         guard let menu = menuItem.menu else { return nil }
@@ -36,7 +36,7 @@ struct ShowToolbarsOnFullScreenMenuFactory {
     }
 
     private static func makeMenuItem( _ prefs: AppearancePreferences) -> NSMenuItem {
-        let item = BlockMenuItem(title: "Show Tabs and Bookmarks Bar in Full Screen", isChecked: prefs.showTabsAndBookmarksBarOnFullScreen) {
+        let item = BlockMenuItem(title: UserText.mainMenuViewShowToolbarsOnFullScreen, isChecked: prefs.showTabsAndBookmarksBarOnFullScreen) {
             prefs.showTabsAndBookmarksBarOnFullScreen = !prefs.showTabsAndBookmarksBarOnFullScreen
         }
         return item

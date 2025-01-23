@@ -588,7 +588,7 @@ final class MainMenu: NSMenu {
     }
 
     private func updateShowToolbarsOnFullScreenMenuItem() {
-        guard let showTabsAndBookmarksBarOnFullScreenMenuItem = ShowToolbarsOnFullScreenMenuFactory.replace(showTabsAndBookmarksBarOnFullScreenMenuItem) else {
+        guard let showTabsAndBookmarksBarOnFullScreenMenuItem = ShowToolbarsOnFullScreenMenuCoordinator.replace(showTabsAndBookmarksBarOnFullScreenMenuItem) else {
             assertionFailure("Could not replace ShowTabsAndBookmarksBarOnFullScreenMenuItem")
             return
         }
