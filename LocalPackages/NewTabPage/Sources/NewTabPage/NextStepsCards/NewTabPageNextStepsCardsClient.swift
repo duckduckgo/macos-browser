@@ -18,14 +18,13 @@
 
 import Common
 import Combine
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
-public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
+public final class NewTabPageNextStepsCardsClient: NewTabPageUserScriptClient {
 
     let model: NewTabPageNextStepsCardsProviding
     let willDisplayCardsPublisher: AnyPublisher<[NewTabPageDataModel.CardID], Never>
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private let willDisplayCardsSubject = PassthroughSubject<[NewTabPageDataModel.CardID], Never>()
     private let getDataSubject = PassthroughSubject<[NewTabPageDataModel.CardID], Never>()
@@ -37,6 +36,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     public init(model: NewTabPageNextStepsCardsProviding) {
         self.model = model
         willDisplayCardsPublisher = willDisplayCardsSubject.eraseToAnyPublisher()
+        super.init()
         connectWillDisplayCardsPublisher()
 
         model.cardsPublisher
@@ -108,7 +108,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
         case setConfig = "nextSteps_setConfig"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.action.rawValue: { [weak self] in try await self?.action(params: $0, original: $1) },
             MessageName.dismiss.rawValue: { [weak self] in try await self?.dismiss(params: $0, original: $1) },

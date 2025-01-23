@@ -579,6 +579,9 @@ extension MainViewController {
             return true
 
         case kVK_ANSI_Y where flags == .command:
+            if NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) {
+                return false
+            }
             (NSApp.mainMenuTyped.historyMenu.accessibilityParent() as? NSMenuItem)?.accessibilityPerformPress()
             return true
 
