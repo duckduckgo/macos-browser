@@ -82,7 +82,7 @@ final class VPNPreferencesModel: ObservableObject {
     ///
     /// Only necessary because this is feature flagged to internal users.
     ///
-    var showExcludedSites: Bool {
+    var exclusionsAvailable: Bool {
         proxySettings.proxyAvailable
     }
 

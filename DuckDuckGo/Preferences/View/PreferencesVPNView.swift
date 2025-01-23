@@ -56,7 +56,7 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
-                if model.showExcludedSites && !model.appExclusionsFeatureEnabled {
+                if model.exclusionsAvailable && !model.appExclusionsFeatureEnabled {
                     // SECTION: Excluded Sites
 
                     PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
@@ -113,7 +113,7 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
-                if model.appExclusionsFeatureEnabled {
+                if model.exclusionsAvailable && model.appExclusionsFeatureEnabled {
                     // SECTION: Exclusions
 
                     PreferencePaneSection {
