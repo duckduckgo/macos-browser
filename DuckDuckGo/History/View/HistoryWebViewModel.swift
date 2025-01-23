@@ -22,14 +22,14 @@ import HistoryView
 import WebKit
 
 /**
- * This class manages a dedicated web view for displaying New Tab Page.
+ * This class manages a dedicated web view for displaying History View.
  *
- * It initializes NTP user script, the NTP-specific web view configuration
+ * It initializes History View user script, the domain-specific web view configuration
  * and then sets up a new web view with that configuration. It also serves
  * as a navigation delegate for the web view, blocking all navigations other than
- * to the New Tab Page.
+ * to the History page.
  *
- * This class is inspired by `DBPUIViewModel`.
+ * This class is inspired by `DBPUIViewModel` and a sibling to `NewTabPageWebViewModel`.
  */
 @MainActor
 final class HistoryWebViewModel: NSObject {

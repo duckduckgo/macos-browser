@@ -23,6 +23,7 @@ import FeatureFlags
 import Foundation
 import MaliciousSiteProtection
 import Networking
+import os.log
 import PixelKit
 
 extension MaliciousSiteProtectionManager {
@@ -93,7 +94,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     var backgroundUpdatesEnabled: Bool { updateTask != nil }
 
     init(
-        apiEnvironment: MaliciousSiteDetector.APIEnvironment = .production,
+        apiEnvironment: MaliciousSiteProtection.APIClientEnvironment? = nil,
         apiService: APIService = DefaultAPIService(urlSession: .shared),
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
         dataManager: MaliciousSiteProtection.DataManager? = nil,
@@ -113,6 +114,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
             return MaliciousSiteProtection.DataManager(fileStore: fileStore, embeddedDataProvider: embeddedDataProvider, fileNameProvider: Self.fileName(for:))
         }()
 
+        let apiEnvironment = apiEnvironment ?? MaliciousSiteDetector.APIEnvironment.production
         self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, eventMapping: Self.debugEvents)
         self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider ?? Self.updateInterval)
         self.detectionPreferences = detectionPreferences
@@ -120,8 +122,17 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         self.setupBindings()
     }
 
-    private static let debugEvents = EventMapping<MaliciousSiteProtection.Event> {event, _, _, _ in
-        PixelKit.fire(event)
+    private static let debugEvents = EventMapping<MaliciousSiteProtection.Event> { event, _, _, _ in
+        switch event {
+        case .errorPageShown,
+             .visitSite,
+             .iframeLoaded,
+             .settingToggled,
+             .matchesApiTimeout:
+            PixelKit.fire(event)
+        case .matchesApiFailure(let error):
+            Logger.maliciousSiteProtection.error("Error fetching matches from API: \(error)")
+        }
     }
 
     private func setupBindings() {

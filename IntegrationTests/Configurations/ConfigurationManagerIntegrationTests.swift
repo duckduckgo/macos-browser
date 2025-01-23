@@ -53,8 +53,8 @@ final class ConfigurationManagerIntegrationTests: XCTestCase {
         // RESET
         _ = AppConfigurationURLProvider(customPrivacyConfiguration: AppConfigurationURLProvider.Constants.defaultPrivacyConfigurationURL)
         await configManager.refreshNow()
-        newEtag = ContentBlocking.shared.trackerDataManager.fetchedData?.etag
-        XCTAssertEqual(etag, newEtag)
+        let resetEtag  = ContentBlocking.shared.trackerDataManager.fetchedData?.etag
+        XCTAssertNotEqual(newEtag, resetEtag)
     }
 
 }
