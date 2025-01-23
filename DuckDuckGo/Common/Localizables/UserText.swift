@@ -167,6 +167,7 @@ struct UserText {
     static let mainMenuViewActualSize = NSLocalizedString("Actual Size", comment: "Main Menu View item")
     static let mainMenuViewZoomIn = NSLocalizedString("Zoom In", comment: "Main Menu View item")
     static let mainMenuViewZoomOut = NSLocalizedString("Zoom Out", comment: "Main Menu View item")
+    static let mainMenuViewShowToolbarsOnFullScreen = NSLocalizedString("Show Tabs and Bookmarks Bar in Full Screen", comment: "Main Menu View item")
 
     static let mainMenuDeveloper = NSLocalizedString("Developer", comment: "Main Menu ")
 

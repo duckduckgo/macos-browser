@@ -19,15 +19,14 @@
 import Bookmarks
 import Common
 import Combine
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
-public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTabPageScriptClient where FavoriteType: NewTabPageFavorite,
-                                                                                                        ActionHandler: FavoritesActionsHandling,
-                                                                                                        ActionHandler.FavoriteType == FavoriteType {
+public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTabPageUserScriptClient where FavoriteType: NewTabPageFavorite,
+                                                                                                            ActionHandler: FavoritesActionsHandling,
+                                                                                                            ActionHandler.FavoriteType == FavoriteType {
 
     let favoritesModel: NewTabPageFavoritesModel<FavoriteType, ActionHandler>
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables: Set<AnyCancellable> = []
     private let preferredFaviconSize: Int
@@ -35,6 +34,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     public init(favoritesModel: NewTabPageFavoritesModel<FavoriteType, ActionHandler>, preferredFaviconSize: Int) {
         self.favoritesModel = favoritesModel
         self.preferredFaviconSize = preferredFaviconSize
+        super.init()
 
         favoritesModel.$favorites.dropFirst()
             .sink { [weak self] favorites in
@@ -65,7 +65,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
         case setConfig = "favorites_setConfig"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.add.rawValue: { [weak self] in try await self?.add(params: $0, original: $1) },
             MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },

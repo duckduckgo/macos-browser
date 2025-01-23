@@ -19,22 +19,22 @@
 import Combine
 import Common
 import RemoteMessaging
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
 public enum RemoteMessageButton: Equatable {
     case close, action, primaryAction, secondaryAction
 }
 
-public final class NewTabPageRMFClient: NewTabPageScriptClient {
+public final class NewTabPageRMFClient: NewTabPageUserScriptClient {
 
     let remoteMessageProvider: NewTabPageActiveRemoteMessageProviding
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables = Set<AnyCancellable>()
 
     public init(remoteMessageProvider: NewTabPageActiveRemoteMessageProviding) {
         self.remoteMessageProvider = remoteMessageProvider
+        super.init()
 
         remoteMessageProvider.newTabPageRemoteMessagePublisher
             .sink { [weak self] remoteMessage in
@@ -51,7 +51,7 @@ public final class NewTabPageRMFClient: NewTabPageScriptClient {
         case rmfSecondaryAction = "rmf_secondaryAction"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.rmfGetData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
             MessageName.rmfDismiss.rawValue: { [weak self] in try await self?.dismiss(params: $0, original: $1) },

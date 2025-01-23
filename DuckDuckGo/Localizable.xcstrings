@@ -63531,6 +63531,59 @@
         }
       }
     },
+    "Show Tabs and Bookmarks Bar in Full Screen" : {
+      "comment" : "Main Menu View item",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs und Lesezeichenleiste im Vollbild anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar Pestañas y Barra de Marcadores en Pantalla Completa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les Onglets et la Barre de Favoris en Plein Écran"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra Schede e Barra dei Segnalibri a Schermo Intero"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toon Tabbladen en Bladwijzerbalk in Volledig Scherm"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż Karty i Pasek Zakładek w Pełnym Ekranie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar Abas e Barra de Favoritos em Tela Cheia"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать вкладки и панель закладок на полном экране"
+          }
+        }
+      }
+    },
     "show.data.clearing.settings" : {
       "comment" : "Button in Settings. It navigates user to Data Clearing Settings. The Data Clearing string should match the string with the preferences.data-clearing key",
       "extractionState" : "extracted_with_value",
