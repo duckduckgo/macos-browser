@@ -65,7 +65,7 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .htmlNewTabPage:
             return true
         case .maliciousSiteProtection:
-            return true
+            return false
         case .autofillPartialFormSaves:
             return true
         case .autcompleteTabs:
@@ -98,7 +98,7 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .freemiumDBP:
             return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
         case .maliciousSiteProtection:
-            return .remoteReleasable(.feature(.maliciousSiteProtection))
+            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.onByDefault))
         case .contextualOnboarding:
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
