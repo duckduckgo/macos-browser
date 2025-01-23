@@ -58,9 +58,11 @@ final class AppContentBlocking {
     private let contentBlockerRulesSource: ContentBlockerRulesLists
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
 
-    struct Constants {
-        static let experimentNameParameterName = "experimentName"
-        static let etagParameterName = "etag"
+    enum Constants {
+        enum ParameterName {
+            static let experimentName = "experimentName"
+            static let etag = "etag"
+        }
     }
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
@@ -110,8 +112,8 @@ final class AppContentBlocking {
         case .trackerDataParseFailed:
             domainEvent = .trackerDataParseFailed
             if let experimentName = TDSOverrideExperimentMetrics.activeTDSExperimentNameWithCohort {
-                finalParameters[Constants.experimentNameParameterName] = experimentName
-                finalParameters[Constants.etagParameterName] = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
+                finalParameters[Constants.ParameterName.experimentName] = experimentName
+                finalParameters[Constants.ParameterName.etag] = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
             }
 
         case .trackerDataReloadFailed:
@@ -165,8 +167,8 @@ final class AppContentBlocking {
             domainEvent = .contentBlockingCompilationTaskPerformance(iterationCount: iterationCount,
                                                                      timeBucketAggregation: timeBucket)
             if let experimentName = TDSOverrideExperimentMetrics.activeTDSExperimentNameWithCohort {
-                finalParameters[Constants.experimentNameParameterName] = experimentName
-                finalParameters[Constants.etagParameterName] = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
+                finalParameters[Constants.ParameterName.experimentName] = experimentName
+                finalParameters[Constants.ParameterName.etag] = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
             }
         }
 

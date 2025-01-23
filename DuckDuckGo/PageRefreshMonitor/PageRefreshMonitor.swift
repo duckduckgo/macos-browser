@@ -26,12 +26,12 @@ extension PageRefreshMonitor {
         let tdsEtag = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
         switch refreshCount {
         case 2:
-            TDSOverrideExperimentMetrics.fireTdsExperimentMetric(metricType: .refresh2X, etag: tdsEtag, fireDebugExperiment: { parameters in
+            TDSOverrideExperimentMetrics.fireTDSExperimentMetric(metricType: .refresh2X, etag: tdsEtag, fireDebugExperiment: { parameters in
                 PixelKit.fire(GeneralPixel.debugBreakageExperiment, frequency: .uniqueByName, withAdditionalParameters: parameters)
             })
         case 3:
             PixelKit.fire(GeneralPixel.pageRefreshThreeTimesWithin20Seconds)
-            TDSOverrideExperimentMetrics.fireTdsExperimentMetric(metricType: .refresh3X, etag: tdsEtag, fireDebugExperiment: { parameters in
+            TDSOverrideExperimentMetrics.fireTDSExperimentMetric(metricType: .refresh3X, etag: tdsEtag, fireDebugExperiment: { parameters in
                 PixelKit.fire(GeneralPixel.debugBreakageExperiment, frequency: .uniqueByName, withAdditionalParameters: parameters)
             })
         default:

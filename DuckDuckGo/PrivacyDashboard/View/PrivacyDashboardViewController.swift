@@ -190,7 +190,7 @@ final class PrivacyDashboardViewController: NSViewController {
             configuration.userDisabledProtection(forDomain: domain)
             PixelKit.fire(NonStandardEvent(GeneralPixel.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue)))
             let tdsEtag = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
-            TDSOverrideExperimentMetrics.fireTdsExperimentMetric(metricType: .privacyToggleUsed, etag: tdsEtag) { parameters in
+            TDSOverrideExperimentMetrics.fireTDSExperimentMetric(metricType: .privacyToggleUsed, etag: tdsEtag) { parameters in
                 PixelKit.fire(GeneralPixel.debugBreakageExperiment, frequency: .uniqueByName, withAdditionalParameters: parameters)
             }
         }
