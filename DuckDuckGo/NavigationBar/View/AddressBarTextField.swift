@@ -1047,7 +1047,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
         if isSuggestionWindowVisible {
             switch commandSelector {
             case #selector(NSResponder.moveRight(_:)):
-                hideSuggestionWindow()
+                suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix, userAppendedStringToTheEnd: false)
                 return false
 
             case #selector(NSResponder.moveDown(_:)):
