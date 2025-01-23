@@ -1278,7 +1278,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
         ])
 
-        let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
+        let isInternalUser = internalUserDecider?.isInternalUser == true
 
         if isInternalUser {
             self.webView.reload()
