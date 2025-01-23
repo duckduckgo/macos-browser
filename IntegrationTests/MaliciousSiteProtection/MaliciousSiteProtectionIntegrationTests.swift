@@ -44,7 +44,13 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
         let featureFlagger = MockFeatureFlagger()
-        detector = MaliciousSiteProtectionManager(featureFlagger: featureFlagger, configManager: MockPrivacyConfigurationManager(), updateIntervalProvider: { _ in nil })
+        let configManager = MockPrivacyConfigurationManager()
+        let privacyConfig = MockPrivacyConfiguration()
+        privacyConfig.isSubfeatureKeyEnabled = { (subfeature: any PrivacySubfeature, _: AppVersionProvider) -> Bool in
+            if case MaliciousSiteProtectionSubfeature.onByDefault = subfeature { true } else { false }
+        }
+        configManager.privacyConfig = privacyConfig
+        detector = MaliciousSiteProtectionManager(featureFlags: featureFlagger.maliciousSiteProtectionFeatureFlags(configManager: configManager), updateIntervalProvider: { _ in nil })
         schemeHandler = TestSchemeHandler()
         schemeHandler.middleware = [{
             if $0.url!.lastPathComponent == "phishing.html" {
