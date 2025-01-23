@@ -29,12 +29,12 @@ public extension NewTabPageDataModel {
         public var title: String
         public var url: String
         public var etldPlusOne: String?
-        public var favicon: String?
+        public var favicon: ActivityFavicon?
         public var favorite: Bool
         public var trackingStatus: TrackingStatus
         public var history: [HistoryEntry]
 
-        public init(id: String, title: String, url: String, etldPlusOne: String?, favicon: String?, favorite: Bool, trackingStatus: TrackingStatus, history: [HistoryEntry]) {
+        public init(id: String, title: String, url: String, etldPlusOne: String?, favicon: ActivityFavicon?, favorite: Bool, trackingStatus: TrackingStatus, history: [HistoryEntry]) {
             self.id = id
             self.title = title
             self.url = url
@@ -43,6 +43,16 @@ public extension NewTabPageDataModel {
             self.favorite = favorite
             self.trackingStatus = trackingStatus
             self.history = history
+        }
+    }
+
+    struct ActivityFavicon: Encodable, Equatable {
+        let maxAvailableSize: Int
+        let src: String
+
+        public init(maxAvailableSize: Int, src: String) {
+            self.maxAvailableSize = maxAvailableSize
+            self.src = src
         }
     }
 

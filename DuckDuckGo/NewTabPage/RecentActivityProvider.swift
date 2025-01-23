@@ -121,12 +121,19 @@ extension NewTabPageDataModel.DomainActivity {
             return nil
         }
 
+        let favicon: NewTabPageDataModel.ActivityFavicon? = {
+            guard let src = URL.duckFavicon(for: historyEntry.url)?.absoluteString else {
+                return nil
+            }
+            return .init(maxAvailableSize: Int(Favicon.SizeCategory.small.rawValue), src: src)
+        }()
+
         self.init(
             id: historyEntry.identifier.uuidString,
             title: host.droppingWwwPrefix(),
             url: rootURLString,
             etldPlusOne: historyEntry.etldPlusOne,
-            favicon: URL.duckFavicon(for: historyEntry.url)?.absoluteString,
+            favicon: favicon,
             favorite: bookmarkManager.isUrlFavorited(url: rootURL),
             trackingStatus: .init(
                 totalCount: Int64(historyEntry.numberOfTrackersBlocked),
