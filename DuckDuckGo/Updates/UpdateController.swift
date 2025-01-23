@@ -182,6 +182,11 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
 
+        // We don't want SUAutomaticallyUpdate enabled because it interferes with our custom updater UI
+        if updater?.automaticallyDownloadsUpdates == true {
+            updater?.automaticallyDownloadsUpdates = false
+        }
+
         updateProcessCancellable = userDriver.updateProgressPublisher
             .assign(to: \.updateProgress, onWeaklyHeld: self)
 
