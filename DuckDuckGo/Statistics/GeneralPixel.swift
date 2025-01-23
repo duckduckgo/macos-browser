@@ -894,11 +894,11 @@ enum GeneralPixel: PixelKitEventV2 {
             return "cfgfetch"
 
         case .trackerDataParseFailed:
-            return "tracker_data_parse_failed"
+            return "trackerata_parse_failed"
         case .trackerDataReloadFailed:
             return "tds_r"
         case .trackerDataCouldNotBeLoaded:
-            return "trackerDataCouldNotBeLoaded"
+            return "m_d_tracker_data_could_not_be_loaded"
 
         case .privacyConfigurationParseFailed:
             return "pcf_p"
