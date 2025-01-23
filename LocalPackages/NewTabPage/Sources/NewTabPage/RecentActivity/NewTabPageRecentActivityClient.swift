@@ -52,7 +52,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
             }
             .store(in: &cancellables)
 
-        model.$activity.dropFirst()
+        model.activityProvider.activityPublisher
             .sink { [weak self] activity in
                 Task { @MainActor in
                     self?.notifyDataUpdated(activity)
@@ -80,7 +80,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
 
     @MainActor
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        return NewTabPageDataModel.ActivityData(activity: model.activity)
+        return NewTabPageDataModel.ActivityData(activity: model.activityProvider.refreshActivity())
     }
 
     @MainActor

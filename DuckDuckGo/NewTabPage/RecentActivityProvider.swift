@@ -22,10 +22,20 @@ import Foundation
 import History
 import NewTabPage
 
-final class RecentActivityProvider {
+final class RecentActivityProvider: NewTabPageRecentActivityProviding {
+    func refreshActivity() -> [NewTabPageDataModel.DomainActivity] {
+        Self.calculateRecentActivity(with: historyCoorinator.history ?? [], bookmarkManager: bookmarkManager)
+    }
+
     let activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never>
 
+    let historyCoorinator: HistoryCoordinating
+    let bookmarkManager: BookmarkManager
+
     init(historyCoordinator: HistoryCoordinating, bookmarkManager: BookmarkManager) {
+        self.historyCoorinator = historyCoordinator
+        self.bookmarkManager = bookmarkManager
+
         activityPublisher = historyCoordinator.historyDictionaryPublisher
             .receive(on: DispatchQueue.main)
             .compactMap { [weak historyCoordinator] _ -> BrowsingHistory? in

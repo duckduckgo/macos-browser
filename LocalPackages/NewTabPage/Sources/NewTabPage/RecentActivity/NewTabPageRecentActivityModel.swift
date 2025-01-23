@@ -23,6 +23,12 @@ import os.log
 import Persistence
 import PrivacyStats
 
+public protocol NewTabPageRecentActivityProviding: AnyObject {
+    func refreshActivity() -> [NewTabPageDataModel.DomainActivity]
+
+    var activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never> { get }
+}
+
 public protocol NewTabPageRecentActivitySettingsPersistor: AnyObject {
     var isViewExpanded: Bool { get set }
 }
@@ -55,6 +61,7 @@ final class UserDefaultsNewTabPageRecentActivitySettingsPersistor: NewTabPagePri
 public final class NewTabPageRecentActivityModel {
 
     let privacyStats: PrivacyStatsCollecting
+    let activityProvider: NewTabPageRecentActivityProviding
     let actionsHandler: RecentActivityActionsHandling
     let statsUpdatePublisher: AnyPublisher<Void, Never>
 
@@ -64,22 +71,20 @@ public final class NewTabPageRecentActivityModel {
         }
     }
 
-    @Published var activity: [NewTabPageDataModel.DomainActivity] = []
-
     private let settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     private let statsUpdateSubject = PassthroughSubject<Void, Never>()
     private var cancellables: Set<AnyCancellable> = []
 
     public convenience init(
         privacyStats: PrivacyStatsCollecting,
-        activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never>,
+        activityProvider: NewTabPageRecentActivityProviding,
         actionsHandler: RecentActivityActionsHandling,
         keyValueStore: KeyValueStoring = UserDefaults.standard,
         getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
     ) {
         self.init(
             privacyStats: privacyStats,
-            activityPublisher: activityPublisher,
+            activityProvider: activityProvider,
             actionsHandler: actionsHandler,
             settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
         )
@@ -87,23 +92,17 @@ public final class NewTabPageRecentActivityModel {
 
     init(
         privacyStats: PrivacyStatsCollecting,
-        activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never>,
+        activityProvider: NewTabPageRecentActivityProviding,
         actionsHandler: RecentActivityActionsHandling,
         settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     ) {
         self.privacyStats = privacyStats
+        self.activityProvider = activityProvider
         self.actionsHandler = actionsHandler
         self.settingsPersistor = settingsPersistor
 
         isViewExpanded = settingsPersistor.isViewExpanded
         statsUpdatePublisher = statsUpdateSubject.eraseToAnyPublisher()
-
-        activityPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] activity in
-                self?.activity = activity
-            }
-            .store(in: &cancellables)
 
         privacyStats.statsUpdatePublisher
             .receive(on: DispatchQueue.main)
