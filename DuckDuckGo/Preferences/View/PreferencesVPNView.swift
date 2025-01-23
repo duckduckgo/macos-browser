@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
-import PreferencesViews
+import PreferencesUI
 import SwiftUI
 import SwiftUIExtensions
 import NetworkProtection
 import PixelKit
+import PreferencesUI
 
 extension Preferences {
 
@@ -117,7 +118,25 @@ extension Preferences {
 
                     PreferencePaneSection {
                         TextMenuItemHeader(UserText.vpnExclusionsTitle)
-                        VPNLocationPreferenceItem(model: model.locationItem)
+
+                        SubfeatureGroup {
+                            SubfeatureView(iconName: "VPN-Icon",
+                                           title: UserText.vpnExcludedSitesTitle,
+                                           description: "None",
+                                           buttonName: "Manage...",
+                                           buttonAction: { /* no-op */ },
+                                           enabled: true)
+
+                            Divider()
+                                .foregroundColor(Color.secondary)
+
+                            SubfeatureView(iconName: "VPN-Icon",
+                                           title: "Excluded Apps",
+                                           description: "None",
+                                           buttonName: "Manage...",
+                                           buttonAction: { /* no-op */ },
+                                           enabled: true)
+                        }
                     }
                     .padding(.bottom, 12)
                 }
@@ -143,7 +162,7 @@ extension Preferences {
                             }.tag(true)
                         }
                         .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .offset(x: PreferencesUI.Const.pickerHorizontalOffset)
                         .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
                             if isCustomDNSSelected {
                                 showsCustomDNSServerPageSheet.toggle()

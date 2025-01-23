@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import PreferencesViews
+import PreferencesUI
 import SwiftUI
 import SwiftUIExtensions
 import BrowserServicesKit

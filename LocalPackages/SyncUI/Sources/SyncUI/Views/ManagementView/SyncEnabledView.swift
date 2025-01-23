@@ -17,7 +17,7 @@
 //
 
 import SwiftUI
-import PreferencesViews
+import PreferencesUI
 
 struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel

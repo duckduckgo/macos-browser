@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import PreferencesViews
+import PreferencesUI
 import SwiftUI
 import SwiftUIExtensions
 import PixelKit
@@ -182,7 +182,7 @@ extension Preferences {
                         Text(UserText.autofillNeverLock).tag(false)
                     }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                    .offset(x: PreferencesUI.Const.pickerHorizontalOffset)
                     TextMenuItemCaption(UserText.autofillNeverLockWarning)
                 }
             }
@@ -194,7 +194,7 @@ extension Preferences {
                 content()
             }, label: {})
             .pickerStyle(.radioGroup)
-            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+            .offset(x: PreferencesUI.Const.pickerHorizontalOffset)
         }
 
         @ViewBuilder private func bitwardenStatusView(for status: BWStatus) -> some View {

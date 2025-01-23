@@ -119,7 +119,6 @@ final class MainViewController: NSViewController {
         }()
 
         navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel,
-                                                                         isBurner: isBurner,
                                                                          networkProtectionPopoverManager: networkProtectionPopoverManager,
                                                                          networkProtectionStatusReporter: networkProtectionStatusReporter,
                                                                          autofillPopoverPresenter: autofillPopoverPresenter,

@@ -21,6 +21,7 @@ import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
+import NetworkProtectionProxy
 import NetworkProtectionUI
 import BrowserServicesKit
 
@@ -73,8 +74,17 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
+
     var appExclusionsFeatureEnabled: Bool {
         featureFlagger.isFeatureOn(.networkProtectionAppExclusions)
+    }
+
+    /// Whether the excluded sites section in preferences is shown.
+    ///
+    /// Only necessary because this is feature flagged to internal users.
+    ///
+    var showExcludedSites: Bool {
+        proxySettings.proxyAvailable
     }
 
     @Published var notifyStatusChanges: Bool {
@@ -97,18 +107,21 @@ final class VPNPreferencesModel: ObservableObject {
 
     private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
+    private let proxySettings: TransparentProxySettings
     private let pinningManager: PinningManager
     private let featureFlagger: FeatureFlagger
     private var cancellables = Set<AnyCancellable>()
 
     init(vpnXPCClient: VPNControllerXPCClient = .shared,
          settings: VPNSettings = .init(defaults: .netP),
+         proxySettings: TransparentProxySettings = .init(defaults: .netP),
          pinningManager: PinningManager = LocalPinningManager.shared,
          defaults: UserDefaults = .netP,
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
 
         self.vpnXPCClient = vpnXPCClient
         self.settings = settings
+        self.proxySettings = proxySettings
         self.pinningManager = pinningManager
         self.featureFlagger = featureFlagger
 

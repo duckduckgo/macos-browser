@@ -56,8 +56,7 @@ public struct TunnelControllerView: View {
             featureToggleRow()
 
             if #available(macOS 14.0, *),
-               tipsModel.canShowTips,
-               case .invalidated = tipsModel.domainExclusionsTip.status {
+               tipsModel.canShowAutoconnectTip {
 
                 TipView(tipsModel.autoconnectTip, action: tipsModel.autoconnectTipActionHandler)
                     .tipImageSize(VPNTipsModel.imageSize)
@@ -82,34 +81,35 @@ public struct TunnelControllerView: View {
                     }
             }
 
-            SiteTroubleshootingView()
-                .padding(.top, 5)
+            if model.exclusionsFeatureEnabled {
+                SiteTroubleshootingView()
+                    .padding(.top, 5)
 
-            if #available(macOS 14.0, *),
-               tipsModel.canShowTips,
-               case .invalidated = tipsModel.geoswitchingTip.status {
+                if #available(macOS 14.0, *),
+                   tipsModel.canShowDomainExclusionsTip {
 
-                TipView(tipsModel.domainExclusionsTip)
-                    .tipImageSize(VPNTipsModel.imageSize)
-                    .tipBackground(Color(.tipBackground))
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 6)
-                    .onAppear {
-                        tipsModel.handleDomainExclusionsTipShown()
-                    }
-                    .task {
-                        var previousStatus = tipsModel.domainExclusionsTip.status
-
-                        for await status in tipsModel.domainExclusionsTip.statusUpdates {
-                            if case .invalidated(let reason) = status {
-                                if case .available = previousStatus {
-                                    tipsModel.handleDomainExclusionTipInvalidated(reason)
-                                }
-                            }
-
-                            previousStatus = status
+                    TipView(tipsModel.domainExclusionsTip)
+                        .tipImageSize(VPNTipsModel.imageSize)
+                        .tipBackground(Color(.tipBackground))
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 6)
+                        .onAppear {
+                            tipsModel.handleDomainExclusionsTipShown()
                         }
-                    }
+                        .task {
+                            var previousStatus = tipsModel.domainExclusionsTip.status
+
+                            for await status in tipsModel.domainExclusionsTip.statusUpdates {
+                                if case .invalidated(let reason) = status {
+                                    if case .available = previousStatus {
+                                        tipsModel.handleDomainExclusionTipInvalidated(reason)
+                                    }
+                                }
+
+                                previousStatus = status
+                            }
+                        }
+                }
             }
 
             Divider()

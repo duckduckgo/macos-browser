@@ -1,0 +1,416 @@
+name: macOS - Publish DMG Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+      tag:
+        description: "Tag to publish"
+        required: true
+        type: string
+      release-type:
+        description: "Release type"
+        required: true
+        type: choice
+        options:
+        - internal
+        - public
+        - hotfix
+  workflow_call:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
+      AWS_ACCESS_KEY_ID_RELEASE_S3:
+        required: true
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
+        required: true
+      GHA_ELEVATED_PERMISSIONS_TOKEN:
+        required: true
+      SPARKLE_PRIVATE_KEY:
+        required: true
+
+jobs:
+
+  # This is only run for public and hotfix releases, so only when it's triggered manually.
+  # Internal release has been tagged as part of code_freeze or bump_interal_release workflows
+  tag-public-release:
+
+    name: Tag public release
+
+    # Run if release-type is provided (not empty) and is not internal
+    if: github.event.inputs.release-type != null && github.event.inputs.release-type != 'internal'
+
+    uses: ./.github/workflows/macos_tag_release.yml
+    with:
+      asana-task-url: ${{ inputs.asana-task-url || github.event.inputs.asana-task-url }}
+      branch: ${{ github.ref_name }}
+      prerelease: false
+    secrets:
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+
+  publish-to-sparkle:
+
+    name: Publish a release to Sparkle
+
+    env:
+      RELEASE_TYPE: ${{ github.event.inputs.release-type || 'internal' }}
+      SPARKLE_DIR: ${{ github.workspace }}/sparkle-updates
+      asana-task-url: ${{ inputs.asana-task-url || github.event.inputs.asana-task-url }}
+
+    needs: [tag-public-release]
+
+    # Allow to run even if the tag-public-release job was skipped (e.g. for internal releases)
+    # or failed (for public releases or hotfixes), because tagging doesn't block publishing the release
+    if: always()
+
+    runs-on: macos-15-xlarge
+    timeout-minutes: 10
+
+    steps:
+
+      - name: Download tag artifact
+        id: download-tag
+        # Only look for the tag artifact when the tag input is empty
+        if: github.event.inputs.tag == null || github.event.inputs.tag == ''
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: tag
+          path: .github
+
+      - name: Set tag variable
+        run: |
+          if [[ "${{ steps.download-tag.outcome }}" == 'success' ]]; then
+            echo "TAG=$(<.github/tag)" >> $GITHUB_ENV
+          else
+            echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          fi
+
+      - name: Verify the tag
+        id: verify-tag
+        run: |
+          tag_regex='^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$'
+
+          if [[ ! "$TAG" =~ $tag_regex ]]; then
+            echo "::error::The provided tag ($TAG) has incorrect format (attempted to match ${tag_regex})."
+            exit 1
+          fi
+          echo "release-version=${TAG//-/.}" >> $GITHUB_OUTPUT
+
+      # Always check out main first, because the release branch might have been deleted (for public releases)
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
+          submodules: recursive
+          ref: main
+
+      - name: Check out the branch if it exists
+        env:
+          branch: ${{ inputs.branch || github.ref_name }}
+        run: |
+          if [[ -z "${branch}" ]] || git ls-remote --exit-code --heads origin "${branch}"; then
+            echo "::notice::Checking out ${branch} branch."
+            git checkout "${branch}"
+          else
+            echo "::notice::Branch ${branch} doesn't exist on the remote repository, staying on main."
+          fi
+
+      - name: Set up fastlane
+        run: bundle install
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+
+      - name: Extract Asana Task ID
+        id: task-id
+        run: bundle exec fastlane run asana_extract_task_id task_url:"${{ env.asana-task-url }}"
+
+      - name: Fetch and validate release notes
+        env:
+          TASK_ID: ${{ steps.task-id.outputs.asana_task_id }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
+            -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+            | jq -r .data.notes > release_task_content.txt
+          raw_release_notes="$(./scripts/extract_release_notes.sh -r < release_task_content.txt)"
+          if [[ ${#raw_release_notes} == 0 || "$raw_release_notes" == *"<-- Add release notes here -->"* ]]; then
+            echo "::error::Release notes are empty or contain a placeholder. Please add release notes to the Asana task and restart the workflow."
+            exit 1
+          fi
+          ./scripts/extract_release_notes.sh < release_task_content.txt > release_notes.html
+          echo "RELEASE_NOTES_FILE=release_notes.html" >> $GITHUB_ENV
+
+      - name: Set up Sparkle tools
+        env:
+          SPARKLE_URL: https://github.com/sparkle-project/Sparkle/releases/download/${{ vars.SPARKLE_VERSION }}/Sparkle-${{ vars.SPARKLE_VERSION }}.tar.xz
+        run: |
+          curl -fLSs $SPARKLE_URL | tar xJ bin
+          echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+
+      - name: Fetch DMG
+        id: fetch-dmg
+        env:
+          DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.release-version }}.dmg
+        run: |
+          # Public release doesn't need fetching a DMG (it's already uploaded to S3)
+          if [[ "${RELEASE_TYPE}" != 'public' ]]; then
+            DMG_URL="${{ vars.DMG_URL_ROOT }}${DMG_NAME}"
+            curl -fLSs -o "$DMG_NAME" "$DMG_URL"
+          fi
+          echo "dmg-name=$DMG_NAME" >> $GITHUB_OUTPUT
+          echo "dmg-path=$DMG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Generate appcast
+        id: appcast
+        env:
+          DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          VERSION: ${{ steps.verify-tag.outputs.release-version }}
+        run: |
+          echo -n "$SPARKLE_PRIVATE_KEY" > sparkle_private_key
+          chmod 600 sparkle_private_key
+
+          case "$RELEASE_TYPE" in
+            "internal")
+              ./scripts/appcast_manager/appcastManager.swift \
+                --release-to-internal-channel \
+                --dmg ${DMG_PATH} \
+                --release-notes-html release_notes.html \
+                --key sparkle_private_key
+              ;;
+            "public")
+              ./scripts/appcast_manager/appcastManager.swift \
+                --release-to-public-channel \
+                --version ${VERSION} \
+                --release-notes-html release_notes.html \
+                --key sparkle_private_key
+              ;;
+            "hotfix")
+              ./scripts/appcast_manager/appcastManager.swift \
+                --release-hotfix-to-public-channel \
+                --dmg ${DMG_PATH} \
+                --release-notes-html release_notes.html \
+                --key sparkle_private_key
+              ;;
+            *)
+              ;;
+          esac
+
+          appcast_patch_name="appcast2-${VERSION}.patch"
+          mv -f ${{ env.SPARKLE_DIR }}/appcast_diff.txt ${{ env.SPARKLE_DIR }}/${appcast_patch_name}
+          echo "appcast-patch-name=${appcast_patch_name}" >> $GITHUB_OUTPUT
+
+      - name: Upload appcast diff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.appcast.outputs.appcast-patch-name }}
+          path: ${{ env.SPARKLE_DIR }}/${{ steps.appcast.outputs.appcast-patch-name }}
+
+      - name: Upload to S3
+        id: upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          VERSION: ${{ steps.verify-tag.outputs.release-version }}
+        run: |
+          # Back up existing appcast2.xml
+          OLD_APPCAST_NAME=appcast2_old.xml
+          echo "OLD_APPCAST_NAME=${OLD_APPCAST_NAME}" >> $GITHUB_ENV
+          curl -fLSs "${{ vars.DMG_URL_ROOT }}appcast2.xml" --output "${OLD_APPCAST_NAME}"
+
+          # Upload files to S3
+          if [[ "${RELEASE_TYPE}" == "internal" ]]; then
+            ./scripts/upload_to_s3/upload_to_s3.sh --run --force
+          else
+            ./scripts/upload_to_s3/upload_to_s3.sh --run --force --overwrite-duckduckgo-dmg "${VERSION}"
+          fi
+
+          if [[ -f "${{ env.SPARKLE_DIR }}/uploaded_files_list.txt" ]]; then
+            echo "FILES_UPLOADED=$(awk '{ print "<li><code>"$1"</code></li>"; }' < ${{ env.SPARKLE_DIR }}/uploaded_files_list.txt | tr '\n' ' ')" >> $GITHUB_ENV
+          else
+            echo "FILES_UPLOADED='No files uploaded.'" >> $GITHUB_ENV
+          fi
+
+      - name: Update Asana for the release
+        id: update-asana
+        if: ${{ env.RELEASE_TYPE != 'internal' }}
+        continue-on-error: true
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          BRANCH: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          bundle exec fastlane run update_asana_for_release \
+            platform:macos \
+            release_type:public \
+            github_handle:"${{ github.actor }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}" \
+            release_task_id:"${{ steps.task-id.outputs.asana_task_id }}" \
+            target_section_id:"${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }}" \
+            tag:"${{ env.TAG }}"
+
+      - name: Get tasks since last internal release
+        id: get-tasks-since-last-internal-release
+        if: contains(github.event.inputs.release-type, '') || github.event.inputs.release-type == 'internal'
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tasks="$(./scripts/update_asana_for_release.sh list-tasks-in-last-internal-release)"
+          echo "tasks=$tasks" >> $GITHUB_OUTPUT
+
+      - name: Set common environment variables
+        if: always()
+        env:
+          DMG_NAME: ${{ steps.fetch-dmg.outputs.dmg-name }}
+        run: |
+          echo "APPCAST_PATCH_NAME=${{ steps.appcast.outputs.appcast-patch-name }}" >> $GITHUB_ENV
+          echo "DMG_NAME=${DMG_NAME}" >> $GITHUB_ENV
+          echo "DMG_URL=${{ vars.DMG_URL_ROOT }}${DMG_NAME}" >> $GITHUB_ENV
+          echo "RELEASE_BUCKET_NAME=${{ vars.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
+          echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
+          echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.asana_task_id }}" >> $GITHUB_ENV
+          echo "TASKS_SINCE_LAST_INTERNAL_RELEASE=${{ steps.get-tasks-since-last-internal-release.outputs.tasks }}" >> $GITHUB_ENV
+          echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
+          echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
+
+      - name: Set up Asana templates
+        if: always()
+        id: asana-templates
+        run: |
+          if [[ ${{ steps.upload.outcome }} == "success" ]]; then
+            if [[ "${RELEASE_TYPE}" == "internal" ]]; then
+              echo "task-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
+              echo "comment-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
+              if [[ -n "${TASKS_SINCE_LAST_INTERNAL_RELEASE}" ]]; then
+                echo "release-task-comment-template=internal-release-complete-with-tasks" >> $GITHUB_OUTPUT
+              else
+                echo "release-task-comment-template=internal-release-complete" >> $GITHUB_OUTPUT
+              fi
+            else
+              echo "task-template=validate-check-for-updates-public" >> $GITHUB_OUTPUT
+              echo "comment-template=validate-check-for-updates-public" >> $GITHUB_OUTPUT
+              echo "release-task-comment-template=public-release-complete" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "task-template=appcast-failed-${RELEASE_TYPE}" >> $GITHUB_OUTPUT
+            echo "comment-template=appcast-failed-${RELEASE_TYPE}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Asana task
+        id: create-task
+        if: always()
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          bundle exec fastlane run asana_create_action_item \
+            task_url:"${{ env.asana-task-url }}" \
+            template_name:"${{ steps.asana-templates.outputs.task-template }}" \
+            github_handle:"${{ github.actor }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
+
+      - name: Create Asana task to handle Asana paperwork
+        id: create-asana-paperwork-task
+        if: ${{ steps.update-asana.outcome == 'failure' }}
+        env:
+          APP_BOARD_ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          bundle exec fastlane run asana_create_action_item \
+            task_url:"${{ env.asana-task-url }}" \
+            template_name:"update-asana-for-public-release" \
+            github_handle:"${{ github.actor }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
+
+      - name: Upload patch to the Asana task
+        id: upload-patch
+        if: success()
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          bundle exec fastlane run asana_upload \
+            file_name:"${{ env.SPARKLE_DIR }}/${{ steps.appcast.outputs.appcast-patch-name }}" \
+            task_id:"${{ steps.create-task.outputs.asana_new_task_id }}"
+
+      - name: Upload old appcast file to the Asana task
+        id: upload-old-appcast
+        if: success()
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          bundle exec fastlane run asana_upload \
+            file_name:"${{ env.OLD_APPCAST_NAME }}" \
+            task_id:"${{ steps.create-task.outputs.asana_new_task_id }}"
+
+      - name: Upload release notes to the Asana task
+        id: upload-release-notes
+        if: success()
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          bundle exec fastlane run asana_upload \
+            file_name:"${{ env.RELEASE_NOTES_FILE }}" \
+            task_id:"${{ steps.create-task.outputs.asana_new_task_id }}"
+
+      - name: Report status
+        if: always()
+        env:
+          ANNOUNCEMENT_TASK_ID: ${{ steps.update-asana.outputs.asana_new_task_id }}
+          ASSIGNEE_ID: ${{ steps.create-task.outputs.asana_assignee_id }}
+          TASK_ID: ${{ steps.create-task.outputs.asana_new_task_id }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          bundle exec fastlane run asana_log_message \
+            task_url:"${{ env.asana-task-url }}" \
+            template_name:"${{ steps.asana-templates.outputs.comment-template }}" \
+            github_handle:"${{ github.actor }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
+
+      - name: Add a comment to the release task
+        if: success()
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          bundle exec fastlane run asana_add_comment \
+            task_url:"${{ env.asana-task-url }}" \
+            template_name:"${{ steps.asana-templates.outputs.release-task-comment-template }}"
+
+  # This is only run for public and hotfix releases
+  create-variants:
+
+    name: Create DMG Variants
+
+    needs: [publish-to-sparkle]
+
+    # Run if release-type is provided (not empty) an is not internal
+    if: github.event.inputs.release-type != null && github.event.inputs.release-type != 'internal'
+
+    uses: duckduckgo/macos-browser/.github/workflows/macos_create_variants.yml@main
+    secrets:
+      APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+      APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
+      MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
+      SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}

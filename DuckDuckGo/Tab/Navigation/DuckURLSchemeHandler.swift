@@ -53,7 +53,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         case .onboarding, .releaseNotes:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
-            handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
+            handleDuckPlayer(requestURL: webViewURL, urlSchemeTask: urlSchemeTask, webView: webView)
         case .error:
             handleErrorPage(urlSchemeTask: urlSchemeTask)
         case .newTab where isNTPSpecialPageSupported && featureFlagger.isFeatureOn(.htmlNewTabPage):
@@ -73,6 +73,14 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+
+    private lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 }
 
 // MARK: - Native UI Paged
@@ -177,10 +185,15 @@ private extension DuckURLSchemeHandler {
             guard let response = HTTPURLResponse(url: requestURL, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil) else {
                 return nil
             }
+            onFaviconMissing()
             return (response, Data())
         }
         let response = URLResponse(url: requestURL, mimeType: "image/png", expectedContentLength: imagePNGData.count, textEncodingName: nil)
         return (response, imagePNGData)
+    }
+
+    private func onFaviconMissing() {
+        faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
     }
 }
 

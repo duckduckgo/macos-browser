@@ -253,6 +253,9 @@ struct UserText {
     static let searchDuckDuckGoSuffix = NSLocalizedString("address.bar.search.suffix",
                                                           value: "Search DuckDuckGo",
                                                           comment: "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo")
+    static let duckDuckGoSearchSuffix = NSLocalizedString("address.bar.search.open.tab.suffix",
+                                                          value: "DuckDuckGo Search",
+                                                          comment: "Suffix of DuckDuckGo Search open tab suggestion. Example: cats – DuckDuckGo Search")
     static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",
                                                          value: "Visit",
                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
@@ -358,25 +361,22 @@ struct UserText {
     // Misc
 
     // AI Chat
-    static let aiChatOnboardingPopoverTitle = NSLocalizedString("ai-chat.onboarding.popover.title", value: "Launch AI Chat directly from your toolbar", comment: "AI Chat onboarding popover title")
-    static let aiChatOnboardingPopoverMessageMarkdown = NSLocalizedString("ai-chat.onboarding.popover.message-markdown", value: "You can adjust this and other AI Chat features in **Settings** > **AI Chat**.", comment: "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **")
+    static let aiChatOnboardingPopoverTitle = NSLocalizedString("duckai.onboarding.popover.title", value: "Launch Duck.ai directly from your toolbar", comment: "AI Chat onboarding popover title")
+    static let aiChatOnboardingPopoverMessageMarkdown = NSLocalizedString("duck.ai.onboarding.popover.message-markdown", value: "You can adjust this and other Duck.ai features in **Settings** > **Duck.ai**.", comment: "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **")
     static let aiChatOnboardingPopoverMessageFallback = NSLocalizedString("ai-chat.onboarding.popover.message-fallback", value: "You can adjust this and other AI Chat features in Settings > AI Chat", comment: "AI Chat onboarding popover message continuation")
     static let aiChatOnboardingPopoverCTAReject = NSLocalizedString("ai-chat.onboarding.popover.reject", value: "No Thanks", comment: "AI Chat onboarding CTA for rejection")
     static let aiChatOnboardingPopoverCTAAccept = NSLocalizedString("ai-chat.onboarding.popover.accept", value: "Add Shortcut", comment: "AI Chat onboarding CTA for approval")
-    static let aiChatOnboardingPopoverConfirmation = NSLocalizedString("ai-chat.onboarding.popover.confirmation", value: "AI Chat shortcut added!", comment: "Confirmation for accepting the AI Chat onboarding popover")
+    static let aiChatOnboardingPopoverConfirmation = NSLocalizedString("duckai.onboarding.popover.confirmation", value: "Duck.ai shortcut added!", comment: "Confirmation for accepting the AI Chat onboarding popover")
 
-    static let aiChatShowInToolbarToggle = NSLocalizedString("ai-chat.show-in-toolbar.toggle", value: "Show AI Chat shortcut in browser toolbar", comment: "Show AI Chat in toolbar")
+    static let aiChatShowInToolbarToggle = NSLocalizedString("duckai.show-in-toolbar.toggle", value: "Show Duck.ai shortcut in browser toolbar", comment: "Show AI Chat in toolbar")
 
-    static let aiChatShowInApplicationMenuToggle = NSLocalizedString("ai-chat.show-in-application-menu.toggle", value: "Show “New AI Chat” in File and application menus", comment: "Show AI Chat in application menus")
+    static let aiChatShowInApplicationMenuToggle = NSLocalizedString("duckai.show-in-application-menu.toggle-setting", value: "Show “New AI Chat” in File and application menus", comment: "Show Duck.ai in application menus")
 
-    static let aiChatPreferencesCaptionWithLinkMarkdown = NSLocalizedString("ai-chat.preferences.caption.link.markdown", value: "AI Chat is an optional feature available at [duck.ai](https://duck.ai) that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models.", comment: "Ai Chat preferences explanation with a markdown link. Do not translate what's inside [] and ()")
+    static let aiChatPreferencesCaption = NSLocalizedString("duckai.preferences.caption", value: "Duck.ai is an optional feature that lets you chat anonymously with popular 3rd-party AI chat models. Your chats are not used to train AI.", comment: "Ai Chat preferences explanation")
 
-    static let aiChatPreferencesCaptionWithLinkFallback = NSLocalizedString("ai-chat.preferences.caption.link.fallback", value: "AI Chat is an optional feature available at duck.ai that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models.", comment: "Ai Chat preferences explanation")
-
-    static let aiChatPreferencesCaption = NSLocalizedString("ai-chat.preferences.caption", value: "Launch AI Chat faster by adding shortcuts to your browser toolbar or menu", comment: "Ai Chat preferences explanation")
     static let aiChatPreferencesLearnMoreButton = NSLocalizedString("ai-chat.preferences.learn-more", value: "Learn More", comment: "AI Chat preferences button to learn more about it")
 
-    static let newAIChatMenuItem = NSLocalizedString("ai-chat.menu.new", value: "New AI Chat", comment: "Menu item to launch AI Chat")
+    static let newAIChatMenuItem = NSLocalizedString("duckai.menu.new", value: "New AI Chat", comment: "Menu item to launch AI Chat")
 
     // Duck Player Preferences
     static let duckPlayerSettingsTitle = NSLocalizedString("duck-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")
@@ -647,7 +647,7 @@ struct UserText {
     static let vpn = NSLocalizedString("preferences.vpn", value: "VPN", comment: "Title of the option to show the VPN preferences")
     static let duckPlayer = NSLocalizedString("preferences.duck-player", value: "Duck Player", comment: "Title of the option to show the Duck Player browser preferences")
     static let about = NSLocalizedString("preferences.about", value: "About", comment: "Title of the option to show the About screen")
-    static let aiChat = NSLocalizedString("preferences.ai-chat", value: "AI Chat", comment: "Title of the option to show AI Chat in preferences")
+    static let aiChat = NSLocalizedString("preferences.duckai", value: "Duck.ai", comment: "Title of the option to show Duck.ai in preferences")
 
     static let accessibility = NSLocalizedString("preferences.accessibility", value: "Accessibility", comment: "Title of the option to show the Accessibility browser preferences")
     static let cookiePopUpProtection = NSLocalizedString("preferences.cookie-pop-up-protection", value: "Cookie Pop-Up Protection", comment: "Title of the option to show the Cookie Pop-Up Protection preferences")
@@ -1008,8 +1008,8 @@ struct UserText {
     static let bitwardenCommunicationInfo = NSLocalizedString("bitwarden.connect.communication-info", value: "All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.", comment: "Warns users that all communication between the DuckDuckGo browser and the password manager Bitwarden is encrypted and doesn't leave the user device")
     static let bitwardenHistoryInfo = NSLocalizedString("bitwarden.connect.history-info", value: "Bitwarden will have access to your browsing history.", comment: "Warn users that the password Manager Bitwarden will have access to their browsing history")
 
-    static let showAIChatShortcut = NSLocalizedString("pinning.show-aichat-shortcut", value: "Show AI Chat Shortcut", comment: "Menu item for showing the AI Chat shortcut")
-    static let hideAIChatShortcut = NSLocalizedString("pinning.hide-aichat-shortcut", value: "Hide AI Chat Shortcut", comment: "Menu item for hiding the AI Chat shortcut")
+    static let showAIChatShortcut = NSLocalizedString("pinning.show-duckai-shortcut", value: "Show Duck.ai Shortcut", comment: "Menu item for showing the AI Chat shortcut")
+    static let hideAIChatShortcut = NSLocalizedString("pinning.hide-duckai-shortcut", value: "Hide Duck.ai Shortcut", comment: "Menu item for hiding the AI Chat shortcut")
 
     static let showAutofillShortcut = NSLocalizedString("pinning.show-autofill-shortcut", value: "Show Passwords Shortcut", comment: "Menu item for showing the passwords shortcut")
     static let hideAutofillShortcut = NSLocalizedString("pinning.hide-autofill-shortcut", value: "Hide Passwords Shortcut", comment: "Menu item for hiding the passwords shortcut")
@@ -1435,4 +1435,6 @@ struct UserText {
     static let homePagePromotionFreemiumDBPPostScanEngagementButtonTitle = "View Results"
 
     static let removeSuggestionTooltip = NSLocalizedString("remove.suggestion.tooltip", value: "Remove from browsing history", comment: "Tooltip for the button which removes the history entry from the history")
+
+    static let switchToTab = NSLocalizedString("switch.to.tab", value: "Switch to Tab", comment: "Suggestion to switch to an open tab button title")
 }

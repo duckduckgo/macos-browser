@@ -1104,7 +1104,8 @@ extension MainViewController: NSMenuItemValidation {
         // Pin Tab
         case #selector(MainViewController.pinOrUnpinTab(_:)):
             guard getActiveTabAndIndex()?.tab.isUrl == true,
-                  tabCollectionViewModel.pinnedTabsManager != nil
+                  tabCollectionViewModel.pinnedTabsManager != nil,
+                  !isBurner
             else {
                 return false
             }
@@ -1240,7 +1241,7 @@ extension MainViewController: FindInPageDelegate {
 extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
 
     func privacyDashboardViewControllerDidChange(size: NSSize) {
-        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: true)
+        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: false)
     }
 }
 

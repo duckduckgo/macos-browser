@@ -34,7 +34,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
         static let initialContentHeight: CGFloat = 489.0
-        static let reportBrokenSiteInitialContentHeight = 587.0 + 28.0
+        static let reportBrokenSiteInitialContentHeight = 406.0 + 28.0
         static let initialContentWidth: CGFloat = 360.0
     }
 
@@ -62,8 +62,6 @@ final class PrivacyDashboardViewController: NSViewController {
         }, keyValueStoring: UserDefaults.standard)
     }()
 
-    private let eventMapping = EventMapping<PrivacyDashboardEvents> { _, _, _, _ in }
-
     private let permissionHandler = PrivacyDashboardPermissionHandler()
     private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
@@ -73,6 +71,20 @@ final class PrivacyDashboardViewController: NSViewController {
     var sizeDelegate: PrivacyDashboardViewControllerSizeDelegate?
     private weak var tabViewModel: TabViewModel?
 
+    private let privacyDashboardEvents = EventMapping<PrivacyDashboardEvents> { event, _, parameters, _ in
+        let domainEvent: NonStandardPixel
+        switch event {
+        case .showReportBrokenSite: domainEvent = .brokenSiteReportShown
+        case .reportBrokenSiteShown: domainEvent = .brokenSiteReportShown
+        case .reportBrokenSiteSent: domainEvent = .brokenSiteReportSent
+        }
+        if let parameters {
+            PixelKit.fire(NonStandardEvent(domainEvent), withAdditionalParameters: parameters)
+        } else {
+            PixelKit.fire(NonStandardEvent(domainEvent))
+        }
+    }
+
     init(privacyInfo: PrivacyInfo? = nil,
          entryPoint: PrivacyDashboardEntryPoint = .dashboard,
          privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
@@ -81,9 +93,8 @@ final class PrivacyDashboardViewController: NSViewController {
         let toggleReportingManager = ToggleReportingManager(feature: toggleReportingFeature)
         self.privacyDashboardController = PrivacyDashboardController(privacyInfo: privacyInfo,
                                                                      entryPoint: entryPoint,
-                                                                     variant: .control,
                                                                      toggleReportingManager: toggleReportingManager,
-                                                                     eventMapping: eventMapping)
+                                                                     eventMapping: privacyDashboardEvents)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -103,7 +114,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 489))
+        view = ColorView(frame: NSRect(x: 0, y: 0, width: 360, height: 489), backgroundColor: NSColor(named: "PopoverBackgroundColor"))
         initWebView()
     }
 
@@ -128,6 +139,7 @@ final class PrivacyDashboardViewController: NSViewController {
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
+        webView.setValue(false, forKey: "drawsBackground")
         self.webView = webView
         view.addAndLayout(webView)
 
@@ -188,15 +200,6 @@ final class PrivacyDashboardViewController: NSViewController {
 extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
-                                    didSelectBreakageCategory category: String) {
-        // Not used in macOS
-    }
-
-    func privacyDashboardControllerDidRequestShowReportBrokenSite(_ privacyDashboardController: PrivacyDashboardController) {
-        // Not used in macOS: PixelKit.fire(GeneralPixel.privacyDashboardReportBrokenSite)
-    }
-
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
                                     didChangeProtectionSwitch protectionState: ProtectionState,
                                     didSendReport: Bool) {
         privacyDashboardProtectionSwitchChangeHandler(state: protectionState)
@@ -246,12 +249,9 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
         dismiss()
     }
 
-    func privacyDashboardControllerDidRequestShowAlertForMissingDescription(_ privacyDashboardController: PrivacyDashboardController) {
-        // Not used in macOS
-    }
-
     func privacyDashboardControllerDidRequestShowGeneralFeedback(_ privacyDashboardController: PrivacyDashboardController) {
-        // Not used in macOS
+        dismiss()
+        FeedbackPresenter.presentFeedbackForm()
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
