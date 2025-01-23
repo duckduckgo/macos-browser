@@ -27,7 +27,7 @@ import os.log
 import BrokenSitePrompt
 
 final class MainViewController: NSViewController {
-    private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
+    private(set) lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
 
     let tabBarViewController: TabBarViewController
     let navigationBarViewController: NavigationBarViewController
@@ -255,6 +255,14 @@ final class MainViewController: NSViewController {
 
     func windowWillEnterFullScreen() {
         tabBarViewController.hideTabPreview()
+    }
+
+    func disableTabPreviews() {
+        tabBarViewController.shouldDisplayTabPreviews = false
+    }
+
+    func enableTabPreviews() {
+        tabBarViewController.shouldDisplayTabPreviews = true
     }
 
     func toggleBookmarksBarVisibility() {
