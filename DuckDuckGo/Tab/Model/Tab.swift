@@ -1281,9 +1281,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
 
         if isInternalUser {
-            recoverFromCrash(with: error)
+            self.webView.reload()
         } else {
-            shouldShowTabCrashedPage(with: error)
+            if case.url(let url, _, _) = content {
+                self.error = error
+
+                loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+            }
         }
 
         Task {
@@ -1305,35 +1309,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         } else {
             // this should be updated using an error page update script call when (if) we have a dynamic error page content implemented
             webView.setDocumentHtml(html)
-        }
-    }
-
-    @MainActor
-    private func shouldShowTabCrashedPage(with error: WKError) {
-        if case.url(let url, _, _) = content {
-            self.error = error
-
-            loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
-        }
-    }
-
-    /// This function will reload the web view when a crash occurs. If we check that a form is in the site,
-    /// we will not reload it. The reason is that it is a bad experience because users will lose all the data.
-    @MainActor
-    private func recoverFromCrash(with wkError: WKError) {
-        webView.evaluateJavaScript("document.forms.length > 0") { (result, error) in
-            // Reload the web view if there's an error or if the result is not a boolean
-            guard error == nil, let hasForms = result as? Bool else {
-                self.webView.reload()
-                return
-            }
-
-            // Reload only if there are no forms
-            if !hasForms {
-                self.webView.reload()
-            } else {
-                self.shouldShowTabCrashedPage(with: wkError)
-            }
         }
     }
 }
