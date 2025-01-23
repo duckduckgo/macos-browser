@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "fcappelli/authv2/networking_improvements",
-        "revision" : "590c3dcb00df830297eee346ac6fbad30a0c0b31"
+        "revision" : "0dad370d15ad9dbac8f81f7b662d84cc8c01cf49"
       }
     },
     {
