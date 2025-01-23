@@ -1989,6 +1989,8 @@
 		84C96E472CF9BB6400A80A01 /* malwareHashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */; };
 		84C96E482CF9BB6400A80A01 /* malwareFilterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E442CF9BB6400A80A01 /* malwareFilterSet.json */; };
 		84C96E492CF9BB6400A80A01 /* malwareHashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */; };
+		84CD91BA2D4288060089A2E7 /* match.api.response.json in Resources */ = {isa = PBXBuildFile; fileRef = 84CD91B92D4288060089A2E7 /* match.api.response.json */; };
+		84CD91BB2D4288060089A2E7 /* match.api.response.json in Resources */ = {isa = PBXBuildFile; fileRef = 84CD91B92D4288060089A2E7 /* match.api.response.json */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DDB90A2C92B66E008C997B /* WKVisitedLinkStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */; };
@@ -4247,6 +4249,7 @@
 		84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+UnitTests.swift"; sourceTree = "<group>"; };
 		84C96E442CF9BB6400A80A01 /* malwareFilterSet.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = malwareFilterSet.json; sourceTree = "<group>"; };
 		84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = malwareHashPrefixes.json; sourceTree = "<group>"; };
+		84CD91B92D4288060089A2E7 /* match.api.response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = match.api.response.json; sourceTree = "<group>"; };
 		84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperTests.swift; sourceTree = "<group>"; };
 		84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKVisitedLinkStoreWrapper.swift; sourceTree = "<group>"; };
 		84F1C8CE2C7705B500716446 /* BookmarksBarMenuPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuPopover.swift; sourceTree = "<group>"; };
@@ -9868,6 +9871,7 @@
 		CD89DD642C89E0BB0080F9AF /* MaliciousSiteProtection */ = {
 			isa = PBXGroup;
 			children = (
+				84CD91B92D4288060089A2E7 /* match.api.response.json */,
 				CD89DD632C89E0BB0080F9AF /* MaliciousSiteProtectionIntegrationTests.swift */,
 			);
 			path = MaliciousSiteProtection;
@@ -10858,6 +10862,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EED9A6782C37FE6900E0FAB9 /* login_deduplication_starting_data.csv in Resources */,
+				84CD91BB2D4288060089A2E7 /* match.api.response.json in Resources */,
 				EEE0E1D02C32F6530058E148 /* mock_login_data_large.csv in Resources */,
 				B64E42AC2B909DC9006C1346 /* test.pdf in Resources */,
 				EED9A6762C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */,
@@ -10876,6 +10881,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EED9A6772C37FE6900E0FAB9 /* login_deduplication_starting_data.csv in Resources */,
+				84CD91BA2D4288060089A2E7 /* match.api.response.json in Resources */,
 				EEE0E1CF2C32F6530058E148 /* mock_login_data_large.csv in Resources */,
 				B64E42AB2B909DC9006C1346 /* test.pdf in Resources */,
 				EED9A6752C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */,
@@ -15423,8 +15429,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 229.0.0;
+				branch = "alex/fix-malsite-timeout-pixel-name";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
