@@ -19,7 +19,7 @@
 import Foundation
 import WebKit
 import BrowserServicesKit
-import UserScript
+import UserScriptActionsManager
 import WebKitExtensions
 
 public final class NewTabPageUserContentController: WKUserContentController {
@@ -32,20 +32,14 @@ public final class NewTabPageUserContentController: WKUserContentController {
 
         super.init()
 
-        newTabPageUserScriptProvider.userScripts.forEach {
-            let userScript = $0.makeWKUserScriptSync()
-            self.installUserScripts([userScript], handlers: [$0])
+        newTabPageUserScriptProvider.userScripts.forEach { userScript in
+            addHandler(userScript)
+            addUserScript(userScript.makeWKUserScriptSync())
         }
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    @MainActor
-    private func installUserScripts(_ wkUserScripts: [WKUserScript], handlers: [UserScript]) {
-        handlers.forEach { self.addHandler($0) }
-        wkUserScripts.forEach(self.addUserScript)
     }
 }
 
@@ -60,20 +54,7 @@ private final class NewTabPageUserScriptProvider: UserScriptsProvider {
         specialPagesUserScript.registerSubfeature(delegate: newTabPageUserScript)
     }
 
-    @MainActor
     func loadWKUserScripts() async -> [WKUserScript] {
-        return await withTaskGroup(of: WKUserScriptBox.self) { @MainActor group in
-            var wkUserScripts = [WKUserScript]()
-            userScripts.forEach { userScript in
-                group.addTask { @MainActor in
-                    await userScript.makeWKUserScript()
-                }
-            }
-            for await result in group {
-                wkUserScripts.append(result.wkUserScript)
-            }
-
-            return wkUserScripts
-        }
+        [await specialPagesUserScript.makeWKUserScript().wkUserScript]
     }
 }
