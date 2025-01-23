@@ -1,3 +1,4 @@
 #import "_WKWebExtensionPermission.h"
 
-WK_EXTERN _WKWebExtensionPermission const _WKWebExtensionPermissionNotifications;
+API_AVAILABLE(macos(13.3))
+_WKWebExtensionPermission const _WKWebExtensionPermissionNotifications;

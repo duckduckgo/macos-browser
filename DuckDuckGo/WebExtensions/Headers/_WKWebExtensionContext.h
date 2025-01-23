@@ -71,7 +71,7 @@ WK_EXTERN _WKWebExtensionContextNotificationUserInfoKey const _WKWebExtensionCon
 API_AVAILABLE(macos(13.3), ios(16.4))
 WK_EXTERN _WKWebExtensionContextNotificationUserInfoKey const _WKWebExtensionContextNotificationUserInfoKeyMatchPatterns;
 
-API_AVAILABLE(macos(13.3), ios(16.4))
+API_AVAILABLE(macos(14.4), ios(16.4))
 @interface _WKWebExtensionContext : NSObject
 
 + (instancetype)new NS_UNAVAILABLE;
@@ -163,7 +163,7 @@ API_AVAILABLE(macos(13.3), ios(16.4))
 
 - (void)loadBackgroundContentWithCompletionHandler:(void (^)(NSError * _Nullable error))completionHandler;
 
-- (nullable _WKWebExtensionAction *)actionForTab:(nullable id <_WKWebExtensionTab>)tab NS_SWIFT_NAME(action(for:));
+- (nullable _WKWebExtensionAction *)actionForTab:(nullable id <_WKWebExtensionTab>)tab NS_SWIFT_NAME(action(for:)) API_AVAILABLE(macos(14.4));
 
 - (void)performActionForTab:(nullable id <_WKWebExtensionTab>)tab NS_SWIFT_NAME(performAction(for:));
 

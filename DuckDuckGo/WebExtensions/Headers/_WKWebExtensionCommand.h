@@ -5,7 +5,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(macos(14.4), ios(17.4), visionos(1.1))
-NS_SWIFT_NAME(WKWebExtension.Command)
 @interface _WKWebExtensionCommand : NSObject
 
 + (instancetype)new NS_UNAVAILABLE;
