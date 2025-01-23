@@ -1,7 +1,7 @@
 //
-//  PageRefreshStore.swift
+//  HistoryViewDataModel+Configuration.swift
 //
-//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,11 +16,17 @@
 //  limitations under the License.
 //
 
-import PageRefreshMonitor
+import Foundation
 
-final class PageRefreshStore: PageRefreshStoring {
+extension HistoryViewDataModel {
 
-    @UserDefaultsWrapper(key: .refreshTimestamps, defaultValue: [])
-    var refreshTimestamps: [Date]
+    struct HistoryViewConfiguration: Encodable {
+        var env: String
+        var locale: String
+        var platform: Platform
 
+        struct Platform: Encodable, Equatable {
+            var name: String
+        }
+    }
 }

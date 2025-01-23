@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1737129345760,
+    "version": 1737620176460,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -66,6 +66,11 @@
             "hash": "b813ade8472a097ffbd43a3331116fe1"
         },
         "additionalCampaignPixelParams": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "addressBarTldNavOrSearch": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -654,6 +659,27 @@
                     "domain": "sueddeutsche.de"
                 },
                 {
+                    "domain": "vital-parts.co.uk"
+                },
+                {
+                    "domain": "lta.org.uk"
+                },
+                {
+                    "domain": "hobbyhall.fi"
+                },
+                {
+                    "domain": "wienmobil.at"
+                },
+                {
+                    "domain": "memsoft.fr"
+                },
+                {
+                    "domain": "bafin.de"
+                },
+                {
+                    "domain": "levi.pt"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -805,7 +831,14 @@
                     "sachsen-netze.de",
                     "alpharunning.co.uk",
                     "lecreuset.co.uk",
-                    "sueddeutsche.de"
+                    "sueddeutsche.de",
+                    "vital-parts.co.uk",
+                    "lta.org.uk",
+                    "hobbyhall.fi",
+                    "wienmobil.at",
+                    "memsoft.fr",
+                    "bafin.de",
+                    "levi.pt"
                 ]
             },
             "state": "enabled",
@@ -814,7 +847,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "fbd77f789ae02d1795a7a001b75f2096"
+            "hash": "f1b13a96807f8030dc4bb31f97a1a33f"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -6222,11 +6255,16 @@
                     "domain": "broken.third-party.site"
                 }
             ],
+            "features": {
+                "onByDefault": {
+                    "state": "enabled"
+                }
+            },
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "hash": "c5507786c7bd5326356357f2291fa536"
+            "hash": "3f08e9c0213c586858a618047970bbd2"
         },
         "marketplaceAdPostback": {
             "state": "disabled",
@@ -10465,6 +10503,11 @@
                 ]
             },
             "hash": "99b098daaea40136ae60aec41f52467e"
+        },
+        "webViewStateRestoration": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "webViewBlobDownload": {
             "exceptions": [],

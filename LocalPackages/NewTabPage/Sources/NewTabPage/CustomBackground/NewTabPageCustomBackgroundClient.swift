@@ -18,7 +18,7 @@
 
 import Common
 import Combine
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
 public protocol NewTabPageCustomBackgroundProviding: AnyObject {
@@ -39,11 +39,10 @@ public protocol NewTabPageCustomBackgroundProviding: AnyObject {
     @MainActor func showContextMenu(for imageID: String, using presenter: NewTabPageContextMenuPresenting) async
 }
 
-public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
+public final class NewTabPageCustomBackgroundClient: NewTabPageUserScriptClient {
 
     let model: NewTabPageCustomBackgroundProviding
     let contextMenuPresenter: NewTabPageContextMenuPresenting
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables: Set<AnyCancellable> = []
 
@@ -53,6 +52,7 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
     ) {
         self.model = model
         self.contextMenuPresenter = contextMenuPresenter
+        super.init()
 
         model.backgroundPublisher
             .sink { [weak self] background in
@@ -99,7 +99,7 @@ public final class NewTabPageCustomBackgroundClient: NewTabPageScriptClient {
         case upload = "customizer_upload"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
             MessageName.deleteImage.rawValue: { [weak self] in try await self?.deleteImage(params: $0, original: $1) },
