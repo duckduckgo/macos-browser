@@ -1195,8 +1195,8 @@
 		376E2D2629428353001CD31B /* PrivacyReferenceTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */; };
 		376E2D2729428353001CD31B /* BrokenSiteReportingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */; };
 		376E2D282942843D001CD31B /* privacy-reference-tests in Resources */ = {isa = PBXBuildFile; fileRef = 31E163BF293A581900963C10 /* privacy-reference-tests */; };
-		376E8C172D4102CC00D5D2EC /* NewTabPageNewUserDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C162D4102C800D5D2EC /* NewTabPageNewUserDecider.swift */; };
-		376E8C182D4102CC00D5D2EC /* NewTabPageNewUserDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C162D4102C800D5D2EC /* NewTabPageNewUserDecider.swift */; };
+		376E8C172D4102CC00D5D2EC /* NewTabPageModeDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C162D4102C800D5D2EC /* NewTabPageModeDecider.swift */; };
+		376E8C182D4102CC00D5D2EC /* NewTabPageModeDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C162D4102C800D5D2EC /* NewTabPageModeDecider.swift */; };
 		376E8C1A2D41186B00D5D2EC /* DefaultRecentActivityActionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */; };
 		376E8C1B2D41186B00D5D2EC /* DefaultRecentActivityActionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */; };
 		376E8C1D2D41920A00D5D2EC /* RecentActivityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E8C1C2D41920200D5D2EC /* RecentActivityProvider.swift */; };
@@ -3741,7 +3741,7 @@
 		376CC8B4296EB630006B63A7 /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>"; };
 		376CC8B5296EBA8F006B63A7 /* BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BuildNumber.xcconfig; sourceTree = "<group>"; };
 		376E708D2BD686260082B7EB /* UI Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "UI Tests.xctestplan"; sourceTree = "<group>"; };
-		376E8C162D4102C800D5D2EC /* NewTabPageNewUserDecider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageNewUserDecider.swift; sourceTree = "<group>"; };
+		376E8C162D4102C800D5D2EC /* NewTabPageModeDecider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageModeDecider.swift; sourceTree = "<group>"; };
 		376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRecentActivityActionsHandler.swift; sourceTree = "<group>"; };
 		376E8C1C2D41920200D5D2EC /* RecentActivityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentActivityProvider.swift; sourceTree = "<group>"; };
 		37717E66296B5A20002FAEDF /* Global.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Global.xcconfig; sourceTree = "<group>"; };
@@ -5919,7 +5919,7 @@
 				376E8C1C2D41920200D5D2EC /* RecentActivityProvider.swift */,
 				371BBC5D2D00CA3E008FA0C7 /* NewTabPageWebViewModel.swift */,
 				371BBC5A2D00C911008FA0C7 /* NewTabPageActionsManagerExtension.swift */,
-				376E8C162D4102C800D5D2EC /* NewTabPageNewUserDecider.swift */,
+				376E8C162D4102C800D5D2EC /* NewTabPageModeDecider.swift */,
 			);
 			path = NewTabPage;
 			sourceTree = "<group>";
@@ -11467,7 +11467,7 @@
 				3768D8412C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */,
 				3706FAB8293F65D500E42796 /* FaviconImageCache.swift in Sources */,
 				3706FAB9293F65D500E42796 /* TabBarViewController.swift in Sources */,
-				376E8C172D4102CC00D5D2EC /* NewTabPageNewUserDecider.swift in Sources */,
+				376E8C172D4102CC00D5D2EC /* NewTabPageModeDecider.swift in Sources */,
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				560EB9332C78946F0080DBC8 /* ContextualOnboardingDialogs.swift in Sources */,
 				37878E552CA3330300CC9EB5 /* HomePageAddressBarModel.swift in Sources */,
@@ -13839,7 +13839,7 @@
 				B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */,
 				4B92929D26670D2A00AD2C21 /* BookmarkNode.swift in Sources */,
 				1DEDB3642C19934C006B6D1B /* MoreOptionsMenuButton.swift in Sources */,
-				376E8C182D4102CC00D5D2EC /* NewTabPageNewUserDecider.swift in Sources */,
+				376E8C182D4102CC00D5D2EC /* NewTabPageModeDecider.swift in Sources */,
 				B693955226F04BEB0015B914 /* LongPressButton.swift in Sources */,
 				B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */,
 				B6DB3AF6278EA0130024C5C4 /* BundleExtension.swift in Sources */,

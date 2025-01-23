@@ -30,8 +30,6 @@ extension NewTabPageActionsManager {
         historyCoordinator: HistoryCoordinating,
         privacyStats: PrivacyStatsCollecting
     ) {
-        let newUserDecider = NewTabPageNewUserDecider()
-
         let favoritesPublisher = bookmarkManager.listPublisher.map({ $0?.favoriteBookmarks ?? [] }).eraseToAnyPublisher()
         let favoritesModel = NewTabPageFavoritesModel(
             actionsHandler: DefaultFavoritesActionsHandler(),
@@ -42,8 +40,24 @@ extension NewTabPageActionsManager {
         let customizationProvider = NewTabPageCustomizationProvider(homePageSettingsModel: NSApp.delegateTyped.homePageSettingsModel)
         let freemiumDBPBannerProvider = NewTabPageFreemiumDBPBannerProvider(model: NSApp.delegateTyped.freemiumDBPPromotionViewCoordinator)
 
-        var scriptClients: [NewTabPageUserScriptClient] = [
+        let privacyStatsModel = NewTabPagePrivacyStatsModel(
+            privacyStats: privacyStats,
+            trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared),
+            eventMapping: NewTabPagePrivacyStatsEventHandler(),
+            getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
+        )
+
+        let recentActivityProvider = RecentActivityProvider(historyCoordinator: historyCoordinator, bookmarkManager: bookmarkManager)
+        let recentActivityModel = NewTabPageRecentActivityModel(
+            privacyStats: privacyStats,
+            activityPublisher: recentActivityProvider.activityPublisher,
+            actionsHandler: DefaultRecentActivityActionsHandler(),
+            getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
+        )
+
+        self.init(scriptClients: [
             NewTabPageConfigurationClient(
+                sectionsAvailabilityProvider: NewTabPageModeDecider(),
                 sectionsVisibilityProvider: appearancePreferences,
                 customBackgroundProvider: customizationProvider,
                 linkOpener: DefaultHomePageSettingsModelNavigator()
@@ -52,35 +66,10 @@ extension NewTabPageActionsManager {
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel),
             NewTabPageFreemiumDBPClient(provider: freemiumDBPBannerProvider),
             NewTabPageNextStepsCardsClient(model: NewTabPageNextStepsCardsProvider(continueSetUpModel: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener()))),
-            NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: Int(Favicon.SizeCategory.medium.rawValue))
-        ]
-
-        if newUserDecider.isNewUser {
-
-            let privacyStatsModel = NewTabPagePrivacyStatsModel(
-                privacyStats: privacyStats,
-                trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared),
-                eventMapping: NewTabPagePrivacyStatsEventHandler(),
-                getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
-            )
-
-            scriptClients.append(NewTabPagePrivacyStatsClient(model: privacyStatsModel))
-
-        } else {
-
-            let recentActivityProvider = RecentActivityProvider(historyCoordinator: historyCoordinator, bookmarkManager: bookmarkManager)
-
-            let recentActivityModel = NewTabPageRecentActivityModel(
-                privacyStats: privacyStats,
-                activityPublisher: recentActivityProvider.activityPublisher,
-                actionsHandler: DefaultRecentActivityActionsHandler(),
-                getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
-            )
-
-            scriptClients.append(NewTabPageRecentActivityClient(model: recentActivityModel))
-        }
-
-        self.init(scriptClients: scriptClients)
+            NewTabPageFavoritesClient(favoritesModel: favoritesModel, preferredFaviconSize: Int(Favicon.SizeCategory.medium.rawValue)),
+            NewTabPagePrivacyStatsClient(model: privacyStatsModel),
+            NewTabPageRecentActivityClient(model: recentActivityModel)
+        ])
     }
 }
 

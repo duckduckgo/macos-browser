@@ -94,6 +94,8 @@ final class MainMenu: NSMenu {
     // MARK: Debug
 
     private var loggingMenu: NSMenu?
+    let newTabPagePrivacyStatsModeMenuItem = NSMenuItem(title: "Privacy Stats", action: #selector(MainMenu.updateNewTabPageMode), representedObject: NewTabPageMode.privacyStats)
+    let newTabPageRecentActivityModeMenuItem = NSMenuItem(title: "Recent Activity", action: #selector(MainMenu.updateNewTabPageMode), representedObject: NewTabPageMode.recentActivity)
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
     let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: nil)
     let autofillDebugScriptMenuItem = NSMenuItem(title: "Autofill Debug Script", action: #selector(MainMenu.toggleAutofillScriptDebugSettingsAction))
@@ -444,6 +446,7 @@ final class MainMenu: NSMenu {
         updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
+        updateNewTabPageModeMenuItem()
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
         updateAutofillDebugScriptMenuItem()
@@ -624,12 +627,16 @@ final class MainMenu: NSMenu {
             NSMenuItem.separator()
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()
+            NSMenuItem(title: "Skip Onboarding", action: #selector(MainViewController.skipOnboarding))
             NSMenuItem(title: "New Tab Page") {
+                NSMenuItem(title: "Mode") {
+                    newTabPagePrivacyStatsModeMenuItem.targetting(self)
+                    newTabPageRecentActivityModeMenuItem.targetting(self)
+                }
                 NSMenuItem(title: "Reset Continue Setup", action: #selector(MainViewController.debugResetContinueSetup))
                 NSMenuItem(title: "Shift New Tab daily impression", action: #selector(MainViewController.debugShiftNewTabOpeningDate))
                 NSMenuItem(title: "Shift \(AppearancePreferences.Constants.dismissNextStepsCardsAfterDays) days", action: #selector(MainViewController.debugShiftNewTabOpeningDateNtimes))
             }
-            NSMenuItem(title: "Skip Onboarding", action: #selector(MainViewController.skipOnboarding))
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
@@ -760,6 +767,19 @@ final class MainMenu: NSMenu {
 
     private func setupAIChatMenu() {
         aiChatMenu.isHidden = !aiChatMenuConfig.shouldDisplayApplicationMenuShortcut
+    }
+
+    private func updateNewTabPageModeMenuItem() {
+        let mode = NewTabPageModeDecider().effectiveMode
+        newTabPagePrivacyStatsModeMenuItem.state = mode == .privacyStats ? .on : .off
+        newTabPageRecentActivityModeMenuItem.state = mode == .recentActivity ? .on : .off
+    }
+
+    @objc private func updateNewTabPageMode(_ sender: NSMenuItem) {
+        guard let mode = sender.representedObject as? NewTabPageMode else {
+            return
+        }
+        NewTabPageModeDecider().modeOverride = mode
     }
 
     private func updateInternalUserItem() {

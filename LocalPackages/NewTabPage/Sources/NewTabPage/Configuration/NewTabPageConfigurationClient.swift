@@ -23,11 +23,12 @@ import os.log
 import UserScriptActionsManager
 import WebKit
 
-public protocol NewTabPageSectionsVisibilityProviding: AnyObject {
-    var isFavoritesAvailable: Bool { get }
+public protocol NewTabPageSectionsAvailabilityProviding: AnyObject {
     var isPrivacyStatsAvailable: Bool { get }
     var isRecentActivityAvailable: Bool { get }
+}
 
+public protocol NewTabPageSectionsVisibilityProviding: AnyObject {
     var isFavoritesVisible: Bool { get set }
     var isPrivacyStatsVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
@@ -44,17 +45,20 @@ public protocol NewTabPageLinkOpening {
 public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
 
     private var cancellables = Set<AnyCancellable>()
+    private let sectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding
     private let sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding
     private let customBackgroundProvider: NewTabPageCustomBackgroundProviding
     private let contextMenuPresenter: NewTabPageContextMenuPresenting
     private let linkOpener: NewTabPageLinkOpening
 
     public init(
+        sectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding,
         sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding,
         customBackgroundProvider: NewTabPageCustomBackgroundProviding,
         contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
         linkOpener: NewTabPageLinkOpening
     ) {
+        self.sectionsAvailabilityProvider = sectionsAvailabilityProvider
         self.sectionsVisibilityProvider = sectionsVisibilityProvider
         self.customBackgroundProvider = customBackgroundProvider
         self.contextMenuPresenter = contextMenuPresenter
@@ -97,10 +101,10 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
             .init(id: .nextSteps),
             .init(id: .favorites),
         ]
-        if sectionsVisibilityProvider.isPrivacyStatsAvailable {
+        if sectionsAvailabilityProvider.isPrivacyStatsAvailable {
             widgets.append(.init(id: .privacyStats))
         }
-        if sectionsVisibilityProvider.isRecentActivityAvailable {
+        if sectionsAvailabilityProvider.isRecentActivityAvailable {
             widgets.append(.init(id: .recentActivity))
         }
 
@@ -108,14 +112,13 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
     }
 
     private func fetchWidgetConfigs() -> [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] {
-        var widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = []
-        if sectionsVisibilityProvider.isFavoritesAvailable {
-            widgetConfigs.append(.init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible))
-        }
-        if sectionsVisibilityProvider.isPrivacyStatsAvailable {
+        var widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
+            .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible)
+        ]
+        if sectionsAvailabilityProvider.isPrivacyStatsAvailable {
             widgetConfigs.append(.init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible))
         }
-        if sectionsVisibilityProvider.isRecentActivityAvailable {
+        if sectionsAvailabilityProvider.isRecentActivityAvailable {
             widgetConfigs.append(.init(id: .recentActivity, isVisible: sectionsVisibilityProvider.isRecentActivityVisible))
         }
 
