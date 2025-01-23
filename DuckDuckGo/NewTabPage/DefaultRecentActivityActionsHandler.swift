@@ -34,11 +34,15 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
     @MainActor
     func addFavorite(_ url: URL) {
-        guard let favorite = bookmarkManager.getBookmark(for: url), !favorite.isFavorite else {
-            return
+        if let bookmark = bookmarkManager.getBookmark(for: url) {
+            guard !bookmark.isFavorite else {
+                return
+            }
+            bookmark.isFavorite = true
+            bookmarkManager.update(bookmark: bookmark)
+        } else {
+            bookmarkManager.makeBookmark(for: url, title: url.host?.droppingWwwPrefix() ?? url.absoluteString, isFavorite: true)
         }
-        favorite.isFavorite = true
-        bookmarkManager.update(bookmark: favorite)
     }
 
     @MainActor

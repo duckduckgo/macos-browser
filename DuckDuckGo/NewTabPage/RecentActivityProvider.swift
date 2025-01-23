@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Common
 import Foundation
 import History
 import NewTabPage
@@ -103,17 +104,20 @@ private extension HistoryEntry {
 extension NewTabPageDataModel.DomainActivity {
 
     init?(_ historyEntry: HistoryEntry, bookmarkManager: BookmarkManager) {
-        guard let host = historyEntry.url.host?.droppingWwwPrefix() else {
+        guard let host = historyEntry.url.host,
+              let rootURLString = historyEntry.url.root?.absoluteString.dropping(suffix: "/"),
+              let rootURL = rootURLString.url
+        else {
             return nil
         }
 
         self.init(
             id: historyEntry.identifier.uuidString,
-            title: host,
-            url: historyEntry.url.absoluteString,
+            title: host.droppingWwwPrefix(),
+            url: rootURLString,
             etldPlusOne: historyEntry.etldPlusOne,
             favicon: URL.duckFavicon(for: historyEntry.url)?.absoluteString,
-            favorite: bookmarkManager.isUrlFavorited(url: historyEntry.url),
+            favorite: bookmarkManager.isUrlFavorited(url: rootURL),
             trackingStatus: .init(
                 totalCount: Int64(historyEntry.numberOfTrackersBlocked),
                 trackerCompanies: historyEntry.blockedTrackingEntities.map(NewTabPageDataModel.TrackingStatus.TrackerCompany.init)
