@@ -343,8 +343,8 @@ extension DataImport.DataType {
 
     var displayName: String {
         switch self {
-            case .bookmarks: UserText.bookmarkImportBookmarks
-            case .passwords: UserText.importLoginsPasswords
+        case .bookmarks: UserText.bookmarkImportBookmarks
+        case .passwords: UserText.importLoginsPasswords
         }
     }
 
