@@ -15429,8 +15429,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "alex/fix-malsite-timeout-pixel-name";
-				kind = branch;
+				kind = exactVersion;
+				version = 229.1.1;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
