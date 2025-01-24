@@ -51,7 +51,6 @@ extension NewTabPageActionsManager {
 
         let recentActivityProvider = RecentActivityProvider(historyCoordinator: historyCoordinator, bookmarkManager: bookmarkManager)
         let recentActivityModel = NewTabPageRecentActivityModel(
-            privacyStats: privacyStats,
             activityProvider: recentActivityProvider,
             actionsHandler: DefaultRecentActivityActionsHandler(),
             getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue

@@ -90,19 +90,19 @@ public extension NewTabPageDataModel {
 
 extension NewTabPageDataModel {
 
-    struct ActivityOpenAction: Decodable, Equatable {
+    struct ActivityOpenAction: Codable, Equatable {
         let id: String?
         let target: OpenTarget
         let url: String
 
-        enum OpenTarget: String, Decodable {
+        enum OpenTarget: String, Codable {
             case sameTab = "same-tab"
             case newTab = "new-tab"
             case newWindow = "new-window"
         }
     }
 
-    struct ActivityItemAction: Decodable, Equatable {
+    struct ActivityItemAction: Codable, Equatable {
         let url: String
     }
 }

@@ -60,10 +60,8 @@ final class UserDefaultsNewTabPageRecentActivitySettingsPersistor: NewTabPagePri
 
 public final class NewTabPageRecentActivityModel {
 
-    let privacyStats: PrivacyStatsCollecting
     let activityProvider: NewTabPageRecentActivityProviding
     let actionsHandler: RecentActivityActionsHandling
-    let statsUpdatePublisher: AnyPublisher<Void, Never>
 
     @Published var isViewExpanded: Bool {
         didSet {
@@ -72,18 +70,14 @@ public final class NewTabPageRecentActivityModel {
     }
 
     private let settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
-    private let statsUpdateSubject = PassthroughSubject<Void, Never>()
-    private var cancellables: Set<AnyCancellable> = []
 
     public convenience init(
-        privacyStats: PrivacyStatsCollecting,
         activityProvider: NewTabPageRecentActivityProviding,
         actionsHandler: RecentActivityActionsHandling,
         keyValueStore: KeyValueStoring = UserDefaults.standard,
         getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
     ) {
         self.init(
-            privacyStats: privacyStats,
             activityProvider: activityProvider,
             actionsHandler: actionsHandler,
             settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
@@ -91,25 +85,15 @@ public final class NewTabPageRecentActivityModel {
     }
 
     init(
-        privacyStats: PrivacyStatsCollecting,
         activityProvider: NewTabPageRecentActivityProviding,
         actionsHandler: RecentActivityActionsHandling,
         settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     ) {
-        self.privacyStats = privacyStats
         self.activityProvider = activityProvider
         self.actionsHandler = actionsHandler
         self.settingsPersistor = settingsPersistor
 
         isViewExpanded = settingsPersistor.isViewExpanded
-        statsUpdatePublisher = statsUpdateSubject.eraseToAnyPublisher()
-
-        privacyStats.statsUpdatePublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.statsUpdateSubject.send()
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: - Actions
