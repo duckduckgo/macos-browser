@@ -18,6 +18,7 @@
 
 import Foundation
 import Navigation
+import BrowserServicesKit
 
 struct UserText {
 
@@ -167,6 +168,7 @@ struct UserText {
     static let mainMenuViewActualSize = NSLocalizedString("Actual Size", comment: "Main Menu View item")
     static let mainMenuViewZoomIn = NSLocalizedString("Zoom In", comment: "Main Menu View item")
     static let mainMenuViewZoomOut = NSLocalizedString("Zoom Out", comment: "Main Menu View item")
+    static let mainMenuViewShowToolbarsOnFullScreen = NSLocalizedString("Show Tabs and Bookmarks Bar in Full Screen", comment: "Main Menu View item")
 
     static let mainMenuDeveloper = NSLocalizedString("Developer", comment: "Main Menu ")
 
@@ -1107,7 +1109,7 @@ struct UserText {
 
     static let passwordManagerAutoPinnedPopoverText = NSLocalizedString("autofill.popover.passwords.auto-pinned.text", value: "Shortcut Added!", comment: "Text confirming the password manager has been pinned to the toolbar")
 
-    static let passwordManagerPinnedPromptPopoverText = NSLocalizedString("autofill.popover.passwords.pin-prompt.text", 
+    static let passwordManagerPinnedPromptPopoverText = NSLocalizedString("autofill.popover.passwords.pin-prompt.text",
                                                                           value: "Add passwords shortcut?",
                                                                           comment: "Text prompting user to pin the password manager shortcut to the toolbar")
     static let passwordManagerPinnedPromptPopoverButtonText = NSLocalizedString("autofill.popover.passwords.pin-prompt.button.text",
@@ -1316,7 +1318,7 @@ struct UserText {
             }
         }
     }
-    
+
     // MARK: - Onboarding
     enum ContextualOnboarding {
         static let onboardingTryASearchTitle = NSLocalizedString("contextual.onboarding.try-a-search.title", value: "Try a search!", comment: "Title of a popover on the browser that invites the user to try a search")
@@ -1355,7 +1357,7 @@ struct UserText {
     }
 
     // MARK: - Privacy Pro
-    
+
     // Key: "subscription.menu.item"
     // Comment: "Title for Subscription item in the options menu"
     static let subscriptionOptionsMenuItem = "Privacy Pro"
