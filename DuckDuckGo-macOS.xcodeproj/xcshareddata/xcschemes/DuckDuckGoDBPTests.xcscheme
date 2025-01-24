@@ -21,7 +21,7 @@
                BlueprintIdentifier = "7B96D0CE2ADFDA7E007E02C8"
                BuildableName = "DuckDuckGoDBPTests.xctest"
                BlueprintName = "DuckDuckGoDBPTests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
