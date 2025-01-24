@@ -19,6 +19,7 @@
 import Foundation
 import SecureStorage
 import PixelKit
+import BrowserServicesKit
 
 internal class FirefoxDataImporter: DataImporter {
 
@@ -72,7 +73,7 @@ internal class FirefoxDataImporter: DataImporter {
 
             let loginsSummary = try loginResult.flatMap { logins in
                 do {
-                    return try .success(loginImporter.importLogins(logins) { count in
+                    return try .success(loginImporter.importLogins(logins, reporter: SecureVaultReporter.shared) { count in
                         try updateProgress(.importingPasswords(numberOfPasswords: count,
                                                                fraction: dataTypeFraction * (0.5 + 0.5 * Double(count) / Double(logins.count))))
                     })
