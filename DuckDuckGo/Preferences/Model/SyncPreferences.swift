@@ -27,6 +27,7 @@ import PDFKit
 import Navigation
 import PixelKit
 import os.log
+import BrowserServicesKit
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -167,6 +168,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService.account?.recoveryCode
     }
 
+    private let featureFlagger: FeatureFlagger
+
     init(
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
@@ -174,7 +177,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         appearancePreferences: AppearancePreferences = .shared,
         managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
-        syncPausedStateManager: any SyncPausedStateManaging
+        syncPausedStateManager: any SyncPausedStateManaging,
+        featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
@@ -183,6 +187,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.syncFeatureFlags = syncService.featureFlags
         self.userAuthenticator = userAuthenticator
         self.syncPausedStateManager = syncPausedStateManager
+        self.featureFlagger = featureFlagger
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
@@ -579,8 +584,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 do {
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)
                 } catch {
-                    if case SyncError.accountAlreadyExists = error {
+                    if case SyncError.accountAlreadyExists = error,
+                        featureFlagger.isFeatureOn(.syncSeamlessAccountSwitching) {
                         handleAccountAlreadyExists(recoveryKey)
+                    } else if case SyncError.accountAlreadyExists = error {
+                        managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToMergeTwoAccounts, description: "")
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
                     } else {
                         managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToSyncToOtherDevice)
                     }
