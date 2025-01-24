@@ -25,6 +25,7 @@ import Configuration
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
+    case crashDaily
     case crashOnCrashHandlersSetUp
     case crashReportingSubmissionFailed
     case crashReportCRCIDMissing
@@ -241,6 +242,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case serpAddedToDock
 
     case protectionToggledOffBreakageReport
+    case debugBreakageExperiment
 
     // Password Import Keychain Prompt
     case passwordImportKeychainPrompt
@@ -474,6 +476,9 @@ enum GeneralPixel: PixelKitEventV2 {
         switch self {
         case .crash:
             return "m_mac_crash"
+
+        case .crashDaily:
+            return "m_mac_crash_daily"
 
         case .crashOnCrashHandlersSetUp:
             return "m_mac_crash_on_handlers_setup"
@@ -828,6 +833,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
+        case .debugBreakageExperiment: return "m_mac_debug_breakage_experiment_u"
 
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
@@ -892,11 +898,11 @@ enum GeneralPixel: PixelKitEventV2 {
             return "cfgfetch"
 
         case .trackerDataParseFailed:
-            return "tds_p"
+            return "trackerata_parse_failed"
         case .trackerDataReloadFailed:
             return "tds_r"
         case .trackerDataCouldNotBeLoaded:
-            return "tds_l"
+            return "tracker_data_could_not_be_loaded"
 
         case .privacyConfigurationParseFailed:
             return "pcf_p"

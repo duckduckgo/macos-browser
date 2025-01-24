@@ -71,6 +71,8 @@ final class TabBarViewController: NSViewController, TabBarRemoteMessagePresentin
     private let pinnedTabsViewModel: PinnedTabsViewModel?
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
+
+    var shouldDisplayTabPreviews: Bool = true
     private var selectionIndexCancellable: AnyCancellable?
     private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -631,21 +633,23 @@ final class TabBarViewController: NSViewController, TabBarRemoteMessagePresentin
     private func showTabPreview(
         for tabViewModel: TabViewModel,
         from xPosition: CGFloat) {
-        let isSelected = tabCollectionViewModel.selectedTabViewModel === tabViewModel
-        tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel,
-                                                                    isSelected: isSelected)
+            if !shouldDisplayTabPreviews { return }
 
-        guard let window = view.window else {
-            Logger.general.error("TabBarViewController: Showing tab preview window failed")
-            return
+            let isSelected = tabCollectionViewModel.selectedTabViewModel === tabViewModel
+            tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel,
+                                                                        isSelected: isSelected)
+
+            guard let window = view.window else {
+                Logger.general.error("TabBarViewController: Showing tab preview window failed")
+                return
+            }
+
+            var point = view.bounds.origin
+            point.y -= TabPreviewWindowController.padding
+            point.x += xPosition
+            let pointInWindow = view.convert(point, to: nil)
+            tabPreviewWindowController.show(parentWindow: window, topLeftPointInWindow: pointInWindow)
         }
-
-        var point = view.bounds.origin
-        point.y -= TabPreviewWindowController.padding
-        point.x += xPosition
-        let pointInWindow = view.convert(point, to: nil)
-        tabPreviewWindowController.show(parentWindow: window, topLeftPointInWindow: pointInWindow)
-    }
 
     func hideTabPreview(allowQuickRedisplay: Bool = false) {
         tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay)

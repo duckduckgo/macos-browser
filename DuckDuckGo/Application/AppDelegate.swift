@@ -27,6 +27,7 @@ import Crashes
 import DDGSync
 import FeatureFlags
 import History
+import HistoryView
 import MetricKit
 import Networking
 import NewTabPage
@@ -96,7 +97,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private(set) lazy var newTabPageActionsManager: NewTabPageActionsManaging = NewTabPageActionsManager(
+    private(set) lazy var historyViewActionsManager: HistoryViewActionsManager = HistoryViewActionsManager()
+    private(set) lazy var newTabPageActionsManager: NewTabPageActionsManager = NewTabPageActionsManager(
         appearancePreferences: .shared,
         activeRemoteMessageModel: activeRemoteMessageModel,
         privacyStats: privacyStats
@@ -450,6 +452,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
             pixelParameters.forEach { parameters in
                 PixelKit.fire(GeneralPixel.crash, withAdditionalParameters: parameters, includeAppVersionParameter: false)
+                PixelKit.fire(GeneralPixel.crashDaily, frequency: .legacyDaily)
             }
 
             guard let lastPayload = payloads.last else {
