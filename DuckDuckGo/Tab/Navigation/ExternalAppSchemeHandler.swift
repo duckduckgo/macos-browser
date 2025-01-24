@@ -79,11 +79,6 @@ extension ExternalAppSchemeHandler: NavigationResponder {
             }
         }
 
-        // proceed with web extension URLs
-        guard !externalUrl.isWebExtensionUrl else {
-            return .next
-        }
-
         // prevent opening twice for session restoration/tab reopening requests
         guard ![.returnCacheDataElseLoad, .returnCacheDataDontLoad]
             .contains((navigationAction.mainFrameNavigation?.navigationAction.redirectHistory?.first

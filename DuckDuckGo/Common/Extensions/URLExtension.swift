@@ -344,11 +344,11 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript, .duck].contains(navigationalScheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript, .duck, .webkitExtension].contains(navigationalScheme)
     }
 
     var isWebExtensionUrl: Bool {
-        return scheme == "webkit-extension"
+        return navigationalScheme == .webkitExtension
     }
 
     // MARK: - DuckDuckGo
