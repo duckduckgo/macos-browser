@@ -29,8 +29,6 @@ final class NewTabPageRecentActivityClientTests: XCTestCase {
 
     private var activityProvider: CapturingNewTabPageRecentActivityProvider!
     private var actionsHandler: CapturingRecentActivityActionsHandler!
-    private var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
-    private var eventMapping: CapturingNewTabPagePrivacyStatsEventHandler!
     private var settingsPersistor: UserDefaultsNewTabPageRecentActivitySettingsPersistor!
 
     private var userScript: NewTabPageUserScript!
@@ -41,7 +39,6 @@ final class NewTabPageRecentActivityClientTests: XCTestCase {
 
         activityProvider = CapturingNewTabPageRecentActivityProvider()
         actionsHandler = CapturingRecentActivityActionsHandler()
-        trackerDataProvider = MockPrivacyStatsTrackerDataProvider()
         settingsPersistor = UserDefaultsNewTabPageRecentActivitySettingsPersistor(MockKeyValueStore(), getLegacySetting: nil)
 
         model = NewTabPageRecentActivityModel(
