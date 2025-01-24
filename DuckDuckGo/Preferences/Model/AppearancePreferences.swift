@@ -229,9 +229,8 @@ final class AppearancePreferences: ObservableObject {
     @Published var isFavoriteVisible: Bool {
         didSet {
             persistor.isFavoriteVisible = isFavoriteVisible
-            // Temporary Pixel
             if !isFavoriteVisible {
-                PixelKit.fire(GeneralPixel.favoriteSectionHidden)
+                PixelKit.fire(NewTabPagePixel.favoriteSectionHidden, frequency: .dailyAndStandard)
             }
         }
     }
@@ -286,9 +285,8 @@ final class AppearancePreferences: ObservableObject {
     @Published var isRecentActivityVisible: Bool {
         didSet {
             persistor.isRecentActivityVisible = isRecentActivityVisible
-            // Temporary Pixel
             if !isRecentActivityVisible {
-                PixelKit.fire(GeneralPixel.recentActivitySectionHidden)
+                PixelKit.fire(NewTabPagePixel.recentActivitySectionHidden, frequency: .dailyAndStandard)
             }
         }
     }
@@ -296,6 +294,9 @@ final class AppearancePreferences: ObservableObject {
     @Published var isPrivacyStatsVisible: Bool {
         didSet {
             persistor.isPrivacyStatsVisible = isPrivacyStatsVisible
+            if !isPrivacyStatsVisible {
+                PixelKit.fire(NewTabPagePixel.blockedTrackingAttemptsSectionHidden, frequency: .dailyAndStandard)
+            }
         }
     }
 
