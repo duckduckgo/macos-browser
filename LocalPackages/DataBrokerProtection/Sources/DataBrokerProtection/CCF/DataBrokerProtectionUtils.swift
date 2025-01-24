@@ -51,7 +51,7 @@ final class DataBrokerUserContentController: WKUserContentController {
 
     @MainActor
     public func cleanUpBeforeClosing() {
-        Logger.dataBrokerProtection.debug("Cleaning up DBP user scripts")
+        Logger.dataBrokerProtection.log("Cleaning up DBP user scripts")
 
         self.removeAllUserScripts()
         self.removeAllScriptMessageHandlers()
@@ -61,7 +61,7 @@ final class DataBrokerUserContentController: WKUserContentController {
     }
 
     deinit {
-        Logger.dataBrokerProtection.debug("DataBrokerUserContentController Deinit")
+        Logger.dataBrokerProtection.log("DataBrokerUserContentController Deinit")
     }
 }
 

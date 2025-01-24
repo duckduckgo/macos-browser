@@ -33,7 +33,7 @@ extension Preferences {
         @ObservedObject var searchModel: SearchPreferences
         @ObservedObject var tabsModel: TabsPreferences
         @ObservedObject var dataClearingModel: DataClearingPreferences
-        @ObservedObject var phishingDetectionModel: MaliciousSiteProtectionPreferences
+        @ObservedObject var maliciousSiteDetectionModel: MaliciousSiteProtectionPreferences
         @State private var showingCustomHomePageSheet = false
         @State private var isAddedToDock = false
         var dockCustomizer: DockCustomizer
@@ -196,18 +196,26 @@ extension Preferences {
                 }
 
                 // SECTION 7: Phishing Detection
-                if featureFlagger.isFeatureOn(.maliciousSiteProtectionErrorPage) {
-                    PreferencePaneSection(UserText.maliciousSiteDetectionHeader) {
+                if featureFlagger.maliciousSiteProtectionFeatureFlags().isMaliciousSiteProtectionEnabled {
+                    PreferencePaneSection(UserText.maliciousSiteDetectionHeader, spacing: 0) {
                         PreferencePaneSubSection {
                             ToggleMenuItem(UserText.maliciousSiteDetectionIsEnabled,
-                                           isOn: $phishingDetectionModel.isEnabled)
-                                .onChange(of: phishingDetectionModel.isEnabled) { newValue in
-                                    PixelKit.fire(MaliciousSiteProtection.Event.settingToggled(to: newValue))
-                                }
-                        }.padding(.bottom, 5)
+                                           isOn: $maliciousSiteDetectionModel.isEnabled)
+                            .onChange(of: maliciousSiteDetectionModel.isEnabled) { newValue in
+                                PixelKit.fire(MaliciousSiteProtection.Event.settingToggled(to: newValue))
+                            }
+                        }
+                        TextButton(UserText.learnMore) {
+                            tabsModel.openNewTab(with: .maliciousSiteProtectionLearnMore)
+                        }
+                        .padding(.leading, 19)
+                        .padding(.top, 0)
+
                         Text(UserText.maliciousDetectionEnabledWarning)
+                            .opacity(maliciousSiteDetectionModel.isEnabled ? 0 : 1)
                             .font(.footnote)
                             .foregroundColor(.red)
+                            .padding(.leading, 19)
                             .padding(.top, 5)
                     }
                 }

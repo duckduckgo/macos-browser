@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
+import FeatureFlags
 import MaliciousSiteProtection
 import PrivacyDashboard
 import WebKit
@@ -32,6 +33,7 @@ final class TabViewModel {
         static let burnerHome = NSImage.burnerTabFavicon
         static let settings = NSImage.settingsMulticolor16
         static let bookmarks = NSImage.bookmarksFolder
+        static let history = NSImage.bookmarksFolder // temporary
         static let emailProtection = NSImage.emailProtectionIcon
         static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
         static let subscription = NSImage.privacyPro
@@ -103,7 +105,7 @@ final class TabViewModel {
         case .subscription, .identityTheftRestoration, .releaseNotes:
             return true
 
-        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
+        case .newtab, .settings, .bookmarks, .history, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
             return false
         }
     }
@@ -171,10 +173,12 @@ final class TabViewModel {
                      .url(_, _, source: .bookmark),
                      .url(_, _, source: .ui),
                      .url(_, _, source: .appOpenUrl),
+                     .url(_, _, source: .switchToOpenTab),
                      .url(_, _, source: .reload),
                      .newtab,
                      .settings,
                      .bookmarks,
+                     .history,
                      .onboarding,
                      .onboardingDeprecated,
                      .none,
@@ -357,6 +361,8 @@ final class TabViewModel {
                 .settingsTrustedIndicator
         case .bookmarks:
                 .bookmarksTrustedIndicator
+        case .history:
+            NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) ? .historyTrustedIndicator : .init()
         case .dataBrokerProtection:
                 .dbpTrustedIndicator
         case .subscription:
@@ -396,16 +402,16 @@ final class TabViewModel {
         var title: String
         switch tab.content {
             // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
-        case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
+        case _ where isShowingErrorPage && (tab.error?.isWebContentProcessTerminated != true || tab.title == nil):
             switch tab.error as NSError? {
-            case let error as URLError? where error?.code == .serverCertificateUntrusted:
+            case is URLError where tab.error?.isServerCertificateUntrusted == true:
                 title = UserText.sslErrorPageTabTitle
             case .some(let error as MaliciousSiteError):
                 switch error.code {
                 case .phishing:
                     title = UserText.phishingErrorPageTabTitle
-                // case .malware:
-                //     title = UserText.malwareErrorPageTabTitle
+                case .malware:
+                    title = UserText.malwareErrorPageTabTitle
                 }
             default:
                 title = UserText.tabErrorTitle
@@ -417,6 +423,8 @@ final class TabViewModel {
             title = UserText.tabPreferencesTitle
         case .bookmarks:
             title = UserText.tabBookmarksTitle
+        case .history:
+            title = UserText.mainMenuHistory
         case .newtab:
             if tab.burnerMode.isBurner {
                 title = UserText.burnerTabHomeTitle
@@ -462,6 +470,8 @@ final class TabViewModel {
             Favicon.settings
         case .bookmarks:
             Favicon.bookmarks
+        case .history:
+            NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) ? Favicon.history : nil
         case .subscription:
             Favicon.subscription
         case .identityTheftRestoration:
@@ -489,7 +499,7 @@ final class TabViewModel {
             return .redAlertCircle16
         case .some(let error as MaliciousSiteError):
             switch error.code {
-            case .phishing/*, .malware*/:
+            case .phishing, .malware:
                 return .redAlertCircle16
             }
         default:
@@ -598,6 +608,8 @@ private extension NSAttributedString {
                                                                            title: UserText.settings)
     static let bookmarksTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
                                                                             title: UserText.bookmarks)
+    static let historyTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
+                                                                          title: UserText.mainMenuHistory)
     static let dbpTrustedIndicator = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
                                                                       title: UserText.tabDataBrokerProtectionTitle)
     static let subscriptionTrustedIndicator = trustedIndicatorAttributedString(with: .privacyPro,

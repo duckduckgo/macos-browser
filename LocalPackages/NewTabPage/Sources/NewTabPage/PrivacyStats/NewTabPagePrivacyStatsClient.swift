@@ -19,12 +19,11 @@
 import Combine
 import Common
 import os.log
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
-public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
+public final class NewTabPagePrivacyStatsClient: NewTabPageUserScriptClient {
 
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
     private let model: NewTabPagePrivacyStatsModel
     private var cancellables: Set<AnyCancellable> = []
 
@@ -34,10 +33,13 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         case onConfigUpdate = "stats_onConfigUpdate"
         case onDataUpdate = "stats_onDataUpdate"
         case setConfig = "stats_setConfig"
+        case showLess = "stats_showLess"
+        case showMore = "stats_showMore"
     }
 
     public init(model: NewTabPagePrivacyStatsModel) {
         self.model = model
+        super.init()
 
         model.$isViewExpanded.dropFirst()
             .sink { [weak self] isExpanded in
@@ -56,11 +58,13 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
             .store(in: &cancellables)
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
             MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
-            MessageName.setConfig.rawValue: { [weak self] in try await self?.setConfig(params: $0, original: $1) }
+            MessageName.setConfig.rawValue: { [weak self] in try await self?.setConfig(params: $0, original: $1) },
+            MessageName.showLess.rawValue: { [weak self] in try await self?.showLess(params: $0, original: $1) },
+            MessageName.showMore.rawValue: { [weak self] in try await self?.showMore(params: $0, original: $1) }
         ])
     }
 
@@ -94,25 +98,16 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         return await model.calculatePrivacyStats()
     }
-}
 
-extension NewTabPagePrivacyStatsClient {
-
-    struct PrivacyStatsData: Encodable, Equatable {
-        let totalCount: Int64
-        let trackerCompanies: [TrackerCompany]
-
-        static func == (lhs: PrivacyStatsData, rhs: PrivacyStatsData) -> Bool {
-            lhs.totalCount == rhs.totalCount && Set(lhs.trackerCompanies) == Set(rhs.trackerCompanies)
-        }
+    @MainActor
+    private func showLess(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        model.showLess()
+        return nil
     }
 
-    struct TrackerCompany: Encodable, Equatable, Hashable {
-        let count: Int64
-        let displayName: String
-
-        static func otherCompanies(count: Int64) -> TrackerCompany {
-            TrackerCompany(count: count, displayName: "__other__")
-        }
+    @MainActor
+    private func showMore(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        model.showMore()
+        return nil
     }
 }

@@ -403,6 +403,9 @@ extension WKWebView {
 
     // prevent exception if private API keys go missing
     open override func value(forUndefinedKey key: String) -> Any? {
+        if key == #keyPath(serverTrust) {
+            return self.serverTrust
+        }
         assertionFailure("valueForUndefinedKey: \(key)")
         return nil
     }

@@ -21,6 +21,7 @@ import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
+import NetworkProtectionProxy
 import NetworkProtectionUI
 import BrowserServicesKit
 
@@ -77,8 +78,9 @@ final class VPNPreferencesModel: ObservableObject {
     ///
     /// Only necessary because this is feature flagged to internal users.
     ///
-    @Published
-    var showExcludedSites: Bool
+    var showExcludedSites: Bool {
+        proxySettings.proxyAvailable
+    }
 
     @Published var notifyStatusChanges: Bool {
         didSet {
@@ -100,16 +102,19 @@ final class VPNPreferencesModel: ObservableObject {
 
     private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
+    private let proxySettings: TransparentProxySettings
     private let pinningManager: PinningManager
     private var cancellables = Set<AnyCancellable>()
 
     init(vpnXPCClient: VPNControllerXPCClient = .shared,
          settings: VPNSettings = .init(defaults: .netP),
+         proxySettings: TransparentProxySettings = .init(defaults: .netP),
          pinningManager: PinningManager = LocalPinningManager.shared,
          defaults: UserDefaults = .netP) {
 
         self.vpnXPCClient = vpnXPCClient
         self.settings = settings
+        self.proxySettings = proxySettings
         self.pinningManager = pinningManager
 
         connectOnLogin = settings.connectOnLogin
@@ -118,7 +123,6 @@ final class VPNPreferencesModel: ObservableObject {
         showInMenuBar = settings.showInMenuBar
         showInBrowserToolbar = pinningManager.isPinned(.networkProtection)
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
-        showExcludedSites = true
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 

@@ -27,6 +27,7 @@ extension Tab {
         case url(URL, credential: URLCredential? = nil, source: URLSource)
         case settings(pane: PreferencePaneIdentifier?)
         case bookmarks
+        case history
         case onboardingDeprecated
         case onboarding
         case none
@@ -52,6 +53,7 @@ extension TabContent {
         case link
         case appOpenUrl
         case reload
+        case switchToOpenTab
 
         case webViewUpdated
 
@@ -71,7 +73,7 @@ extension TabContent {
             switch self {
             case .userEntered(_, downloadRequested: true):
                 .custom(.userRequestedPageDownload)
-            case .userEntered:
+            case .userEntered, .switchToOpenTab /* fallback */:
                 .custom(.userEnteredUrl)
             case .pendingStateRestoration:
                 .sessionRestoration
@@ -100,7 +102,7 @@ extension TabContent {
                 .returnCacheDataElseLoad
             case .reload, .loadedByStateRestoration:
                 .reloadIgnoringCacheData
-            case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
+            case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated, .switchToOpenTab:
                 .useProtocolCachePolicy
             }
         }
@@ -121,6 +123,8 @@ extension TabContent {
             return .anySettingsPane
         case URL.bookmarks, URL.Invalid.aboutBookmarks:
             return .bookmarks
+        case URL.history:
+            return .history
         case URL.dataBrokerProtection:
             return .dataBrokerProtection
         case URL.releaseNotes:
@@ -209,6 +213,7 @@ extension TabContent {
         case .url, .newtab, .onboarding, .none: return nil
         case .settings: return UserText.tabPreferencesTitle
         case .bookmarks: return UserText.tabBookmarksTitle
+        case .history: return UserText.mainMenuHistory
         case .onboardingDeprecated: return UserText.tabOnboardingTitle
         case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
         case .releaseNotes: return UserText.releaseNotesTitle
@@ -242,6 +247,8 @@ extension TabContent {
             return .settings
         case .bookmarks:
             return .bookmarks
+        case .history:
+            return .history
         case .onboardingDeprecated:
             return .welcome
         case .onboarding:
@@ -261,7 +268,7 @@ extension TabContent {
         switch self {
         case .url(_, _, source: let source):
             return source
-        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .releaseNotes, .dataBrokerProtection,
+        case .newtab, .settings, .bookmarks, .history, .onboardingDeprecated, .onboarding, .releaseNotes, .dataBrokerProtection,
                 .subscription, .identityTheftRestoration, .none:
             return .ui
         }
@@ -323,7 +330,7 @@ extension TabContent {
         switch self {
         case .newtab, .onboardingDeprecated, .onboarding, .none:
             return false
-        case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
+        case .url, .settings, .bookmarks, .history, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
             return true
         }
     }

@@ -121,8 +121,7 @@ protocol NewWindowPolicyDecisionMaker {
                      maliciousSiteDetector: MaliciousSiteDetecting = MaliciousSiteProtectionManager.shared,
                      tabsPreferences: TabsPreferences = TabsPreferences.shared,
                      onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter(),
-                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern,
-                                                                                    store: PageRefreshStore())
+                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern)
     ) {
 
         let duckPlayer = duckPlayer
@@ -263,6 +262,10 @@ protocol NewWindowPolicyDecisionMaker {
                           isTabBurner: burnerMode.isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           setContent: { tabGetter()?.setContent($0) },
+                          closeTab: {
+                guard let tab = tabGetter() else { return }
+                tab.delegate?.closeTab(tab)
+            },
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
@@ -791,13 +794,7 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 #endif
-
-        if PixelExperiment.cohort == .newOnboarding {
-            Application.appDelegate.onboardingStateMachine.state = .notStarted
-            setContent(.onboarding)
-        } else {
-            setContent(.onboardingDeprecated)
-        }
+        setContent(PixelExperiment.cohort == .newOnboarding ? .onboarding : .onboardingDeprecated)
     }
 
     @MainActor(unsafe)
@@ -1280,10 +1277,16 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
         ])
 
-        if case.url(let url, _, _) = content {
-            self.error = error
+        let isInternalUser = internalUserDecider?.isInternalUser == true
 
-            loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+        if isInternalUser {
+            self.webView.reload()
+        } else {
+            if case.url(let url, _, _) = content {
+                self.error = error
+
+                loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+            }
         }
 
         Task {
@@ -1307,7 +1310,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             webView.setDocumentHtml(html)
         }
     }
-
 }
 
 extension Tab: NewWindowPolicyDecisionMaker {

@@ -18,25 +18,25 @@
 
 import Common
 import Combine
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
-public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
+public final class NewTabPageNextStepsCardsClient: NewTabPageUserScriptClient {
 
     let model: NewTabPageNextStepsCardsProviding
-    let willDisplayCardsPublisher: AnyPublisher<[CardID], Never>
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
+    let willDisplayCardsPublisher: AnyPublisher<[NewTabPageDataModel.CardID], Never>
 
-    private let willDisplayCardsSubject = PassthroughSubject<[CardID], Never>()
-    private let getDataSubject = PassthroughSubject<[CardID], Never>()
+    private let willDisplayCardsSubject = PassthroughSubject<[NewTabPageDataModel.CardID], Never>()
+    private let getDataSubject = PassthroughSubject<[NewTabPageDataModel.CardID], Never>()
     private let getConfigSubject = PassthroughSubject<Bool, Never>()
-    private let notifyDataUpdatedSubject = PassthroughSubject<[CardID], Never>()
+    private let notifyDataUpdatedSubject = PassthroughSubject<[NewTabPageDataModel.CardID], Never>()
     private let notifyConfigUpdatedSubject = PassthroughSubject<Bool, Never>()
     private var cancellables: Set<AnyCancellable> = []
 
     public init(model: NewTabPageNextStepsCardsProviding) {
         self.model = model
         willDisplayCardsPublisher = willDisplayCardsSubject.eraseToAnyPublisher()
+        super.init()
         connectWillDisplayCardsPublisher()
 
         model.cardsPublisher
@@ -57,7 +57,9 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
         willDisplayCardsPublisher
             .sink { cards in
-                model.willDisplayCards(cards)
+                Task { @MainActor in
+                    model.willDisplayCards(cards)
+                }
             }
             .store(in: &cancellables)
     }
@@ -81,7 +83,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
         // only notify about cards revealed by expanding the view (i.e. other than the first 2)
         let cardsOnConfigUpdated = notifyConfigUpdatedSubject
             .drop(untilOutputFrom: firstInitialCards)
-            .compactMap { [weak self] isViewExpanded -> [CardID]? in
+            .compactMap { [weak self] isViewExpanded -> [NewTabPageDataModel.CardID]? in
                 guard let self, isViewExpanded, model.cards.count > 2 else {
                     return nil
                 }
@@ -106,7 +108,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
         case setConfig = "nextSteps_setConfig"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.action.rawValue: { [weak self] in try await self?.action(params: $0, original: $1) },
             MessageName.dismiss.rawValue: { [weak self] in try await self?.dismiss(params: $0, original: $1) },
@@ -118,7 +120,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
     @MainActor
     private func action(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let card: Card = DecodableHelper.decode(from: params) else {
+        guard let card: NewTabPageDataModel.Card = DecodableHelper.decode(from: params) else {
             return nil
         }
         model.handleAction(for: card.id)
@@ -127,7 +129,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
     @MainActor
     private func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let card: Card = DecodableHelper.decode(from: params) else {
+        guard let card: NewTabPageDataModel.Card = DecodableHelper.decode(from: params) else {
             return nil
         }
         model.dismiss(card.id)
@@ -153,16 +155,16 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     @MainActor
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let cardIDs = model.cards
-        let cards = cardIDs.map(Card.init(id:))
+        let cards = cardIDs.map(NewTabPageDataModel.Card.init(id:))
 
         getDataSubject.send(cardIDs)
-        return NextStepsData(content: cards.isEmpty ? nil : cards)
+        return NewTabPageDataModel.NextStepsData(content: cards.isEmpty ? nil : cards)
     }
 
     @MainActor
-    private func notifyDataUpdated(_ cardIDs: [CardID]) {
-        let cards = cardIDs.map(Card.init(id:))
-        let params = NextStepsData(content: cards.isEmpty ? nil : cards)
+    private func notifyDataUpdated(_ cardIDs: [NewTabPageDataModel.CardID]) {
+        let cards = cardIDs.map(NewTabPageDataModel.Card.init(id:))
+        let params = NewTabPageDataModel.NextStepsData(content: cards.isEmpty ? nil : cards)
 
         notifyDataUpdatedSubject.send(cardIDs)
         pushMessage(named: MessageName.onDataUpdate.rawValue, params: params)
@@ -175,24 +177,5 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
         notifyConfigUpdatedSubject.send(showAllCards)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
-    }
-}
-
-extension NewTabPageNextStepsCardsClient {
-
-    public enum CardID: String, Codable {
-        case bringStuff
-        case defaultApp
-        case emailProtection
-        case duckplayer
-        case addAppToDockMac
-    }
-
-    struct Card: Codable, Equatable {
-        let id: CardID
-    }
-
-    struct NextStepsData: Codable, Equatable {
-        public let content: [Card]?
     }
 }

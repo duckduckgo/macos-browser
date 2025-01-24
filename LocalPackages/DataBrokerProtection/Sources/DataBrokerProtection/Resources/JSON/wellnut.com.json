@@ -1,8 +1,7 @@
 {
   "name": "Wellnut",
   "url": "wellnut.com",
-  "version": "0.4.0",
-  "parent": "verecor.com",
+  "version": "0.5.0",
   "addedDatetime": 1703052000000,
   "optOutUrl": "https://wellnut.com/noi/control/privacy",
   "steps": [
@@ -63,8 +62,80 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://wellnut.com/noi/control/privacy",
+          "id": "af96e7b3-fc16-4eed-9307-32da204941a1"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "ce8f2fbd-04f7-48fd-8d67-2cf083b48df3"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "7b01c715-eb45-4b8c-94f0-cb5280a4f1d8"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "d3a79100-785b-4cf8-8bbe-5df701851925"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "d6b36f44-291b-4951-8444-ea4a08a3c1fc"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "a3a7cf9b-4653-4aac-9004-c2f738121ed7"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "cbafc394-018e-47ff-b95e-fbc521508e3f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "918f6692-c5c4-4072-95c8-795296e1a956"
+        }
+      ]
     }
   ],
   "schedulingConfig": {

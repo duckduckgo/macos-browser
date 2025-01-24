@@ -1,0 +1,74 @@
+{
+  "matches": [
+    {
+      "hash": "e4754e22ffaa3c7c65622d1f7db1ff30e923d8bfb130570d4352b81ee786623d",
+      "regex": "(?i)^https?\\:\\/\\/fghcfghjdgfjgjfjfgfgj\\.blogspot\\.de(?:\\:(?:80|443))?",
+      "hostname": "fghcfghjdgfjgjfjfgfgj.blogspot.de",
+      "url": "https://fghcfghjdgfjgjfjfgfgj.blogspot.de/",
+      "category": "phishing"
+    },
+    {
+      "hash": "e4759b9a50733809b40774234ebee6c17d9d2e00fe3fc4bc5d3d287cd549adda",
+      "regex": "(?i)^https?\\:\\/\\/huynhcanhit\\.blogspot\\.com\\.eg(?:\\:(?:80|443))?",
+      "hostname": "huynhcanhit.blogspot.com.eg",
+      "url": "https://huynhcanhit.blogspot.com.eg/search/label/linq%20c?m=1",
+      "category": "malware"
+    },
+    {
+      "category": "malware",
+      "hash": "e4753ddad954dafd4ff4ef67f82b3c1a2db6ef4a51bda43513260170e558bd13",
+      "regex": "https?:\\/\\/privacy-test-pages.site\\/security\\/badware\\/malware\\.html",
+      "hostname": "privacy-test-pages.site",
+      "url": "https://privacy-test-pages.site/security/badware/malware.html"
+    },
+    {
+      "category": "malware",
+      "hash": "e4753ddad954dafd4ff4ef67f82b3c1a2db6ef4a51bda43513260170e558bd13",
+      "regex": "https?:\\/\\/privacy-test-pages.site\\/security\\/badware\\/phishing-redirect\\/download",
+      "hostname": "privacy-test-pages.site",
+      "url": "https://privacy-test-pages.site/security/badware/phishing-redirect/download"
+    },
+    {
+      "category": "phishing",
+      "hash": "e4753ddad954dafd4ff4ef67f82b3c1a2db6ef4a51bda43513260170e558bd13",
+      "regex": "https?:\\/\\/privacy-test-pages.site\\/security\\/badware\\/phishing\\.html",
+      "hostname": "privacy-test-pages.site",
+      "url": "https://privacy-test-pages.site/security/badware/phishing.html"
+    },
+    {
+      "category": "phishing",
+      "hash": "e4753ddad954dafd4ff4ef67f82b3c1a2db6ef4a51bda43513260170e558bd13",
+      "regex": "https?:\\/\\/privacy-test-pages.site\\/security\\/badware\\/phishing-legit-iframe-loader\\.html",
+      "hostname": "privacy-test-pages.site",
+      "url": "https://privacy-test-pages.site/security/badware/phishing-legit-iframe-loader.html"
+    },
+    {
+      "category": "phishing",
+      "hash": "e4753ddad954dafd4ff4ef67f82b3c1a2db6ef4a51bda43513260170e558bd13",
+      "regex": "https?:\\/\\/privacy-test-pages.site\\/security\\/badware\\/phishing-redirect\\/302",
+      "hostname": "privacy-test-pages.site",
+      "url": "https://privacy-test-pages.site/security/badware/phishing-redirect/302"
+    },
+    {
+      "category": "phishing",
+      "hash": "e4753ddad954dafd4ff4ef67f82b3c1a2db6ef4a51bda43513260170e558bd13",
+      "regex": "https?:\\/\\/privacy-test-pages.site\\/security\\/badware\\/phishing-meta-redirect\\.html",
+      "hostname": "privacy-test-pages.site",
+      "url": "https://privacy-test-pages.site/security/badware/phishing-meta-redirect.html"
+    },
+    {
+      "category": "phishing",
+      "hash": "e4753ddad954dafd4ff4ef67f82b3c1a2db6ef4a51bda43513260170e558bd13",
+      "regex": "https?:\\/\\/privacy-test-pages.site\\/security\\/badware\\/phishing-redirect\\/form",
+      "hostname": "privacy-test-pages.site",
+      "url": "https://privacy-test-pages.site/security/badware/phishing-redirect/form"
+    },
+    {
+      "category": "phishing",
+      "hash": "e4753ddad954dafd4ff4ef67f82b3c1a2db6ef4a51bda43513260170e558bd13",
+      "regex": "https?:\\/\\/privacy-test-pages.site\\/security\\/badware\\/local-check\\.html",
+      "hostname": "privacy-test-pages.site",
+      "url": "https://privacy-test-pages.site/security/badware/local-check.html"
+    }
+  ]
+}

@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Common
 import Foundation
 import os.log
 import Persistence
@@ -51,6 +52,10 @@ final class UserDefaultsNewTabPagePrivacyStatsSettingsPersistor: NewTabPagePriva
     }
 }
 
+public enum NewTabPagePrivacyStatsEvent: Equatable {
+    case showLess, showMore
+}
+
 public final class NewTabPagePrivacyStatsModel {
 
     let privacyStats: PrivacyStatsCollecting
@@ -65,6 +70,7 @@ public final class NewTabPagePrivacyStatsModel {
     private let settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     private var topCompanies: Set<String> = []
     private let trackerDataProvider: PrivacyStatsTrackerDataProviding
+    private let eventMapping: EventMapping<NewTabPagePrivacyStatsEvent>?
 
     private let statsUpdateSubject = PassthroughSubject<Void, Never>()
     private var cancellables: Set<AnyCancellable> = []
@@ -72,12 +78,14 @@ public final class NewTabPagePrivacyStatsModel {
     public convenience init(
         privacyStats: PrivacyStatsCollecting,
         trackerDataProvider: PrivacyStatsTrackerDataProviding,
+        eventMapping: EventMapping<NewTabPagePrivacyStatsEvent>? = nil,
         keyValueStore: KeyValueStoring = UserDefaults.standard,
         getLegacyIsViewExpandedSetting: @autoclosure () -> Bool?
     ) {
         self.init(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: eventMapping,
             settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
         )
     }
@@ -85,10 +93,12 @@ public final class NewTabPagePrivacyStatsModel {
     init(
         privacyStats: PrivacyStatsCollecting,
         trackerDataProvider: PrivacyStatsTrackerDataProviding,
+        eventMapping: EventMapping<NewTabPagePrivacyStatsEvent>?,
         settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
     ) {
         self.privacyStats = privacyStats
         self.trackerDataProvider = trackerDataProvider
+        self.eventMapping = eventMapping
         self.settingsPersistor = settingsPersistor
 
         isViewExpanded = settingsPersistor.isViewExpanded
@@ -111,25 +121,33 @@ public final class NewTabPagePrivacyStatsModel {
         refreshTopCompanies()
     }
 
-    func calculatePrivacyStats() async -> NewTabPagePrivacyStatsClient.PrivacyStatsData {
+    func showLess() {
+        eventMapping?.fire(.showLess)
+    }
+
+    func showMore() {
+        eventMapping?.fire(.showMore)
+    }
+
+    func calculatePrivacyStats() async -> NewTabPageDataModel.PrivacyStatsData {
         let stats = await privacyStats.fetchPrivacyStats()
 
         var totalCount: Int64 = 0
         var otherCount: Int64 = 0
 
-        var companiesStats: [NewTabPagePrivacyStatsClient.TrackerCompany] = stats.compactMap { key, value in
+        var companiesStats: [NewTabPageDataModel.TrackerCompany] = stats.compactMap { key, value in
             totalCount += value
             guard topCompanies.contains(key) else {
                 otherCount += value
                 return nil
             }
-            return NewTabPagePrivacyStatsClient.TrackerCompany(count: value, displayName: key)
+            return NewTabPageDataModel.TrackerCompany(count: value, displayName: key)
         }
 
         if otherCount > 0 {
             companiesStats.append(.otherCompanies(count: otherCount))
         }
-        return NewTabPagePrivacyStatsClient.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
+        return NewTabPageDataModel.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
     }
 
     private func refreshTopCompanies() {

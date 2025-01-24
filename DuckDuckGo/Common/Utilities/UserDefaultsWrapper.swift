@@ -101,7 +101,7 @@ public struct UserDefaultsWrapper<T> {
 
         case homeButtonPosition = "preferences.appeareance.home-button-position"
 
-        case phishingDetectionEnabled = "preferences.security.phishing-detection-enabled"
+        case maliciousSiteDetectionEnabled = "preferences.security.phishing-detection-enabled"
 
         // ATB
         case installDate = "statistics.installdate.key"
@@ -154,6 +154,8 @@ public struct UserDefaultsWrapper<T> {
         case showBookmarksBar = "bookmarks.bar.show"
         case centerAlignedBookmarksBar = "bookmarks.bar.center.aligned"
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
+
+        case showTabsAndBookmarksBarOnFullScreen = "show.toolbars.on.fullscren"
 
         case pinnedViews = "pinning.pinned-views"
         case manuallyToggledPinnedViews = "pinning.manually-toggled-pinned-views"

@@ -20,6 +20,7 @@
 
 import Bookmarks
 import Foundation
+import BrowserServicesKit
 
 final class BookmarkStoreMock: BookmarkStore, CustomDebugStringConvertible {
 
@@ -50,7 +51,6 @@ final class BookmarkStoreMock: BookmarkStore, CustomDebugStringConvertible {
                     queue.append(contentsOf: folder.children)
                 }
             }
-            var indexInFavoritesArray = 0
             store?.save(entitiesAtIndices: entities.map { ($0, nil, nil) }, completion: { _ in })
         }
     }

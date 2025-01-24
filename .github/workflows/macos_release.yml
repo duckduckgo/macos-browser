@@ -1,0 +1,108 @@
+name: macOS - Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+      skip-appstore:
+        description: "Skip App Store release and only make a DMG build"
+        default: false
+        type: boolean
+      destination:
+        description: "Upload destination (TestFlight or App Store)"
+        required: false
+        default: testflight
+        type: string
+  workflow_call:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+      skip-appstore:
+        description: "Skip App Store release and only make a DMG build"
+        default: false
+        type: boolean
+      destination:
+        description: "Upload destination (TestFlight or App Store)"
+        required: false
+        default: testflight
+        type: string
+    secrets:
+      APPLE_API_KEY_BASE64:
+        required: true
+      APPLE_API_KEY_ID:
+        required: true
+      APPLE_API_KEY_ISSUER:
+        required: true
+      ASANA_ACCESS_TOKEN:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_ACCESS_KEY_ID_RELEASE_S3:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
+        required: true
+      MATCH_PASSWORD:
+        required: true
+      MM_HANDLES_BASE64:
+        required: true
+      MM_WEBHOOK_URL:
+        required: true
+      SSH_PRIVATE_KEY_FASTLANE_MATCH:
+        required: true
+
+jobs:
+
+  dmg-release:
+    name: Prepare DMG Release
+    uses: ./.github/workflows/macos_build_notarized.yml
+    with:
+      release-type: release
+      create-dmg: true
+      asana-task-url: ${{ inputs.asana-task-url }}
+      branch: ${{ inputs.branch }}
+    secrets:
+      APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+      APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
+      MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
+      SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+
+  appstore-release:
+    name: Prepare AppStore Release
+
+    if: inputs.skip-appstore != 'true'
+
+    uses: ./.github/workflows/macos_build_appstore.yml
+    with:
+      destination: ${{ inputs.destination }}
+      asana-task-url: ${{ inputs.asana-task-url }}
+      branch: ${{ inputs.branch }}
+    secrets:
+      SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+      APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+      APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
+      MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

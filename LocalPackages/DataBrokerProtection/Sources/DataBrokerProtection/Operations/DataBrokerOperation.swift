@@ -64,7 +64,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
     private var _isFinished = false
 
     deinit {
-        Logger.dataBrokerProtection.debug("Deinit operation: \(String(describing: self.id.uuidString), privacy: .public)")
+        Logger.dataBrokerProtection.log("Deinit operation: \(String(describing: self.id.uuidString), privacy: .public)")
     }
 
     init(dataBrokerID: Int64,
@@ -115,7 +115,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         }
     }
 
-    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerJobData] {
+    static func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerJobData] {
         let operationsData: [BrokerJobData]
 
         switch operationType {
@@ -131,8 +131,8 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
 
         if let priorityDate = priorityDate {
             filteredAndSortedOperationsData = operationsData
-                .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
-                .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
+                .eligibleForRun(byDate: priorityDate)
+                .sortedByPreferredRunDate()
         } else {
             filteredAndSortedOperationsData = operationsData
         }
@@ -152,15 +152,15 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
 
         let brokerProfileQueriesData = allBrokerProfileQueryData.filter { $0.dataBroker.id == dataBrokerID }
 
-        let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
-                                                                          operationType: operationType,
-                                                                          priorityDate: priorityDate)
+        let filteredAndSortedOperationsData = Self.filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
+                                                                               operationType: operationType,
+                                                                               priorityDate: priorityDate)
 
-        Logger.dataBrokerProtection.debug("filteredAndSortedOperationsData count: \(filteredAndSortedOperationsData.count, privacy: .public) for brokerID \(self.dataBrokerID, privacy: .public)")
+        Logger.dataBrokerProtection.log("filteredAndSortedOperationsData count: \(filteredAndSortedOperationsData.count, privacy: .public) for brokerID \(self.dataBrokerID, privacy: .public)")
 
         for operationData in filteredAndSortedOperationsData {
             if isCancelled {
-                Logger.dataBrokerProtection.debug("Cancelled operation, returning...")
+                Logger.dataBrokerProtection.log("Cancelled operation, returning...")
                 return
             }
 
@@ -172,7 +172,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                 continue
             }
             do {
-                Logger.dataBrokerProtection.debug("Running operation: \(String(describing: operationData), privacy: .public)")
+                Logger.dataBrokerProtection.log("Running operation: \(String(describing: operationData), privacy: .public)")
 
                 try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
                                                                                 brokerProfileQueryData: brokerProfileData,
@@ -189,7 +189,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                 })
 
                 let sleepInterval = operationDependencies.config.intervalBetweenSameBrokerOperations
-                Logger.dataBrokerProtection.debug("Waiting...: \(sleepInterval, privacy: .public)")
+                Logger.dataBrokerProtection.log("Waiting...: \(sleepInterval, privacy: .public)")
                 try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
             } catch {
                 Logger.dataBrokerProtection.error("Error: \(error.localizedDescription, privacy: .public)")
@@ -211,7 +211,44 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         didChangeValue(forKey: #keyPath(isExecuting))
         didChangeValue(forKey: #keyPath(isFinished))
 
-        Logger.dataBrokerProtection.debug("Finished operation: \(self.id.uuidString, privacy: .public)")
+        Logger.dataBrokerProtection.log("Finished operation: \(self.id.uuidString, privacy: .public)")
     }
 }
 // swiftlint:enable explicit_non_final_class
+
+extension Array where Element == BrokerJobData {
+    /// Filters jobs based on their preferred run date:
+    /// - Opt-out jobs with no preferred run date are included.
+    /// - Jobs with a preferred run date on or before the priority date are included.
+    ///
+    /// Note: Opt-out jobs without a preferred run date may be:
+    /// 1. From child brokers (will be skipped during runOptOutOperation).
+    /// 2. From former child brokers now acting as parent brokers (will be processed if extractedProfile hasn't been removed).
+    func eligibleForRun(byDate priorityDate: Date) -> [BrokerJobData] {
+        filter { jobData in
+            guard let preferredRunDate = jobData.preferredRunDate else {
+                return jobData is OptOutJobData
+            }
+
+            return preferredRunDate <= priorityDate
+        }
+    }
+
+    /// Sorts BrokerJobData array based on their preferred run dates.
+    /// - Jobs with non-nil preferred run dates are sorted in ascending order (earliest date first).
+    /// - Opt-out jobs with nil preferred run dates come last, maintaining their original relative order.
+    func sortedByPreferredRunDate() -> [BrokerJobData] {
+        sorted { lhs, rhs in
+            switch (lhs.preferredRunDate, rhs.preferredRunDate) {
+            case (nil, nil):
+                return false
+            case (_, nil):
+                return true
+            case (nil, _):
+                return false
+            case (let lhsRunDate?, let rhsRunDate?):
+                return lhsRunDate < rhsRunDate
+            }
+        }
+    }
+}

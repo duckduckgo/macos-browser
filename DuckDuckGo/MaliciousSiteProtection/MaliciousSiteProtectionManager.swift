@@ -23,6 +23,7 @@ import FeatureFlags
 import Foundation
 import MaliciousSiteProtection
 import Networking
+import os.log
 import PixelKit
 
 extension MaliciousSiteProtectionManager {
@@ -31,8 +32,8 @@ extension MaliciousSiteProtectionManager {
         switch (dataType, dataType.threatKind) {
         case (.hashPrefixSet, .phishing): "phishingHashPrefixes.json"
         case (.filterSet, .phishing): "phishingFilterSet.json"
-//            case (.hashPrefixes, .malware): "malwareHashPrefixes.json"
-//            case (.filters, .malware): "malwareFilterSet.json"
+        case (.hashPrefixSet, .malware): "malwareHashPrefixes.json"
+        case (.filterSet, .malware): "malwareFilterSet.json"
         }
     }
 
@@ -46,11 +47,11 @@ extension MaliciousSiteProtectionManager {
     struct EmbeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
 
         private enum Constants {
-            static let embeddedDataRevision = 1694418
-            static let phishingEmbeddedHashPrefixDataSHA = "d9eccd24d05ce16d4ab877574df728f69be6c7840aea00e1be11aeafffb0b1dc"
-            static let phishingEmbeddedFilterSetDataSHA = "5452a5a36651c3edb5f87716042175b5a3074acb5cc62a279dbca75479fc1eda"
-//            static let malwareEmbeddedHashPrefixDataSHA = "be5a2320307ed0dd8b8b2f2702dbade752dfb886aae24f212b0c3009524636aa"
-//            static let malwareEmbeddedFilterSetDataSHA = "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+            static let embeddedDataRevision = 1696473
+            static let phishingEmbeddedHashPrefixDataSHA = "cdb609c37e950b7d0dcdaa80ae4071cf2c87223cfdd189caafae723722bd3158"
+            static let phishingEmbeddedFilterSetDataSHA = "4e52518aba04b0fd360fada76c9899001d3137d4a745cc13c484a54115a0fcd8"
+            static let malwareEmbeddedHashPrefixDataSHA = "6b5eb296e9e10ae9ea41c5b5356f532226d647e4f3b832c30ac670102446ea7a"
+            static let malwareEmbeddedFilterSetDataSHA = "4dc971fffaf244ee99267f28222a2c116743e35ef837dcbc0199693ed6a691cd"
         }
 
         func revision(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> Int {
@@ -69,8 +70,8 @@ extension MaliciousSiteProtectionManager {
             switch (dataType, dataType.threatKind) {
             case (.hashPrefixSet, .phishing): Constants.phishingEmbeddedHashPrefixDataSHA
             case (.filterSet, .phishing): Constants.phishingEmbeddedFilterSetDataSHA
-//            case (.hashPrefixes, .malware): Constants.malwareEmbeddedHashPrefixDataSHA
-//            case (.filters, .malware): Constants.malwareEmbeddedFilterSetDataSHA
+            case (.hashPrefixSet, .malware): Constants.malwareEmbeddedHashPrefixDataSHA
+            case (.filterSet, .malware): Constants.malwareEmbeddedFilterSetDataSHA
             }
         }
 
@@ -78,14 +79,36 @@ extension MaliciousSiteProtectionManager {
     }
 }
 
+// API Environment for testing:
+/*
+private struct MaliciousSiteTestEnvironment: MaliciousSiteProtection.APIClientEnvironment {
+    func headers(for requestType: APIRequestType, platform: MaliciousSiteDetector.APIEnvironment.Platform, authToken: String?) -> APIRequestV2.HeadersV2 {
+        MaliciousSiteDetector.APIEnvironment.production.headers(for: requestType, platform: platform, authToken: authToken)
+    }
+    func url(for requestType: APIRequestType, platform: MaliciousSiteDetector.APIEnvironment.Platform) -> URL {
+        MaliciousSiteDetector.APIEnvironment.production.url(for: requestType, platform: platform)
+        // append to always make non-cached API request
+            .appendingParameter(name: "no_cache", value: String(Int.random(in: 0...10000000)))
+    }
+    func timeout(for requestType: APIRequestType) -> TimeInterval? {
+        switch requestType {
+        case .hashPrefixSet, .filterSet:
+            MaliciousSiteDetector.APIEnvironment.production.timeout(for: requestType)
+        case .matches:
+            // used to simulate Matches API timeout
+            0.0001
+        }
+    }
+}
+*/
+
 public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     static let shared = MaliciousSiteProtectionManager()
 
     private let detector: MaliciousSiteDetecting
     private let updateManager: MaliciousSiteProtection.UpdateManager
     private let detectionPreferences: MaliciousSiteProtectionPreferences
-    private let featureFlagger: FeatureFlagger
-    private let configManager: PrivacyConfigurationManaging
+    private let featureFlags: MaliciousSiteProtectionFeatureFlagger
 
     private var featureFlagsCancellable: AnyCancellable?
     private var detectionPreferencesEnabledCancellable: AnyCancellable?
@@ -93,18 +116,17 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     var backgroundUpdatesEnabled: Bool { updateTask != nil }
 
     init(
-        apiEnvironment: MaliciousSiteDetector.APIEnvironment = .production,
+        apiEnvironment: MaliciousSiteProtection.APIClientEnvironment? = nil,
         apiService: APIService = DefaultAPIService(urlSession: .shared),
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
         dataManager: MaliciousSiteProtection.DataManager? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
         detectionPreferences: MaliciousSiteProtectionPreferences = MaliciousSiteProtectionPreferences.shared,
-        featureFlagger: FeatureFlagger? = nil,
+        featureFlags: MaliciousSiteProtectionFeatureFlagger? = nil,
         configManager: PrivacyConfigurationManaging? = nil,
         updateIntervalProvider: UpdateManager.UpdateIntervalProvider? = nil
     ) {
-        self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
-        self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        self.featureFlags = featureFlags ?? NSApp.delegateTyped.featureFlagger.maliciousSiteProtectionFeatureFlags()
 
         let embeddedDataProvider = embeddedDataProvider ?? EmbeddedDataProvider()
         let dataManager = dataManager ?? {
@@ -113,6 +135,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
             return MaliciousSiteProtection.DataManager(fileStore: fileStore, embeddedDataProvider: embeddedDataProvider, fileNameProvider: Self.fileName(for:))
         }()
 
+        let apiEnvironment = apiEnvironment ?? MaliciousSiteDetector.APIEnvironment.production
         self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, eventMapping: Self.debugEvents)
         self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider ?? Self.updateInterval)
         self.detectionPreferences = detectionPreferences
@@ -120,28 +143,22 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         self.setupBindings()
     }
 
-    private static let debugEvents = EventMapping<MaliciousSiteProtection.Event> {event, _, _, _ in
-        PixelKit.fire(event)
+    private static let debugEvents = EventMapping<MaliciousSiteProtection.Event> { event, _, _, _ in
+        switch event {
+        case .errorPageShown,
+             .visitSite,
+             .iframeLoaded,
+             .settingToggled,
+             .matchesApiTimeout:
+            PixelKit.fire(event)
+        case .matchesApiFailure(let error):
+            Logger.maliciousSiteProtection.error("Error fetching matches from API: \(error)")
+        }
     }
 
     private func setupBindings() {
-        if featureFlagger.isFeatureOn(.maliciousSiteProtectionErrorPage) {
-            subscribeToDetectionPreferences()
-            return
-        }
-
-        guard let overridesHandler = featureFlagger.localOverrides?.actionHandler as? FeatureFlagOverridesPublishingHandler<FeatureFlag> else { return }
-        featureFlagsCancellable = overridesHandler.flagDidChangePublisher
-            .filter { $0.0 == .maliciousSiteProtectionErrorPage }
-            .sink { [weak self] change in
-                guard let self else { return }
-                if change.1 {
-                    subscribeToDetectionPreferences()
-                } else {
-                    detectionPreferencesEnabledCancellable = nil
-                    stopUpdateTasks()
-                }
-            }
+        guard featureFlags.isMaliciousSiteProtectionEnabled else { return }
+        subscribeToDetectionPreferences()
     }
 
     private func subscribeToDetectionPreferences() {
@@ -171,10 +188,18 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     // MARK: - Public
 
     public func evaluate(_ url: URL) async -> ThreatKind? {
-        guard configManager.privacyConfig.isFeature(.maliciousSiteProtection, enabledForDomain: url.host),
-              detectionPreferences.isEnabled else { return .none }
+        guard detectionPreferences.isEnabled,
+              featureFlags.shouldDetectMaliciousThreat(forDomain: url.host) else { return .none }
 
         return await detector.evaluate(url)
     }
 
+}
+
+extension FeatureFlagger {
+    func maliciousSiteProtectionFeatureFlags(configManager: PrivacyConfigurationManaging? = nil) -> MaliciousSiteProtectionFeatureFlags {
+        let configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        return .init(privacyConfigManager: configManager,
+                     isMaliciousSiteProtectionEnabled: { self.isFeatureOn(.maliciousSiteProtection) })
+    }
 }

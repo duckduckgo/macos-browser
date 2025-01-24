@@ -25,14 +25,15 @@ public protocol NewTabPageNextStepsCardsProviding: AnyObject {
     var isViewExpanded: Bool { get set }
     var isViewExpandedPublisher: AnyPublisher<Bool, Never> { get }
 
-    var cards: [NewTabPageNextStepsCardsClient.CardID] { get }
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> { get }
+    var cards: [NewTabPageDataModel.CardID] { get }
+    var cardsPublisher: AnyPublisher<[NewTabPageDataModel.CardID], Never> { get }
 
     @MainActor
-    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID)
+    func handleAction(for card: NewTabPageDataModel.CardID)
 
     @MainActor
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID)
+    func dismiss(_ card: NewTabPageDataModel.CardID)
 
-    func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID])
+    @MainActor
+    func willDisplayCards(_ cards: [NewTabPageDataModel.CardID])
 }

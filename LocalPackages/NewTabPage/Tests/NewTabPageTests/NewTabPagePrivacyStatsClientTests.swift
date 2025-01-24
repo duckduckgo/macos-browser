@@ -24,31 +24,36 @@ import XCTest
 @testable import NewTabPage
 
 final class NewTabPagePrivacyStatsClientTests: XCTestCase {
-    var client: NewTabPagePrivacyStatsClient!
-    var model: NewTabPagePrivacyStatsModel!
+    private var client: NewTabPagePrivacyStatsClient!
+    private var model: NewTabPagePrivacyStatsModel!
 
-    var privacyStats: CapturingPrivacyStats!
-    var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
-    var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
+    private var privacyStats: CapturingPrivacyStats!
+    private var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
+    private var eventMapping: CapturingNewTabPagePrivacyStatsEventHandler!
+    private var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
 
-    var userScript: NewTabPageUserScript!
+    private var userScript: NewTabPageUserScript!
+    private var messageHelper: MessageHelper<NewTabPagePrivacyStatsClient.MessageName>!
 
     override func setUp() async throws {
         try await super.setUp()
 
         privacyStats = CapturingPrivacyStats()
         trackerDataProvider = MockPrivacyStatsTrackerDataProvider()
+        eventMapping = CapturingNewTabPagePrivacyStatsEventHandler()
         settingsPersistor = UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(MockKeyValueStore(), getLegacySetting: nil)
 
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: eventMapping,
             settingsPersistor: settingsPersistor
         )
 
         client = NewTabPagePrivacyStatsClient(model: model)
 
         userScript = NewTabPageUserScript()
+        messageHelper = .init(userScript: userScript)
         client.registerMessageHandlers(for: userScript)
     }
 
@@ -56,14 +61,14 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
 
     func testWhenPrivacyStatsViewIsExpandedThenGetConfigReturnsExpandedState() async throws {
         model.isViewExpanded = true
-        let config: NewTabPageUserScript.WidgetConfig = try await handleMessage(named: .getConfig)
+        let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
         XCTAssertEqual(config.animation, .auto)
         XCTAssertEqual(config.expansion, .expanded)
     }
 
     func testWhenPrivacyStatsViewIsCollapsedThenGetConfigReturnsCollapsedState() async throws {
         model.isViewExpanded = false
-        let config: NewTabPageUserScript.WidgetConfig = try await handleMessage(named: .getConfig)
+        let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
         XCTAssertEqual(config.animation, .auto)
         XCTAssertEqual(config.expansion, .collapsed)
     }
@@ -73,14 +78,14 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
     func testWhenSetConfigContainsExpandedStateThenModelSettingIsSetToExpanded() async throws {
         model.isViewExpanded = false
         let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .expanded)
-        try await handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(model.isViewExpanded, true)
     }
 
     func testWhenSetConfigContainsCollapsedStateThenModelSettingIsSetToCollapsed() async throws {
         model.isViewExpanded = true
         let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .collapsed)
-        try await handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
+        try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(model.isViewExpanded, false)
     }
 
@@ -99,6 +104,7 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: eventMapping,
             settingsPersistor: settingsPersistor
         )
         privacyStats.privacyStats = ["A": 1, "B": 2, "C": 3, "D": 4, "E": 1500, "F": 100, "G": 900]
@@ -106,9 +112,10 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
         client = NewTabPagePrivacyStatsClient(model: model)
 
         userScript = NewTabPageUserScript()
+        messageHelper = .init(userScript: userScript)
         client.registerMessageHandlers(for: userScript)
 
-        let data: NewTabPagePrivacyStatsClient.PrivacyStatsData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.PrivacyStatsData = try await messageHelper.handleMessage(named: .getData)
         XCTAssertEqual(data, .init(totalCount: 2510, trackerCompanies: [
             .init(count: 1, displayName: "A"),
             .init(count: 2, displayName: "B"),
@@ -119,21 +126,21 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
     }
 
     func testWhenPrivacyStatsAreEmptyThenGetDataReturnsEmptyArray() async throws {
-        let data: NewTabPagePrivacyStatsClient.PrivacyStatsData = try await handleMessage(named: .getData)
+        let data: NewTabPageDataModel.PrivacyStatsData = try await messageHelper.handleMessage(named: .getData)
         XCTAssertEqual(data, .init(totalCount: 0, trackerCompanies: []))
     }
 
-    // MARK: - Helper functions
+    // MARK: - showLess
 
-    func handleMessage<Response: Encodable>(named methodName: NewTabPagePrivacyStatsClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
-        return try XCTUnwrap(response as? Response, file: file, line: line)
+    func testThatShowLessIsPassedToTheModelAndToTheEventMapping() async throws {
+        try await messageHelper.handleMessageExpectingNilResponse(named: .showLess)
+        XCTAssertEqual(eventMapping.events, [.showLess])
     }
 
-    func handleMessageExpectingNilResponse(named methodName: NewTabPagePrivacyStatsClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
-        XCTAssertNil(response, file: file, line: line)
+    // MARK: - showMore
+
+    func testThatShowMoreIsPassedToTheModelAndToTheEventMapping() async throws {
+        try await messageHelper.handleMessageExpectingNilResponse(named: .showMore)
+        XCTAssertEqual(eventMapping.events, [.showMore])
     }
 }

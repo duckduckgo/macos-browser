@@ -26,8 +26,14 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MaliciousSiteProtectionTests: XCTestCase {
-    lazy var phishingDetection: MaliciousSiteProtectionManager! = {
-        MaliciousSiteProtectionManager(apiService: apiService, dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlagger: MockFeatureFlagger())
+    lazy var phishingDetection: MaliciousSiteProtectionManager! = { () -> MaliciousSiteProtectionManager in
+        let configManager = MockPrivacyConfigurationManager()
+        let privacyConfig = MockPrivacyConfiguration()
+        privacyConfig.isSubfeatureKeyEnabled = { (subfeature: any PrivacySubfeature, _: AppVersionProvider) -> Bool in
+            if case MaliciousSiteProtectionSubfeature.onByDefault = subfeature { true } else { false }
+        }
+        configManager.privacyConfig = privacyConfig
+        return MaliciousSiteProtectionManager(apiService: apiService, dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlags: MaliciousSiteProtectionFeatureFlags(privacyConfigManager: configManager, isMaliciousSiteProtectionEnabled: { true }))
     }()
     var apiService: MockAPIService!
     var mockDetector: MockMaliciousSiteDetector!
@@ -53,9 +59,14 @@ final class MaliciousSiteProtectionTests: XCTestCase {
         XCTAssertTrue(phishingDetection.backgroundUpdatesEnabled)
     }
 
-    func testDisableFeature() async {
+    func testWhenFeatureDisabled_phishingIsNotDetected() async {
         MaliciousSiteProtectionPreferences.shared.isEnabled = false
-        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malicious.com")!)
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://phishing.com")!)
+        XCTAssertNil(isMalicious)
+    }
+    func testWhenFeatureDisabled_malwareIsNotDetected() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = false
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malware.com")!)
         XCTAssertNil(isMalicious)
     }
 
@@ -68,38 +79,21 @@ final class MaliciousSiteProtectionTests: XCTestCase {
         XCTAssertFalse(phishingDetection.backgroundUpdatesEnabled)
     }
 
-    func testIsMalicious() async {
+    func testWhenPhishingDetected_phishingThreatReturned() async {
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
-        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malicious.com")!)
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://phishing.com")!)
         XCTAssertEqual(isMalicious, .phishing)
+    }
+
+    func testWhenMalwareDetected_malwareThreatReturned() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = true
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malware.com")!)
+        XCTAssertEqual(isMalicious, .malware)
     }
 
     func testIsNotMalicious() async {
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
         let isMalicious = await phishingDetection.evaluate(URL(string: "https://trusted.com")!)
         XCTAssertNil(isMalicious)
-    }
-}
-
-extension MaliciousSiteProtectionTests {
-    class MockFeatureFlagger: FeatureFlagger {
-        var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: MockInternalUserStoring())
-        var localOverrides: FeatureFlagLocalOverriding?
-
-        func isFeatureOn<Flag: FeatureFlagDescribing>(for featureFlag: Flag, allowOverride: Bool) -> Bool {
-            return true
-        }
-
-        func getCohortIfEnabled(_ subfeature: any PrivacySubfeature) -> CohortID? {
-            return nil
-        }
-
-        func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
-            return nil
-        }
-
-        func getAllActiveExperiments() -> Experiments {
-            return [:]
-        }
     }
 }

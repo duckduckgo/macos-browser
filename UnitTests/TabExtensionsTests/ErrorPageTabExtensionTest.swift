@@ -44,6 +44,9 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     var detector: MockMaliciousSiteDetector!
     let errorURLString = "com.example.error"
     let phishingURLString = "https://privacy-test-pages.site/security/phishing.html"
+    private var onCloseTab: (() -> Void) = {
+        XCTFail("Unexpected call to closeTab")
+    }
 
     override func setUpWithError() throws {
         mockWebViewPublisher = PassthroughSubject<MockWKWebView, Never>()
@@ -51,7 +54,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let featureFlagger = MockFeatureFlagger()
         credentialCreator = MockCredentialCreator()
         detector = MockMaliciousSiteDetector { _ in .phishing }
-        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, maliciousSiteDetector: detector)
+        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, closeTab: self.closeTab, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, maliciousSiteDetector: detector)
     }
 
     override func tearDownWithError() throws {
@@ -59,6 +62,10 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = nil
         errorPageExtention = nil
         credentialCreator = nil
+    }
+
+    private func closeTab() {
+        onCloseTab()
     }
 
     @MainActor func testWhenCertificateExpired_ThenTabExtenstionErrorIsExpectedError() {
@@ -190,26 +197,87 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         // GIVEN
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         mockWebViewPublisher.send(mockWebView)
+        let error = WKError.serverCertificateUntrustedError(sslErrorCode: -9843, url: errorURLString)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [], isCurrent: true, isCommitted: true)
+        errorPageExtention.navigation(navigation, didFailWith: error)
 
         // WHEN
+        mockWebView.canGoBack = true
         errorPageExtention.leaveSiteAction()
 
         // THEN
+        XCTAssertFalse(mockWebView.openNewTabCalled)
         XCTAssertTrue(mockWebView.goBackCalled)
     }
 
     @MainActor
-    func testWhenLeaveSiteCalled_AndCanGoBackFalse_ThenWebViewCloses() {
+    func testWhenLeaveSiteCalled_AndCanGoBackFalse_ThenTabIsClosedAndNewTabOpened() async {
         // GIVEN
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
-        mockWebView.canGoBack = false
         mockWebViewPublisher.send(mockWebView)
+        let error = WKError.serverCertificateUntrustedError(sslErrorCode: -9843, url: errorURLString)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [], isCurrent: true, isCommitted: true)
+        errorPageExtention.navigation(navigation, didFailWith: error)
+
+        let eTabClosed = expectation(description: "Tab closed")
+        onCloseTab = { eTabClosed.fulfill() }
+
+        // WHEN
+        mockWebView.canGoBack = false
+        errorPageExtention.leaveSiteAction()
+
+        // THEN
+        await fulfillment(of: [eTabClosed], timeout: 1)
+        XCTAssertTrue(mockWebView.openNewTabCalled)
+    }
+
+    @MainActor
+    func testWhenLeaveSiteCalledForPhishingWebsite_ThenTabIsClosedAndNewTabOpened() async {
+        // GIVEN
+        let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
+        let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
+        let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
+        let mainFrameTarget = FrameInfo(webView: nil, handle: FrameHandle(rawValue: 1 as UInt64)!, isMainFrame: true, url: URL(string: phishingURLString)!, securityOrigin: .empty)
+        let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
+        var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
+        mockWebViewPublisher.send(mockWebView)
+        _=await errorPageExtention.decidePolicy(for: navigationAction, preferences: &preferences)
+        errorPageExtention.navigation(mainFrameNavigation, didFailWith: WKError(_nsError: MaliciousSiteError(code: .phishing, failingUrl: URL(string: phishingURLString)!) as NSError))
+
+        let eTabClosed = expectation(description: "Tab closed")
+        onCloseTab = { eTabClosed.fulfill() }
 
         // WHEN
         errorPageExtention.leaveSiteAction()
 
         // THEN
-        XCTAssertTrue(mockWebView.closedCalled)
+        await fulfillment(of: [eTabClosed], timeout: 1)
+        XCTAssertTrue(mockWebView.openNewTabCalled)
+    }
+
+    @MainActor
+    func testWhenLeaveSiteCalledForMalwareWebsite_ThenTabIsClosedAndNewTabOpened() async {
+        // GIVEN
+        detector.isMalicious = { _ in .malware }
+        let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
+        let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
+        let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
+        let mainFrameTarget = FrameInfo(webView: nil, handle: FrameHandle(rawValue: 1 as UInt64)!, isMainFrame: true, url: URL(string: phishingURLString)!, securityOrigin: .empty)
+        let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
+        var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
+        mockWebViewPublisher.send(mockWebView)
+        _=await errorPageExtention.decidePolicy(for: navigationAction, preferences: &preferences)
+        errorPageExtention.navigation(mainFrameNavigation, didFailWith: WKError(_nsError: MaliciousSiteError(code: .malware, failingUrl: URL(string: phishingURLString)!) as NSError))
+
+        let eTabClosed = expectation(description: "Tab closed")
+        onCloseTab = { eTabClosed.fulfill() }
+
+        // WHEN
+        errorPageExtention.leaveSiteAction()
+
+        // THEN
+        await fulfillment(of: [eTabClosed], timeout: 1)
+        XCTAssertTrue(mockWebView.openNewTabCalled)
     }
 
     @MainActor
@@ -223,10 +291,11 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
         // THEN
         XCTAssertTrue(mockWebView.reloadCalled)
+        XCTAssertFalse(mockWebView.openNewTabCalled)
     }
 
     @MainActor
-    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsCredentials() async {
+    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWebViewURL_ThenReturnsCredentials() async {
         // GIVEN
         let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
@@ -255,7 +324,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWebViewURL_ThenReturnsNoCredentials() async {
         // GIVEN
         let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodClientCertificate)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
@@ -272,14 +341,14 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsTheSameAsWebViewURL_ThenReturnsNoCredentials() async {
         // GIVEN
         let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         mockWebViewPublisher.send(mockWebView)
-        errorPageExtention.leaveSiteAction()
+        // errorPageExtention.leaveSiteAction()
 
         // WHEN
         let disposition = await errorPageExtention.didReceive(URLAuthenticationChallenge(protectionSpace: protectionSpace, proposedCredential: nil, previousFailureCount: 0, failureResponse: nil, error: nil, sender: ChallangeSender()), for: navigation)
@@ -289,7 +358,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor
-    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsNotTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsNotTheSameAsWebViewURL_ThenReturnsNoCredentials() async {
         // GIVEN
         let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.different.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
@@ -376,6 +445,7 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
     var capturedHTML: String = ""
     var goBackCalled = false
     var reloadCalled = false
+    var openNewTabCalled = false
     var closedCalled = false
     var loadCalled = false
 
@@ -396,9 +466,12 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
         return nil
     }
 
-    func reloadPage() -> WKNavigation? {
+    func reloadPageFromErrorPage() {
         reloadCalled = true
-        return nil
+    }
+
+    @MainActor func openNewTabFromErrorPage() async {
+        openNewTabCalled = true
     }
 
     func close() {
@@ -467,6 +540,7 @@ class ChallangeSender: URLAuthenticationChallengeSender {
 class MockFeatureFlagger: FeatureFlagger {
     var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: MockInternalUserStoring())
     var localOverrides: FeatureFlagLocalOverriding?
+    var cohort: (any FlagCohort)?
 
     var isFeatureOn = true
     func isFeatureOn<Flag: FeatureFlagDescribing>(for featureFlag: Flag, allowOverride: Bool) -> Bool {
@@ -478,7 +552,7 @@ class MockFeatureFlagger: FeatureFlagger {
     }
 
     func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
-        return nil
+        return cohort
     }
 
     func getAllActiveExperiments() -> Experiments {

@@ -27,6 +27,7 @@ import Crashes
 import DDGSync
 import FeatureFlags
 import History
+import HistoryView
 import MetricKit
 import Networking
 import NewTabPage
@@ -71,7 +72,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let fileStore: FileStore
 
 #if APPSTORE
-    private let crashCollection = CrashCollection(platform: .macOSAppStore)
+    private let crashCollection = CrashCollection(crashReportSender: CrashReportSender(platform: .macOSAppStore,
+                                                                                       pixelEvents: CrashReportSender.pixelEvents))
 #else
     private let crashReporter = CrashReporter()
 #endif
@@ -95,7 +97,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private(set) lazy var newTabPageActionsManager: NewTabPageActionsManaging = NewTabPageActionsManager(
+    private(set) lazy var historyViewActionsManager: HistoryViewActionsManager = HistoryViewActionsManager()
+    private(set) lazy var newTabPageActionsManager: NewTabPageActionsManager = NewTabPageActionsManager(
         appearancePreferences: .shared,
         activeRemoteMessageModel: activeRemoteMessageModel,
         privacyStats: privacyStats
@@ -197,8 +200,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
-        configurationManager = ConfigurationManager(store: configurationStore)
-
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
 
@@ -278,6 +279,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             )
         }
 
+        configurationManager = ConfigurationManager(store: configurationStore)
+
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
@@ -327,7 +330,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
         if NSApplication.runType.requiresEnvironment {
-            privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
+            privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase(), errorEvents: PrivacyStatsErrorHandler())
         } else {
             privacyStats = MockPrivacyStats()
         }
@@ -449,6 +452,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
             pixelParameters.forEach { parameters in
                 PixelKit.fire(GeneralPixel.crash, withAdditionalParameters: parameters, includeAppVersionParameter: false)
+                PixelKit.fire(GeneralPixel.crashDaily, frequency: .legacyDaily)
             }
 
             guard let lastPayload = payloads.last else {

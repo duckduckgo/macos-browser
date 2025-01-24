@@ -85,7 +85,13 @@ class MockMaliciousSiteFileStore: MaliciousSiteProtection.FileStoring {
 final class MockMaliciousSiteDetector: MaliciousSiteProtection.MaliciousSiteDetecting {
 
     var isMalicious: (URL) -> MaliciousSiteProtection.ThreatKind? = { url in
-        url.absoluteString.contains("malicious") ? .phishing : nil
+        if url.absoluteString.contains("phishing") {
+            .phishing
+        } else if url.absoluteString.contains("malware") {
+            .malware
+        } else {
+            nil
+        }
     }
 
     init(isMalicious: ((URL) -> MaliciousSiteProtection.ThreatKind?)? = nil) {

@@ -1,0 +1,171 @@
+name: macOS - Make App Store Connect Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      destination:
+        description: "Upload destination (TestFlight or App Store)"
+        required: true
+        default: testflight
+        type: choice
+        options:
+        - testflight
+        - testflight_review
+        - appstore
+      asana-task-url:
+        description: "Asana release task URL"
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      destination:
+        description: "Upload destination (TestFlight or App Store)"
+        required: true
+        default: testflight
+        type: string
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+    secrets:
+      SSH_PRIVATE_KEY_FASTLANE_MATCH:
+        required: true
+      APPLE_API_KEY_BASE64:
+        required: true
+      APPLE_API_KEY_ID:
+        required: true
+      APPLE_API_KEY_ISSUER:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      MATCH_PASSWORD:
+        required: true
+      ASANA_ACCESS_TOKEN:
+        required: true
+      MM_HANDLES_BASE64:
+        required: true
+      MM_WEBHOOK_URL:
+        required: true
+
+jobs:
+  make-release:
+
+    name: Make App Store Connect Release
+
+    runs-on: macos-15-xlarge
+
+    env:
+      destination: ${{ github.event.inputs.destination || inputs.destination }}
+      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      branch: ${{ inputs.branch || github.ref_name }}
+
+    steps:
+
+    - name: Assert release branch
+      if: env.destination == 'appstore' || env.destination == 'testflight'
+      run: |
+        case "${branch}" in
+          release/*) ;;
+          hotfix/*) ;;
+          *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
+        esac
+
+    - name: Register SSH key for certificates repository access
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        ref: ${{ env.branch }}
+
+    - name: Set up fastlane
+      run: bundle install
+
+    - name: Check if this is an official release build
+      id: is-official-release
+      env:
+        is-official-release: ${{ (env.destination == 'appstore' || env.destination == 'testflight') && (startsWith(env.branch, 'release') || startsWith(env.branch, 'hotfix')) }}
+      run: |
+        if [[ "${{ env.is-official-release }}" == "true" ]]; then
+          upload_to=s3
+          echo "upload-to=${upload_to}" >> $GITHUB_OUTPUT
+          echo "upload-to=${upload_to}" >> $GITHUB_ENV
+        fi
+
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+
+    - name: Archive and Upload the App
+      env:
+        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      run: |
+        if [ "${{ env.destination }}" == "testflight_review" ]; then
+          app_bundle_name="DuckDuckGo App Store Review"
+          app_dsym_name="DuckDuckGo-AppStore-Review"
+        else
+          app_bundle_name="DuckDuckGo App Store"
+          app_dsym_name="DuckDuckGo-AppStore"
+        fi
+
+        bundle exec fastlane release_${{ env.destination }}
+        dsym_path="${{ github.workspace }}/${app_dsym_name}.app.dSYM.zip"
+        mv -f "${{ github.workspace }}/${app_bundle_name}.app.dSYM.zip" "${dsym_path}"
+        version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
+        build_number="$(cut -d ' ' -f 3 < Configuration/BuildNumber.xcconfig)"
+        echo "dsym-path=${dsym_path}" >> $GITHUB_ENV
+        echo "app-version=${version}.${build_number}" >> $GITHUB_ENV
+
+    - name: Upload dSYMs artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: DuckDuckGo-${{ env.destination }}-dSYM-${{ env.app-version }}
+        path: ${{ env.dsym-path }}
+
+    - name: Upload dSYMs to S3
+      id: upload-dsyms-to-s3
+      if: ${{ env.upload-to == 's3' }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+        DSYM_S3_PATH: s3://${{ vars.DSYM_BUCKET_NAME }}/${{ vars.MACOS_DSYM_BUCKET_PREFIX }}/DuckDuckGo-AppStore-${{ env.app-version }}-dSYM.zip
+      run: |
+        echo "dsym-s3-path=${DSYM_S3_PATH}" >> $GITHUB_OUTPUT
+        aws s3 cp ${{ env.dsym-path }} ${{ env.DSYM_S3_PATH }}
+
+    - name: Report success
+      env:
+        DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
+        TAG: ${{ env.app-version }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_log_message \
+          task_url:"${{ env.asana-task-url }}" \
+          template_name:"debug-symbols-uploaded" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
+
+    - name: Send Mattermost message
+      if: success() || failure() # Don't execute when cancelled
+      env:
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        DESTINATION: ${{ env.destination }}
+        PLATFORM: macOS
+      run: |
+        bundle exec fastlane run mattermost_send_message \
+          mattermost_webhook_url:${{ secrets.MM_WEBHOOK_URL }} \
+          github_handle:${{ github.actor }} \
+          template_name:$([[ "${{ job.status }}" == "success" ]] && echo "public-release-complete" || echo "public-release-failed")

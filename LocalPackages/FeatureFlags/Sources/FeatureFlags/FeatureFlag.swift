@@ -22,7 +22,7 @@ import BrowserServicesKit
 public enum FeatureFlag: String, CaseIterable {
     case debugMenu
     case sslCertificatesBypass
-    case maliciousSiteProtectionErrorPage
+    case maliciousSiteProtection
 
     /// Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
@@ -38,6 +38,9 @@ public enum FeatureFlag: String, CaseIterable {
 
     case credentialsImportPromotionForExistingUsers
 
+    /// https://app.asana.com/0/0/1209150117333883/f
+    case networkProtectionAppExclusions
+
     /// https://app.asana.com/0/72649045549333/1208231259093710/f
     case networkProtectionUserTips
 
@@ -47,17 +50,27 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/0/72649045549333/1208241266421040/f
     case htmlNewTabPage
 
-    case isPrivacyProLaunchedROW
-    case isPrivacyProLaunchedROWOverride
+    /// https://app.asana.com/0/1201048563534612/1208850443048685/f
+    case historyView
+
+    case autofillPartialFormSaves
+    case autcompleteTabs
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .htmlNewTabPage,
-             .isPrivacyProLaunchedROWOverride:
+        case .historyView:
             return true
-        case .maliciousSiteProtectionErrorPage:
+        case .htmlNewTabPage:
+            return true
+        case .maliciousSiteProtection:
+            return false
+        case .autofillPartialFormSaves:
+            return true
+        case .autcompleteTabs:
+            return true
+        case .networkProtectionAppExclusions:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -67,8 +80,7 @@ extension FeatureFlag: FeatureFlagDescribing {
              .unknownUsernameCategorization,
              .credentialsImportPromotionForExistingUsers,
              .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes,
-             .isPrivacyProLaunchedROW:
+             .networkProtectionEnforceRoutes:
             return false
         }
     }
@@ -85,22 +97,26 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
         case .freemiumDBP:
             return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
-        case .maliciousSiteProtectionErrorPage:
-            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.allowErrorPage))
+        case .maliciousSiteProtection:
+            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.onByDefault))
         case .contextualOnboarding:
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
             return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
+        case .networkProtectionAppExclusions:
+            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.appExclusions))
         case .networkProtectionUserTips:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
         case .networkProtectionEnforceRoutes:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
+            return .remoteReleasable(.subfeature(HTMLNewTabPageSubfeature.isLaunched))
+        case .historyView:
             return .disabled
-        case .isPrivacyProLaunchedROW:
-            return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROW))
-        case .isPrivacyProLaunchedROWOverride:
-            return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROWOverride))
+        case .autofillPartialFormSaves:
+            return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
+        case .autcompleteTabs:
+            return .remoteReleasable(.feature(.autocompleteTabs))
         }
     }
 }

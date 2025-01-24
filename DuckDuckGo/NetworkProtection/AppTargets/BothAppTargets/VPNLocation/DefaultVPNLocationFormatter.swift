@@ -56,10 +56,10 @@ struct DefaultVPNLocationFormatter: VPNLocationFormatting {
 
         if let location {
             var attributedString = AttributedString(
-                preferredLocation.isNearest ? "\(location) \(UserText.netPVPNLocationNearest)" : location
+                preferredLocation.isNearest ? "\(location) \(UserText.locationFormatterNearestLocationDescriptor)" : location
             )
             attributedString.foregroundColor = locationTextColor
-            if let range = attributedString.range(of: UserText.netPVPNLocationNearest) {
+            if let range = attributedString.range(of: UserText.locationFormatterNearestLocationDescriptor) {
                 attributedString[range].foregroundColor = preferredLocationTextColor
             }
             return attributedString
@@ -84,13 +84,13 @@ final class VPNLocationModel: ObservableObject {
     init(selectedLocation: VPNSettings.SelectedLocation) {
         switch selectedLocation {
         case .nearest:
-            title = UserText.vpnLocationNearestAvailable
+            title = UserText.locationFormatterNearestLocation
             icon = .defaultIcon
             isNearest = true
         case .location(let location):
             let countryLabelsModel = NetworkProtectionVPNCountryLabelsModel(country: location.country, useFullCountryName: true)
             if let city = location.city {
-                title = UserText.netPVPNSettingsLocationSubtitleFormattedCityAndCountry(
+                title = UserText.locationFormatterLocationFormattedCityAndCountry(
                     city: city,
                     country: countryLabelsModel.title
                 )

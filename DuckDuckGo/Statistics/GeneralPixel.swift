@@ -25,7 +25,10 @@ import Configuration
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
+    case crashDaily
     case crashOnCrashHandlersSetUp
+    case crashReportingSubmissionFailed
+    case crashReportCRCIDMissing
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
     case launch(isDefault: Bool)
@@ -144,6 +147,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerYouTubeOverlayNavigationClosed
     case duckPlayerYouTubeNavigationIdle30
 
+    // Temporary Home Page Pixels
+    case privacyFeedHistoryLinkOpened
+
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
@@ -236,6 +242,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case serpAddedToDock
 
     case protectionToggledOffBreakageReport
+    case debugBreakageExperiment
 
     // Password Import Keychain Prompt
     case passwordImportKeychainPrompt
@@ -247,6 +254,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case autocompleteClickBookmark(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteClickFavorite(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteClickHistory(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickOpenTab(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteToggledOff
     case autocompleteToggledOn
 
@@ -318,6 +326,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case contentBlockingFetchLRCSucceeded
     case contentBlockingNoMatchInLRC
     case contentBlockingLRCMissing
+    case contentBlockingCompilationTaskPerformance(iterationCount: Int, timeBucketAggregation: CompileTimeBucketAggregation)
 
     case secureVaultInitError(error: Error)
     case secureVaultError(error: Error)
@@ -463,17 +472,22 @@ enum GeneralPixel: PixelKitEventV2 {
     case siteNotWorkingShown
     case siteNotWorkingWebsiteIsBroken
 
-    // Privacy Stats
-    case privacyStatsCouldNotLoadDatabase
-
     var name: String {
         switch self {
-
         case .crash:
             return "m_mac_crash"
 
+        case .crashDaily:
+            return "m_mac_crash_daily"
+
         case .crashOnCrashHandlersSetUp:
             return "m_mac_crash_on_handlers_setup"
+
+        case .crashReportCRCIDMissing:
+            return "m_mac_crashreporting_crcid-missing"
+
+        case .crashReportingSubmissionFailed:
+            return "m_mac_crashreporting_submission-failed"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
@@ -675,7 +689,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .duckPlayerContingencyLearnMoreClicked:
             return "duckplayer_mac_contingency_learn-more-clicked"
 
-        // Duck Player Temporary Overlay Pixels
+            // Duck Player Temporary Overlay Pixels
         case .duckPlayerYouTubeOverlayNavigationBack:
             return "duckplayer_youtube_overlay_navigation_back"
         case .duckPlayerYouTubeOverlayNavigationRefresh:
@@ -688,6 +702,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_youtube_overlay_navigation_closed"
         case .duckPlayerYouTubeNavigationIdle30:
             return "duckplayer_youtube_overlay_idle-30"
+
+        case .privacyFeedHistoryLinkOpened:
+            return "privacy_feed_history_link_opened"
 
         case .dashboardProtectionAllowlistAdd:
             return "mp_wla"
@@ -816,6 +833,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
+        case .debugBreakageExperiment: return "m_mac_debug_breakage_experiment_u"
 
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
@@ -827,6 +845,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autocompleteClickBookmark: return "m_mac_autocomplete_click_bookmark"
         case .autocompleteClickFavorite: return "m_mac_autocomplete_click_favorite"
         case .autocompleteClickHistory: return "m_mac_autocomplete_click_history"
+        case .autocompleteClickOpenTab: return "m_mac_autocomplete_click_opentab"
         case .autocompleteToggledOff: return "m_mac_autocomplete_toggled_off"
         case .autocompleteToggledOn: return "m_mac_autocomplete_toggled_on"
 
@@ -879,11 +898,11 @@ enum GeneralPixel: PixelKitEventV2 {
             return "cfgfetch"
 
         case .trackerDataParseFailed:
-            return "tds_p"
+            return "trackerata_parse_failed"
         case .trackerDataReloadFailed:
             return "tds_r"
         case .trackerDataCouldNotBeLoaded:
-            return "tds_l"
+            return "tracker_data_could_not_be_loaded"
 
         case .privacyConfigurationParseFailed:
             return "pcf_p"
@@ -945,6 +964,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "content_blocking_no_match_in_lrc"
         case .contentBlockingLRCMissing:
             return "content_blocking_lrc_missing"
+
+        case .contentBlockingCompilationTaskPerformance(let iterationCount, let timeBucketAggregation):
+            return "content_blocking_compilation_loops_\(iterationCount)_time_\(timeBucketAggregation)"
 
         case .secureVaultInitError:
             return "secure_vault_init_error"
@@ -1140,9 +1162,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
-
-            // Privacy Stats
-        case .privacyStatsCouldNotLoadDatabase: return "privacy_stats_could_not_load_database"
         }
     }
 
@@ -1327,7 +1346,8 @@ enum GeneralPixel: PixelKitEventV2 {
                 .autocompleteClickWebsite(let from, let cohort, let onboardingCohort),
                 .autocompleteClickBookmark(let from, let cohort, let onboardingCohort),
                 .autocompleteClickFavorite(let from, let cohort, let onboardingCohort),
-                .autocompleteClickHistory(let from, let cohort, let onboardingCohort):
+                .autocompleteClickHistory(let from, let cohort, let onboardingCohort),
+                .autocompleteClickOpenTab(let from, let cohort, let onboardingCohort):
             var parameters: [String: String] = [:]
             if let from {
                 parameters[NewTabSearchBoxExperimentPixel.Parameters.from] = from.rawValue
@@ -1441,5 +1461,53 @@ enum GeneralPixel: PixelKitEventV2 {
             }
         }
 
+    }
+
+    enum AutofillParameterKeys {
+        static var backfilled = "backfilled"
+    }
+
+    public enum CompileTimeBucketAggregation: String, CustomStringConvertible {
+
+        public var description: String { rawValue }
+
+        case lessThan1 = "1"
+        case lessThan2 = "2"
+        case lessThan3 = "3"
+        case lessThan4 = "4"
+        case lessThan5 = "5"
+        case lessThan6 = "6"
+        case lessThan7 = "7"
+        case lessThan8 = "8"
+        case lessThan9 = "9"
+        case lessThan10 = "10"
+        case more
+
+        public init(number: Double) {
+            switch number {
+            case ...1:
+                self = .lessThan1
+            case ...2:
+                self = .lessThan2
+            case ...3:
+                self = .lessThan3
+            case ...4:
+                self = .lessThan4
+            case ...5:
+                self = .lessThan5
+            case ...6:
+                self = .lessThan6
+            case ...7:
+                self = .lessThan7
+            case ...8:
+                self = .lessThan8
+            case ...9:
+                self = .lessThan9
+            case ...10:
+                self = .lessThan10
+            default:
+                self = .more
+            }
+        }
     }
 }

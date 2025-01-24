@@ -43,7 +43,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
     let featureFlagger: FeatureFlagger
-    var isROWLaunched: Bool = false
 
     private var subscriptionPlatform: Subscription.Platform?
 
@@ -165,7 +164,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         } else {
             self.subscriptionStorefrontRegion = currentStorefrontRegion()
         }
-        isROWLaunched = featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW) || featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
     }
 
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
@@ -316,6 +314,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
+    func openPrivacyPolicy() {
+        openURLHandler(URL(string: "https://duckduckgo.com/pro/privacy-terms")!)
+    }
+
+    @MainActor
     func refreshSubscriptionPendingState() {
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
@@ -452,24 +455,15 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
-
         let formattedDate = dateFormatter.string(from: date)
-
-        let billingPeriod: String
-
-        switch period {
-        case .monthly: billingPeriod = UserText.monthlySubscriptionBillingPeriod.lowercased()
-        case .yearly: billingPeriod = UserText.yearlySubscriptionBillingPeriod.lowercased()
-        case .unknown: billingPeriod = ""
-        }
 
         switch status {
         case .autoRenewable:
-            self.subscriptionDetails = UserText.preferencesSubscriptionActiveRenewCaption(period: billingPeriod, formattedDate: formattedDate)
+            self.subscriptionDetails = UserText.preferencesSubscriptionRenewingCaption(billingPeriod: period, formattedDate: formattedDate)
         case .expired, .inactive:
             self.subscriptionDetails = UserText.preferencesSubscriptionExpiredCaption(formattedDate: formattedDate)
         default:
-            self.subscriptionDetails = UserText.preferencesSubscriptionActiveExpireCaption(period: billingPeriod, formattedDate: formattedDate)
+            self.subscriptionDetails = UserText.preferencesSubscriptionExpiringCaption(billingPeriod: period, formattedDate: formattedDate)
         }
     }
 

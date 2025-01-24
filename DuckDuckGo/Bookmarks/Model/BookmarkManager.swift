@@ -21,6 +21,7 @@ import Cocoa
 import Combine
 import Common
 import os.log
+import BrowserServicesKit
 
 protocol BookmarkManager: AnyObject {
 
@@ -187,7 +188,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         for variant in url.bookmarkButtonUrlVariants() {
-            let variantString = variant.absoluteString
+            let variantString = variant.absoluteString.lowercased()
             if let bookmark = list.lowercasedItemsDict[variantString]?.first {
                 return bookmark
             }

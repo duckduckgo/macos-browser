@@ -1,8 +1,7 @@
 {
   "name": "New England Facts",
   "url": "newenglandfacts.com",
-  "version": "0.3.0",
-  "parent": "verecor.com",
+  "version": "0.4.0",
   "addedDatetime": 1703052000000,
   "optOutUrl": "https://newenglandfacts.com/ng/control/privacy",
   "steps": [
@@ -61,8 +60,70 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://newenglandfacts.com/ng/control/privacy",
+          "id": "08332622-1749-4bdc-97d0-2366fef87522"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#name"
+            },
+            {
+              "type": "email",
+              "selector": "#email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "e3fdaaf0-70a5-4b7b-afa8-18306276f13a"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "05bcd52d-21c7-4c00-bb18-b1de4b6803aa"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "37511ba6-e622-4614-8657-d4523f650a18"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "80f13572-98f8-4aeb-a77c-25dcc863681a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "fd232579-b39e-40c8-ab33-596b7e01bf33"
+        }
+      ]
     }
   ],
   "schedulingConfig": {

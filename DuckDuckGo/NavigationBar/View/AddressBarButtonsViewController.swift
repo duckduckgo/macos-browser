@@ -535,11 +535,7 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.position = .right
             privacyEntryPointButton.position = .left
         }
-        let isFlaggedAsMalicious = (tabViewModel?.tab.privacyInfo?.malicousSiteThreatKind != .none)
-        privacyEntryPointButton.isAnimationEnabled = !isFlaggedAsMalicious
-        privacyEntryPointButton.normalTintColor = isFlaggedAsMalicious ? .fireButtonRedPressed : .privacyEnabled
-        privacyEntryPointButton.mouseOverTintColor = isFlaggedAsMalicious ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
-        privacyEntryPointButton.mouseDownTintColor = isFlaggedAsMalicious ? .alertRedPressed : privacyEntryPointButton.mouseDownTintColor
+
         privacyEntryPointButton.sendAction(on: .leftMouseUp)
 
         imageButton.applyFaviconStyle()
@@ -751,10 +747,12 @@ final class AddressBarButtonsViewController: NSViewController {
             imageButton.image = .web
         case .browsing:
             imageButton.image = tabViewModel.favicon
-        case .editing(isUrl: true):
+        case .editing(.url):
             imageButton.image = .web
-        case .editing(isUrl: false):
+        case .editing(.text):
             imageButton.image = .search
+        case .editing(.openTabSuggestion):
+            imageButton.image = .openTabSuggestion
         default:
             imageButton.image = nil
         }
@@ -772,6 +770,12 @@ final class AddressBarButtonsViewController: NSViewController {
         let isLocalUrl = url?.isLocalURL ?? false
 
         // Privacy entry point button
+        let isFlaggedAsMalicious = (tabViewModel.tab.privacyInfo?.malicousSiteThreatKind != .none)
+        privacyEntryPointButton.isAnimationEnabled = !isFlaggedAsMalicious
+        privacyEntryPointButton.normalTintColor = isFlaggedAsMalicious ? .fireButtonRedPressed : .privacyEnabled
+        privacyEntryPointButton.mouseOverTintColor = isFlaggedAsMalicious ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
+        privacyEntryPointButton.mouseDownTintColor = isFlaggedAsMalicious ? .alertRedPressed : privacyEntryPointButton.mouseDownTintColor
+
         privacyEntryPointButton.isShown = !isEditingMode
         && !isTextFieldEditorFirstResponder
         && isHypertextUrl

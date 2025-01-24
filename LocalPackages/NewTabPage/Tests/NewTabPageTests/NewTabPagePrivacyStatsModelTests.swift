@@ -67,10 +67,10 @@ final class MockPrivacyStatsTrackerDataProvider: PrivacyStatsTrackerDataProvidin
 
 final class NewTabPagePrivacyStatsModelTests: XCTestCase {
 
-    var model: NewTabPagePrivacyStatsModel!
-    var privacyStats: CapturingPrivacyStats!
-    var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
-    var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
+    private var model: NewTabPagePrivacyStatsModel!
+    private var privacyStats: CapturingPrivacyStats!
+    private var trackerDataProvider: MockPrivacyStatsTrackerDataProvider!
+    private var settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor!
 
     override func setUp() async throws {
         try await super.setUp()
@@ -81,6 +81,7 @@ final class NewTabPagePrivacyStatsModelTests: XCTestCase {
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: nil,
             settingsPersistor: settingsPersistor
         )
     }
@@ -106,12 +107,13 @@ final class NewTabPagePrivacyStatsModelTests: XCTestCase {
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: nil,
             settingsPersistor: settingsPersistor
         )
 
         privacyStats.privacyStats = ["A": 1, "B": 2, "C": 3, "D": 4, "E": 1500, "F": 100, "G": 900]
 
-        let stats: NewTabPagePrivacyStatsClient.PrivacyStatsData = await model.calculatePrivacyStats()
+        let stats: NewTabPageDataModel.PrivacyStatsData = await model.calculatePrivacyStats()
 
         XCTAssertEqual(stats, .init(totalCount: 2510, trackerCompanies: [
             .init(count: 1, displayName: "A"),
@@ -135,12 +137,13 @@ final class NewTabPagePrivacyStatsModelTests: XCTestCase {
         model = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
             trackerDataProvider: trackerDataProvider,
+            eventMapping: nil,
             settingsPersistor: settingsPersistor
         )
 
         privacyStats.privacyStats = ["A": 1, "B": 2, "C": 3, "D": 4, "E": 1500, "F": 100, "G": 900]
 
-        let stats: NewTabPagePrivacyStatsClient.PrivacyStatsData = await model.calculatePrivacyStats()
+        let stats: NewTabPageDataModel.PrivacyStatsData = await model.calculatePrivacyStats()
 
         XCTAssertEqual(stats, .init(totalCount: 2510, trackerCompanies: [
             .init(count: 1, displayName: "A"),

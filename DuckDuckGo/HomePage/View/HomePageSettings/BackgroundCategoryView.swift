@@ -40,25 +40,28 @@ extension HomePage.Views {
 
         var body: some View {
             Button(action: action) {
-                VStack(alignment: .leading, spacing: Const.titleSpacing) {
-                    ZStack {
-                        if modeModel.contentType == .customImagePicker && !model.hasUserImages {
-                            BackgroundThumbnailView(displayMode: .addBackground)
-                        } else if modeModel.contentType == .defaultBackground {
-                            BackgroundThumbnailView(displayMode: .categoryView) {
-                                Color.newTabPageBackground
+                VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: Const.titleSpacing) {
+                        ZStack {
+                            if modeModel.contentType == .customImagePicker && !model.hasUserImages {
+                                BackgroundThumbnailView(displayMode: .addBackground)
+                            } else if modeModel.contentType == .defaultBackground {
+                                BackgroundThumbnailView(displayMode: .categoryView) {
+                                    Color.newTabPageBackground
+                                }
+                            } else {
+                                BackgroundThumbnailView(
+                                    displayMode: .categoryView,
+                                    customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.color01)
+                                )
                             }
-                        } else {
-                            BackgroundThumbnailView(
-                                displayMode: .categoryView,
-                                customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.color01)
-                            )
+                        }
+                        if showTitle {
+                            Text(modeModel.title)
+                                .font(.system(size: 11))
                         }
                     }
-                    if showTitle {
-                        Text(modeModel.title)
-                            .font(.system(size: 11))
-                    }
+                    Spacer(minLength: 0)
                 }
             }
             .buttonStyle(.plain)

@@ -24,7 +24,8 @@ import PixelKit
 final class CrashReporter {
 
     private let reader = CrashReportReader()
-    private lazy var sender = CrashReportSender(platform: .macOS)
+    private lazy var sender = CrashReportSender(platform: .macOS, pixelEvents: CrashReportSender.pixelEvents)
+    private lazy var crcidManager = CRCIDManager()
     private lazy var promptPresenter = CrashReportPromptPresenter()
 
     @UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: nil)
@@ -49,6 +50,7 @@ final class CrashReporter {
         }
 
         PixelKit.fire(GeneralPixel.crash)
+        PixelKit.fire(GeneralPixel.crashDaily, frequency: .legacyDaily)
 
         promptPresenter.showPrompt(for: latest) {
             guard let contentData = latest.contentData else {
@@ -56,7 +58,9 @@ final class CrashReporter {
                 return
             }
             Task {
-                await self.sender.send(contentData)
+                let crcid = self.crcidManager.crcid
+                let result = await self.sender.send(contentData, crcid: crcid)
+                self.crcidManager.handleCrashSenderResult(result: result.result, response: result.response)
             }
         }
 

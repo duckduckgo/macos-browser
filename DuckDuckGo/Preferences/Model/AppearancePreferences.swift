@@ -41,6 +41,7 @@ protocol AppearancePreferencesPersistor {
     var homeButtonPosition: HomeButtonPosition { get set }
     var homePageCustomBackground: String? { get set }
     var centerAlignedBookmarksBar: Bool { get set }
+    var showTabsAndBookmarksBarOnFullScreen: Bool { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -103,6 +104,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .centerAlignedBookmarksBar, defaultValue: true)
     var centerAlignedBookmarksBar: Bool
+
+    @UserDefaultsWrapper(key: .showTabsAndBookmarksBarOnFullScreen, defaultValue: true)
+    var showTabsAndBookmarksBarOnFullScreen: Bool
 }
 
 protocol HomePageNavigator {
@@ -117,6 +121,11 @@ final class DefaultHomePageNavigator: HomePageNavigator {
             if let window = WindowControllersManager.shared.lastKeyMainWindowController {
                 let homePageViewController = window.mainViewController.browserTabViewController.homePageViewController
                 homePageViewController?.settingsVisibilityModel.isSettingsVisible = true
+
+                if NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage) {
+                    let newTabPageViewModel = window.mainViewController.browserTabViewController.newTabPageWebViewModel
+                    NSApp.delegateTyped.homePageSettingsModel.customizerOpener.openSettings(for: newTabPageViewModel.webView)
+                }
             }
         }
     }
@@ -188,10 +197,12 @@ final class AppearancePreferences: ObservableObject {
         static let showBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
         static let bookmarksBarSettingAppearanceChanged = NSNotification.Name("BookmarksBarSettingAppearanceChanged")
         static let bookmarksBarAlignmentChanged = NSNotification.Name("BookmarksBarAlignmentChanged")
+        static let showTabsAndBookmarksBarOnFullScreenChanged = NSNotification.Name("ShowTabsAndBookmarksBarOnFullScreenChanged")
     }
 
     struct Constants {
         static let bookmarksBarAlignmentChangedIsCenterAlignedParameter = "isCenterAligned"
+        static let showTabsAndBookmarksBarOnFullScreenParameter = "showTabsAndBookmarksBarOnFullScreen"
         static let dismissNextStepsCardsAfterDays = 9
     }
 
@@ -326,6 +337,15 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var showTabsAndBookmarksBarOnFullScreen: Bool {
+        didSet {
+            persistor.showTabsAndBookmarksBarOnFullScreen = showTabsAndBookmarksBarOnFullScreen
+            NotificationCenter.default.post(name: Notifications.showTabsAndBookmarksBarOnFullScreenChanged,
+                                            object: nil,
+                                            userInfo: [Constants.showTabsAndBookmarksBarOnFullScreenParameter: showTabsAndBookmarksBarOnFullScreen])
+        }
+    }
+
     var isContinueSetUpAvailable: Bool {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
 
@@ -364,6 +384,7 @@ final class AppearancePreferences: ObservableObject {
         homeButtonPosition = persistor.homeButtonPosition
         homePageCustomBackground = persistor.homePageCustomBackground.flatMap(CustomBackground.init)
         centerAlignedBookmarksBarBool = persistor.centerAlignedBookmarksBar
+        showTabsAndBookmarksBarOnFullScreen = persistor.showTabsAndBookmarksBarOnFullScreen
     }
 
     private var persistor: AppearancePreferencesPersistor

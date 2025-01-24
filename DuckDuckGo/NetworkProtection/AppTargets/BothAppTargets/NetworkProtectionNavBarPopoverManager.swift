@@ -133,11 +133,11 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
+                            name: UserText.networkProtectionNavBarStatusViewVPNSettings, action: {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                            name: UserText.networkProtectionNavBarStatusViewFAQ, action: {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
@@ -149,7 +149,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 } else {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                            name: UserText.networkProtectionNavBarStatusViewFAQ, action: {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
@@ -191,6 +191,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                          activeSitePublisher: activeSitePublisher,
                                          forMenuApp: false,
                                          vpnSettings: vpnSettings,
+                                         proxySettings: proxySettings,
                                          logger: Logger(subsystem: "DuckDuckGo", category: "TipKit"))
 
             let popover = NetworkProtectionPopover(
