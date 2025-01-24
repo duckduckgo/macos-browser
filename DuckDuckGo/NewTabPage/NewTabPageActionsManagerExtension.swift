@@ -25,10 +25,12 @@ extension NewTabPageActionsManager {
 
     convenience init(
         appearancePreferences: AppearancePreferences,
+        settingsModel: HomePage.Models.SettingsModel,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         historyCoordinator: HistoryCoordinating,
-        privacyStats: PrivacyStatsCollecting
+        privacyStats: PrivacyStatsCollecting,
+        freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
     ) {
         let favoritesPublisher = bookmarkManager.listPublisher.map({ $0?.favoriteBookmarks ?? [] }).eraseToAnyPublisher()
         let favoritesModel = NewTabPageFavoritesModel(
@@ -37,8 +39,8 @@ extension NewTabPageActionsManager {
             getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowAllFavorites, defaultValue: false).wrappedValue
         )
 
-        let customizationProvider = NewTabPageCustomizationProvider(homePageSettingsModel: NSApp.delegateTyped.homePageSettingsModel)
-        let freemiumDBPBannerProvider = NewTabPageFreemiumDBPBannerProvider(model: NSApp.delegateTyped.freemiumDBPPromotionViewCoordinator)
+        let customizationProvider = NewTabPageCustomizationProvider(homePageSettingsModel: settingsModel)
+        let freemiumDBPBannerProvider = NewTabPageFreemiumDBPBannerProvider(model: freemiumDBPPromotionViewCoordinator)
 
         let privacyStatsModel = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,

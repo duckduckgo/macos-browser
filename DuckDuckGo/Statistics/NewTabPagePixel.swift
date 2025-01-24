@@ -29,6 +29,16 @@ import PixelKit
 enum NewTabPagePixel: PixelKitEventV2 {
 
     /**
+     * Event Trigger: New Tab Page is displayed to user.
+     *
+     * > Note: This is a daily pixel.
+     *
+     * Anomaly Investigation:
+     * - Anomaly in this pixel may mean an increase/drop in app use.
+     */
+    case newTabPageShown(favorites: Bool, recentActivity: Bool?, privacyStats: Bool?, customBackground: Bool)
+
+    /**
      * Event Trigger: "Show Less" button is clicked in Privacy Stats table on the New Tab Page, to collapse the table.
      *
      * > Note: This isn't the section collapse setting (like for Favorites or Next Steps), but the sub-setting
@@ -80,6 +90,7 @@ enum NewTabPagePixel: PixelKitEventV2 {
 
     var name: String {
         switch self {
+        case .newTabPageShown: return "m_mac_newtab_shown"
         case .blockedTrackingAttemptsShowLess: return "m_mac_new-tab-page_blocked-tracking-attempts_show-less"
         case .blockedTrackingAttemptsShowMore: return "m_mac_new-tab-page_blocked-tracking-attempts_show-more"
         case .privacyStatsCouldNotLoadDatabase: return "new-tab-page_privacy-stats_could-not-load-database"
@@ -88,7 +99,25 @@ enum NewTabPagePixel: PixelKitEventV2 {
     }
 
     var parameters: [String: String]? {
-        nil
+        switch self {
+        case .newTabPageShown(let favorites, let recentActivity, let privacyStats, let customBackground):
+            var parameters = [
+                "favorites": String(favorites),
+                "background": customBackground ? "custom" : "default"
+            ]
+            if let recentActivity {
+                parameters["recent-activity"] = String(recentActivity)
+            }
+            if let privacyStats {
+                parameters["privacy-stats"] = String(privacyStats)
+            }
+            return parameters
+        case .blockedTrackingAttemptsShowLess,
+                .blockedTrackingAttemptsShowMore,
+                .privacyStatsCouldNotLoadDatabase,
+                .privacyStatsDatabaseError:
+            return nil
+        }
     }
 
     var error: (any Error)? {

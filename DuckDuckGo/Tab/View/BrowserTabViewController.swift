@@ -99,7 +99,7 @@ final class BrowserTabViewController: NSViewController {
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-         newTabPageActionsManager: NewTabPageActionsManager = NSApp.delegateTyped.newTabPageActionsManager,
+         newTabPageActionsManager: NewTabPageActionsManager = NSApp.delegateTyped.newTabPageCoordinator.actionsManager,
          historyViewActionsManager: HistoryViewActionsManager = NSApp.delegateTyped.historyViewActionsManager,
          activeRemoteMessageModel: ActiveRemoteMessageModel = NSApp.delegateTyped.activeRemoteMessageModel
     ) {
