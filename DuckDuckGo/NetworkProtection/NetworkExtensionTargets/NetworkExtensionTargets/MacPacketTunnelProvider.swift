@@ -432,10 +432,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                           serviceName: Self.tokenServiceName,
                                                           keychainType: Bundle.keychainType)
         let legacyTokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
-                                                                           serviceName: Self.tokenServiceName,
-                                                                           errorEvents: debugEvents,
-                                                                           useAccessTokenProvider: false,
-                                                                           accessTokenProvider: { nil })
+                                                                   serviceName: Self.tokenServiceName,
+                                                                   errorEvents: debugEvents,
+                                                                   useAccessTokenProvider: false,
+                                                                   accessTokenProvider: { nil })
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
                                             legacyTokenStorage: legacyTokenStore,
                                             authService: authService)

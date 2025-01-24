@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionKeychainStore+TokenStoring.swift
+//  NetworkProtectionKeychainStore+AuthTokenStoring.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -21,7 +21,7 @@ import Subscription
 import NetworkProtection
 import Networking
 
-extension NetworkProtectionKeychainStore: @retroactive TokenStoring {
+extension NetworkProtectionKeychainStore: @retroactive AuthTokenStoring {
     static var name = "com.duckduckgo.networkprotection.tokenContainer"
 
     public var tokenContainer: Networking.TokenContainer? {
