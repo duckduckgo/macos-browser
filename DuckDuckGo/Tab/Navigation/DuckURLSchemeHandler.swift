@@ -306,6 +306,7 @@ private extension DuckURLSchemeHandler {
         case "svg": return "image/svg+xml"
         case "ico": return "image/x-icon"
         case "riv": return "application/octet-stream"
+        case "json": return "application/json"
         default: return nil
         }
     }
