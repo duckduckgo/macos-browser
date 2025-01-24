@@ -22,7 +22,7 @@ import BrowserServicesKit
 protocol AIChatMenuVisibilityConfigurable {
 
     /// This property validates remote feature flags and user settings to determine if the shortcut
-    /// should be presented to the user.
+    /// should be presented to the user. s
     ///
     /// - Returns: `true` if the application menu shortcut should be displayed; otherwise, `false`.
     var shouldDisplayApplicationMenuShortcut: Bool { get }
