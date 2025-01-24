@@ -239,6 +239,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case addToDockNewTabPageCardPresented
     case userAddedToDockFromNewTabPageCard
     case userAddedToDockFromSettings
+    case userAddedToDockFromMainMenu
+    case userAddedToDockFromMoreOptionsMenu
+    case userAddedToDockFromDefaultBrowserSection
     case serpAddedToDock
 
     case protectionToggledOffBreakageReport
@@ -830,6 +833,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .addToDockNewTabPageCardPresented: return "m_mac_add_to_dock_new_tab_page_card_presented_u"
         case .userAddedToDockFromNewTabPageCard: return "m_mac_user_added_to_dock_from_new_tab_page_card"
         case .userAddedToDockFromSettings: return "m_mac_user_added_to_dock_from_settings"
+        case .userAddedToDockFromMainMenu: return "m_mac_user_added_to_dock_from_main_menu"
+        case .userAddedToDockFromMoreOptionsMenu: return "m_mac_user_added_to_dock_from_more_options_menu"
+        case .userAddedToDockFromDefaultBrowserSection: return "m_mac_user_added_to_dock_from_default_browser_section"
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"

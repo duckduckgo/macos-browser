@@ -103,11 +103,13 @@ final class MainMenu: NSMenu {
 
     let helpMenu = NSMenu(title: UserText.mainMenuHelp)
     let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
+    let addToDockMenuItem = NSMenuItem(title: "Add DuckDuckGo To Dock…", action: #selector(AppDelegate.addToDock))
     let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser + "…", action: #selector(AppDelegate.setAsDefault))
     let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
     let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
     let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
 
+    private let dockCustomizer: DockCustomization
     private let defaultBrowserPreferences: DefaultBrowserPreferences
     private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
 
@@ -117,9 +119,11 @@ final class MainMenu: NSMenu {
     init(featureFlagger: FeatureFlagger,
          bookmarkManager: BookmarkManager,
          faviconManager: FaviconManagement,
+         dockCustomizer: DockCustomization = DockCustomizer(), // TODO: could this be injected?
          defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
          aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
 
+        self.dockCustomizer = dockCustomizer
         self.defaultBrowserPreferences = defaultBrowserPreferences
         self.aiChatMenuConfig = aiChatMenuConfig
         super.init(title: UserText.duckDuckGo)
@@ -149,6 +153,7 @@ final class MainMenu: NSMenu {
             NSMenuItem.separator()
 
             preferencesMenuItem
+            addToDockMenuItem
             setAsDefaultMenuItem
 
             NSMenuItem.separator()
@@ -438,6 +443,11 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
+#if !APPSTORE
+        addToDockMenuItem.isHidden = dockCustomizer.isAddedToDock
+#else
+        addToDockMenuItem.isHidden = true
+#endif
         setAsDefaultMenuItem.isHidden = defaultBrowserPreferences.isDefault
 
         // To be safe, hide the NetP shortcut menu item by default.

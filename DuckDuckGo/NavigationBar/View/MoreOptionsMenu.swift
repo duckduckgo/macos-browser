@@ -65,6 +65,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     private let freemiumDBPFeature: FreemiumDBPFeature
     private let freemiumDBPPresenter: FreemiumDBPPresenter
     private let appearancePreferences: AppearancePreferences
+    private let dockCustomizer: DockCustomization
     private let defaultBrowserPreferences: DefaultBrowserPreferences
 
     private let notificationCenter: NotificationCenter
@@ -93,6 +94,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
          freemiumDBPFeature: FreemiumDBPFeature,
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
+         dockCustomizer: DockCustomization = DockCustomizer(),
          defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
          notificationCenter: NotificationCenter = .default,
          freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler(),
@@ -109,6 +111,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         self.freemiumDBPFeature = freemiumDBPFeature
         self.freemiumDBPPresenter = freemiumDBPPresenter
         self.appearancePreferences = appearancePreferences
+        self.dockCustomizer = dockCustomizer
         self.defaultBrowserPreferences = defaultBrowserPreferences
         self.notificationCenter = notificationCenter
         self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
@@ -150,6 +153,14 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
 #endif // FEEDBACK
 
+#if !APPSTORE
+        if !dockCustomizer.isAddedToDock {
+            let addToDockMenuItem = NSMenuItem(title: "Add DuckDuckGo To Dock", action: #selector(addToDock(_:)))
+                .targetting(self)
+                .withImage(.addToDockMenuItem)
+            addItem(addToDockMenuItem)
+        }
+#endif
         if !defaultBrowserPreferences.isDefault {
             let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser, action: #selector(setAsDefault(_:)))
                 .targetting(self)
@@ -194,6 +205,12 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     @objc func showNetworkProtectionStatus(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
+    }
+
+    @MainActor
+    @objc func addToDock(_ sender: NSMenuItem) {
+        PixelKit.fire(GeneralPixel.userAddedToDockFromMoreOptionsMenu)
+        dockCustomizer.addToDock()
     }
 
     @MainActor

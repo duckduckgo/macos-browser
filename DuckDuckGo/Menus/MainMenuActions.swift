@@ -161,6 +161,12 @@ extension AppDelegate {
     }
 
     @MainActor
+    @objc func addToDock(_ sender: Any?) {
+        DockCustomizer().addToDock()
+        PixelKit.fire(GeneralPixel.userAddedToDockFromMainMenu)
+    }
+
+    @MainActor
     @objc func setAsDefault(_ sender: Any?) {
         PixelKit.fire(GeneralPixel.defaultRequestedFromMainMenu)
         DefaultBrowserPreferences.shared.becomeDefault()
