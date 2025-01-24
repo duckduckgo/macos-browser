@@ -53,6 +53,11 @@ final class TabCollection: NSObject {
 
         let tab = tabs[index]
         tabWillClose(at: index, forced: forced)
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didCloseTab(tab, windowIsClosing: false)
+        }
+
         tabs.remove(at: index)
         if published {
             didRemoveTabPublisher.send((tab, index))

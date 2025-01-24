@@ -56,7 +56,7 @@ final class WebExtensionEventsListener: WebExtensionEventsListening {
     }
 
     func didCloseTab(_ tab: _WKWebExtensionTab, windowIsClosing: Bool) {
-//        controller?.didClose(tab, windowIsClosing: windowIsClosing)
+        controller?.didClose(tab, windowIsClosing: windowIsClosing)
     }
 
     func didActivateTab(_ tab: _WKWebExtensionTab, previousActiveTab: _WKWebExtensionTab?) {

@@ -71,10 +71,6 @@ final class MainWindowController: NSWindowController {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
-
-        if #available(macOS 14.4, *) {
-            WebExtensionManager.shared.eventsListener.didCloseWindow(self)
-        }
     }
 
     private var shouldShowOnboarding: Bool {
@@ -303,6 +299,10 @@ extension MainWindowController: NSWindowDelegate {
         // Push the Window Controller into current autorelease pool so it‘s released when the event loop pass ends
         _=Unmanaged.passRetained(self).autorelease()
         WindowControllersManager.shared.unregister(self)
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didCloseWindow(self)
+        }
     }
 
     func windowShouldClose(_ window: NSWindow) -> Bool {

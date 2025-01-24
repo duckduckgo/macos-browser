@@ -369,10 +369,6 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        if #available(macOS 14.4, *) {
-            WebExtensionManager.shared.eventsListener.didCloseTab(self, windowIsClosing: false)
-        }
-
         DispatchQueue.main.asyncOrNow { [webView, userContentController] in
             // WebKit objects must be deallocated on the main thread
             webView.stopAllMedia(shouldStopLoading: true)
