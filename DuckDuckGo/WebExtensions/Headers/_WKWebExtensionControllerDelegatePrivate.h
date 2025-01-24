@@ -2,7 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-API_AVAILABLE(macos(13.3), ios(16.4))
+API_AVAILABLE(macos(14.4), ios(16.4))
 @protocol _WKWebExtensionControllerDelegatePrivate <_WKWebExtensionControllerDelegate>
 @optional
 

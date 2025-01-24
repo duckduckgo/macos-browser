@@ -50,11 +50,13 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     static let shared = WebExtensionManager()
 
     init(webExtensionPathsCache: WebExtensionPathsCaching = WebExtensionPathsCache(),
+         webExtensionLoader: WebExtensionLoading = WebExtensionLoader(),
          internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider,
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
-        self.webExtensionPathsCache = webExtensionPathsCache
+        self.pathsCache = webExtensionPathsCache
         self.internalUserDecider = internalUserDecider
         self.featureFlagger = featureFlagger
+        self.loader = webExtensionLoader
         super.init()
 
         internalSiteHandler.dataSource = self
@@ -74,10 +76,10 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
 
     // Caches paths to selected web extensions
-    var webExtensionPathsCache: WebExtensionPathsCaching
+    var pathsCache: WebExtensionPathsCaching
 
     // Loads web extensions after selection or application start
-    var loader = WebExtensionLoader()
+    var loader: WebExtensionLoading
 
     // Loaded extensions
     var extensions: [_WKWebExtension] = []
@@ -99,15 +101,15 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 
     // MARK: - Adding and removing extensions
     var webExtensionPaths: [String] {
-        webExtensionPathsCache.cache
+        pathsCache.cache
     }
 
     func addExtension(path: String) {
-        webExtensionPathsCache.add(path)
+        pathsCache.add(path)
     }
 
     func removeExtension(path: String) {
-        webExtensionPathsCache.remove(path)
+        pathsCache.remove(path)
     }
 
     func extensionName(from path: String) -> String? {
@@ -123,7 +125,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         guard areExtenstionsEnabled else { return }
 
         // Load extensions
-        extensions = loader.loadWebExtensions(from: webExtensionPathsCache.cache)
+        extensions = loader.loadWebExtensions(from: pathsCache.cache)
 
         // Make contexts
         contexts = extensions.map {

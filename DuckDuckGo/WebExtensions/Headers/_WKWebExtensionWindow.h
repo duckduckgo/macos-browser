@@ -8,16 +8,16 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, _WKWebExtensionWindowType) {
     _WKWebExtensionWindowTypeNormal,
     _WKWebExtensionWindowTypePopup,
-} API_AVAILABLE(macos(13.3), ios(16.4));
+} API_AVAILABLE(macos(14.4), ios(16.4));
 
 typedef NS_ENUM(NSInteger, _WKWebExtensionWindowState) {
     _WKWebExtensionWindowStateNormal,
     _WKWebExtensionWindowStateMinimized,
     _WKWebExtensionWindowStateMaximized,
     _WKWebExtensionWindowStateFullscreen,
-} API_AVAILABLE(macos(13.3), ios(16.4));
+} API_AVAILABLE(macos(14.4), ios(16.4));
 
-API_AVAILABLE(macos(13.3), ios(16.4))
+API_AVAILABLE(macos(14.4), ios(16.4))
 @protocol _WKWebExtensionWindow <NSObject>
 @optional
 

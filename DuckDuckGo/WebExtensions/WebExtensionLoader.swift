@@ -17,7 +17,14 @@
 //
 
 @available(macOS 14.4, *)
-final class WebExtensionLoader {
+protocol WebExtensionLoading: AnyObject {
+
+    func loadWebExtensions(from paths: [String]) -> [_WKWebExtension]
+
+}
+
+@available(macOS 14.4, *)
+final class WebExtensionLoader: WebExtensionLoading {
 
     private func loadWebExtension(path: String) -> _WKWebExtension? {
         guard let extensionURL = URL(string: path) else {

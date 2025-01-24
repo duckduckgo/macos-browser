@@ -22,8 +22,6 @@ import os.log
 @available(macOS 14.4, *)
 final class NativeMessagingHandler {
 
-    static var applicationPathsAndArgs = [String: (String, [String])]()
-
     var nativeMessagingConnections = [NativeMessagingConnection]()
 
     private func connection(for port: _WKWebExtension.MessagePort) -> NativeMessagingConnection? {
@@ -88,7 +86,8 @@ final class NativeMessagingHandler {
             connection.communicator.send(messageData: jsonData)
         }
 
-        // In future, detect the application path from the appropriate extension file
+        // ⚠️ Missing application path
+        // Detect the application path from the appropriate extension file
         let communicator = NativeMessagingCommunicator(appPath: "", arguments: [])
         communicator.delegate = self
         let connection = NativeMessagingConnection(port: port,
