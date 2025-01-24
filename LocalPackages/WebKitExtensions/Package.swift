@@ -32,7 +32,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "229.1.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "bunn/update-css"),
         .package(path: "../AppKitExtensions")
     ],
     targets: [
