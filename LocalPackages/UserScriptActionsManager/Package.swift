@@ -31,7 +31,7 @@ let package = Package(
             targets: ["UserScriptActionsManager"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "bunn/update-css"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "230.1.0"),
     ],
     targets: [
         .target(
