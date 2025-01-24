@@ -61,6 +61,8 @@ final class SyncPreferencesTests: XCTestCase {
 
         syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences, syncErrorHandler: SyncErrorHandler())
         syncCredentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: AutofillSecureVaultFactory, syncErrorHandler: SyncErrorHandler())
+        let featureFlagger = MockFeatureFlagger()
+        featureFlagger.isFeatureOn = true
 
         syncPreferences = SyncPreferences(
             syncService: ddgSyncing,
@@ -69,7 +71,8 @@ final class SyncPreferencesTests: XCTestCase {
             appearancePreferences: appearancePreferences,
             managementDialogModel: managementDialogModel,
             userAuthenticator: MockUserAuthenticator(),
-            syncPausedStateManager: pausedStateManager
+            syncPausedStateManager: pausedStateManager,
+            featureFlagger: featureFlagger
         )
     }
 
@@ -311,6 +314,7 @@ final class SyncPreferencesTests: XCTestCase {
         // Removal of currentDialog indicates end of flow
         managementDialogModel.currentDialog = .enterRecoveryCode(code: "")
         let loginCalledExpectation = XCTestExpectation(description: "Login Called Once")
+        let secondLoginCalledExpectation = XCTestExpectation(description: "Login Called Again")
 
         ddgSyncing.spyLogin = { [weak self] _, _, _ in
             self?.ddgSyncing.spyLogin = { _, _, _ in
@@ -323,7 +327,7 @@ final class SyncPreferencesTests: XCTestCase {
         syncPreferences.recoverDevice(recoveryCode: testRecoveryCode, fromRecoveryScreen: false)
         await fulfillment(of: [loginCalledExpectation], timeout: 5.0)
 
-        XCTAssertNil(managementDialogModel.currentDialog)
+        _ = try await waitForPublisher(managementDialogModel.$currentDialog, timeout: 5.0, toEmit: nil)
     }
 
     func test_recoverDevice_accountAlreadyExists_twoOrMoreDevices_showsAccountSwitchingMessage() async throws {
