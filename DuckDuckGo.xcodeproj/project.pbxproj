@@ -5914,16 +5914,7 @@
 				371BBC5A2D00C911008FA0C7 /* NewTabPageActionsManagerExtension.swift */,
 				371BBC5D2D00CA3E008FA0C7 /* NewTabPageWebViewModel.swift */,
 				376E8C162D4102C800D5D2EC /* NewTabPageModeDecider.swift */,
-				376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */,
-				37F9AEB02D1316FE007FD19B /* DefaultHomePageSettingsModelNavigator+NewTabPageLinkOpening.swift */,
-				3758A38B2D108229001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift */,
-				371E1D662D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift */,
-				37BE08792D09C0EA00C77B8E /* NewTabPageNextStepsCardsProvider.swift */,
-				37E307B12D075B5E00599500 /* NewTabPagePrivacyStatsEventHandler.swift */,
-				374EFDF22D01C99700B30939 /* ActiveRemoteMessageModel+NewTabPage.swift */,
-				372D15EB2D00FA1400A11576 /* AppearancePreferences+NewTabPage.swift */,
-				3772BEDC2D019CDF0019B9EF /* DefaultsFavoritesActionHandler.swift */,
-				376E8C1C2D41920200D5D2EC /* RecentActivityProvider.swift */,
+				379E4D632D439F9A00A901B1 /* Features */,
 			);
 			path = NewTabPage;
 			sourceTree = "<group>";
@@ -6075,6 +6066,23 @@
 				379230982D3856500019E130 /* HistoryWebViewModel.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		379E4D632D439F9A00A901B1 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */,
+				37F9AEB02D1316FE007FD19B /* DefaultHomePageSettingsModelNavigator+NewTabPageLinkOpening.swift */,
+				3758A38B2D108229001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift */,
+				371E1D662D0B2E9F00F9205B /* NewTabPageCustomizationProvider.swift */,
+				37BE08792D09C0EA00C77B8E /* NewTabPageNextStepsCardsProvider.swift */,
+				37E307B12D075B5E00599500 /* NewTabPagePrivacyStatsEventHandler.swift */,
+				374EFDF22D01C99700B30939 /* ActiveRemoteMessageModel+NewTabPage.swift */,
+				372D15EB2D00FA1400A11576 /* AppearancePreferences+NewTabPage.swift */,
+				3772BEDC2D019CDF0019B9EF /* DefaultsFavoritesActionHandler.swift */,
+				376E8C1C2D41920200D5D2EC /* RecentActivityProvider.swift */,
+			);
+			path = Features;
 			sourceTree = "<group>";
 		};
 		37BF3F12286D8A4B00BD9014 /* PinnedTabs */ = {
