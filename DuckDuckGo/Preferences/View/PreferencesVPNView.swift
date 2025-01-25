@@ -16,12 +16,11 @@
 //  limitations under the License.
 //
 
-import PreferencesUI
-import SwiftUI
-import SwiftUIExtensions
 import NetworkProtection
 import PixelKit
 import PreferencesUI
+import SwiftUI
+import SwiftUIExtensions
 
 extension Preferences {
 

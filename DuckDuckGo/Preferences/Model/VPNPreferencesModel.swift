@@ -91,7 +91,7 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     var excludedAppsCount: Int {
-        proxySettings.appRoutingRules.filter { (bundleId, rule) in
+        proxySettings.appRoutingRules.filter { (_, rule) in
             rule == .exclude
         }.count
     }
