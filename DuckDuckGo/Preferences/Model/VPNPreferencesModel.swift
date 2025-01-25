@@ -86,6 +86,16 @@ final class VPNPreferencesModel: ObservableObject {
         proxySettings.proxyAvailable
     }
 
+    var excludedDomainsCount: Int {
+        proxySettings.excludedDomains.count
+    }
+
+    var excludedAppsCount: Int {
+        proxySettings.appRoutingRules.filter { (bundleId, rule) in
+            rule == .exclude
+        }.count
+    }
+
     @Published var notifyStatusChanges: Bool {
         didSet {
             settings.notifyStatusChanges = notifyStatusChanges

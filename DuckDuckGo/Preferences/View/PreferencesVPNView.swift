@@ -118,23 +118,24 @@ extension Preferences {
 
                     PreferencePaneSection {
                         TextMenuItemHeader(UserText.vpnExclusionsTitle)
+                        TextMenuItemCaption(UserText.vpnSettingsExclusionsDescription)
 
                         SubfeatureGroup {
-                            SubfeatureView(iconName: "VPN-Icon",
+                            SubfeatureView(icon: Image(.globe16),
                                            title: UserText.vpnExcludedSitesTitle,
-                                           description: "None",
-                                           buttonName: "Manage...",
-                                           buttonAction: { /* no-op */ },
+                                           description: exclusionCountString(value: model.excludedDomainsCount),
+                                           buttonName: UserText.vpnSettingsManageExclusionsButtonTitle,
+                                           buttonAction: { model.manageExcludedSites() },
                                            enabled: true)
 
                             Divider()
                                 .foregroundColor(Color.secondary)
 
-                            SubfeatureView(iconName: "VPN-Icon",
-                                           title: "Excluded Apps",
-                                           description: "None",
-                                           buttonName: "Manage...",
-                                           buttonAction: { /* no-op */ },
+                            SubfeatureView(icon: Image(.window16),
+                                           title: UserText.vpnExcludedAppsTitle,
+                                           description: exclusionCountString(value: model.excludedAppsCount),
+                                           buttonName: UserText.vpnSettingsManageExclusionsButtonTitle,
+                                           buttonAction: { /* will be implemented in follow-up PR */ },
                                            enabled: true)
                         }
                     }
@@ -202,6 +203,12 @@ extension Preferences {
                     }
                 }
             }
+        }
+
+        /// Resolves the text to be used for exclusion counts
+        ///
+        private func exclusionCountString(value: Int) -> String {
+            value > 0 ? String(value) : "None"
         }
     }
 }

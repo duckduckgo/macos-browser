@@ -20,15 +20,16 @@ import SwiftUI
 import SwiftUIExtensions
 
 public struct SubfeatureView: View {
-    public var iconName: String
+    public var icon: Image
     public var title: String
     public var description: String
     public var buttonName: String?
     public var buttonAction: (() -> Void)?
     public var enabled: Bool
 
-    public init(iconName: String, title: String, description: String, buttonName: String? = nil, buttonAction: (() -> Void)? = nil, enabled: Bool = true) {
-        self.iconName = iconName
+    public init(icon: Image, title: String, description: String, buttonName: String? = nil, buttonAction: (() -> Void)? = nil, enabled: Bool = true) {
+
+        self.icon = icon
         self.title = title
         self.description = description
         self.buttonName = buttonName
@@ -40,7 +41,7 @@ public struct SubfeatureView: View {
         VStack(alignment: .center) {
             VStack {
                 HStack(alignment: .center, spacing: 8) {
-                    Image(iconName, bundle: .module)
+                    icon
                         .padding(4)
                         .background(Color(.badgeBackground))
                         .cornerRadius(4)

@@ -3435,7 +3435,7 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		4B2D065D2A11D2AE00DE1F49 /* Embed Login Items */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (

@@ -68885,6 +68885,18 @@
         }
       }
     },
+    "vpn.excluded.apps.title" : {
+      "comment" : "Excluded Apps title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Excluded Apps"
+          }
+        }
+      }
+    },
     "vpn.excluded.domains.add.domain" : {
       "comment" : "Add Domain button for the excluded sites view",
       "extractionState" : "extracted_with_value",
@@ -69061,6 +69073,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Исключенные сайты"
+          }
+        }
+      }
+    },
+    "vpn.exclusions.title" : {
+      "comment" : "Exclusions section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Exclusions"
           }
         }
       }
@@ -71581,6 +71605,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Управление исключенными сайтами…"
+          }
+        }
+      }
+    },
+    "vpn.setting.exclusions.description" : {
+      "comment" : "The description shown for the exclusions section in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some websites and apps are not compatible with VPNs. Exclude these sites and apps to use them while connected to the VPN."
+          }
+        }
+      }
+    },
+    "vpn.setting.exclusions.manage.button.title" : {
+      "comment" : "Title for the button to manage exclusions",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manage..."
           }
         }
       }

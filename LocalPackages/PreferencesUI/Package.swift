@@ -15,6 +15,9 @@ let package = Package(
     targets: [
         .target(
             name: "PreferencesUI",
+            dependencies: [
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ]
