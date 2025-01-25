@@ -18,6 +18,7 @@
 
 import AppKit
 import SwiftUI
+import BrowserServicesKit
 
 @MainActor
 struct DataImportView: ModalView {

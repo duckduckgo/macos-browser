@@ -19,6 +19,7 @@
 import AppKit
 import Foundation
 import GRDB
+import BrowserServicesKit
 
 final class ChromiumFaviconsReader {
 

@@ -79,6 +79,29 @@ extension MaliciousSiteProtectionManager {
     }
 }
 
+// API Environment for testing:
+/*
+private struct MaliciousSiteTestEnvironment: MaliciousSiteProtection.APIClientEnvironment {
+    func headers(for requestType: APIRequestType, platform: MaliciousSiteDetector.APIEnvironment.Platform, authToken: String?) -> APIRequestV2.HeadersV2 {
+        MaliciousSiteDetector.APIEnvironment.production.headers(for: requestType, platform: platform, authToken: authToken)
+    }
+    func url(for requestType: APIRequestType, platform: MaliciousSiteDetector.APIEnvironment.Platform) -> URL {
+        MaliciousSiteDetector.APIEnvironment.production.url(for: requestType, platform: platform)
+        // append to always make non-cached API request
+            .appendingParameter(name: "no_cache", value: String(Int.random(in: 0...10000000)))
+    }
+    func timeout(for requestType: APIRequestType) -> TimeInterval? {
+        switch requestType {
+        case .hashPrefixSet, .filterSet:
+            MaliciousSiteDetector.APIEnvironment.production.timeout(for: requestType)
+        case .matches:
+            // used to simulate Matches API timeout
+            0.0001
+        }
+    }
+}
+*/
+
 public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     static let shared = MaliciousSiteProtectionManager()
 
