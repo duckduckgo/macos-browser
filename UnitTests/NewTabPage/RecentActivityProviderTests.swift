@@ -39,7 +39,8 @@ final class MockDuckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitle
 
 final class MockTrackerEntityPrevalenceComparator: TrackerEntityPrevalenceComparing {
     func isPrevalence(for lhsEntityName: String, greaterThan rhsEntityName: String) -> Bool {
-        true
+        // comparing names to simplify testing
+        return lhsEntityName.localizedCaseInsensitiveCompare(rhsEntityName) == .orderedAscending
     }
 }
 
@@ -61,6 +62,12 @@ final class RecentActivityProviderTests: XCTestCase {
             duckPlayerHistoryEntryTitleProvider: duckPlayerHistoryEntryTitleProvider,
             trackerEntityPrevalenceComparator: MockTrackerEntityPrevalenceComparator()
         )
+    }
+
+    func testWhenHistoryIsEmptyThenActivityIsEmpty() throws {
+        historyCoordinator.history = []
+
+        XCTAssertEqual(provider.refreshActivity(), [])
     }
 
     func testWhenHistoryEntryHasVisitsToRootURLThenActivityHasNoHistory() throws {
@@ -142,6 +149,89 @@ final class RecentActivityProviderTests: XCTestCase {
                         .init(relativeTime: UserText.justNow, title: "/index2.html", url: "https://example.com/index2.html"),
                         .init(relativeTime: UserText.justNow, title: "/index3.html", url: "https://example.com/index3.html")
                     ]
+                )
+            ]
+        )
+    }
+
+    func testWhenHistoryEntryHasVisitsToTwoDifferentDomainsThenActivityHasTwoEntries() throws {
+        let uuid = UUID()
+        let url1 = try XCTUnwrap("https://example.com".url)
+        let url2 = try XCTUnwrap("https://example2.com".url)
+        let date = Date()
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url1.appending("index1.html"), lastVisit: date),
+            .make(identifier: uuid, url: url1.appending("index2.html"), lastVisit: date.addingTimeInterval(-1)),
+            .make(identifier: uuid, url: url2.appending("index3.html"), lastVisit: date.addingTimeInterval(-2)),
+            .make(identifier: uuid, url: url2.appending("index4.html"), lastVisit: date.addingTimeInterval(-3))
+        ]
+
+        XCTAssertEqual(
+            provider.refreshActivity(),
+            [
+                .init(
+                    id: uuid.uuidString,
+                    title: "example.com",
+                    url: "https://example.com",
+                    etldPlusOne: "example.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url1)?.absoluteString)),
+                    favorite: false,
+                    trackingStatus: .init(totalCount: 0, trackerCompanies: []),
+                    history: [
+                        .init(relativeTime: UserText.justNow, title: "/index1.html", url: "https://example.com/index1.html"),
+                        .init(relativeTime: UserText.justNow, title: "/index2.html", url: "https://example.com/index2.html"),
+                    ]
+                ),
+                .init(
+                    id: uuid.uuidString,
+                    title: "example2.com",
+                    url: "https://example2.com",
+                    etldPlusOne: "example2.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url2)?.absoluteString)),
+                    favorite: false,
+                    trackingStatus: .init(totalCount: 0, trackerCompanies: []),
+                    history: [
+                        .init(relativeTime: UserText.justNow, title: "/index3.html", url: "https://example2.com/index3.html"),
+                        .init(relativeTime: UserText.justNow, title: "/index4.html", url: "https://example2.com/index4.html")
+                    ]
+                )
+            ]
+        )
+    }
+
+    func testThatHistoryEntryThatFailedToLoadIsFilteredOutInActivity() throws {
+        let uuid = UUID()
+        let url = try XCTUnwrap("https://example.com".url)
+        let date = Date()
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url, failedToLoad: true, lastVisit: date)
+        ]
+
+        XCTAssertEqual(provider.refreshActivity(), [])
+    }
+
+    func testWhenHistoryEntryHasTrackerStatsThenActivityHasEntryWithTrackerStats() throws {
+        let uuid = UUID()
+        let url = try XCTUnwrap("https://example.com".url)
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url, lastVisit: Date(), numberOfTrackersBlocked: 40, blockedTrackingEntities: ["A", "B", "C"])
+        ]
+
+        XCTAssertEqual(
+            provider.refreshActivity(),
+            [
+                .init(
+                    id: uuid.uuidString,
+                    title: "example.com",
+                    url: "https://example.com",
+                    etldPlusOne: "example.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
+                    favorite: false,
+                    trackingStatus: .init(totalCount: 40, trackerCompanies: [.init(displayName: "A"), .init(displayName: "B"), .init(displayName: "C")]),
+                    history: []
                 )
             ]
         )
