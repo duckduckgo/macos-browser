@@ -89,6 +89,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
                     favorite: false,
+                    trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: []
                 )
@@ -114,6 +115,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
                     favorite: false,
+                    trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
                         .init(relativeTime: UserText.justNow, title: "/index.html", url: "https://example.com/index.html")
@@ -144,6 +146,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
                     favorite: false,
+                    trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
                         .init(relativeTime: UserText.justNow, title: "/index1.html", url: "https://example.com/index1.html"),
@@ -178,6 +181,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url1)?.absoluteString)),
                     favorite: false,
+                    trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
                         .init(relativeTime: UserText.justNow, title: "/index1.html", url: "https://example.com/index1.html"),
@@ -191,6 +195,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example2.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url2)?.absoluteString)),
                     favorite: false,
+                    trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
                         .init(relativeTime: UserText.justNow, title: "/index3.html", url: "https://example2.com/index3.html"),
@@ -231,6 +236,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
                     favorite: false,
+                    trackersFound: false,
                     trackingStatus: .init(totalCount: 40, trackerCompanies: [.init(displayName: "A"), .init(displayName: "B"), .init(displayName: "C")]),
                     history: []
                 )
@@ -256,6 +262,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "duckduckgo.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: "https://duckduckgo.com".url!)?.absoluteString)),
                     favorite: false,
+                    trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
                         .init(relativeTime: UserText.justNow, title: "hello", url: url.absoluteString),

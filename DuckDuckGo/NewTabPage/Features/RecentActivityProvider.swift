@@ -186,6 +186,7 @@ extension NewTabPageDataModel.DomainActivity {
             etldPlusOne: historyEntry.etldPlusOne,
             favicon: favicon,
             favorite: urlFavoriteStatusProvider.isUrlFavorited(url: rootURL),
+            trackersFound: historyEntry.trackersFound,
             trackingStatus: .init(
                 totalCount: Int64(historyEntry.numberOfTrackersBlocked),
                 trackerCompanies: historyEntry.blockedTrackingEntities.map(NewTabPageDataModel.TrackingStatus.TrackerCompany.init)
