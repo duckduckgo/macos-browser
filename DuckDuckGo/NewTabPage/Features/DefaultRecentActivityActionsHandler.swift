@@ -62,14 +62,20 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
     }
 
     @MainActor
+    func confirmBurn(_ url: URL) async -> Bool {
+        guard let domain = url.host?.droppingWwwPrefix(), fireproofDomains.isFireproof(fireproofDomain: domain) else {
+            return false
+        }
+        guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
+            return false
+        }
+        return true
+    }
+
+    @MainActor
     func burn(_ url: URL) async {
         guard let domain = url.host?.droppingWwwPrefix() else {
             return
-        }
-        if fireproofDomains.isFireproof(fireproofDomain: domain) {
-            guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
-                return
-            }
         }
         let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
         await fire().burnEntity(entity: .none(selectedDomains: domains))

@@ -119,6 +119,11 @@ public final class NewTabPageRecentActivityModel {
         await actionsHandler.removeFavorite(url)
     }
 
+    @MainActor func confirmBurn(_ url: String) async -> Bool {
+        guard let url = URL(string: url), url.isValid else { return false }
+        return await actionsHandler.confirmBurn(url)
+    }
+
     @MainActor func burn(_ url: String) async {
         guard let url = URL(string: url), url.isValid else { return }
         await actionsHandler.burn(url)

@@ -109,4 +109,12 @@ extension NewTabPageDataModel {
     struct ActivityItemAction: Codable, Equatable {
         let url: String
     }
+
+    struct ConfirmBurnResponse: Codable, Equatable {
+        let action: Action
+
+        enum Action: String, Codable {
+            case burn, none
+        }
+    }
 }
