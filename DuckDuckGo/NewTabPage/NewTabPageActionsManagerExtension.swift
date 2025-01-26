@@ -26,7 +26,8 @@ extension NewTabPageActionsManager {
     convenience init(
         appearancePreferences: AppearancePreferences,
         settingsModel: HomePage.Models.SettingsModel,
-        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        bookmarkManager: BookmarkManager & URLFavoriteStatusProviding = LocalBookmarkManager.shared,
+        duckPlayer: DuckPlayer = DuckPlayer.shared,
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         historyCoordinator: HistoryCoordinating,
         privacyStats: PrivacyStatsCollecting,
@@ -49,7 +50,11 @@ extension NewTabPageActionsManager {
             getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowRecentlyVisited, defaultValue: false).wrappedValue
         )
 
-        let recentActivityProvider = RecentActivityProvider(historyCoordinator: historyCoordinator, bookmarkManager: bookmarkManager)
+        let recentActivityProvider = RecentActivityProvider(
+            historyCoordinator: historyCoordinator,
+            urlFavoriteStatusProvider: bookmarkManager,
+            duckPlayerHistoryEntryTitleProvider: duckPlayer
+        )
         let recentActivityModel = NewTabPageRecentActivityModel(
             activityProvider: recentActivityProvider,
             actionsHandler: DefaultRecentActivityActionsHandler(),

@@ -39873,6 +39873,18 @@
         }
       }
     },
+    "newTab.recent.activity.just.now" : {
+      "comment" : "Relative timestamp for a URL that was last visited within recent 60 seconds",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Just now"
+          }
+        }
+      }
+    },
     "newTab.recent.activity.section.title" : {
       "comment" : "Title of the RecentActivity section in the home page",
       "extractionState" : "extracted_with_value",

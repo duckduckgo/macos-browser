@@ -29,7 +29,7 @@ final class NewTabPageCoordinator {
     init(
         appearancePreferences: AppearancePreferences,
         settingsModel: HomePage.Models.SettingsModel,
-        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        bookmarkManager: BookmarkManager & URLFavoriteStatusProviding = LocalBookmarkManager.shared,
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         historyCoordinator: HistoryCoordinating,
         privacyStats: PrivacyStatsCollecting,

@@ -23,9 +23,20 @@ import os.log
 import Persistence
 import PrivacyStats
 
+/**
+ * This protocol describes Recent Activity widget data source.
+ *
+ * It allows subscribing to history updates as well as triggering activity calculation on demand.
+ */
 public protocol NewTabPageRecentActivityProviding: AnyObject {
+    /**
+     * This function should return `DomainActivity` array based on current state of browser history.
+     */
     func refreshActivity() -> [NewTabPageDataModel.DomainActivity]
 
+    /**
+     * This publisher should publish changes to `DomainActivity` array every time browser history is updated.
+     */
     var activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never> { get }
 }
 

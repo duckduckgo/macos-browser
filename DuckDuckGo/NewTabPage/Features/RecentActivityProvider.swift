@@ -22,35 +22,65 @@ import Foundation
 import History
 import NewTabPage
 
+protocol DuckPlayerHistoryEntryTitleProviding {
+    func title(for historyEntry: NewTabPageDataModel.HistoryEntry) -> String?
+}
+
+protocol URLFavoriteStatusProviding: AnyObject {
+    func isUrlFavorited(url: URL) -> Bool
+}
+
+extension DuckPlayer: DuckPlayerHistoryEntryTitleProviding {}
+
+extension LocalBookmarkManager: URLFavoriteStatusProviding {}
+
 final class RecentActivityProvider: NewTabPageRecentActivityProviding {
     func refreshActivity() -> [NewTabPageDataModel.DomainActivity] {
-        Self.calculateRecentActivity(with: historyCoorinator.history ?? [], bookmarkManager: bookmarkManager)
+        Self.calculateRecentActivity(
+            with: historyCoordinator.history ?? [],
+            urlFavoriteStatusProvider: urlFavoriteStatusProvider,
+            duckPlayerHistoryItemTitleProvider: duckPlayerHistoryEntryTitleProvider
+        )
     }
 
     let activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never>
 
-    let historyCoorinator: HistoryCoordinating
-    let bookmarkManager: BookmarkManager
+    let historyCoordinator: HistoryCoordinating
+    let urlFavoriteStatusProvider: URLFavoriteStatusProviding
+    let duckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitleProviding
 
-    init(historyCoordinator: HistoryCoordinating, bookmarkManager: BookmarkManager) {
-        self.historyCoorinator = historyCoordinator
-        self.bookmarkManager = bookmarkManager
+    init(
+        historyCoordinator: HistoryCoordinating,
+        urlFavoriteStatusProvider: URLFavoriteStatusProviding,
+        duckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitleProviding = DuckPlayer.shared
+    ) {
+        self.historyCoordinator = historyCoordinator
+        self.urlFavoriteStatusProvider = urlFavoriteStatusProvider
+        self.duckPlayerHistoryEntryTitleProvider = duckPlayerHistoryEntryTitleProvider
 
         activityPublisher = historyCoordinator.historyDictionaryPublisher
             .receive(on: DispatchQueue.main)
             .compactMap { [weak historyCoordinator] _ -> BrowsingHistory? in
                 historyCoordinator?.history
             }
-            .compactMap { [weak bookmarkManager] history -> [NewTabPageDataModel.DomainActivity]? in
-                guard let bookmarkManager else {
+            .compactMap { [weak urlFavoriteStatusProvider] history -> [NewTabPageDataModel.DomainActivity]? in
+                guard let urlFavoriteStatusProvider else {
                     return nil
                 }
-                return Self.calculateRecentActivity(with: history, bookmarkManager: bookmarkManager)
+                return Self.calculateRecentActivity(
+                    with: history,
+                    urlFavoriteStatusProvider: urlFavoriteStatusProvider,
+                    duckPlayerHistoryItemTitleProvider: duckPlayerHistoryEntryTitleProvider
+                )
             }
             .eraseToAnyPublisher()
     }
 
-    private static func calculateRecentActivity(with browsingHistory: BrowsingHistory, bookmarkManager: BookmarkManager) -> [NewTabPageDataModel.DomainActivity] {
+    private static func calculateRecentActivity(
+        with browsingHistory: BrowsingHistory,
+        urlFavoriteStatusProvider: URLFavoriteStatusProviding,
+        duckPlayerHistoryItemTitleProvider: DuckPlayerHistoryEntryTitleProviding
+    ) -> [NewTabPageDataModel.DomainActivity] {
 
         var activityItems = [DomainActivityRef]()
         var activityItemsByDomain = [String: DomainActivityRef]()
@@ -64,7 +94,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
                 guard let host = historyEntry.url.host else { return }
 
                 var activityItem = activityItemsByDomain[host]
-                if activityItem == nil, let newItem = NewTabPageDataModel.DomainActivity(historyEntry, bookmarkManager: bookmarkManager) {
+                if activityItem == nil, let newItem = NewTabPageDataModel.DomainActivity(historyEntry, urlFavoriteStatusProvider: urlFavoriteStatusProvider) {
                     let newItemRef = DomainActivityRef(newItem)
                     activityItems.append(newItemRef)
                     activityItemsByDomain[host] = newItemRef
@@ -76,7 +106,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
             }
 
         activityItems.forEach {
-            $0.activity.prettifyTitles()
+            $0.activity.prettifyTitles(duckPlayerHistoryItemTitleProvider)
             $0.activity.sortTrackingEntities()
         }
 
@@ -92,7 +122,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
     private static func relativeTime(_ date: Date) -> String {
         let interval = date.timeIntervalSinceNow
         if interval > -60 {
-            return "Just now"
+            return UserText.justNow
         }
         return relativeDateFormatter.localizedString(fromTimeInterval: date.timeIntervalSinceNow)
     }
@@ -113,7 +143,7 @@ private extension HistoryEntry {
 
 extension NewTabPageDataModel.DomainActivity {
 
-    init?(_ historyEntry: HistoryEntry, bookmarkManager: BookmarkManager) {
+    init?(_ historyEntry: HistoryEntry, urlFavoriteStatusProvider: URLFavoriteStatusProviding) {
         guard let host = historyEntry.url.host,
               let rootURLString = historyEntry.url.root?.absoluteString.dropping(suffix: "/"),
               let rootURL = rootURLString.url
@@ -134,7 +164,7 @@ extension NewTabPageDataModel.DomainActivity {
             url: rootURLString,
             etldPlusOne: historyEntry.etldPlusOne,
             favicon: favicon,
-            favorite: bookmarkManager.isUrlFavorited(url: rootURL),
+            favorite: urlFavoriteStatusProvider.isUrlFavorited(url: rootURL),
             trackingStatus: .init(
                 totalCount: Int64(historyEntry.numberOfTrackersBlocked),
                 trackerCompanies: historyEntry.blockedTrackingEntities.map(NewTabPageDataModel.TrackingStatus.TrackerCompany.init)
@@ -148,7 +178,7 @@ extension NewTabPageDataModel.DomainActivity {
         trackingStatus.trackerCompanies = Array(Set(trackingStatus.trackerCompanies).union(trackerCompanies))
     }
 
-    mutating func addPage(fromHistory entry: HistoryEntry, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, dateFormatter: (Date) -> String) {
+    mutating func addPage(fromHistory entry: HistoryEntry, dateFormatter: (Date) -> String) {
         // Skip root URLs and non-search DDG urls
         guard !entry.url.isRoot || (entry.url.isDuckDuckGo && !entry.url.isDuckDuckGoSearch) else { return  }
 
@@ -158,7 +188,7 @@ extension NewTabPageDataModel.DomainActivity {
         history.append(.init(relativeTime: dateFormatter(entry.lastVisit), title: entry.title ?? "", url: entry.url.absoluteString))
     }
 
-    mutating func prettifyTitles() {
+    mutating func prettifyTitles(_ duckPlayerHistoryItemTitleProvider: DuckPlayerHistoryEntryTitleProviding) {
         var searches = Set<String>()
         var urlsToRemove = [String]()
 
@@ -172,7 +202,7 @@ extension NewTabPageDataModel.DomainActivity {
                 } else {
                     urlsToRemove.append(url.absoluteString)
                 }
-            } else if let title = DuckPlayer.shared.title(for: historyItem) {
+            } else if let title = duckPlayerHistoryItemTitleProvider.title(for: historyItem) {
                 fixedHistoryItem.title = title
             } else {
                 fixedHistoryItem.title = historyItem.url
