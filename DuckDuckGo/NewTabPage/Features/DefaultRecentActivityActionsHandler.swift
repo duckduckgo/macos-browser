@@ -23,11 +23,18 @@ import NewTabPage
 final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
     let bookmarkManager: BookmarkManager
+    let fireproofDomains: FireproofDomains
     let fire: () async -> Fire
     let tld: TLD
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, fire: (() async -> (Fire))? = nil, tld: TLD = ContentBlocking.shared.tld) {
+    init(
+        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        fireproofDomains: FireproofDomains = FireproofDomains.shared,
+        fire: (() async -> (Fire))? = nil,
+        tld: TLD = ContentBlocking.shared.tld
+    ) {
         self.bookmarkManager = bookmarkManager
+        self.fireproofDomains = fireproofDomains
         self.fire = fire ?? { @MainActor in FireCoordinator.fireViewModel.fire }
         self.tld = tld
     }
@@ -58,6 +65,11 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
     func burn(_ url: URL) async {
         guard let domain = url.host?.droppingWwwPrefix() else {
             return
+        }
+        if fireproofDomains.isFireproof(fireproofDomain: domain) {
+            guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
+                return
+            }
         }
         let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
         await fire().burnEntity(entity: .none(selectedDomains: domains))
