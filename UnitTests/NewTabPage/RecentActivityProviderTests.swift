@@ -30,6 +30,14 @@ final class MockURLFavoriteStatusProvider: URLFavoriteStatusProviding {
     var isUrlFavorited: (URL) -> Bool = { _ in false }
 }
 
+final class MockURLFireproofStatusProvider: URLFireproofStatusProviding {
+    func isDomainFireproof(forURL url: URL) -> Bool {
+        isDomainFireproof(url)
+    }
+    
+    var isDomainFireproof: (URL) -> Bool = { _ in false }
+}
+
 final class MockDuckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitleProviding {
     func title(for historyEntry: NewTabPageDataModel.HistoryEntry) -> String? {
         titleForHistoryEntry(historyEntry)
@@ -49,6 +57,7 @@ final class RecentActivityProviderTests: XCTestCase {
     var provider: RecentActivityProvider!
     var historyCoordinator: HistoryCoordinatingMock!
     var urlFavoriteStatusProvider: MockURLFavoriteStatusProvider!
+    var urlFireproofStatusProvider: MockURLFireproofStatusProvider!
     var duckPlayerHistoryEntryTitleProvider: MockDuckPlayerHistoryEntryTitleProvider!
 
     override func setUp() async throws {
@@ -56,10 +65,12 @@ final class RecentActivityProviderTests: XCTestCase {
 
         historyCoordinator = HistoryCoordinatingMock()
         urlFavoriteStatusProvider = MockURLFavoriteStatusProvider()
+        urlFireproofStatusProvider = MockURLFireproofStatusProvider()
         duckPlayerHistoryEntryTitleProvider = MockDuckPlayerHistoryEntryTitleProvider()
         provider = RecentActivityProvider(
             historyCoordinator: historyCoordinator,
             urlFavoriteStatusProvider: urlFavoriteStatusProvider,
+            urlFireproofStatusProvider: urlFireproofStatusProvider,
             duckPlayerHistoryEntryTitleProvider: duckPlayerHistoryEntryTitleProvider,
             trackerEntityPrevalenceComparator: MockTrackerEntityPrevalenceComparator()
         )
@@ -89,6 +100,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
                     favorite: false,
+                    fireproof: false,
                     trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: []
@@ -115,6 +127,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
                     favorite: false,
+                    fireproof: false,
                     trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
@@ -146,6 +159,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
                     favorite: false,
+                    fireproof: false,
                     trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
@@ -181,6 +195,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url1)?.absoluteString)),
                     favorite: false,
+                    fireproof: false,
                     trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
@@ -195,6 +210,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example2.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url2)?.absoluteString)),
                     favorite: false,
+                    fireproof: false,
                     trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [
@@ -236,6 +252,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "example.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
                     favorite: false,
+                    fireproof: false,
                     trackersFound: false,
                     trackingStatus: .init(totalCount: 40, trackerCompanies: [.init(displayName: "A"), .init(displayName: "B"), .init(displayName: "C")]),
                     history: []
@@ -262,6 +279,7 @@ final class RecentActivityProviderTests: XCTestCase {
                     etldPlusOne: "duckduckgo.com",
                     favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: "https://duckduckgo.com".url!)?.absoluteString)),
                     favorite: false,
+                    fireproof: false,
                     trackersFound: false,
                     trackingStatus: .init(totalCount: 0, trackerCompanies: []),
                     history: [

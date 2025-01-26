@@ -30,6 +30,10 @@ protocol URLFavoriteStatusProviding: AnyObject {
     func isUrlFavorited(url: URL) -> Bool
 }
 
+protocol URLFireproofStatusProviding: AnyObject {
+    func isDomainFireproof(forURL url: URL) -> Bool
+}
+
 protocol TrackerEntityPrevalenceComparing {
     func isPrevalence(for lhsEntityName: String, greaterThan rhsEntityName: String) -> Bool
 }
@@ -37,6 +41,15 @@ protocol TrackerEntityPrevalenceComparing {
 extension DuckPlayer: DuckPlayerHistoryEntryTitleProviding {}
 
 extension LocalBookmarkManager: URLFavoriteStatusProviding {}
+
+extension FireproofDomains: URLFireproofStatusProviding {
+    func isDomainFireproof(forURL url: URL) -> Bool {
+        guard let domain = url.host?.droppingWwwPrefix() else {
+            return false
+        }
+        return isFireproof(fireproofDomain: domain)
+    }
+}
 
 struct ContentBlockingPrevalenceComparator: TrackerEntityPrevalenceComparing {
     let contentBlocking: ContentBlockingProtocol
@@ -51,6 +64,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
         Self.calculateRecentActivity(
             with: historyCoordinator.history ?? [],
             urlFavoriteStatusProvider: urlFavoriteStatusProvider,
+            urlFireproofStatusProvider: urlFireproofStatusProvider,
             duckPlayerHistoryItemTitleProvider: duckPlayerHistoryEntryTitleProvider,
             trackerEntityPrevalenceComparator: trackerEntityPrevalenceComparator
         )
@@ -60,17 +74,20 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
 
     let historyCoordinator: HistoryCoordinating
     let urlFavoriteStatusProvider: URLFavoriteStatusProviding
+    let urlFireproofStatusProvider: URLFireproofStatusProviding
     let duckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitleProviding
     let trackerEntityPrevalenceComparator: TrackerEntityPrevalenceComparing
 
     init(
         historyCoordinator: HistoryCoordinating,
         urlFavoriteStatusProvider: URLFavoriteStatusProviding,
+        urlFireproofStatusProvider: URLFireproofStatusProviding,
         duckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitleProviding,
         trackerEntityPrevalenceComparator: TrackerEntityPrevalenceComparing
     ) {
         self.historyCoordinator = historyCoordinator
         self.urlFavoriteStatusProvider = urlFavoriteStatusProvider
+        self.urlFireproofStatusProvider = urlFireproofStatusProvider
         self.duckPlayerHistoryEntryTitleProvider = duckPlayerHistoryEntryTitleProvider
         self.trackerEntityPrevalenceComparator = trackerEntityPrevalenceComparator
 
@@ -86,6 +103,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
                 return Self.calculateRecentActivity(
                     with: history,
                     urlFavoriteStatusProvider: urlFavoriteStatusProvider,
+                    urlFireproofStatusProvider: urlFireproofStatusProvider,
                     duckPlayerHistoryItemTitleProvider: duckPlayerHistoryEntryTitleProvider,
                     trackerEntityPrevalenceComparator: trackerEntityPrevalenceComparator
                 )
@@ -96,6 +114,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
     private static func calculateRecentActivity(
         with browsingHistory: BrowsingHistory,
         urlFavoriteStatusProvider: URLFavoriteStatusProviding,
+        urlFireproofStatusProvider: URLFireproofStatusProviding,
         duckPlayerHistoryItemTitleProvider: DuckPlayerHistoryEntryTitleProviding,
         trackerEntityPrevalenceComparator: TrackerEntityPrevalenceComparing
     ) -> [NewTabPageDataModel.DomainActivity] {
@@ -115,7 +134,8 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
                 guard let host = historyEntry.url.host else { return }
 
                 var activityItem = activityItemsByDomain[host]
-                if activityItem == nil, let newItem = NewTabPageDataModel.DomainActivity(historyEntry, urlFavoriteStatusProvider: urlFavoriteStatusProvider) {
+                let newItem = NewTabPageDataModel.DomainActivity(historyEntry, urlFavoriteStatusProvider: urlFavoriteStatusProvider, urlFireproofStatusProvider: urlFireproofStatusProvider)
+                if activityItem == nil, let newItem {
                     let newItemRef = DomainActivityRef(newItem)
                     activityItems.append(newItemRef)
                     activityItemsByDomain[host] = newItemRef
@@ -164,7 +184,7 @@ private extension HistoryEntry {
 
 extension NewTabPageDataModel.DomainActivity {
 
-    init?(_ historyEntry: HistoryEntry, urlFavoriteStatusProvider: URLFavoriteStatusProviding) {
+    init?(_ historyEntry: HistoryEntry, urlFavoriteStatusProvider: URLFavoriteStatusProviding, urlFireproofStatusProvider: URLFireproofStatusProviding) {
         guard let host = historyEntry.url.host,
               let rootURLString = historyEntry.url.root?.absoluteString.dropping(suffix: "/"),
               let rootURL = rootURLString.url
@@ -186,6 +206,7 @@ extension NewTabPageDataModel.DomainActivity {
             etldPlusOne: historyEntry.etldPlusOne,
             favicon: favicon,
             favorite: urlFavoriteStatusProvider.isUrlFavorited(url: rootURL),
+            fireproof: urlFireproofStatusProvider.isDomainFireproof(forURL: rootURL),
             trackersFound: historyEntry.trackersFound,
             trackingStatus: .init(
                 totalCount: Int64(historyEntry.numberOfTrackersBlocked),

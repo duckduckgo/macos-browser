@@ -27,6 +27,7 @@ extension NewTabPageActionsManager {
         appearancePreferences: AppearancePreferences,
         settingsModel: HomePage.Models.SettingsModel,
         bookmarkManager: BookmarkManager & URLFavoriteStatusProviding = LocalBookmarkManager.shared,
+        urlFireproofStatusProvider: URLFireproofStatusProviding = FireproofDomains.shared,
         duckPlayer: DuckPlayer = DuckPlayer.shared,
         contentBlocking: ContentBlockingProtocol = ContentBlocking.shared,
         activeRemoteMessageModel: ActiveRemoteMessageModel,
@@ -54,6 +55,7 @@ extension NewTabPageActionsManager {
         let recentActivityProvider = RecentActivityProvider(
             historyCoordinator: historyCoordinator,
             urlFavoriteStatusProvider: bookmarkManager,
+            urlFireproofStatusProvider: urlFireproofStatusProvider,
             duckPlayerHistoryEntryTitleProvider: duckPlayer,
             trackerEntityPrevalenceComparator: ContentBlockingPrevalenceComparator(contentBlocking: contentBlocking)
         )
