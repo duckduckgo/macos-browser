@@ -32,6 +32,11 @@ final class CapturingRecentActivityActionsHandler: RecentActivityActionsHandling
         removeFavoriteCalls.append(url)
     }
 
+    func confirmBurn(_ url: URL) async -> Bool {
+        confirmBurnCalls.append(url)
+        return _confirmBurn(url)
+    }
+
     func burn(_ url: URL) async {
         burnCalls.append(url)
     }
@@ -41,8 +46,12 @@ final class CapturingRecentActivityActionsHandler: RecentActivityActionsHandling
         let target: LinkOpenTarget
     }
 
+    // swiftlint:disable:next identifier_name
+    var _confirmBurn: (URL) -> Bool = { _ in true }
+
     var openCalls: [Open] = []
     var addFavoriteCalls: [URL] = []
     var removeFavoriteCalls: [URL] = []
+    var confirmBurnCalls: [URL] = []
     var burnCalls: [URL] = []
 }

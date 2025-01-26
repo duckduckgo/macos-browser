@@ -140,6 +140,30 @@ final class NewTabPageRecentActivityClientTests: XCTestCase {
         XCTAssertEqual(actionsHandler.removeFavoriteCalls, [url])
     }
 
+    // MARK: - confirmBurn
+
+    func testWhenConfirmBurnReturnsTrueThenResponseContainsBurnAction() async throws {
+        let url = try XCTUnwrap(URL(string: "https://en.wikipedia.org/wiki/index.html"))
+        let action: NewTabPageDataModel.ActivityItemAction = .init(url: url.absoluteString)
+
+        actionsHandler._confirmBurn = { _ in true }
+
+        let response: NewTabPageDataModel.ConfirmBurnResponse = try await messageHelper.handleMessage(named: .confirmBurn, parameters: action)
+        XCTAssertEqual(actionsHandler.confirmBurnCalls, [url])
+        XCTAssertEqual(response.action, .burn)
+    }
+
+    func testWhenConfirmBurnReturnsFalseThenResponseContainsBurnAction() async throws {
+        let url = try XCTUnwrap(URL(string: "https://en.wikipedia.org/wiki/index.html"))
+        let action: NewTabPageDataModel.ActivityItemAction = .init(url: url.absoluteString)
+
+        actionsHandler._confirmBurn = { _ in false }
+
+        let response: NewTabPageDataModel.ConfirmBurnResponse = try await messageHelper.handleMessage(named: .confirmBurn, parameters: action)
+        XCTAssertEqual(actionsHandler.confirmBurnCalls, [url])
+        XCTAssertEqual(response.action, .none)
+    }
+
     // MARK: - burn
 
     func testThatBurnIsPassedToTheModel() async throws {
