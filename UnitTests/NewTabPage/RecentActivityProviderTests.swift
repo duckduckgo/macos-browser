@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import History
 import NewTabPage
 import XCTest
@@ -232,6 +233,33 @@ final class RecentActivityProviderTests: XCTestCase {
                     favorite: false,
                     trackingStatus: .init(totalCount: 40, trackerCompanies: [.init(displayName: "A"), .init(displayName: "B"), .init(displayName: "C")]),
                     history: []
+                )
+            ]
+        )
+    }
+
+    func testThatHistoryEntryForDDGSearchHasPrettifiedTitle() throws {
+        let uuid = UUID()
+        let url = try XCTUnwrap(URL.makeSearchUrl(from: "hello"))
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url, lastVisit: Date())
+        ]
+
+        XCTAssertEqual(
+            provider.refreshActivity(),
+            [
+                .init(
+                    id: uuid.uuidString,
+                    title: "duckduckgo.com",
+                    url: "https://duckduckgo.com",
+                    etldPlusOne: "duckduckgo.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: "https://duckduckgo.com".url!)?.absoluteString)),
+                    favorite: false,
+                    trackingStatus: .init(totalCount: 0, trackerCompanies: []),
+                    history: [
+                        .init(relativeTime: UserText.justNow, title: "hello", url: url.absoluteString),
+                    ]
                 )
             ]
         )
