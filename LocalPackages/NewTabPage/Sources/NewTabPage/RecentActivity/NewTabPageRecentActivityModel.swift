@@ -113,8 +113,7 @@ public final class NewTabPageRecentActivityModel {
         await actionsHandler.burn(url)
     }
 
-    @MainActor
-    func open(_ url: String, target: LinkOpenTarget) async {
+    @MainActor func open(_ url: String, target: LinkOpenTarget) async {
         guard let url = URL(string: url), url.isValid else { return }
         await actionsHandler.open(url, target: target)
     }

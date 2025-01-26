@@ -47,6 +47,54 @@ final class NewTabPageRecentActivityModelTests: XCTestCase {
         )
     }
 
+    func testThatAddFavoriteForwardsTheCallToActionsHandler() async throws {
+        let validURLString = "https://example.com"
+        await model.addFavorite(validURLString)
+        XCTAssertEqual(actionsHandler.addFavoriteCalls, [try XCTUnwrap(URL(string: validURLString))])
+    }
+
+    func testWhenURLIsInvalidThenAddFavoriteDoesNotForwardTheCallToActionsHandler() async throws {
+        let invalidURLString = "aaaa"
+        await model.addFavorite(invalidURLString)
+        XCTAssertEqual(actionsHandler.addFavoriteCalls, [])
+    }
+
+    func testThatRemoveFavoriteForwardsTheCallToActionsHandler() async throws {
+        let validURLString = "https://example.com"
+        await model.removeFavorite(validURLString)
+        XCTAssertEqual(actionsHandler.removeFavoriteCalls, [try XCTUnwrap(URL(string: validURLString))])
+    }
+
+    func testWhenURLIsInvalidThenRemoveFavoriteDoesNotForwardTheCallToActionsHandler() async throws {
+        let invalidURLString = "aaaa"
+        await model.removeFavorite(invalidURLString)
+        XCTAssertEqual(actionsHandler.removeFavoriteCalls, [])
+    }
+
+    func testThatBurnForwardsTheCallToActionsHandler() async throws {
+        let validURLString = "https://example.com"
+        await model.burn(validURLString)
+        XCTAssertEqual(actionsHandler.burnCalls, [try XCTUnwrap(URL(string: validURLString))])
+    }
+
+    func testWhenURLIsInvalidThenBurnDoesNotForwardTheCallToActionsHandler() async throws {
+        let invalidURLString = "aaaa"
+        await model.burn(invalidURLString)
+        XCTAssertEqual(actionsHandler.burnCalls, [])
+    }
+
+    func testThatOpenForwardsTheCallToActionsHandler() async throws {
+        let validURLString = "https://example.com"
+        await model.open(validURLString, target: .current)
+        XCTAssertEqual(actionsHandler.openCalls, [.init(url: try XCTUnwrap(URL(string: validURLString)), target: .current)])
+    }
+
+    func testWhenURLIsInvalidThenOpenDoesNotForwardTheCallToActionsHandler() async throws {
+        let invalidURLString = "aaaa"
+        await model.open(invalidURLString, target: .current)
+        XCTAssertEqual(actionsHandler.openCalls, [])
+    }
+
     func testWhenIsViewExpandedIsUpdatedThenPersistorIsUpdated() {
         model.isViewExpanded = true
         XCTAssertTrue(settingsPersistor.isViewExpanded)
