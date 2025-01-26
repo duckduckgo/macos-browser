@@ -28,6 +28,7 @@ extension NewTabPageActionsManager {
         settingsModel: HomePage.Models.SettingsModel,
         bookmarkManager: BookmarkManager & URLFavoriteStatusProviding = LocalBookmarkManager.shared,
         duckPlayer: DuckPlayer = DuckPlayer.shared,
+        contentBlocking: ContentBlockingProtocol = ContentBlocking.shared,
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         historyCoordinator: HistoryCoordinating,
         privacyStats: PrivacyStatsCollecting,
@@ -53,7 +54,8 @@ extension NewTabPageActionsManager {
         let recentActivityProvider = RecentActivityProvider(
             historyCoordinator: historyCoordinator,
             urlFavoriteStatusProvider: bookmarkManager,
-            duckPlayerHistoryEntryTitleProvider: duckPlayer
+            duckPlayerHistoryEntryTitleProvider: duckPlayer,
+            trackerEntityPrevalenceComparator: ContentBlockingPrevalenceComparator(contentBlocking: contentBlocking)
         )
         let recentActivityModel = NewTabPageRecentActivityModel(
             activityProvider: recentActivityProvider,

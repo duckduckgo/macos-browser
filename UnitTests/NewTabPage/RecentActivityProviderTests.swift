@@ -37,6 +37,12 @@ final class MockDuckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitle
     var titleForHistoryEntry: (NewTabPageDataModel.HistoryEntry) -> String? = { _ in nil }
 }
 
+final class MockTrackerEntityPrevalenceComparator: TrackerEntityPrevalenceComparing {
+    func isPrevalence(for lhsEntityName: String, greaterThan rhsEntityName: String) -> Bool {
+        true
+    }
+}
+
 final class RecentActivityProviderTests: XCTestCase {
     var provider: RecentActivityProvider!
     var historyCoordinator: HistoryCoordinatingMock!
@@ -52,7 +58,120 @@ final class RecentActivityProviderTests: XCTestCase {
         provider = RecentActivityProvider(
             historyCoordinator: historyCoordinator,
             urlFavoriteStatusProvider: urlFavoriteStatusProvider,
-            duckPlayerHistoryEntryTitleProvider: duckPlayerHistoryEntryTitleProvider
+            duckPlayerHistoryEntryTitleProvider: duckPlayerHistoryEntryTitleProvider,
+            trackerEntityPrevalenceComparator: MockTrackerEntityPrevalenceComparator()
+        )
+    }
+
+    func testWhenHistoryEntryHasVisitsToRootURLThenActivityHasNoHistory() throws {
+        let uuid = UUID()
+        let url = try XCTUnwrap("https://example.com".url)
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url, lastVisit: Date())
+        ]
+
+        XCTAssertEqual(
+            provider.refreshActivity(),
+            [
+                .init(
+                    id: uuid.uuidString,
+                    title: "example.com",
+                    url: "https://example.com",
+                    etldPlusOne: "example.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
+                    favorite: false,
+                    trackingStatus: .init(totalCount: 0, trackerCompanies: []),
+                    history: []
+                )
+            ]
+        )
+    }
+
+    func testWhenHistoryEntryHasVisitsToNonRootURLThenActivityHasOneEntryWithHistory() throws {
+        let uuid = UUID()
+        let url = try XCTUnwrap("https://example.com".url)
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url.appending("index.html"), lastVisit: Date())
+        ]
+
+        XCTAssertEqual(
+            provider.refreshActivity(),
+            [
+                .init(
+                    id: uuid.uuidString,
+                    title: "example.com",
+                    url: "https://example.com",
+                    etldPlusOne: "example.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
+                    favorite: false,
+                    trackingStatus: .init(totalCount: 0, trackerCompanies: []),
+                    history: [
+                        .init(relativeTime: UserText.justNow, title: "/index.html", url: "https://example.com/index.html")
+                    ]
+                )
+            ]
+        )
+    }
+
+    func testWhenHistoryEntryHasVisitsToDifferentNonRootURLsOfTheSameDomainThenActivityHasOneEntryWithHistory() throws {
+        let uuid = UUID()
+        let url = try XCTUnwrap("https://example.com".url)
+        let date = Date()
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url.appending("index1.html"), lastVisit: date),
+            .make(identifier: uuid, url: url.appending("index2.html"), lastVisit: date.addingTimeInterval(-1)),
+            .make(identifier: uuid, url: url.appending("index3.html"), lastVisit: date.addingTimeInterval(-2))
+        ]
+
+        XCTAssertEqual(
+            provider.refreshActivity(),
+            [
+                .init(
+                    id: uuid.uuidString,
+                    title: "example.com",
+                    url: "https://example.com",
+                    etldPlusOne: "example.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
+                    favorite: false,
+                    trackingStatus: .init(totalCount: 0, trackerCompanies: []),
+                    history: [
+                        .init(relativeTime: UserText.justNow, title: "/index1.html", url: "https://example.com/index1.html"),
+                        .init(relativeTime: UserText.justNow, title: "/index2.html", url: "https://example.com/index2.html"),
+                        .init(relativeTime: UserText.justNow, title: "/index3.html", url: "https://example.com/index3.html")
+                    ]
+                )
+            ]
+        )
+    }
+}
+
+private extension HistoryEntry {
+    static func make(
+        identifier: UUID,
+        url: URL,
+        title: String? = nil,
+        failedToLoad: Bool = false,
+        numberOfTotalVisits: Int = 1,
+        lastVisit: Date,
+        visits: Set<Visit> = [],
+        numberOfTrackersBlocked: Int = 0,
+        blockedTrackingEntities: Set<String> = [],
+        trackersFound: Bool = false
+    ) -> HistoryEntry {
+        HistoryEntry(
+            identifier: identifier,
+            url: url,
+            title: title,
+            failedToLoad: failedToLoad,
+            numberOfTotalVisits: numberOfTotalVisits,
+            lastVisit: lastVisit,
+            visits: visits,
+            numberOfTrackersBlocked: numberOfTrackersBlocked,
+            blockedTrackingEntities: blockedTrackingEntities,
+            trackersFound: trackersFound
         )
     }
 }

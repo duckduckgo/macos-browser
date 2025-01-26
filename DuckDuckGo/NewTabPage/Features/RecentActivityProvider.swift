@@ -30,16 +30,29 @@ protocol URLFavoriteStatusProviding: AnyObject {
     func isUrlFavorited(url: URL) -> Bool
 }
 
+protocol TrackerEntityPrevalenceComparing {
+    func isPrevalence(for lhsEntityName: String, greaterThan rhsEntityName: String) -> Bool
+}
+
 extension DuckPlayer: DuckPlayerHistoryEntryTitleProviding {}
 
 extension LocalBookmarkManager: URLFavoriteStatusProviding {}
+
+struct ContentBlockingPrevalenceComparator: TrackerEntityPrevalenceComparing {
+    let contentBlocking: ContentBlockingProtocol
+
+    func isPrevalence(for lhsEntityName: String, greaterThan rhsEntityName: String) -> Bool {
+        contentBlocking.prevalenceForEntity(named: lhsEntityName) > contentBlocking.prevalenceForEntity(named: rhsEntityName)
+    }
+}
 
 final class RecentActivityProvider: NewTabPageRecentActivityProviding {
     func refreshActivity() -> [NewTabPageDataModel.DomainActivity] {
         Self.calculateRecentActivity(
             with: historyCoordinator.history ?? [],
             urlFavoriteStatusProvider: urlFavoriteStatusProvider,
-            duckPlayerHistoryItemTitleProvider: duckPlayerHistoryEntryTitleProvider
+            duckPlayerHistoryItemTitleProvider: duckPlayerHistoryEntryTitleProvider,
+            trackerEntityPrevalenceComparator: trackerEntityPrevalenceComparator
         )
     }
 
@@ -48,15 +61,18 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
     let historyCoordinator: HistoryCoordinating
     let urlFavoriteStatusProvider: URLFavoriteStatusProviding
     let duckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitleProviding
+    let trackerEntityPrevalenceComparator: TrackerEntityPrevalenceComparing
 
     init(
         historyCoordinator: HistoryCoordinating,
         urlFavoriteStatusProvider: URLFavoriteStatusProviding,
-        duckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitleProviding = DuckPlayer.shared
+        duckPlayerHistoryEntryTitleProvider: DuckPlayerHistoryEntryTitleProviding,
+        trackerEntityPrevalenceComparator: TrackerEntityPrevalenceComparing
     ) {
         self.historyCoordinator = historyCoordinator
         self.urlFavoriteStatusProvider = urlFavoriteStatusProvider
         self.duckPlayerHistoryEntryTitleProvider = duckPlayerHistoryEntryTitleProvider
+        self.trackerEntityPrevalenceComparator = trackerEntityPrevalenceComparator
 
         activityPublisher = historyCoordinator.historyDictionaryPublisher
             .receive(on: DispatchQueue.main)
@@ -70,7 +86,8 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
                 return Self.calculateRecentActivity(
                     with: history,
                     urlFavoriteStatusProvider: urlFavoriteStatusProvider,
-                    duckPlayerHistoryItemTitleProvider: duckPlayerHistoryEntryTitleProvider
+                    duckPlayerHistoryItemTitleProvider: duckPlayerHistoryEntryTitleProvider,
+                    trackerEntityPrevalenceComparator: trackerEntityPrevalenceComparator
                 )
             }
             .eraseToAnyPublisher()
@@ -79,8 +96,12 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
     private static func calculateRecentActivity(
         with browsingHistory: BrowsingHistory,
         urlFavoriteStatusProvider: URLFavoriteStatusProviding,
-        duckPlayerHistoryItemTitleProvider: DuckPlayerHistoryEntryTitleProviding
+        duckPlayerHistoryItemTitleProvider: DuckPlayerHistoryEntryTitleProviding,
+        trackerEntityPrevalenceComparator: TrackerEntityPrevalenceComparing
     ) -> [NewTabPageDataModel.DomainActivity] {
+        guard !browsingHistory.isEmpty else {
+            return []
+        }
 
         var activityItems = [DomainActivityRef]()
         var activityItemsByDomain = [String: DomainActivityRef]()
@@ -107,7 +128,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
 
         activityItems.forEach {
             $0.activity.prettifyTitles(duckPlayerHistoryItemTitleProvider)
-            $0.activity.sortTrackingEntities()
+            $0.activity.sortTrackingEntities(using: trackerEntityPrevalenceComparator)
         }
 
         return activityItems.map(\.activity)
@@ -152,7 +173,7 @@ extension NewTabPageDataModel.DomainActivity {
         }
 
         let favicon: NewTabPageDataModel.ActivityFavicon? = {
-            guard let src = URL.duckFavicon(for: historyEntry.url)?.absoluteString else {
+            guard let src = URL.duckFavicon(for: rootURL)?.absoluteString else {
                 return nil
             }
             return .init(maxAvailableSize: Int(Favicon.SizeCategory.small.rawValue), src: src)
@@ -216,9 +237,9 @@ extension NewTabPageDataModel.DomainActivity {
         history = fixedHistory.filter { !urlsToRemove.contains($0.url) }
     }
 
-    mutating func sortTrackingEntities(_ contentBlocking: AnyContentBlocking = ContentBlocking.shared) {
+    mutating func sortTrackingEntities(using comparator: TrackerEntityPrevalenceComparing) {
         trackingStatus.trackerCompanies = trackingStatus.trackerCompanies.sorted(by: { lhs, rhs in
-            contentBlocking.prevalenceForEntity(named: lhs.displayName) > contentBlocking.prevalenceForEntity(named: rhs.displayName)
+            comparator.isPrevalence(for: lhs.displayName, greaterThan: rhs.displayName)
         })
     }
 
@@ -227,6 +248,10 @@ extension NewTabPageDataModel.DomainActivity {
     }
 }
 
+/**
+ * This helper class wraps `NewTabPageDataModel.DomainActivity` in a reference type, so that
+ * an array of activities can be mutated.
+ */
 private final class DomainActivityRef {
     var activity: NewTabPageDataModel.DomainActivity
 
