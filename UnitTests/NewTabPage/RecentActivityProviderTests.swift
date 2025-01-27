@@ -34,7 +34,7 @@ final class MockURLFireproofStatusProvider: URLFireproofStatusProviding {
     func isDomainFireproof(forURL url: URL) -> Bool {
         isDomainFireproof(url)
     }
-    
+
     var isDomainFireproof: (URL) -> Bool = { _ in false }
 }
 
