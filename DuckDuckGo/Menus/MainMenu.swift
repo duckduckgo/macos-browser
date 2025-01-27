@@ -119,7 +119,7 @@ final class MainMenu: NSMenu {
     init(featureFlagger: FeatureFlagger,
          bookmarkManager: BookmarkManager,
          faviconManager: FaviconManagement,
-         dockCustomizer: DockCustomization = DockCustomizer(), // TODO: could this be injected?
+         dockCustomizer: DockCustomization = DockCustomizer(),
          defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
          aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
 
