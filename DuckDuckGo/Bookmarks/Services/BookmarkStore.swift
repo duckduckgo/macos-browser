@@ -18,6 +18,7 @@
 
 import Bookmarks
 import Foundation
+import BrowserServicesKit
 
 enum BookmarkStoreFetchPredicateType {
     case bookmarks
@@ -28,18 +29,6 @@ enum BookmarkStoreFetchPredicateType {
 enum ParentFolderType: Equatable {
     case root
     case parent(uuid: String)
-}
-
-struct BookmarksImportSummary: Equatable {
-    var successful: Int
-    var duplicates: Int
-    var failed: Int
-
-    static func += (left: inout BookmarksImportSummary, right: BookmarksImportSummary) {
-        left.successful += right.successful
-        left.duplicates += right.duplicates
-        left.failed += right.failed
-    }
 }
 
 protocol BookmarkStore {

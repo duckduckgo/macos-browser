@@ -80,6 +80,7 @@ final class MainMenu: NSMenu {
     private var toggleBookmarksBarMenuItem = NSMenuItem(title: "BookmarksBarMenuPlaceholder", action: #selector(MainViewController.toggleBookmarksBarFromMenu), keyEquivalent: "B")
 
     var homeButtonMenuItem = NSMenuItem(title: "HomeButtonPlaceholder")
+    var showTabsAndBookmarksBarOnFullScreenMenuItem = NSMenuItem(title: "ShowTabsAndBookmarksBarOnFullScreenMenuItem")
     let toggleAutofillShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowAutofillShortcut, action: #selector(MainViewController.toggleAutofillShortcut), keyEquivalent: "A")
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
@@ -277,6 +278,8 @@ final class MainMenu: NSMenu {
             NSMenuItem(title: UserText.mainMenuViewHome, action: #selector(MainViewController.home), keyEquivalent: "H")
             NSMenuItem.separator()
 
+            showTabsAndBookmarksBarOnFullScreenMenuItem
+
             toggleBookmarksBarMenuItem
 
             NSMenuItem(title: UserText.openDownloads, action: #selector(MainViewController.toggleDownloads), keyEquivalent: "j")
@@ -450,6 +453,7 @@ final class MainMenu: NSMenu {
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
         updateAutofillDebugScriptMenuItem()
+        updateShowToolbarsOnFullScreenMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -584,6 +588,14 @@ final class MainMenu: NSMenu {
             return
         }
         self.homeButtonMenuItem = homeButtonMenuItem
+    }
+
+    private func updateShowToolbarsOnFullScreenMenuItem() {
+        guard let showTabsAndBookmarksBarOnFullScreenMenuItem = ShowToolbarsOnFullScreenMenuCoordinator.replace(showTabsAndBookmarksBarOnFullScreenMenuItem) else {
+            assertionFailure("Could not replace ShowTabsAndBookmarksBarOnFullScreenMenuItem")
+            return
+        }
+        self.showTabsAndBookmarksBarOnFullScreenMenuItem = showTabsAndBookmarksBarOnFullScreenMenuItem
     }
 
     @MainActor

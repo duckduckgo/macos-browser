@@ -20,14 +20,21 @@ import BrowserServicesKit
 import Combine
 import Foundation
 import MaliciousSiteProtection
-import TestUtils
+import PersistenceTestingUtils
+import NetworkingTestingUtils
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MaliciousSiteProtectionTests: XCTestCase {
-    lazy var phishingDetection: MaliciousSiteProtectionManager! = {
-        MaliciousSiteProtectionManager(apiService: apiService, dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlagger: MockFeatureFlagger())
+    lazy var phishingDetection: MaliciousSiteProtectionManager! = { () -> MaliciousSiteProtectionManager in
+        let configManager = MockPrivacyConfigurationManager()
+        let privacyConfig = MockPrivacyConfiguration()
+        privacyConfig.isSubfeatureKeyEnabled = { (subfeature: any PrivacySubfeature, _: AppVersionProvider) -> Bool in
+            if case MaliciousSiteProtectionSubfeature.onByDefault = subfeature { true } else { false }
+        }
+        configManager.privacyConfig = privacyConfig
+        return MaliciousSiteProtectionManager(apiService: apiService, dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlags: MaliciousSiteProtectionFeatureFlags(privacyConfigManager: configManager, isMaliciousSiteProtectionEnabled: { true }))
     }()
     var apiService: MockAPIService!
     var mockDetector: MockMaliciousSiteDetector!
@@ -89,28 +96,5 @@ final class MaliciousSiteProtectionTests: XCTestCase {
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
         let isMalicious = await phishingDetection.evaluate(URL(string: "https://trusted.com")!)
         XCTAssertNil(isMalicious)
-    }
-}
-
-extension MaliciousSiteProtectionTests {
-    class MockFeatureFlagger: FeatureFlagger {
-        var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: MockInternalUserStoring())
-        var localOverrides: FeatureFlagLocalOverriding?
-
-        func isFeatureOn<Flag: FeatureFlagDescribing>(for featureFlag: Flag, allowOverride: Bool) -> Bool {
-            return true
-        }
-
-        func getCohortIfEnabled(_ subfeature: any PrivacySubfeature) -> CohortID? {
-            return nil
-        }
-
-        func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
-            return nil
-        }
-
-        func getAllActiveExperiments() -> Experiments {
-            return [:]
-        }
     }
 }
