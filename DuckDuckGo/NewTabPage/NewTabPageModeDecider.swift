@@ -83,15 +83,12 @@ final class NewTabPageModeDecider: NewTabPageModeDeciding, NewTabPageSectionsAva
     }
 
     private func initializeStorageIfNeeded() {
-#if DEBUG
-        let isNewUser = false
-#else
         guard keyValueStore.object(forKey: Keys.isNewUser) == nil else {
             return
         }
-        let isOnboardingFinished = (keyValueStore.object(forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished) as? Bool) ?? false
+        let onboardingFinishedKey = UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue
+        let isOnboardingFinished = (keyValueStore.object(forKey: onboardingFinishedKey) as? Bool) ?? false
         let isNewUser = !isOnboardingFinished
-#endif
         keyValueStore.set(isNewUser, forKey: Keys.isNewUser)
     }
 }
