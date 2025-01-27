@@ -15374,7 +15374,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = 232.0.0;
+				branch = fcappelli/authv2/adding_v2_classes;
 				kind = branch;
 			};
 		};

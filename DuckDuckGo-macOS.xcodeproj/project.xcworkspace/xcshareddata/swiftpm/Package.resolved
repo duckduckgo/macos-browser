@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "232.0.0",
-        "revision" : "204a7de1bc67acd8c8b87a8f55b6f434f11b72f7"
+        "branch" : "fcappelli/authv2/adding_v2_classes",
+        "revision" : "fecc9d92592f11317bccc743f1002eeb3d58f731"
       }
     },
     {
