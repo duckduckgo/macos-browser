@@ -17,8 +17,8 @@
 //
 
 import Combine
+import PersistenceTestingUtils
 import PrivacyStats
-import TestUtils
 import TrackerRadarKit
 import XCTest
 @testable import NewTabPage

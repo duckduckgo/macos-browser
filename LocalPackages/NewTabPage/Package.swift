@@ -44,9 +44,9 @@ let package = Package(
             name: "NewTabPage",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
+                .product(name: "PersistenceTestingUtils", package: "BrowserServicesKit"),
                 .product(name: "PrivacyStats", package: "BrowserServicesKit"),
                 .product(name: "RemoteMessaging", package: "BrowserServicesKit"),
-                .product(name: "PersistenceTestingUtils", package: "BrowserServicesKit"),
                 .product(name: "UserScript", package: "BrowserServicesKit"),
                 .product(name: "UserScriptActionsManager", package: "UserScriptActionsManager"),
                 .product(name: "WebKitExtensions", package: "WebKitExtensions"),
