@@ -1080,6 +1080,8 @@
 		371209312C233D69003ADF3D /* RemoteMessagingStoreErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3712092B2C23383C003ADF3D /* RemoteMessagingStoreErrorHandling.swift */; };
 		3714B1E728EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E628EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift */; };
 		3714B1E928EDBAAB0056C57A /* DuckPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */; };
+		3718FF922D47D9610018F652 /* NewTabPageModeDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718FF912D47D95F0018F652 /* NewTabPageModeDeciderTests.swift */; };
+		3718FF932D47D9610018F652 /* NewTabPageModeDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718FF912D47D95F0018F652 /* NewTabPageModeDeciderTests.swift */; };
 		37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */; };
 		37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */; };
 		37197EA32942441D00394917 /* UserDialogRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */; };
@@ -3682,6 +3684,7 @@
 		3712092B2C23383C003ADF3D /* RemoteMessagingStoreErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingStoreErrorHandling.swift; sourceTree = "<group>"; };
 		3714B1E628EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerPreferencesTests.swift; sourceTree = "<group>"; };
 		3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerTests.swift; sourceTree = "<group>"; };
+		3718FF912D47D95F0018F652 /* NewTabPageModeDeciderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageModeDeciderTests.swift; sourceTree = "<group>"; };
 		371BBC5A2D00C911008FA0C7 /* NewTabPageActionsManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageActionsManagerExtension.swift; sourceTree = "<group>"; };
 		371BBC5D2D00CA3E008FA0C7 /* NewTabPageWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageWebViewModel.swift; sourceTree = "<group>"; };
 		371BFF5E2D39360E0075DB87 /* HistoryViewActionsManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewActionsManagerExtension.swift; sourceTree = "<group>"; };
@@ -5938,6 +5941,7 @@
 		377D7BC32D0AC7F100ADFD06 /* NewTabPage */ = {
 			isa = PBXGroup;
 			children = (
+				3718FF912D47D95F0018F652 /* NewTabPageModeDeciderTests.swift */,
 				370E70A22D46914A0077D4F3 /* RecentActivityProviderTests.swift */,
 				3730F20E2D2E725A00239F96 /* NewTabPageCustomizationProviderTests.swift */,
 				377D7BC02D0AC7E000ADFD06 /* NewTabPageNextStepsCardsProviderTests.swift */,
@@ -12337,6 +12341,7 @@
 				3706FDE1293F661700E42796 /* AdjacentItemEnumeratorTests.swift in Sources */,
 				4B9DB0572A983B55000927DB /* MockNotificationService.swift in Sources */,
 				3706FDE4293F661700E42796 /* TabLazyLoaderTests.swift in Sources */,
+				3718FF922D47D9610018F652 /* NewTabPageModeDeciderTests.swift in Sources */,
 				3706FDE5293F661700E42796 /* URLEventHandlerTests.swift in Sources */,
 				3706FDE6293F661700E42796 /* BookmarkOutlineViewDataSourceTests.swift in Sources */,
 				3706FDE7293F661700E42796 /* RecentlyVisitedSiteModelTests.swift in Sources */,
@@ -14306,6 +14311,7 @@
 				B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				56A054162C1C37B0007D8FAB /* CapturingOnboardingNavigation.swift in Sources */,
+				3718FF932D47D9610018F652 /* NewTabPageModeDeciderTests.swift in Sources */,
 				9FBD847A2BB3EC3300220859 /* MockAttributionOriginProvider.swift in Sources */,
 				CD3301302C89B602009AA127 /* ErrorPageHTMLFactoryTests.swift in Sources */,
 				4B2975992828285900187C4E /* FirefoxKeyReaderTests.swift in Sources */,
