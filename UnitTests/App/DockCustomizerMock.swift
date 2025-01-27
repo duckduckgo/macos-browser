@@ -21,7 +21,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class DockCustomizerMock: DockCustomization {
-    private var dockStatus: Bool = false
+    var dockStatus: Bool = false
 
     var isAddedToDock: Bool {
         return dockStatus
