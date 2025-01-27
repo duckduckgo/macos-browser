@@ -32,7 +32,7 @@ let package = Package(
             targets: ["FeatureFlags"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "229.1.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "231.0.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

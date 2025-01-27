@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B2D06682A13318400DE1F49"
-               BuildableName = "DuckDuckGo VPN.app"
-               BlueprintName = "DuckDuckGoVPNAppStore"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+               BlueprintIdentifier = "4B9579252AC7AE700062CA31"
+               BuildableName = "DuckDuckGo Privacy Pro.app"
+               BlueprintName = "DuckDuckGo Privacy Pro"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -43,10 +43,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4B2D06682A13318400DE1F49"
-            BuildableName = "DuckDuckGo VPN.app"
-            BlueprintName = "DuckDuckGoVPNAppStore"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            BlueprintIdentifier = "4B9579252AC7AE700062CA31"
+            BuildableName = "DuckDuckGo Privacy Pro.app"
+            BlueprintName = "DuckDuckGo Privacy Pro"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -60,10 +60,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4B2D06682A13318400DE1F49"
-            BuildableName = "DuckDuckGo VPN.app"
-            BlueprintName = "DuckDuckGoVPNAppStore"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            BlueprintIdentifier = "4B9579252AC7AE700062CA31"
+            BuildableName = "DuckDuckGo Privacy Pro.app"
+            BlueprintName = "DuckDuckGo Privacy Pro"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
