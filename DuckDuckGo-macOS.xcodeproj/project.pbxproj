@@ -1109,7 +1109,6 @@
 		37219B3B2CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B392CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift */; };
 		37219B3D2CC27DB700C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */; };
 		37219B3E2CC27DB700C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */; };
-		372217822B33380700B8E9C2 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 372217812B33380700B8E9C2 /* TestUtils */; };
 		37269EFB2B332F9E005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFA2B332F9E005E8E46 /* Common */; };
 		37269EFD2B332FAC005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFC2B332FAC005E8E46 /* Common */; };
 		37269EFF2B332FBB005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFE2B332FBB005E8E46 /* Common */; };
@@ -5080,7 +5079,6 @@
 				4BCBE45A2BA7E17800FC75A1 /* Subscription in Frameworks */,
 				B6EC37FF29B8D915001ACE79 /* Configuration in Frameworks */,
 				567A23C52C7F75BB0010F66C /* SpecialErrorPages in Frameworks */,
-				372217822B33380700B8E9C2 /* TestUtils in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
 				5641734D2CFE169400F4B716 /* PixelExperimentKit in Frameworks */,
 				85E2BBD02B8F534A00DBEC7A /* History in Frameworks */,
@@ -9995,7 +9993,6 @@
 				37DF000629F9C061002B7D3E /* SyncDataProviders */,
 				9DC70B192AA1FA5B005A844B /* LoginItems */,
 				37269EFC2B332FAC005E8E46 /* Common */,
-				372217812B33380700B8E9C2 /* TestUtils */,
 				4BF97AD02B43C43F00EB4240 /* NetworkProtectionIPC */,
 				4BF97AD22B43C43F00EB4240 /* NetworkProtectionUI */,
 				4BF97AD42B43C43F00EB4240 /* NetworkProtection */,
@@ -15630,11 +15627,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 371D00DF29D8509400EC8598 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */;
 			productName = OpenSSL;
-		};
-		372217812B33380700B8E9C2 /* TestUtils */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = TestUtils;
 		};
 		37269EFA2B332F9E005E8E46 /* Common */ = {
 			isa = XCSwiftPackageProductDependency;
