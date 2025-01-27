@@ -155,7 +155,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
 #if !APPSTORE
         if !dockCustomizer.isAddedToDock {
-            let addToDockMenuItem = NSMenuItem(title: "Add DuckDuckGo To Dock", action: #selector(addToDock(_:)))
+            let addToDockMenuItem = NSMenuItem(title: UserText.addDuckDuckGoToDock, action: #selector(addToDock(_:)))
                 .targetting(self)
                 .withImage(.addToDockMenuItem)
             addItem(addToDockMenuItem)
