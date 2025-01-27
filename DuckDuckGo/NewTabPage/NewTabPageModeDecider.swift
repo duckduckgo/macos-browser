@@ -89,7 +89,8 @@ final class NewTabPageModeDecider: NewTabPageModeDeciding, NewTabPageSectionsAva
         guard keyValueStore.object(forKey: Keys.isNewUser) == nil else {
             return
         }
-        let isNewUser = UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false).wrappedValue
+        let isOnboardingFinished = (keyValueStore.object(forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished) as? Bool) ?? false
+        let isNewUser = !isOnboardingFinished
 #endif
         keyValueStore.set(isNewUser, forKey: Keys.isNewUser)
     }
