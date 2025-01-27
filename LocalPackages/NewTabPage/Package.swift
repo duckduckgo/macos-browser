@@ -32,7 +32,7 @@ let package = Package(
             targets: ["NewTabPage"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "230.1.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "231.0.0"),
         .package(path: "../WebKitExtensions"),
         .package(path: "../UserScriptActionsManager"),
         .package(path: "../Utilities"),
