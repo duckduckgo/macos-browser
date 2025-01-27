@@ -55,6 +55,7 @@ public enum FeatureFlag: String, CaseIterable {
 
     case autofillPartialFormSaves
     case autcompleteTabs
+    case syncSeamlessAccountSwitching
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -71,6 +72,8 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .autcompleteTabs:
             return true
         case .networkProtectionAppExclusions:
+            return true
+        case .syncSeamlessAccountSwitching:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -117,6 +120,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         case .autcompleteTabs:
             return .remoteReleasable(.feature(.autocompleteTabs))
+        case .syncSeamlessAccountSwitching:
+            return .remoteReleasable(.subfeature(SyncSubfeature.seamlessAccountSwitching))
         }
     }
 }

@@ -250,7 +250,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         ensureUserUnauthenticatedState()
 
         authService.validateTokenResult = .failure(Constants.invalidTokenError)
-        storePurchaseManager.mostRecentTransactionResult = nil
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
 
         // When
         let result = try await feature.getSubscription(params: Constants.mockParams, original: Constants.mockScriptMessage)
@@ -417,8 +417,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         XCTAssertFalse(accountManager.isUserAuthenticated)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
-        storePurchaseManager.mostRecentTransactionResult = nil
-
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
         authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
                                                                          externalID: Constants.externalID,
                                                                          status: "created"))
@@ -428,6 +427,13 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
                                                                                      subscription: SubscriptionMockFactory.subscription))
+        authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
+                                                                   email: Constants.email,
+                                                                   externalID: Constants.externalID,
+                                                                   id: 1,
+                                                                   status: "authenticated"))
+        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -454,7 +460,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         XCTAssertFalse(accountManager.isUserAuthenticated)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
-        storePurchaseManager.mostRecentTransactionResult = nil
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
 
         authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
                                                                          externalID: Constants.externalID,
@@ -465,6 +471,13 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
                                                                                      subscription: SubscriptionMockFactory.subscription))
+        authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
+                                                                   email: Constants.email,
+                                                                   externalID: Constants.externalID,
+                                                                   id: 1,
+                                                                   status: "authenticated"))
+        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -493,7 +506,6 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.hasActiveSubscriptionResult = false
         storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
         subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
-
         authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
                                                                    email: Constants.email,
                                                                    externalID: Constants.externalID,
@@ -626,10 +638,19 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
-        storePurchaseManager.mostRecentTransactionResult = nil
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
 
         authService.createAccountResult = .failure(Constants.invalidTokenError)
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
+        authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
+                                                                   email: Constants.email,
+                                                                   externalID: Constants.externalID,
+                                                                   id: 1,
+                                                                   status: "authenticated"))
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
+        authService.getAccessTokenResult = .failure(Constants.invalidTokenError)
+        authService.validateTokenResult = .failure(Constants.invalidTokenError)
+        storePurchaseManager.purchaseSubscriptionResult = .failure(StorePurchaseManagerError.purchaseCancelledByUser)
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -978,7 +999,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         XCTAssertFalse(accountManager.isUserAuthenticated)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
-        storePurchaseManager.mostRecentTransactionResult = nil
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
 
         authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
                                                                          externalID: Constants.externalID,
@@ -989,7 +1010,13 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
                                                                                      subscription: SubscriptionMockFactory.subscription))
-
+        authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
+                                                                   email: Constants.email,
+                                                                   externalID: Constants.externalID,
+                                                                   id: 1,
+                                                                   status: "authenticated"))
+        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
         mockFreemiumDBPUserStateManager.didActivate = true
         feature.with(broker: broker)
         let notificationPostedExpectation = expectation(forNotification: .subscriptionUpgradeFromFreemium, object: nil)
@@ -1011,7 +1038,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         XCTAssertFalse(accountManager.isUserAuthenticated)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
-        storePurchaseManager.mostRecentTransactionResult = nil
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
 
         authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
                                                                          externalID: Constants.externalID,
@@ -1022,7 +1049,13 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
                                                                                      subscription: SubscriptionMockFactory.subscription))
-
+        authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
+                                                                   email: Constants.email,
+                                                                   externalID: Constants.externalID,
+                                                                   id: 1,
+                                                                   status: "authenticated"))
+        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
         mockFreemiumDBPUserStateManager.didActivate = false
         feature.with(broker: broker)
         let notificationPostedExpectation = expectation(forNotification: .subscriptionUpgradeFromFreemium, object: nil)
@@ -1045,7 +1078,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         XCTAssertFalse(accountManager.isUserAuthenticated)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
-        storePurchaseManager.mostRecentTransactionResult = nil
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
 
         authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
                                                                          externalID: Constants.externalID,
@@ -1056,7 +1089,12 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
                                                                                      subscription: SubscriptionMockFactory.subscription))
-
+        authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
+                                                                   email: Constants.email,
+                                                                   externalID: Constants.externalID,
+                                                                   id: 1,
+                                                                   status: "authenticated"))
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = true
         feature.with(broker: broker)
         let freeiumOrigin = PrivacyProSubscriptionAttributionPixelHandler.Consts.freemiumOrigin
@@ -1077,13 +1115,19 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         XCTAssertFalse(accountManager.isUserAuthenticated)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
-        storePurchaseManager.mostRecentTransactionResult = nil
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
 
         authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
                                                                          externalID: Constants.externalID,
                                                                          status: "created"))
         authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
         authService.validateTokenResult = .success(Constants.validateTokenResponse)
+        authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
+                                                                   email: Constants.email,
+                                                                   externalID: Constants.externalID,
+                                                                   id: 1,
+                                                                   status: "authenticated"))
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
