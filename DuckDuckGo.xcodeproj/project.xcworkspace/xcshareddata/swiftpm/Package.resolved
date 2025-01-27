@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "fcappelli/authv2/networking_improvements",
-        "revision" : "4e6e7b35b4137a4dee44b176d3594abacd4f6a5f"
+        "revision" : "2e2a6a4b38f29ede2eae8eadfa4d3f0ae54ca744"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "0ac30560ec969a321caea321f95537120416c323",
-        "version" : "7.7.0"
+        "revision" : "181696656f3627c1b3ca8cda06d54971e03436ef",
+        "version" : "7.10.0"
       }
     },
     {
