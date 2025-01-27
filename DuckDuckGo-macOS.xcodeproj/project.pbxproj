@@ -15374,7 +15374,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "graeme/simplify-connecting-sync-accounts-when-2";
+				branch = 232.0.0;
 				kind = branch;
 			};
 		};
