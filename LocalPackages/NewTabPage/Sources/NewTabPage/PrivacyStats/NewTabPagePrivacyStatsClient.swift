@@ -82,7 +82,7 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageUserScriptClient {
 
     @MainActor
     private func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
+        guard let config: NewTabPageUserScript.WidgetConfig = CodableHelper.decode(from: params) else {
             return nil
         }
         model.isViewExpanded = config.expansion == .expanded
