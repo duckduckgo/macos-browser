@@ -89,6 +89,49 @@ class MainMenuTests: XCTestCase {
         XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
     }
 
+    // MARK: - Add To Dock Action
+
+    @MainActor
+    func testWhenBrowserIsAddedToDockThenMenuItemIsHidden() throws {
+        let dockCustomizer = DockCustomizerMock()
+        dockCustomizer.addToDock()
+
+        let sut = MainMenu(
+            featureFlagger: DummyFeatureFlagger(),
+            bookmarkManager: MockBookmarkManager(),
+            faviconManager: FaviconManagerMock(),
+            dockCustomizer: dockCustomizer,
+            aiChatMenuConfig: DummyAIChatConfig()
+        )
+
+        sut.update()
+
+        let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
+
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.addDuckDuckGoToDock)
+        XCTAssertTrue(duckDuckGoMenu.items[3].isHidden)
+    }
+
+    @MainActor
+    func testWhenBrowserIsNotInTheDockThenMenuItemIsVisible() throws {
+        let dockCustomizer = DockCustomizerMock()
+
+        let sut = MainMenu(
+            featureFlagger: DummyFeatureFlagger(),
+            bookmarkManager: MockBookmarkManager(),
+            faviconManager: FaviconManagerMock(),
+            dockCustomizer: dockCustomizer,
+            aiChatMenuConfig: DummyAIChatConfig()
+        )
+
+        sut.update()
+
+        let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
+
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.addDuckDuckGoToDock)
+        XCTAssertFalse(duckDuckGoMenu.items[3].isHidden)
+    }
+
     // MARK: - Default Browser Action
 
     @MainActor
@@ -108,8 +151,8 @@ class MainMenuTests: XCTestCase {
 
         let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
 
-        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "…")
-        XCTAssertTrue(duckDuckGoMenu.items[3].isHidden)
+        XCTAssertEqual(duckDuckGoMenu.items[4].title, UserText.setAsDefaultBrowser + "…")
+        XCTAssertTrue(duckDuckGoMenu.items[4].isHidden)
     }
 
     @MainActor
@@ -129,8 +172,8 @@ class MainMenuTests: XCTestCase {
 
         let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
 
-        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "…")
-        XCTAssertFalse(duckDuckGoMenu.items[3].isHidden)
+        XCTAssertEqual(duckDuckGoMenu.items[4].title, UserText.setAsDefaultBrowser + "…")
+        XCTAssertFalse(duckDuckGoMenu.items[4].isHidden)
     }
 
     // MARK: - Bookmarks
