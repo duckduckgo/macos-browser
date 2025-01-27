@@ -1046,6 +1046,10 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
         if isSuggestionWindowVisible {
             switch commandSelector {
+            case #selector(NSResponder.moveRight(_:)):
+                suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix, userAppendedStringToTheEnd: false)
+                return false
+
             case #selector(NSResponder.moveDown(_:)):
                 suggestionContainerViewModel?.selectNextIfPossible()
                 return true
@@ -1054,14 +1058,11 @@ extension AddressBarTextField: NSTextFieldDelegate {
                 suggestionContainerViewModel?.selectPreviousIfPossible()
                 return true
 
-            case #selector(NSResponder.deleteBackward(_:)),
-                 #selector(NSResponder.deleteForward(_:)),
+            case #selector(NSResponder.deleteForward(_:)),
                  #selector(NSResponder.deleteToMark(_:)),
                  #selector(NSResponder.deleteWordForward(_:)),
-                 #selector(NSResponder.deleteWordBackward(_:)),
                  #selector(NSResponder.deleteToEndOfLine(_:)),
                  #selector(NSResponder.deleteToEndOfParagraph(_:)),
-                 #selector(NSResponder.deleteToBeginningOfLine(_:)),
                  #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
 
                 suggestionContainerViewModel?.clearSelection()
