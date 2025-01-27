@@ -382,7 +382,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     public var session: NETunnelProviderSession? {
         get async {
-            guard let manager = await manager,
+            guard let manager = internalManager,
                   let session = manager.connection as? NETunnelProviderSession else {
 
                 // The active connection is not running, so there's no session, this is acceptable

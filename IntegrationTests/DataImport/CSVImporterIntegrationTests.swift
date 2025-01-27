@@ -51,7 +51,7 @@ final class CSVImporterIntegrationTests: XCTestCase {
         let csvImporter = CSVImporter(
             fileURL: csvURL,
             loginImporter: SecureVaultLoginImporter(),
-            defaultColumnPositions: nil
+            defaultColumnPositions: nil, reporter: SecureVaultReporter.shared
         )
         let importTask = csvImporter.importData(types: [.passwords])
 
@@ -76,7 +76,7 @@ final class CSVImporterIntegrationTests: XCTestCase {
         let startingDataImporter = CSVImporter(
             fileURL: startingDataURL,
             loginImporter: SecureVaultLoginImporter(),
-            defaultColumnPositions: nil
+            defaultColumnPositions: nil, reporter: SecureVaultReporter.shared
         )
         _ = await startingDataImporter.importData(types: [.passwords]).result
 
@@ -84,7 +84,7 @@ final class CSVImporterIntegrationTests: XCTestCase {
         let testDataImporter = CSVImporter(
             fileURL: testDataURL,
             loginImporter: SecureVaultLoginImporter(),
-            defaultColumnPositions: nil
+            defaultColumnPositions: nil, reporter: SecureVaultReporter.shared
         )
         let importTask = testDataImporter.importData(types: [.passwords])
         let result = await importTask.result

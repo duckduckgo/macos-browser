@@ -79,7 +79,7 @@ class StateRestorationTests: UITestCase {
             "Site didn't load with the expected title in a reasonable timeframe."
         )
 
-        app.terminate()
+        app.typeKey("q", modifierFlags: [.command])
         app.launch()
 
         XCTAssertTrue(

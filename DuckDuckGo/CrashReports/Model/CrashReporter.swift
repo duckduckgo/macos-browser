@@ -50,6 +50,7 @@ final class CrashReporter {
         }
 
         PixelKit.fire(GeneralPixel.crash)
+        PixelKit.fire(GeneralPixel.crashDaily, frequency: .legacyDaily)
 
         promptPresenter.showPrompt(for: latest) {
             guard let contentData = latest.contentData else {
