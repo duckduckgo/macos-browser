@@ -25,7 +25,7 @@ final class CapturingNewTabPageRecentActivityProvider: NewTabPageRecentActivityP
         refreshActivityCallCount += 1
         return refreshActivityReturnValue
     }
-    
+
     var activityPublisher: AnyPublisher<[NewTabPageDataModel.DomainActivity], Never> {
         $activity.dropFirst().eraseToAnyPublisher()
     }
