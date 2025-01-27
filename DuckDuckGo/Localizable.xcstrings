@@ -1233,22 +1233,10 @@
       "comment" : "Suffix of DuckDuckGo Search open tab suggestion. Example: cats – DuckDuckGo Search",
       "extractionState" : "extracted_with_value",
       "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo-Suche"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "DuckDuckGo Search"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Búsqueda de DuckDuckGo"
           }
         },
         "fr" : {
@@ -1257,16 +1245,10 @@
             "value" : "Recherche DuckDuckGo"
           }
         },
-        "it" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ricerca DuckDuckGo"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoeken met DuckDuckGo"
+            "value" : "DuckDuckGo-Suche"
           }
         },
         "pl" : {
@@ -1275,16 +1257,34 @@
             "value" : "Wyszukiwanie DuckDuckGo"
           }
         },
-        "pt" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pesquisa DuckDuckGo"
+            "value" : "Búsqueda de DuckDuckGo"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Поиск DuckDuckGo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoeken met DuckDuckGo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisa DuckDuckGo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricerca DuckDuckGo"
           }
         }
       }
@@ -64019,22 +64019,10 @@
       "comment" : "Suggestion to switch to an open tab button title",
       "extractionState" : "extracted_with_value",
       "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu Tab wechseln"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Switch to Tab"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cambiar a Pestaña"
           }
         },
         "fr" : {
@@ -64043,16 +64031,10 @@
             "value" : "Passer à l'onglet"
           }
         },
-        "it" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passa alla scheda"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Overschakelen naar tabblad"
+            "value" : "Zu Tab wechseln"
           }
         },
         "pl" : {
@@ -64061,16 +64043,34 @@
             "value" : "Przełącz na kartę"
           }
         },
-        "pt" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mudar para separador"
+            "value" : "Cambiar a Pestaña"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перейти на вкладку"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overschakelen naar tabblad"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mudar para separador"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passa alla scheda"
           }
         }
       }
