@@ -21,7 +21,7 @@ import DDGSync
 import Combine
 import Common
 import SystemConfiguration
-import SyncUI
+import SyncUI_macOS
 import SwiftUI
 import PDFKit
 import Navigation
@@ -40,7 +40,7 @@ extension SyncDevice {
     }
 }
 
-final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
+final class SyncPreferences: ObservableObject, SyncUI_macOS.ManagementViewModel {
     var syncPausedTitle: String? {
         return syncPausedStateManager.syncPausedMessageData?.title
     }
