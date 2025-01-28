@@ -30,6 +30,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
     enum MessageName: String, CaseIterable {
         case getConfig = "activity_getConfig"
         case getData = "activity_getData"
+        case onBurnComplete = "activity_onBurnComplete"
         case onConfigUpdate = "activity_onConfigUpdate"
         case onDataUpdate = "activity_onDataUpdate"
         case setConfig = "activity_setConfig"
@@ -56,6 +57,14 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
             .sink { [weak self] activity in
                 Task { @MainActor in
                     self?.notifyDataUpdated(activity)
+                }
+            }
+            .store(in: &cancellables)
+
+        model.actionsHandler.burnDidCompletePublisher
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.notifyBurnDidComplete()
                 }
             }
             .store(in: &cancellables)
@@ -102,6 +111,11 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
     @MainActor
     private func notifyDataUpdated(_ activity: [NewTabPageDataModel.DomainActivity]) {
         pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageDataModel.ActivityData(activity: activity))
+    }
+
+    @MainActor
+    private func notifyBurnDidComplete() {
+        pushMessage(named: MessageName.onBurnComplete.rawValue, params: nil)
     }
 
     @MainActor

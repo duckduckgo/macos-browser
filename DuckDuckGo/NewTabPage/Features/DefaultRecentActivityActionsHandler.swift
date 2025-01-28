@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Common
 import Foundation
 import NewTabPage
@@ -39,6 +40,8 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
     let fireproofStatusProvider: URLFireproofStatusProviding
     let fireViewModel: () async -> FireViewModel
     let tld: TLD
+    let burnDidCompletePublisher: AnyPublisher<Void, Never>
+    private let burnDidCompleteSubject = PassthroughSubject<Void, Never>()
 
     init(
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
@@ -50,6 +53,7 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
         self.fireproofStatusProvider = fireproofStatusProvider
         self.fireViewModel = fireViewModel ?? { @MainActor in FireCoordinator.fireViewModel }
         self.tld = tld
+        self.burnDidCompletePublisher = burnDidCompleteSubject.eraseToAnyPublisher()
     }
 
     @MainActor
@@ -86,7 +90,9 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
         }
         let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
         let fireViewModel = await fireViewModel()
-        fireViewModel.fire.burnEntity(entity: .none(selectedDomains: domains))
+        fireViewModel.fire.burnEntity(entity: .none(selectedDomains: domains)) { [weak self] in
+            self?.burnDidCompleteSubject.send()
+        }
         return true
     }
 
