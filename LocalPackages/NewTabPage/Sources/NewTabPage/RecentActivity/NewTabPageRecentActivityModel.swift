@@ -57,7 +57,7 @@ final class UserDefaultsNewTabPageRecentActivitySettingsPersistor: NewTabPagePri
     }
 
     var isViewExpanded: Bool {
-        get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
+        get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? true }
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
     }
 
