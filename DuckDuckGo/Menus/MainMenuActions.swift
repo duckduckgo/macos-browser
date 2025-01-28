@@ -912,6 +912,11 @@ extension MainViewController {
         SyncPromoManager().resetPromos()
     }
 
+    @objc func resetAddToDockFeatureNotification(_ sender: Any?) {
+        guard var dockCustomizer = Application.appDelegate.dockCustomization else { return }
+        dockCustomizer.wasFeatureShownFromMoreOptionsMenu = false
+    }
+
     @objc func resetTipKit(_ sender: Any?) {
         TipKitDebugOptionsUIActionHandler().resetTipKitTapped()
     }

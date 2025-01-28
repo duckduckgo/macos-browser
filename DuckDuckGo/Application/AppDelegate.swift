@@ -164,6 +164,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if SPARKLE
     var updateController: UpdateController!
+    var dockCustomization: DockCustomization!
 #endif
 
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
@@ -349,6 +350,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if SPARKLE
         if NSApp.runType != .uiTests {
             updateController = UpdateController(internalUserDecider: internalUserDecider)
+            dockCustomization = DockCustomizer()
             stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
         }
 #endif

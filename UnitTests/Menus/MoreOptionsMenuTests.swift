@@ -310,6 +310,7 @@ final class MoreOptionsMenuTests: XCTestCase {
             return
         }
 
+        dockCustomizer.wasFeatureShownFromMoreOptionsMenu = true
         dockCustomizer.dockStatus = false
 
         setupMoreOptionsMenu()
@@ -354,6 +355,7 @@ final class MoreOptionsMenuTests: XCTestCase {
             return
         }
 
+        dockCustomizer.wasFeatureShownFromMoreOptionsMenu = true
         dockCustomizer.dockStatus = false
         defaultBrowserProvider.isDefault = false
 

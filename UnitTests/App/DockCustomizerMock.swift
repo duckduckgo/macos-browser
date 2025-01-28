@@ -16,11 +16,23 @@
 //  limitations under the License.
 //
 
+import Combine
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
 class DockCustomizerMock: DockCustomization {
+    private var featureShownSubject = CurrentValueSubject<Bool, Never>(false)
+
+    var wasFeatureShownPublisher: AnyPublisher<Bool, Never> {
+        featureShownSubject.eraseToAnyPublisher()
+    }
+
+    var wasFeatureShownFromMoreOptionsMenu: Bool {
+        get { featureShownSubject.value }
+        set { featureShownSubject.send(newValue) }
+    }
+
     var dockStatus: Bool = false
 
     var isAddedToDock: Bool {

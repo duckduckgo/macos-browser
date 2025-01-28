@@ -17,22 +17,39 @@
 //
 
 import Foundation
+import Combine
 import Common
 import os.log
+import Persistence
 
 protocol DockCustomization {
     var isAddedToDock: Bool { get }
+    var wasFeatureShownFromMoreOptionsMenu: Bool { get set }
+    var wasFeatureShownPublisher: AnyPublisher<Bool, Never> { get }
 
     @discardableResult
     func addToDock() -> Bool
 }
 
 final class DockCustomizer: DockCustomization {
+    enum Keys {
+        static let wasAddToDockFeatureShown = "more-options-menu.was-add-to-dock-shown"
+    }
 
     private let positionProvider: DockPositionProviding
+    private let keyValueStore: KeyValueStoring
 
-    init(positionProvider: DockPositionProviding = DockPositionProvider()) {
+    @Published private var isFeatureShownFromMoreOptionsMenu: Bool = false
+    var wasFeatureShownPublisher: AnyPublisher<Bool, Never> {
+        $isFeatureShownFromMoreOptionsMenu.eraseToAnyPublisher()
+    }
+
+    init(positionProvider: DockPositionProviding = DockPositionProvider(),
+         keyValueStore: KeyValueStoring = UserDefaults.standard) {
         self.positionProvider = positionProvider
+        self.keyValueStore = keyValueStore
+
+        isFeatureShownFromMoreOptionsMenu = keyValueStore.object(forKey: Keys.wasAddToDockFeatureShown) as? Bool ?? false
     }
 
     private var dockPlistURL: URL = URL(fileURLWithPath: NSString(string: "~/Library/Preferences/com.apple.dock.plist").expandingTildeInPath)
@@ -51,6 +68,14 @@ final class DockCustomizer: DockCustomization {
         }
 
         return persistentApps.contains(where: { ($0["tile-data"] as? [String: AnyObject])?["bundle-identifier"] as? String == bundleIdentifier })
+    }
+
+    var wasFeatureShownFromMoreOptionsMenu: Bool {
+        get { return isFeatureShownFromMoreOptionsMenu }
+        set {
+            isFeatureShownFromMoreOptionsMenu = newValue
+            keyValueStore.set(newValue, forKey: Keys.wasAddToDockFeatureShown)
+        }
     }
 
     // Adds a dictionary representing the application, either by using an existing 

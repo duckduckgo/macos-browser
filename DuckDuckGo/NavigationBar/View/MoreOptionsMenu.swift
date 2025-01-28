@@ -26,6 +26,7 @@ import Subscription
 import os.log
 import Freemium
 import DataBrokerProtection
+import SwiftUI
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -65,7 +66,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     private let freemiumDBPFeature: FreemiumDBPFeature
     private let freemiumDBPPresenter: FreemiumDBPPresenter
     private let appearancePreferences: AppearancePreferences
-    private let dockCustomizer: DockCustomization
+    private var dockCustomizer: DockCustomization?
     private let defaultBrowserPreferences: DefaultBrowserPreferences
 
     private let notificationCenter: NotificationCenter
@@ -94,7 +95,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
          freemiumDBPFeature: FreemiumDBPFeature,
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
-         dockCustomizer: DockCustomization = DockCustomizer(),
+         dockCustomizer: DockCustomization? = nil,
          defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
          notificationCenter: NotificationCenter = .default,
          freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler(),
@@ -153,12 +154,28 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
 #endif // FEEDBACK
 
-#if !APPSTORE
-        if !dockCustomizer.isAddedToDock {
-            let addToDockMenuItem = NSMenuItem(title: UserText.addDuckDuckGoToDock, action: #selector(addToDock(_:)))
-                .targetting(self)
-                .withImage(.addToDockMenuItem)
-            addItem(addToDockMenuItem)
+#if SPARKLE
+        if let dockCustomizer = self.dockCustomizer {
+            if dockCustomizer.isAddedToDock == false {
+                if dockCustomizer.wasFeatureShownFromMoreOptionsMenu {
+                    let addToDockMenuItem = NSMenuItem(title: UserText.addDuckDuckGoToDock, action: #selector(addToDock(_:)))
+                        .targetting(self)
+                        .withImage(.addToDockMenuItem)
+                    addItem(addToDockMenuItem)
+                } else {
+                    let addToDockMenuItem = NSMenuItem(action: #selector(addToDock(_:)))
+                        .targetting(self)
+                    addToDockMenuItem.view = createMenuItemWithFeatureIndicator(
+                        title: UserText.addDuckDuckGoToDock,
+                        image: .addToDockMenuItem) {
+                            if let target = addToDockMenuItem.target {
+                                _ = target.perform(addToDockMenuItem.action, with: addToDockMenuItem)
+                                // TODO: Need to close the menu when this happens
+                            }
+                        }
+                    addItem(addToDockMenuItem)
+                }
+            }
         }
 #endif
         if !defaultBrowserPreferences.isDefault {
@@ -199,6 +216,16 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         addItem(preferencesItem)
     }
 
+    private func createMenuItemWithFeatureIndicator(title: String, image: NSImage, onTap: @escaping () -> Void) -> NSView {
+        let menuItem = MenuItemWithNotificationDot(leftImage: image, title: title, onTapMenuItem: onTap)
+
+        let hostingView = NSHostingView(rootView: menuItem)
+        hostingView.frame = NSRect(x: 0, y: 0, width: size.width, height: 22)
+        hostingView.autoresizingMask = [.width, .height]
+
+        return hostingView
+    }
+
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
     }
@@ -210,7 +237,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     @MainActor
     @objc func addToDock(_ sender: NSMenuItem) {
         PixelKit.fire(GeneralPixel.userAddedToDockFromMoreOptionsMenu)
-        dockCustomizer.addToDock()
+        dockCustomizer?.addToDock()
     }
 
     @MainActor
@@ -529,6 +556,10 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
             updateController.needsNotificationDot = false
         }
 #endif
+    }
+
+    func menuDidClose(_ menu: NSMenu) {
+        dockCustomizer?.wasFeatureShownFromMoreOptionsMenu = true
     }
 }
 

@@ -684,6 +684,7 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Home Page Settings Onboarding", action: #selector(MainViewController.resetHomePageSettingsOnboarding(_:)))
                 NSMenuItem(title: "Reset Contextual Onboarding", action: #selector(MainViewController.resetContextualOnboarding(_:)))
                 NSMenuItem(title: "Reset Sync Promo prompts", action: #selector(MainViewController.resetSyncPromoPrompts))
+                NSMenuItem(title: "Reset Add To Dock more options menu notification", action: #selector(MainViewController.resetAddToDockFeatureNotification))
 
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
