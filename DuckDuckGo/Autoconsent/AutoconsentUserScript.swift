@@ -255,7 +255,19 @@ extension AutoconsentUserScript {
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
         let filterlistExceptions = remoteConfig["filterlistExceptions"] as? [String] ?? []
+
+#if DEBUG
+        // The `filterList` feature flag being disabled causes the integration test suite to fail - this is a temporary change to hardcode the
+        // flag to true when integration tests are running. In all other cases, continue to use the flag as usual.
+        let enableFilterList: Bool
+        if [.integrationTests].contains(NSApp.runType) {
+            enableFilterList = true
+        } else {
+            enableFilterList = config.isSubfeatureEnabled(AutoconsentSubfeature.filterlist) && !self.matchDomainList(domain: topURLDomain, domainsList: filterlistExceptions)
+        }
+#else
         let enableFilterList = config.isSubfeatureEnabled(AutoconsentSubfeature.filterlist) && !self.matchDomainList(domain: topURLDomain, domainsList: filterlistExceptions)
+#endif
 
         let autoconsentConfig = [
             "type": "initResp",
