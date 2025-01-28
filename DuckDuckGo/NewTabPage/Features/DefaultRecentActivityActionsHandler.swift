@@ -20,21 +20,34 @@ import Common
 import Foundation
 import NewTabPage
 
+protocol URLFireproofStatusProviding: AnyObject {
+    func isDomainFireproof(forURL url: URL) -> Bool
+}
+
+extension FireproofDomains: URLFireproofStatusProviding {
+    func isDomainFireproof(forURL url: URL) -> Bool {
+        guard let domain = url.host?.droppingWwwPrefix() else {
+            return false
+        }
+        return isFireproof(fireproofDomain: domain)
+    }
+}
+
 final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
     let bookmarkManager: BookmarkManager
-    let fireproofDomains: FireproofDomains
+    let fireproofStatusProvider: URLFireproofStatusProviding
     let fire: () async -> Fire
     let tld: TLD
 
     init(
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-        fireproofDomains: FireproofDomains = FireproofDomains.shared,
+        fireproofStatusProvider: URLFireproofStatusProviding = FireproofDomains.shared,
         fire: (() async -> (Fire))? = nil,
         tld: TLD = ContentBlocking.shared.tld
     ) {
         self.bookmarkManager = bookmarkManager
-        self.fireproofDomains = fireproofDomains
+        self.fireproofStatusProvider = fireproofStatusProvider
         self.fire = fire ?? { @MainActor in FireCoordinator.fireViewModel.fire }
         self.tld = tld
     }
@@ -63,7 +76,7 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
     @MainActor
     func confirmBurn(_ url: URL) async -> Bool {
-        guard let domain = url.host?.droppingWwwPrefix(), fireproofDomains.isFireproof(fireproofDomain: domain) else {
+        guard fireproofStatusProvider.isDomainFireproof(forURL: url) else {
             return false
         }
         guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {

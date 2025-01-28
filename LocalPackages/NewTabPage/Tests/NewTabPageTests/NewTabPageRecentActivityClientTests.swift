@@ -97,7 +97,6 @@ final class NewTabPageRecentActivityClientTests: XCTestCase {
                 etldPlusOne: "example.com",
                 favicon: .init(maxAvailableSize: 32, src: "duck://favicon/http%3A//example.com"),
                 favorite: false,
-                fireproof: false,
                 trackersFound: true,
                 trackingStatus: .init(totalCount: 5, trackerCompanies: [.init(displayName: "Facebook")]),
                 history: [
