@@ -19,6 +19,7 @@
 import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
 
 private struct ChromiumLoginStore {
     static let legacy: Self = .init(directory: "Legacy", decryptionKey: "0geUdf5dTuZmIrtd8Omf/Q==")

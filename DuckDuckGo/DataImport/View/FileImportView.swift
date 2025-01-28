@@ -20,6 +20,7 @@ import Common
 import SwiftUI
 import UniformTypeIdentifiers
 import os.log
+import BrowserServicesKit
 
 @InstructionsView.InstructionsBuilder
 func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImport.DataType, button: @escaping (String) -> AnyView) -> [InstructionsView.InstructionsItem] {

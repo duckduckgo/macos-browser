@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import BrowserServicesKit
 
 @MainActor
 struct DataImportSourcePicker: View {
