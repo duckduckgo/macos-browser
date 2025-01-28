@@ -29,4 +29,5 @@ extension Logger {
     static var tabLazyLoading = { Logger(subsystem: "Lazy Loading", category: "") }()
     static var updates = { Logger(subsystem: "Updates", category: "") }()
     static var tabPreview = { Logger(subsystem: "Tab Preview", category: "") }()
+    static var maliciousSiteProtection = { Logger(subsystem: "Malsite Protection", category: "") }()
 }

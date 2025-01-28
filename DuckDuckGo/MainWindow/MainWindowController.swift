@@ -24,8 +24,10 @@ import Common
 final class MainWindowController: NSWindowController {
 
     private var fireViewModel: FireViewModel
+    private var cancellables: Set<AnyCancellable> = []
     private static var knownFullScreenMouseDetectionWindows = Set<NSValue>()
     let fireWindowSession: FireWindowSession?
+    private let appearancePreferences: AppearancePreferences = .shared
 
     var mainViewController: MainViewController {
         // swiftlint:disable force_cast
@@ -59,6 +61,7 @@ final class MainWindowController: NSWindowController {
         subscribeToTrafficLightsAlpha()
         subscribeToBurningData()
         subscribeToResolutionChange()
+        subscribeToFullScreenToolbarChanges()
 
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.eventsListener.didOpenWindow(self)
@@ -103,6 +106,21 @@ final class MainWindowController: NSWindowController {
 
     private func subscribeToResolutionChange() {
         NotificationCenter.default.addObserver(self, selector: #selector(didChangeScreenParameters), name: NSApplication.didChangeScreenParametersNotification, object: NSApp)
+    }
+
+    private func subscribeToFullScreenToolbarChanges() {
+        NotificationCenter.default.publisher(for: AppearancePreferences.Notifications.showTabsAndBookmarksBarOnFullScreenChanged)
+            .compactMap { $0.userInfo?[AppearancePreferences.Constants.showTabsAndBookmarksBarOnFullScreenParameter] as? Bool }
+            .sink { [weak self] showTabsAndBookmarksBarOnFullScreen in
+                if self?.window?.isFullScreen == true {
+                    if showTabsAndBookmarksBarOnFullScreen {
+                        self?.showTabBarAndBookmarksBar()
+                    } else {
+                        self?.hideTabBarAndBookmarksBar()
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
 
     @objc
@@ -235,6 +253,41 @@ extension MainWindowController: NSWindowDelegate {
     func windowWillEnterFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
         mainViewController.windowWillEnterFullScreen()
+
+        if !appearancePreferences.showTabsAndBookmarksBarOnFullScreen {
+            hideTabBarAndBookmarksBar()
+        }
+    }
+
+    func windowWillExitFullScreen(_ notification: Notification) {
+        mainViewController.tabBarViewController.draggingSpace.isHidden = false
+
+        if !appearancePreferences.showTabsAndBookmarksBarOnFullScreen {
+            showTabBarAndBookmarksBar()
+        }
+    }
+
+    private func hideTabBarAndBookmarksBar() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+            self?.mainViewController.disableTabPreviews()
+            self?.mainViewController.mainView.navigationBarTopConstraint.animator().constant = 0
+            self?.mainViewController.mainView.tabBarHeightConstraint.animator().constant = 0
+            self?.mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultHigh
+            self?.mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultLow
+            self?.moveTabBarView(toTitlebarView: false)
+            self?.window?.toolbar = nil
+        }
+    }
+
+    private func showTabBarAndBookmarksBar() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+            self?.mainViewController.enableTabPreviews()
+            self?.mainViewController.mainView.tabBarHeightConstraint.animator().constant = 38
+            self?.mainViewController.mainView.navigationBarTopConstraint.animator().constant = 38
+            self?.mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultLow
+            self?.mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultHigh
+            self?.setupToolbar()
+        }
     }
 
     func windowWillMiniaturize(_ notification: Notification) {
@@ -282,10 +335,6 @@ extension MainWindowController: NSWindowDelegate {
 
             break
         }
-    }
-
-    func windowWillExitFullScreen(_ notification: Notification) {
-        mainViewController.tabBarViewController.draggingSpace.isHidden = false
     }
 
     func windowWillClose(_ notification: Notification) {
@@ -409,4 +458,10 @@ extension Notification.Name {
 
     static let windowDidBecomeKey = Notification.Name(rawValue: "windowDidBecomeKey")
 
+}
+
+extension NSWindow {
+    var isFullScreen: Bool {
+        return self.styleMask.contains(.fullScreen) && self.isMiniaturized == false
+    }
 }

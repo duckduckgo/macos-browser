@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
+import FeatureFlags
 import MaliciousSiteProtection
 import PrivacyDashboard
 import WebKit
@@ -32,6 +33,7 @@ final class TabViewModel {
         static let burnerHome = NSImage.burnerTabFavicon
         static let settings = NSImage.settingsMulticolor16
         static let bookmarks = NSImage.bookmarksFolder
+        static let history = NSImage.bookmarksFolder // temporary
         static let emailProtection = NSImage.emailProtectionIcon
         static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
         static let subscription = NSImage.privacyPro
@@ -103,7 +105,7 @@ final class TabViewModel {
         case .subscription, .identityTheftRestoration, .releaseNotes, .webExtensionUrl:
             return true
 
-        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
+        case .newtab, .settings, .bookmarks, .history, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
             return false
         }
     }
@@ -176,6 +178,7 @@ final class TabViewModel {
                      .newtab,
                      .settings,
                      .bookmarks,
+                     .history,
                      .onboarding,
                      .onboardingDeprecated,
                      .none,
@@ -359,6 +362,8 @@ final class TabViewModel {
                 .settingsTrustedIndicator
         case .bookmarks:
                 .bookmarksTrustedIndicator
+        case .history:
+            NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) ? .historyTrustedIndicator : .init()
         case .dataBrokerProtection:
                 .dbpTrustedIndicator
         case .subscription:
@@ -419,6 +424,8 @@ final class TabViewModel {
             title = UserText.tabPreferencesTitle
         case .bookmarks:
             title = UserText.tabBookmarksTitle
+        case .history:
+            title = UserText.mainMenuHistory
         case .newtab:
             if tab.burnerMode.isBurner {
                 title = UserText.burnerTabHomeTitle
@@ -464,6 +471,8 @@ final class TabViewModel {
             Favicon.settings
         case .bookmarks:
             Favicon.bookmarks
+        case .history:
+            NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) ? Favicon.history : nil
         case .subscription:
             Favicon.subscription
         case .identityTheftRestoration:
@@ -600,6 +609,8 @@ private extension NSAttributedString {
                                                                            title: UserText.settings)
     static let bookmarksTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
                                                                             title: UserText.bookmarks)
+    static let historyTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
+                                                                          title: UserText.mainMenuHistory)
     static let dbpTrustedIndicator = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
                                                                       title: UserText.tabDataBrokerProtectionTitle)
     static let subscriptionTrustedIndicator = trustedIndicatorAttributedString(with: .privacyPro,

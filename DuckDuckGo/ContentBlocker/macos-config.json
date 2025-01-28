@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1737129345760,
+    "version": 1737984611862,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -66,6 +66,11 @@
             "hash": "b813ade8472a097ffbd43a3331116fe1"
         },
         "additionalCampaignPixelParams": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "addressBarTldNavOrSearch": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -654,6 +659,33 @@
                     "domain": "sueddeutsche.de"
                 },
                 {
+                    "domain": "vital-parts.co.uk"
+                },
+                {
+                    "domain": "lta.org.uk"
+                },
+                {
+                    "domain": "hobbyhall.fi"
+                },
+                {
+                    "domain": "wienmobil.at"
+                },
+                {
+                    "domain": "memsoft.fr"
+                },
+                {
+                    "domain": "bafin.de"
+                },
+                {
+                    "domain": "levi.pt"
+                },
+                {
+                    "domain": "premiumegeszsegpenztar.hu"
+                },
+                {
+                    "domain": "mapquest.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -805,16 +837,25 @@
                     "sachsen-netze.de",
                     "alpharunning.co.uk",
                     "lecreuset.co.uk",
-                    "sueddeutsche.de"
+                    "sueddeutsche.de",
+                    "vital-parts.co.uk",
+                    "lta.org.uk",
+                    "hobbyhall.fi",
+                    "wienmobil.at",
+                    "memsoft.fr",
+                    "bafin.de",
+                    "levi.pt",
+                    "premiumegeszsegpenztar.hu",
+                    "mapquest.com"
                 ]
             },
             "state": "enabled",
             "features": {
                 "filterlist": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
-            "hash": "fbd77f789ae02d1795a7a001b75f2096"
+            "hash": "bf854997830faf3646b66a7d3f4ba112"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -6222,11 +6263,16 @@
                     "domain": "broken.third-party.site"
                 }
             ],
+            "features": {
+                "onByDefault": {
+                    "state": "enabled"
+                }
+            },
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "hash": "c5507786c7bd5326356357f2291fa536"
+            "hash": "3f08e9c0213c586858a618047970bbd2"
         },
         "marketplaceAdPostback": {
             "state": "disabled",
@@ -6316,12 +6362,12 @@
                     "state": "enabled"
                 },
                 "appExclusions": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.57.1",
-            "hash": "a989cefea7c549442afa51e6359a153a"
+            "hash": "430d1d2964babe769602afc10bda17b4"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
@@ -8714,6 +8760,16 @@
                             }
                         ]
                     },
+                    "karte.io": {
+                        "rules": [
+                            {
+                                "rule": "bs.karte.io",
+                                "domains": [
+                                    "rentio.jp"
+                                ]
+                            }
+                        ]
+                    },
                     "klarnaservices.com": {
                         "rules": [
                             {
@@ -10262,7 +10318,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "2d19877231df04e21e86f3c271e10f28"
+            "hash": "3b7320c31c287b5cbad8b28219312263"
         },
         "trackingCookies1p": {
             "settings": {
@@ -10465,6 +10521,11 @@
                 ]
             },
             "hash": "99b098daaea40136ae60aec41f52467e"
+        },
+        "webViewStateRestoration": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "webViewBlobDownload": {
             "exceptions": [],

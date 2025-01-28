@@ -121,8 +121,7 @@ protocol NewWindowPolicyDecisionMaker {
                      maliciousSiteDetector: MaliciousSiteDetecting = MaliciousSiteProtectionManager.shared,
                      tabsPreferences: TabsPreferences = TabsPreferences.shared,
                      onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter(),
-                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern,
-                                                                                    store: PageRefreshStore())
+                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern)
     ) {
 
         let duckPlayer = duckPlayer
@@ -1281,10 +1280,16 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
         ])
 
-        if case.url(let url, _, _) = content {
-            self.error = error
+        let isInternalUser = internalUserDecider?.isInternalUser == true
 
-            loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+        if isInternalUser {
+            self.webView.reload()
+        } else {
+            if case.url(let url, _, _) = content {
+                self.error = error
+
+                loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+            }
         }
 
         Task {
@@ -1308,7 +1313,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             webView.setDocumentHtml(html)
         }
     }
-
 }
 
 extension Tab: NewWindowPolicyDecisionMaker {

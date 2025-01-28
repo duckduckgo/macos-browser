@@ -23,6 +23,7 @@ import BrowserServicesKit
 import PrivacyDashboard
 import Common
 import PixelKit
+import PixelExperimentKit
 import os.log
 
 protocol PrivacyDashboardViewControllerSizeDelegate: AnyObject {
@@ -188,6 +189,10 @@ final class PrivacyDashboardViewController: NSViewController {
         } else {
             configuration.userDisabledProtection(forDomain: domain)
             PixelKit.fire(NonStandardEvent(GeneralPixel.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue)))
+            let tdsEtag = ContentBlocking.shared.trackerDataManager.fetchedData?.etag ?? ""
+            TDSOverrideExperimentMetrics.fireTDSExperimentMetric(metricType: .privacyToggleUsed, etag: tdsEtag) { parameters in
+                PixelKit.fire(GeneralPixel.debugBreakageExperiment, frequency: .uniqueByName, withAdditionalParameters: parameters)
+            }
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()

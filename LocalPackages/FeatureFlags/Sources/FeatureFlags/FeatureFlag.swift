@@ -50,16 +50,19 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/0/72649045549333/1208241266421040/f
     case htmlNewTabPage
 
+    /// https://app.asana.com/0/1201048563534612/1208850443048685/f
+    case historyView
+
     case autofillPartialFormSaves
     case autcompleteTabs
-
     case webExtensions
+    case syncSeamlessAccountSwitching
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .htmlNewTabPage, .maliciousSiteProtection, .autofillPartialFormSaves, .autcompleteTabs, .networkProtectionAppExclusions, .webExtensions:
+        case .htmlNewTabPage, .autofillPartialFormSaves, .autcompleteTabs, .networkProtectionAppExclusions, .syncSeamlessAccountSwitching, .historyView, .webExtensions:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -69,7 +72,8 @@ extension FeatureFlag: FeatureFlagDescribing {
              .unknownUsernameCategorization,
              .credentialsImportPromotionForExistingUsers,
              .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes:
+             .networkProtectionEnforceRoutes,
+             .maliciousSiteProtection:
             return false
         }
     }
@@ -87,7 +91,7 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .freemiumDBP:
             return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
         case .maliciousSiteProtection:
-            return .remoteReleasable(.feature(.maliciousSiteProtection))
+            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.onByDefault))
         case .contextualOnboarding:
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
@@ -100,12 +104,16 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
             return .remoteReleasable(.subfeature(HTMLNewTabPageSubfeature.isLaunched))
+        case .historyView:
+            return .disabled
         case .autofillPartialFormSaves:
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         case .autcompleteTabs:
             return .remoteReleasable(.feature(.autocompleteTabs))
         case .webExtensions:
             return .internalOnly()
+        case .syncSeamlessAccountSwitching:
+            return .remoteReleasable(.subfeature(SyncSubfeature.seamlessAccountSwitching))
         }
     }
 }
