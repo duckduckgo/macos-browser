@@ -166,10 +166,15 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 
     // MARK: - UI
 
+    static let buttonSize: CGFloat = 28
+
     func toolbarButtons() -> [MouseOverButton] {
         return contexts.enumerated().map { (index, context) in
-            let image = context.webExtension.icon(for: CGSize(width: 64, height: 64)) ?? NSImage(named: "Web")!
+            let image = context.webExtension.icon(for: CGSize(width: Self.buttonSize, height: Self.buttonSize)) ?? NSImage(named: "Web")!
             let button = MouseOverButton(image: image, target: self, action: #selector(WebExtensionManager.toolbarButtonClicked))
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.widthAnchor.constraint(equalToConstant: Self.buttonSize).isActive = true
+            button.heightAnchor.constraint(equalToConstant: Self.buttonSize).isActive = true
             button.tag = index
             return button
         }
