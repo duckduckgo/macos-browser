@@ -306,6 +306,10 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testWhenBrowserIsNotAddedToDockThenMenuItemIsVisible() {
+        if NSApp.isSandboxed {
+            return
+        }
+
         dockCustomizer.dockStatus = false
 
         setupMoreOptionsMenu()
@@ -346,6 +350,10 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testWhenBrowserIsNotInTheDockAndIsNotSetAsDefaultThenTheOrderIsCorrect() {
+        if NSApp.isSandboxed {
+            return
+        }
+
         dockCustomizer.dockStatus = false
         defaultBrowserProvider.isDefault = false
 
