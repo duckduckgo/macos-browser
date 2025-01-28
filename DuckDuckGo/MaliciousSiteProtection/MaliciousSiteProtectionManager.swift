@@ -153,6 +153,9 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
             PixelKit.fire(event)
         case .matchesApiFailure(let error):
             Logger.maliciousSiteProtection.error("Error fetching matches from API: \(error)")
+        case .failedToDownloadInitialDataSets:
+            // `.failedToDownloadInitialDataSets` Pixel is sent within the BSK library
+            break
         }
     }
 
