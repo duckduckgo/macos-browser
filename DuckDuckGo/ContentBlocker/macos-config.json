@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1737620176460,
+    "version": 1737984611862,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -680,6 +680,12 @@
                     "domain": "levi.pt"
                 },
                 {
+                    "domain": "premiumegeszsegpenztar.hu"
+                },
+                {
+                    "domain": "mapquest.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -838,16 +844,18 @@
                     "wienmobil.at",
                     "memsoft.fr",
                     "bafin.de",
-                    "levi.pt"
+                    "levi.pt",
+                    "premiumegeszsegpenztar.hu",
+                    "mapquest.com"
                 ]
             },
             "state": "enabled",
             "features": {
                 "filterlist": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
-            "hash": "f1b13a96807f8030dc4bb31f97a1a33f"
+            "hash": "bf854997830faf3646b66a7d3f4ba112"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -6354,12 +6362,12 @@
                     "state": "enabled"
                 },
                 "appExclusions": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.57.1",
-            "hash": "a989cefea7c549442afa51e6359a153a"
+            "hash": "430d1d2964babe769602afc10bda17b4"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
@@ -8752,6 +8760,16 @@
                             }
                         ]
                     },
+                    "karte.io": {
+                        "rules": [
+                            {
+                                "rule": "bs.karte.io",
+                                "domains": [
+                                    "rentio.jp"
+                                ]
+                            }
+                        ]
+                    },
                     "klarnaservices.com": {
                         "rules": [
                             {
@@ -10300,7 +10318,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "2d19877231df04e21e86f3c271e10f28"
+            "hash": "3b7320c31c287b5cbad8b28219312263"
         },
         "trackingCookies1p": {
             "settings": {

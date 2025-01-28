@@ -22,6 +22,7 @@ import Foundation
 import Subscription
 import NetworkProtection
 import NetworkProtectionUI
+import os.log
 
 final class NetworkProtectionSubscriptionEventHandler {
 
@@ -66,8 +67,7 @@ final class NetworkProtectionSubscriptionEventHandler {
                     }
 
                     guard let entitlements = notification.userInfo?[UserDefaultsCacheKey.subscriptionEntitlements] as? [Entitlement] else {
-
-                        assertionFailure("Missing entitlements are truly unexpected")
+                        Logger.networkProtection.error("Missing entitlements are truly unexpected")
                         return
                     }
 

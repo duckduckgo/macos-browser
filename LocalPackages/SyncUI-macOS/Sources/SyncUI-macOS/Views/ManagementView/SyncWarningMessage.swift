@@ -17,7 +17,7 @@
 //
 
 import SwiftUI
-import PreferencesUI
+import PreferencesUI_macOS
 
 struct SyncWarningMessage: View {
     let title: String
