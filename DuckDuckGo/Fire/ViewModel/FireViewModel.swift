@@ -29,7 +29,19 @@ final class FireViewModel {
     var isFirePresentationInProgress: AnyPublisher<Bool, Never> {
         Publishers
             .CombineLatest($isAnimationPlaying, fire.$burningData)
+            .map { (isAnimationPlaying, burningData) in
+                print("FIRE PRESENTATION IS ANIMATION PLAYING: \(isAnimationPlaying) BURNING DATA: \(String(reflecting: burningData))")
+                switch burningData {
+                case .specificDomains(_, false):
+                    return Just((isAnimationPlaying, burningData)).delay(for: .seconds(1), scheduler: RunLoop.main).eraseToAnyPublisher()
+                default:
+                    return Just((isAnimationPlaying, burningData)).eraseToAnyPublisher()
+                }
+            }
+            .switchToLatest()
+            .throttle(for: .seconds(1), scheduler: RunLoop.main, latest: false)
             .map { (isAnimationPlaying, burningData) -> (Bool) in
+                print("FIRE PRESENTATION SHOULD BE IN PROGRESS \(isAnimationPlaying || burningData != nil)")
                 return isAnimationPlaying || burningData != nil
             }
             .eraseToAnyPublisher()

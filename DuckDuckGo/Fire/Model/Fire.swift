@@ -157,6 +157,7 @@ final class Fire {
             group.enter()
             self.burnTabs(burningEntity: entity) {
                 Task {
+                    try? await Task.sleep(nanoseconds: 2000000000)
                     await self.burnWebCache(baseDomains: domains)
                     if includingHistory {
                         self.burnHistory(ofEntity: entity) {

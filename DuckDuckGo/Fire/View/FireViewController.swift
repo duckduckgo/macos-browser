@@ -92,6 +92,7 @@ final class FireViewController: NSViewController {
     private func subscribeToFireAnimationEvents() {
         fireAnimationEventsCancellable = fireViewModel.isFirePresentationInProgress
             .sink { [weak self] isFirePresentationInProgress in
+                print("FIRE PRESENTATION IN PROGRESS: \(isFirePresentationInProgress)")
                 self?.view.superview?.isHidden = !isFirePresentationInProgress
             }
     }
