@@ -37,7 +37,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
         case removeFavorite = "activity_removeFavorite"
         case removeItem = "activity_removeItem"
         case confirmBurn = "activity_confirmBurn"
-        case burn = "activity_burn"
+        case burnAnimationComplete = "activity_burnAnimationComplete"
         case open = "activity_open"
     }
 
@@ -70,7 +70,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
             MessageName.addFavorite.rawValue: { [weak self] in try await self?.addFavorite(params: $0, original: $1) },
             MessageName.removeFavorite.rawValue: { [weak self] in try await self?.removeFavorite(params: $0, original: $1) },
             MessageName.confirmBurn.rawValue: { [weak self] in try await self?.confirmBurn(params: $0, original: $1) },
-            MessageName.burn.rawValue: { [weak self] in try await self?.burn(params: $0, original: $1) },
+            MessageName.burnAnimationComplete.rawValue: { [weak self] in try await self?.burnAnimationComplete(params: $0, original: $1) },
             MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) }
         ])
     }
@@ -134,11 +134,8 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
     }
 
     @MainActor
-    private func burn(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let action: NewTabPageDataModel.ActivityItemAction = DecodableHelper.decode(from: params) else {
-            return nil
-        }
-        await model.burn(action.url)
+    private func burnAnimationComplete(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        await model.burnAnimationComplete()
         return nil
     }
 

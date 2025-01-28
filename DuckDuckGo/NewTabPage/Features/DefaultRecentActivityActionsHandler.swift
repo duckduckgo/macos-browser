@@ -37,18 +37,18 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
     let bookmarkManager: BookmarkManager
     let fireproofStatusProvider: URLFireproofStatusProviding
-    let fire: () async -> Fire
+    let fireViewModel: () async -> FireViewModel
     let tld: TLD
 
     init(
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
         fireproofStatusProvider: URLFireproofStatusProviding = FireproofDomains.shared,
-        fire: (() async -> (Fire))? = nil,
+        fireViewModel: (() async -> (FireViewModel))? = nil,
         tld: TLD = ContentBlocking.shared.tld
     ) {
         self.bookmarkManager = bookmarkManager
         self.fireproofStatusProvider = fireproofStatusProvider
-        self.fire = fire ?? { @MainActor in FireCoordinator.fireViewModel.fire }
+        self.fireViewModel = fireViewModel ?? { @MainActor in FireCoordinator.fireViewModel }
         self.tld = tld
     }
 
@@ -76,22 +76,24 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
     @MainActor
     func confirmBurn(_ url: URL) async -> Bool {
-        guard fireproofStatusProvider.isDomainFireproof(forURL: url) else {
+        guard let domain = url.host?.droppingWwwPrefix() else {
             return false
         }
-        guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
-            return false
+        if fireproofStatusProvider.isDomainFireproof(forURL: url) {
+            guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
+                return false
+            }
         }
+        let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
+        let fireViewModel = await fireViewModel()
+        fireViewModel.fire.burnEntity(entity: .none(selectedDomains: domains))
+        fireViewModel.isAnimationPlaying = true
         return true
     }
 
     @MainActor
-    func burn(_ url: URL) async {
-        guard let domain = url.host?.droppingWwwPrefix() else {
-            return
-        }
-        let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
-        await fire().burnEntity(entity: .none(selectedDomains: domains))
+    func burnAnimationComplete() async {
+        await fireViewModel().isAnimationPlaying = false
     }
 
     @MainActor
