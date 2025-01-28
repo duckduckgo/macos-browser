@@ -91,11 +91,36 @@ final class FireViewController: NSViewController {
     private var fireAnimationEventsCancellable: AnyCancellable?
     private func subscribeToFireAnimationEvents() {
         fireAnimationEventsCancellable = fireViewModel.isFirePresentationInProgress
-            .sink { [weak self] isFirePresentationInProgress in
-                print("FIRE PRESENTATION DIALOG SHOW: \(isFirePresentationInProgress)")
-                self?.view.superview?.isHidden = !isFirePresentationInProgress
+            .sink { [weak self] shouldShowFirePresentation in
+                guard let self else {
+                    return
+                }
+                print("FIRE PRESENTATION DIALOG SHOW: \(shouldShowFirePresentation)")
+                if shouldShowFirePresentation {
+                    fireIndicatorDialogPresentedAt = Date()
+                    timer?.invalidate()
+                    view.superview?.isHidden = false
+                } else {
+                    if let fireIndicatorDialogPresentedAt {
+                        let presentationDuration = Date().timeIntervalSince(fireIndicatorDialogPresentedAt)
+                        if presentationDuration > Self.fireIndicatorPresentationDuration {
+                            view.superview?.isHidden = true
+                        } else {
+                            timer = Timer.scheduledTimer(withTimeInterval: Self.fireIndicatorPresentationDuration - presentationDuration, repeats: false) { [weak self] timer in
+                                timer.invalidate()
+                                self?.view.superview?.isHidden = true
+                            }
+                        }
+                    } else {
+                        view.superview?.isHidden = true
+                    }
+                }
             }
     }
+
+    private var fireIndicatorDialogPresentedAt: Date?
+    private var timer: Timer?
+    static let fireIndicatorPresentationDuration = TimeInterval.seconds(2)
 
     @MainActor
     private func setupFireAnimationView() async {
