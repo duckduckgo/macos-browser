@@ -92,30 +92,31 @@ final class FireViewController: NSViewController {
     private func subscribeToFireAnimationEvents() {
         fireAnimationEventsCancellable = fireViewModel.isFirePresentationInProgress
             .sink { [weak self] shouldShowFirePresentation in
-                guard let self else {
-                    return
-                }
-                print("FIRE PRESENTATION DIALOG SHOW: \(shouldShowFirePresentation)")
-                if shouldShowFirePresentation {
-                    fireIndicatorDialogPresentedAt = Date()
-                    timer?.invalidate()
-                    view.superview?.isHidden = false
+                self?.updateFireIndicatorVisibility(shouldShowFirePresentation)
+            }
+    }
+
+    private func updateFireIndicatorVisibility(_ shouldShow: Bool) {
+        print("FIRE PRESENTATION DIALOG SHOW: \(shouldShow)")
+        if shouldShow {
+            fireIndicatorDialogPresentedAt = Date()
+            timer?.invalidate()
+            view.superview?.isHidden = false
+        } else {
+            if let fireIndicatorDialogPresentedAt {
+                let presentationDuration = Date().timeIntervalSince(fireIndicatorDialogPresentedAt)
+                if presentationDuration > Self.fireIndicatorPresentationDuration {
+                    view.superview?.isHidden = true
                 } else {
-                    if let fireIndicatorDialogPresentedAt {
-                        let presentationDuration = Date().timeIntervalSince(fireIndicatorDialogPresentedAt)
-                        if presentationDuration > Self.fireIndicatorPresentationDuration {
-                            view.superview?.isHidden = true
-                        } else {
-                            timer = Timer.scheduledTimer(withTimeInterval: Self.fireIndicatorPresentationDuration - presentationDuration, repeats: false) { [weak self] timer in
-                                timer.invalidate()
-                                self?.view.superview?.isHidden = true
-                            }
-                        }
-                    } else {
-                        view.superview?.isHidden = true
+                    let remainingPresentationTime = Self.fireIndicatorPresentationDuration - presentationDuration,
+                    timer = Timer.scheduledTimer(withTimeInterval: remainingPresentationTime, repeats: false) { [weak self] timer in
+                        self?.view.superview?.isHidden = true
                     }
                 }
+            } else {
+                view.superview?.isHidden = true
             }
+        }
     }
 
     private var fireIndicatorDialogPresentedAt: Date?
