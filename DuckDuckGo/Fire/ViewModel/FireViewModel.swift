@@ -19,6 +19,17 @@
 import WebKit
 import Combine
 
+extension Fire.BurningData {
+    var shouldDelayShowingDialog: Bool {
+        switch self {
+        case .specificDomains(_, false):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 final class FireViewModel {
 
     let fire: Fire
@@ -31,17 +42,13 @@ final class FireViewModel {
             .CombineLatest($isAnimationPlaying, fire.$burningData)
             .map { (isAnimationPlaying, burningData) in
                 print("FIRE PRESENTATION IS ANIMATION PLAYING: \(isAnimationPlaying) BURNING DATA: \(String(reflecting: burningData))")
-                switch burningData {
-                case .specificDomains(_, false):
+                if burningData?.shouldDelayShowingDialog == true {
                     return Just((isAnimationPlaying, burningData)).delay(for: .seconds(1), scheduler: RunLoop.main).eraseToAnyPublisher()
-                default:
-                    return Just((isAnimationPlaying, burningData)).eraseToAnyPublisher()
                 }
+                return Just((isAnimationPlaying, burningData)).eraseToAnyPublisher()
             }
             .switchToLatest()
-            .throttle(for: .seconds(1), scheduler: RunLoop.main, latest: false)
             .map { (isAnimationPlaying, burningData) -> (Bool) in
-                print("FIRE PRESENTATION SHOULD BE IN PROGRESS \(isAnimationPlaying || burningData != nil)")
                 return isAnimationPlaying || burningData != nil
             }
             .eraseToAnyPublisher()

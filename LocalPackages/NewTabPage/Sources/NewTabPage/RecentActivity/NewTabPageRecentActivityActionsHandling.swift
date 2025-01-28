@@ -24,5 +24,4 @@ public protocol RecentActivityActionsHandling {
     @MainActor func addFavorite(_ url: URL) async
     @MainActor func removeFavorite(_ url: URL) async
     @MainActor func confirmBurn(_ url: URL) async -> Bool
-    @MainActor func burnAnimationComplete() async
 }

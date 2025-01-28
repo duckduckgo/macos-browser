@@ -87,13 +87,7 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
         let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
         let fireViewModel = await fireViewModel()
         fireViewModel.fire.burnEntity(entity: .none(selectedDomains: domains))
-        fireViewModel.isAnimationPlaying = true
         return true
-    }
-
-    @MainActor
-    func burnAnimationComplete() async {
-        await fireViewModel().isAnimationPlaying = false
     }
 
     @MainActor
