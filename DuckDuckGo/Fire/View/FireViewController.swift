@@ -108,7 +108,7 @@ final class FireViewController: NSViewController {
                 if presentationDuration > Self.fireIndicatorPresentationDuration {
                     view.superview?.isHidden = true
                 } else {
-                    let remainingPresentationTime = Self.fireIndicatorPresentationDuration - presentationDuration,
+                    let remainingPresentationTime = Self.fireIndicatorPresentationDuration - presentationDuration
                     timer = Timer.scheduledTimer(withTimeInterval: remainingPresentationTime, repeats: false) { [weak self] timer in
                         self?.view.superview?.isHidden = true
                     }
