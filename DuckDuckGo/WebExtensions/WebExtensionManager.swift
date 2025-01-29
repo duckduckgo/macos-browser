@@ -184,6 +184,20 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     @objc func toolbarButtonClicked(sender: NSButton) {
         let index = sender.tag
         let context = contexts[index]
+
+        // If the popover is already open
+        if let popover = context.action(for: nil)?.popupPopover, popover.isShown {
+            // Close it
+            popover.close()
+
+            // If the sender button is in a different window, open the popover there
+            if sender.window != popover.mainWindow {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2/3) {
+                    context.performAction(for: nil)
+                }
+            }
+            return
+        }
         // Show dashboard - perform default action
         context.performAction(for: nil)
     }
