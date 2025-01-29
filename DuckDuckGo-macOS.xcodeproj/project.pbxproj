@@ -1856,6 +1856,8 @@
 		7B8FDD242CDD88D300720907 /* FeatureFlags in Frameworks */ = {isa = PBXBuildFile; productRef = 7B8FDD232CDD88D300720907 /* FeatureFlags */; };
 		7B8FDD262CDD88D900720907 /* FeatureFlags in Frameworks */ = {isa = PBXBuildFile; productRef = 7B8FDD252CDD88D900720907 /* FeatureFlags */; };
 		7B934C412A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
+		7B93A68B2D4A5AF200E9FFC1 /* ExcludedAppsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B93A68A2D4A5AEC00E9FFC1 /* ExcludedAppsModel.swift */; };
+		7B93A68C2D4A5AF200E9FFC1 /* ExcludedAppsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B93A68A2D4A5AEC00E9FFC1 /* ExcludedAppsModel.swift */; };
 		7B97CD592B7E0B57004FEF43 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7B97CD582B7E0B57004FEF43 /* NetworkProtectionProxy */; };
 		7B97CD5B2B7E0B85004FEF43 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 7B97CD5A2B7E0B85004FEF43 /* Common */; };
 		7B97CD5C2B7E0BBB004FEF43 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
@@ -4184,6 +4186,7 @@
 		7B9167A82C09E88800322310 /* AppLauncher */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppLauncher; sourceTree = "<group>"; };
 		7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionShared.swift"; sourceTree = "<group>"; };
+		7B93A68A2D4A5AEC00E9FFC1 /* ExcludedAppsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExcludedAppsModel.swift; sourceTree = "<group>"; };
 		7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoVPNAppStore.xcconfig; sourceTree = "<group>"; };
 		7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoVPN.xcconfig; sourceTree = "<group>"; };
 		7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckDuckGoVPNAppDelegate.swift; sourceTree = "<group>"; };
@@ -7172,6 +7175,7 @@
 			children = (
 				7B0A6DF72D47CCDF00FDFDC2 /* ExcludedApps.storyboard */,
 				7B0A6DF82D47CCDF00FDFDC2 /* ExcludedAppsViewController.swift */,
+				7B93A68A2D4A5AEC00E9FFC1 /* ExcludedAppsModel.swift */,
 			);
 			path = ExcludedApps;
 			sourceTree = "<group>";
@@ -11887,6 +11891,7 @@
 				4B4D60B72A0C847D00BCD287 /* NetworkProtectionNavBarButtonModel.swift in Sources */,
 				3706FBB6293F65D500E42796 /* ChromiumPreferences.swift in Sources */,
 				85B49AFB2CD1B7C5007FAA2A /* SystemInfo.swift in Sources */,
+				7B93A68B2D4A5AF200E9FFC1 /* ExcludedAppsModel.swift in Sources */,
 				3706FBB7293F65D500E42796 /* FirePopoverViewController.swift in Sources */,
 				3706FBB8293F65D500E42796 /* SavePaymentMethodPopover.swift in Sources */,
 				B6CC266D2BAD9CD800F53F8D /* FileProgressPresenter.swift in Sources */,
@@ -13440,6 +13445,7 @@
 				AA5FA69D275F945C00DCE9C9 /* FaviconStore.swift in Sources */,
 				4B9DB0352A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */,
+				7B93A68C2D4A5AF200E9FFC1 /* ExcludedAppsModel.swift in Sources */,
 				3173072A2CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift in Sources */,
 				4B6785472AA8DE68008A5004 /* VPNUninstaller.swift in Sources */,
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,

@@ -19,7 +19,7 @@
 import AppKit
 
 final class ExcludedAppsViewController: NSViewController {
-    typealias Model = ExcludedDomainsViewModel
+    typealias Model = ExcludedAppsModel
 
     enum Constants {
         static let storyboardName = "ExcludedApps"
@@ -27,11 +27,11 @@ final class ExcludedAppsViewController: NSViewController {
         static let cellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "ExcludedAppCell")
     }
 
-    static func create(model: Model = DefaultExcludedDomainsViewModel()) -> ExcludedDomainsViewController {
+    static func create(model: Model = DefaultExcludedAppsModel()) -> ExcludedAppsViewController {
         let storyboard = loadStoryboard()
 
         return storyboard.instantiateController(identifier: Constants.identifier) { coder in
-            ExcludedDomainsViewController(model: model, coder: coder)
+            ExcludedAppsViewController(model: model, coder: coder)
         }
     }
 
@@ -40,18 +40,18 @@ final class ExcludedAppsViewController: NSViewController {
     }
 
     @IBOutlet var tableView: NSTableView!
-    @IBOutlet var addDomainButton: NSButton!
-    @IBOutlet var removeDomainButton: NSButton!
+    @IBOutlet var addAppButton: NSButton!
+    @IBOutlet var removeAppButton: NSButton!
     @IBOutlet var doneButton: NSButton!
-    @IBOutlet var excludedDomainsLabel: NSTextField!
+    @IBOutlet var titleLabel: NSTextField!
 
     private let faviconManagement: FaviconManagement = FaviconManager.shared
 
-    private var allDomains = [String]()
-    private var filteredDomains: [String]?
+    private var allApps = [String]()
+    private var filteredApps: [String]?
 
-    private var visibleDomains: [String] {
-        return filteredDomains ?? allDomains
+    private var visibleApps: [String] {
+        return filteredApps ?? allApps
     }
 
     private let model: Model
@@ -75,18 +75,18 @@ final class ExcludedAppsViewController: NSViewController {
     }
 
     private func setUpStrings() {
-        addDomainButton.title = UserText.vpnExcludedDomainsAddDomain
-        removeDomainButton.title = UserText.remove
+        addAppButton.title = UserText.vpnExcludedAppsAddApp
+        removeAppButton.title = UserText.remove
         doneButton.title = UserText.done
-        excludedDomainsLabel.stringValue = UserText.vpnExcludedDomainsTitle
+        titleLabel.stringValue = UserText.vpnExcludedAppsTitle
     }
 
     private func updateRemoveButtonState() {
-        removeDomainButton.isEnabled = tableView.selectedRow > -1
+        removeAppButton.isEnabled = tableView.selectedRow > -1
     }
 
     fileprivate func reloadData() {
-        allDomains = model.domains.sorted { (lhs, rhs) -> Bool in
+        allApps = model.excludedApps.sorted { (lhs, rhs) -> Bool in
             return lhs < rhs
         }
 
@@ -98,28 +98,26 @@ final class ExcludedAppsViewController: NSViewController {
         dismiss()
     }
 
-    @IBAction func addDomain(_ sender: NSButton) {
+    @IBAction func addApp(_ sender: NSButton) {
         AddExcludedDomainView(title: UserText.vpnAddExcludedDomainTitle, buttonsState: .compressed, cancelActionTitle: UserText.vpnAddExcludedDomainCancelButtonTitle, cancelAction: { dismiss in
 
             dismiss()
-        }, defaultActionTitle: UserText.vpnAddExcludedDomainActionButtonTitle) { [weak self] domain, dismiss in
+        }, defaultActionTitle: UserText.vpnAddExcludedDomainActionButtonTitle) { [weak self] bundleID, dismiss in
             guard let self else { return }
 
-            addDomain(domain)
+            addApp(bundleID)
             dismiss()
         }.show(in: view.window)
     }
 
-    private func addDomain(_ domain: String) {
+    private func addApp(_ bundleID: String) {
         Task {
-            model.add(domain: domain)
+            model.add(bundleID: bundleID)
             reloadData()
 
-            if let newRowIndex = allDomains.firstIndex(of: domain) {
+            if let newRowIndex = allApps.firstIndex(of: bundleID) {
                 tableView.scrollRowToVisible(newRowIndex)
             }
-
-            await model.askUserToReportIssues(withDomain: domain, in: view.window)
         }
     }
 
@@ -129,8 +127,8 @@ final class ExcludedAppsViewController: NSViewController {
             return
         }
 
-        let selectedDomain = visibleDomains[tableView.selectedRow]
-        model.remove(domain: selectedDomain)
+        let bundleID = visibleApps[tableView.selectedRow]
+        model.remove(bundleID: bundleID)
         reloadData()
     }
 }
@@ -138,11 +136,11 @@ final class ExcludedAppsViewController: NSViewController {
 extension ExcludedAppsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return visibleDomains.count
+        return visibleApps.count
     }
 
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        return visibleDomains[row]
+        return visibleApps[row]
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
@@ -151,7 +149,7 @@ extension ExcludedAppsViewController: NSTableViewDataSource, NSTableViewDelegate
             return nil
         }
 
-        let domain = visibleDomains[row]
+        let domain = visibleApps[row]
 
         cell.textField?.stringValue = domain
         cell.imageView?.image = faviconManagement.getCachedFavicon(forDomainOrAnySubdomain: domain, sizeCategory: .small)?.image
@@ -171,9 +169,9 @@ extension ExcludedAppsViewController: NSTextFieldDelegate {
         guard let field = notification.object as? NSSearchField else { return }
 
         if field.stringValue.isEmpty {
-            filteredDomains = nil
+            filteredApps = nil
         } else {
-            filteredDomains = allDomains.filter { $0.contains(field.stringValue) }
+            filteredApps = allApps.filter { $0.contains(field.stringValue) }
         }
 
         reloadData()

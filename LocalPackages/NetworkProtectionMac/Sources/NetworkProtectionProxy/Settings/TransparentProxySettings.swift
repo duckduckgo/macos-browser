@@ -67,6 +67,16 @@ public final class TransparentProxySettings {
         }
     }
 
+    public var excludedApps: [String] {
+        appRoutingRules.compactMap { (bundleID, rule) in
+            guard rule == .exclude else {
+                return nil
+            }
+
+            return bundleID
+        }
+    }
+
     public var excludedDomains: [String] {
         get {
             defaults.vpnProxyExcludedDomains

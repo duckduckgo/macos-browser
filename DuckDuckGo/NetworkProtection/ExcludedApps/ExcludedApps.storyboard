@@ -8,7 +8,7 @@
         <!--Excluded Apps View Controller-->
         <scene sceneID="YwQ-9C-eXK">
             <objects>
-                <viewController storyboardIdentifier="ExcludedDomainsViewController" id="Clu-Bo-JRW" userLabel="Excluded Apps View Controller" customClass="ExcludedDomainsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ExcludedAppsViewController" id="Clu-Bo-JRW" userLabel="Excluded Apps View Controller" customClass="ExcludedAppsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="fBT-ND-Nbh">
                         <rect key="frame" x="0.0" y="0.0" width="475" height="307"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -169,11 +169,11 @@ DQ
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="addDomainButton" destination="DEQ-Uh-Y7p" id="Qkv-iR-eiu"/>
+                        <outlet property="addAppButton" destination="DEQ-Uh-Y7p" id="WrZ-Qw-Wzu"/>
                         <outlet property="doneButton" destination="goL-jl-7Gp" id="8Yb-2X-umJ"/>
-                        <outlet property="excludedDomainsLabel" destination="aur-0h-QzR" id="B5V-iN-MUj"/>
-                        <outlet property="removeDomainButton" destination="KAc-ZW-ZAV" id="8KQ-H9-MnP"/>
+                        <outlet property="removeAppButton" destination="KAc-ZW-ZAV" id="mSg-jy-HD8"/>
                         <outlet property="tableView" destination="pIp-Qw-5G1" id="kNl-PR-zGb"/>
+                        <outlet property="titleLabel" destination="aur-0h-QzR" id="qDn-Xs-MB9"/>
                     </connections>
                 </viewController>
                 <customObject id="fm2-qY-a3s" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

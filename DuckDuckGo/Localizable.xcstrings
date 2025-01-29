@@ -68938,6 +68938,18 @@
         }
       }
     },
+    "vpn.excluded.apps.add.app" : {
+      "comment" : "Add Application button for the excluded apps view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Application"
+          }
+        }
+      }
+    },
     "vpn.excluded.apps.title" : {
       "comment" : "Excluded Apps title in VPN settings",
       "extractionState" : "extracted_with_value",
