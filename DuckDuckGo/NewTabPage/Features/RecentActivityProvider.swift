@@ -127,7 +127,8 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
 
         let oneWeekAgo = Date.weekAgo
 
-        browsingHistory.filter { !$0.failedToLoad && $0.lastVisit > oneWeekAgo }
+        browsingHistory
+            .filter(\.isValidForRecentActivity)
             .sorted(by: { $0.lastVisit > $1.lastVisit })
             .forEach { historyEntry in
 
@@ -270,6 +271,12 @@ extension NewTabPageDataModel.DomainActivity {
 
     private enum Const {
         static let maxPageListSize = 10
+    }
+}
+
+extension HistoryEntry {
+    var isValidForRecentActivity: Bool {
+        !failedToLoad && lastVisit > Date.weekAgo
     }
 }
 
