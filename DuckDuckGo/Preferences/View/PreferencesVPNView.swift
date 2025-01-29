@@ -207,7 +207,7 @@ extension Preferences {
         /// Resolves the text to be used for exclusion counts
         ///
         private func exclusionCountString(value: Int) -> String {
-            value > 0 ? String(value) : "None"
+            value > 0 ? String(value) : UserText.vpnNoExclusionsFoundText
         }
     }
 }
