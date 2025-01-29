@@ -134,11 +134,14 @@ extension Preferences {
                                            title: UserText.vpnExcludedAppsTitle,
                                            description: exclusionCountString(value: model.excludedAppsCount),
                                            buttonName: UserText.vpnSettingsManageExclusionsButtonTitle,
-                                           buttonAction: { /* will be implemented in follow-up PR */ },
+                                           buttonAction: { showExcludedAppsManagementView = true },
                                            enabled: true)
                         }
                     }
                     .padding(.bottom, 12)
+                    .sheet(isPresented: $showExcludedAppsManagementView) {
+                        AddRemoveItemDialog(isSheetPresented: $showExcludedAppsManagementView)
+                    }
                 }
 
                 // SECTION: DNS Settings

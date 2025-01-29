@@ -17,13 +17,13 @@
 //
 
 import AppKit
+import BrowserServicesKit
 import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionProxy
 import NetworkProtectionUI
-import BrowserServicesKit
 
 final class VPNPreferencesModel: ObservableObject {
 
@@ -243,7 +243,21 @@ final class VPNPreferencesModel: ObservableObject {
         return alert
     }
 
-    // MARK: - Excluded Sites
+    // MARK: - Actions
+
+    @MainActor
+    func manageExcludedApps() {
+        let windowController = ExcludedAppsViewController.create().wrappedInWindowController()
+
+        guard let window = windowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("DataClearingPreferences: Failed to present ExcludedDomainsViewController")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(window)
+    }
 
     @MainActor
     func manageExcludedSites() {
