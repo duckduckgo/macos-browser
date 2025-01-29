@@ -27,31 +27,35 @@ struct MenuItemWithNotificationDot: View {
     @State private var isHovered: Bool = false
 
     var body: some View {
-        HStack(spacing: 0) {
-            Image(nsImage: leftImage)
-                .resizable()
-                .foregroundColor(isHovered ? .white : .blackWhite100)
-                .frame(width: 16, height: 16)
-                .padding([.leading, .trailing], 6)
+            ZStack {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(isHovered ? .menuItemHover : Color.clear)
+                    .padding([.leading, .trailing], 5)
+                    .frame(maxWidth: .infinity)
 
-            Text(title)
-                .foregroundColor(isHovered ? .white : .blackWhite100.opacity(0.9))
-                .frame(maxWidth: .infinity, alignment: .leading)
+                HStack(spacing: 0) {
+                    Image(nsImage: leftImage)
+                        .resizable()
+                        .foregroundColor(isHovered ? .white : .blackWhite100)
+                        .frame(width: 16, height: 16)
+                        .padding(.trailing, 6)
+                        .padding(.leading, 14)
 
-            Circle()
-                .fill(isHovered ? .white : .updateIndicator)
-                .frame(width: 7, height: 7)
-                .padding(.trailing, 6)
+                    Text(title)
+                        .foregroundColor(isHovered ? .white : .blackWhite100.opacity(0.9))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Circle()
+                        .fill(isHovered ? .white : .updateIndicator)
+                        .frame(width: 7, height: 7)
+                        .padding(.trailing, 14)
+                }
+            }
+            .onHover { hovering in
+                isHovered = hovering
+            }
+            .onTapGesture {
+                onTapMenuItem()
+            }
         }
-        .padding(4)
-        .background(isHovered ? .menuItemHover : Color.clear)
-        .cornerRadius(3)
-        .onHover { hovering in
-            isHovered = hovering
-        }
-        .padding(4)
-        .onTapGesture {
-            onTapMenuItem()
-        }
-    }
 }
