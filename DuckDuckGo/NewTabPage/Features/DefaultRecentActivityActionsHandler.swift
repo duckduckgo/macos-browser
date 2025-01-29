@@ -34,66 +34,125 @@ extension FireproofDomains: URLFireproofStatusProviding {
     }
 }
 
+protocol RecentActivityActionsHandlerBookmarkManaging: AnyObject {
+    func getBookmark(for url: URL) -> Bookmark?
+    func getFavorite(for url: URL) -> Bookmark?
+    func markAsFavorite(_ bookmark: Bookmark)
+    func unmarkAsFavorite(_ bookmark: Bookmark)
+    func addNewFavorite(for url: URL)
+}
+
+extension LocalBookmarkManager: RecentActivityActionsHandlerBookmarkManaging {
+
+    func getFavorite(for url: URL) -> Bookmark? {
+        guard let favorite = getBookmark(for: url), favorite.isFavorite else {
+            return nil
+        }
+        return favorite
+    }
+
+    func markAsFavorite(_ bookmark: Bookmark) {
+        guard !bookmark.isFavorite else {
+            return
+        }
+        bookmark.isFavorite = true
+        update(bookmark: bookmark)
+    }
+
+    func unmarkAsFavorite(_ bookmark: Bookmark) {
+        guard bookmark.isFavorite else {
+            return
+        }
+        bookmark.isFavorite = false
+        update(bookmark: bookmark)
+    }
+
+    func addNewFavorite(for url: URL) {
+        makeBookmark(for: url, title: url.host?.droppingWwwPrefix() ?? url.absoluteString, isFavorite: true)
+    }
+}
+
+protocol RecentActivityItemBurning: AnyObject {
+    @MainActor func burn(_ url: URL, burningDidComplete: @escaping () -> Void) async -> Bool
+}
+
+final class RecentActivityItemBurner: RecentActivityItemBurning {
+
+    let tld: TLD
+    let fire: () async -> Fire
+    let fireproofStatusProvider: URLFireproofStatusProviding
+
+    init(
+        fireproofStatusProvider: URLFireproofStatusProviding = FireproofDomains.shared,
+        tld: TLD = ContentBlocking.shared.tld,
+        fire: (() async -> Fire)? = nil
+    ) {
+        self.fireproofStatusProvider = fireproofStatusProvider
+        self.tld = tld
+        self.fire = fire ?? { @MainActor in FireCoordinator.fireViewModel.fire }
+    }
+
+    @MainActor func burn(_ url: URL, burningDidComplete: @escaping () -> Void) async -> Bool {
+        guard let domain = url.host?.droppingWwwPrefix() else {
+            return false
+        }
+        guard await confirmBurningFireproofDomainIfNeeded(url) else {
+            return false
+        }
+        let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
+        await fire().burnEntity(entity: .none(selectedDomains: domains), completion: burningDidComplete)
+        return true
+    }
+
+    @MainActor
+    func confirmBurningFireproofDomainIfNeeded(_ url: URL) async -> Bool {
+        if fireproofStatusProvider.isDomainFireproof(forURL: url) {
+            guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
+                return false
+            }
+        }
+        return true
+    }
+}
+
 final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
-    let bookmarkManager: BookmarkManager
-    let fireproofStatusProvider: URLFireproofStatusProviding
-    let fireViewModel: () async -> FireViewModel
-    let tld: TLD
+    let bookmarkManager: RecentActivityActionsHandlerBookmarkManaging
+    let burner: RecentActivityItemBurning
     let burnDidCompletePublisher: AnyPublisher<Void, Never>
     private let burnDidCompleteSubject = PassthroughSubject<Void, Never>()
 
     init(
-        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-        fireproofStatusProvider: URLFireproofStatusProviding = FireproofDomains.shared,
-        fireViewModel: (() async -> (FireViewModel))? = nil,
-        tld: TLD = ContentBlocking.shared.tld
+        bookmarkManager: RecentActivityActionsHandlerBookmarkManaging = LocalBookmarkManager.shared,
+        burner: RecentActivityItemBurning = RecentActivityItemBurner()
     ) {
         self.bookmarkManager = bookmarkManager
-        self.fireproofStatusProvider = fireproofStatusProvider
-        self.fireViewModel = fireViewModel ?? { @MainActor in FireCoordinator.fireViewModel }
-        self.tld = tld
+        self.burner = burner
         self.burnDidCompletePublisher = burnDidCompleteSubject.eraseToAnyPublisher()
     }
 
     @MainActor
     func addFavorite(_ url: URL) {
         if let bookmark = bookmarkManager.getBookmark(for: url) {
-            guard !bookmark.isFavorite else {
-                return
-            }
-            bookmark.isFavorite = true
-            bookmarkManager.update(bookmark: bookmark)
+            bookmarkManager.markAsFavorite(bookmark)
         } else {
-            bookmarkManager.makeBookmark(for: url, title: url.host?.droppingWwwPrefix() ?? url.absoluteString, isFavorite: true)
+            bookmarkManager.addNewFavorite(for: url)
         }
     }
 
     @MainActor
     func removeFavorite(_ url: URL) {
-        guard let favorite = bookmarkManager.getBookmark(for: url), favorite.isFavorite else {
+        guard let favorite = bookmarkManager.getFavorite(for: url) else {
             return
         }
-        favorite.isFavorite = false
-        bookmarkManager.update(bookmark: favorite)
+        bookmarkManager.unmarkAsFavorite(favorite)
     }
 
     @MainActor
     func confirmBurn(_ url: URL) async -> Bool {
-        guard let domain = url.host?.droppingWwwPrefix() else {
-            return false
-        }
-        if fireproofStatusProvider.isDomainFireproof(forURL: url) {
-            guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
-                return false
-            }
-        }
-        let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
-        let fireViewModel = await fireViewModel()
-        fireViewModel.fire.burnEntity(entity: .none(selectedDomains: domains)) { [weak self] in
+        await burner.burn(url) { [weak self] in
             self?.burnDidCompleteSubject.send()
         }
-        return true
     }
 
     @MainActor
@@ -111,11 +170,6 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
         } else {
             tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url, source: .bookmark))
         }
-    }
-
-    @MainActor
-    private var window: NSWindow? {
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.view.window
     }
 
     @MainActor

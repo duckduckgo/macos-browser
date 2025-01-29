@@ -271,6 +271,7 @@ final class FireIndicatorVisibilityManager {
         } else {
             if let fireIndicatorDialogPresentedAt {
                 let presentationDuration = Date().timeIntervalSince(fireIndicatorDialogPresentedAt)
+                self.fireIndicatorDialogPresentedAt = nil
                 if presentationDuration > Self.fireIndicatorPresentationDuration {
                     view()?.isHidden = true
                 } else {
