@@ -771,16 +771,16 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     private func handleAccountAlreadyExists(_ recoveryKey: SyncCode.RecoveryKey) {
-        if devices.count > 1 {
-            managementDialogModel.shouldShowSwitchAccountsMessage = true
-            PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncAskUserToSwitchAccount.withoutMacPrefix)
-        } else {
-            Task { @MainActor in
+        Task { @MainActor in
+            if devices.count > 1 {
+                managementDialogModel.showSwitchAccountsMessage()
+                PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncAskUserToSwitchAccount.withoutMacPrefix)
+            } else {
                 await switchAccounts(recoveryKey: recoveryKey)
                 managementDialogModel.endFlow()
             }
+            PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: SyncError.accountAlreadyExists)))
         }
-        PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: SyncError.accountAlreadyExists)))
     }
 
     func userConfirmedSwitchAccounts(recoveryCode: String) {
