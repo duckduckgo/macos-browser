@@ -56,9 +56,25 @@ public enum FeatureFlag: String, CaseIterable {
     case autofillPartialFormSaves
     case autcompleteTabs
     case syncSeamlessAccountSwitching
+
+    case textExperiment
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
+    public var cohortType: (any FlagCohort.Type)? {
+        switch self {
+        case .textExperiment:
+            return TextEperimentCohort.self
+        default:
+            return nil
+        }
+    }
+
+    public enum TextEperimentCohort: String, FlagCohort {
+        case control
+        case treatment
+    }
+
     public var supportsLocalOverriding: Bool {
         switch self {
         case .historyView:
@@ -74,6 +90,8 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .networkProtectionAppExclusions:
             return true
         case .syncSeamlessAccountSwitching:
+            return true
+        case.textExperiment:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -122,6 +140,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.feature(.autocompleteTabs))
         case .syncSeamlessAccountSwitching:
             return .remoteReleasable(.subfeature(SyncSubfeature.seamlessAccountSwitching))
+        case .textExperiment:
+            return .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
         }
     }
 }
