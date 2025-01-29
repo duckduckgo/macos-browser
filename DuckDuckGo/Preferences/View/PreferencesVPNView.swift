@@ -18,7 +18,7 @@
 
 import NetworkProtection
 import PixelKit
-import PreferencesUI
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 
@@ -165,7 +165,7 @@ extension Preferences {
                             }.tag(true)
                         }
                         .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesUI.Const.pickerHorizontalOffset)
+                        .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                         .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
                             if isCustomDNSSelected {
                                 showsCustomDNSServerPageSheet.toggle()

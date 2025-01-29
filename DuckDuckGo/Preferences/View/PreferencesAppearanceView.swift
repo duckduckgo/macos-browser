@@ -17,7 +17,7 @@
 //
 
 import Bookmarks
-import PreferencesUI
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 

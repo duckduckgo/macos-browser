@@ -17,10 +17,10 @@
 //
 
 import Common
-import PreferencesUI
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
-import SyncUI
+import SyncUI_macOS
 import BrowserServicesKit
 import PixelKit
 import Subscription

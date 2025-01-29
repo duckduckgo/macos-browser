@@ -140,8 +140,8 @@ public struct SyncErrorMessage {
     var type: SyncErrorType
     var errorDescription: String
 
-    public init(type: SyncErrorType, description: String) {
+    public init(type: SyncErrorType, description: String? = nil) {
         self.type = type
-        self.errorDescription = description
+        self.errorDescription = description ?? type.description
     }
 }

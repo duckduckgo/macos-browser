@@ -21,7 +21,7 @@ import Combine
 import FeatureFlags
 import MaliciousSiteProtection
 import PixelKit
-import PreferencesUI
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 
@@ -89,7 +89,7 @@ extension Preferences {
                         }, label: {})
                         .pickerStyle(.radioGroup)
                         .disabled(dataClearingModel.isAutoClearEnabled)
-                        .offset(x: PreferencesUI.Const.pickerHorizontalOffset)
+                        .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                         .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
                         if dataClearingModel.isAutoClearEnabled {
                             VStack(alignment: .leading, spacing: 1) {
@@ -145,7 +145,7 @@ extension Preferences {
                             }.tag(true)
                         }
                         .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesUI.Const.pickerHorizontalOffset)
+                        .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                     }
 
                     PreferencePaneSubSection {

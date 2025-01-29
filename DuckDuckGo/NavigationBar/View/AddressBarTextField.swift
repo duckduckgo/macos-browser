@@ -92,10 +92,6 @@ final class AddressBarTextField: NSTextField {
     // flag when updating the Value from `handleTextDidChange()`
     private var currentTextDidChangeEvent: TextDidChangeEventType = .none
 
-//    var subscriptionEnvironment: SubscriptionEnvironment {
-//        Application.appDelegate.subscriptionManager.currentEnvironment
-//    }
-
     // MARK: - Lifecycle
 
     override func awakeFromNib() {
@@ -1053,19 +1049,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
             case #selector(NSResponder.moveUp(_:)):
                 suggestionContainerViewModel?.selectPreviousIfPossible()
                 return true
-
-            case #selector(NSResponder.deleteBackward(_:)),
-                 #selector(NSResponder.deleteForward(_:)),
-                 #selector(NSResponder.deleteToMark(_:)),
-                 #selector(NSResponder.deleteWordForward(_:)),
-                 #selector(NSResponder.deleteWordBackward(_:)),
-                 #selector(NSResponder.deleteToEndOfLine(_:)),
-                 #selector(NSResponder.deleteToEndOfParagraph(_:)),
-                 #selector(NSResponder.deleteToBeginningOfLine(_:)),
-                 #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
-
-                suggestionContainerViewModel?.clearSelection()
-                return false
 
             default:
                 return false
