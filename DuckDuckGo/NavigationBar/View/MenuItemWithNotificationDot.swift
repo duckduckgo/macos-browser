@@ -45,7 +45,7 @@ struct MenuItemWithNotificationDot: View {
         }
         .padding(4)
         .background(isHovered ? .menuItemHover : Color.clear)
-        .cornerRadius(5)
+        .cornerRadius(3)
         .onHover { hovering in
             isHovered = hovering
         }
