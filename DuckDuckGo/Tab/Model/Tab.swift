@@ -302,10 +302,6 @@ protocol NewWindowPolicyDecisionMaker {
             }
 
         addDeallocationChecks(for: webView)
-
-        if #available(macOS 14.4, *) {
-            WebExtensionManager.shared.eventsListener.didOpenTab(self)
-        }
     }
 
 #if DEBUG
