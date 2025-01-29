@@ -67,7 +67,7 @@ public struct SubfeatureView: View {
                 }
             }
         }
-        .padding(.vertical, 7)
+        .padding(.vertical, 8)
         .disabled(!enabled)
         .opacity(enabled ? 1.0 : 0.6)
     }
