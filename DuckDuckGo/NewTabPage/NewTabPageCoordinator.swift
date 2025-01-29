@@ -20,11 +20,13 @@ import Combine
 import Foundation
 import History
 import NewTabPage
+import Persistence
 import PixelKit
 import PrivacyStats
 
 final class NewTabPageCoordinator {
     let actionsManager: NewTabPageActionsManager
+    let keyValueStore: KeyValueStoring
 
     init(
         appearancePreferences: AppearancePreferences,
@@ -33,7 +35,10 @@ final class NewTabPageCoordinator {
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         historyCoordinator: HistoryCoordinating,
         privacyStats: PrivacyStatsCollecting,
-        freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
+        freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator,
+        keyValueStore: KeyValueStoring = UserDefaults.standard,
+        notificationCenter: NotificationCenter = .default,
+        fireDailyPixel: @escaping (PixelKitEvent) -> Void = { PixelKit.fire($0, frequency: .daily) }
     ) {
         actionsManager = NewTabPageActionsManager(
             appearancePreferences: appearancePreferences,
@@ -44,34 +49,36 @@ final class NewTabPageCoordinator {
             privacyStats: privacyStats,
             freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator
         )
+        self.keyValueStore = keyValueStore
+        self.fireDailyPixel = fireDailyPixel
 
-        NotificationCenter.default.publisher(for: .newTabPageWebViewDidAppear)
+        notificationCenter.publisher(for: .newTabPageWebViewDidAppear)
             .prefix(1)
             .sink { [weak self, weak settingsModel, weak appearancePreferences] _ in
                 guard let self, let settingsModel, let appearancePreferences else {
                     return
                 }
-                sendNewTabPageShownPixel(appearancePreferences: appearancePreferences, settingsModel: settingsModel)
+                fireNewTabPageShownPixel(appearancePreferences: appearancePreferences, settingsModel: settingsModel)
             }
             .store(in: &cancellables)
     }
 
-    private func sendNewTabPageShownPixel(appearancePreferences: AppearancePreferences, settingsModel: HomePage.Models.SettingsModel) {
-        let mode = NewTabPageModeDecider().effectiveMode
+    private func fireNewTabPageShownPixel(appearancePreferences: AppearancePreferences, settingsModel: HomePage.Models.SettingsModel) {
+        let mode = NewTabPageModeDecider(keyValueStore: keyValueStore).effectiveMode
         let recentActivity = mode == .recentActivity ? appearancePreferences.isRecentActivityVisible : nil
-        let privacyStats = mode == .privacyStats ? appearancePreferences.isPrivacyStatsAvailable : nil
+        let privacyStats = mode == .privacyStats ? appearancePreferences.isPrivacyStatsVisible : nil
         let customBackground = settingsModel.customBackground != nil
 
-        PixelKit.fire(
+        fireDailyPixel(
             NewTabPagePixel.newTabPageShown(
                 favorites: appearancePreferences.isFavoriteVisible,
                 recentActivity: recentActivity,
                 privacyStats: privacyStats,
                 customBackground: customBackground
-            ),
-            frequency: .daily
+            )
         )
     }
 
+    private let fireDailyPixel: (PixelKitEvent) -> Void
     private var cancellables: Set<AnyCancellable> = []
 }
