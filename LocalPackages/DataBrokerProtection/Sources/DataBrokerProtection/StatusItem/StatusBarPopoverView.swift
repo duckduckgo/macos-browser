@@ -51,8 +51,8 @@ struct StatusBarPopoverView: View {
                 Text(details)
                     .font(.body)
                     .foregroundColor(.secondary)
-                    .makeSelectable()
-                    .lineLimit(nil)
+                    //.makeSelectable()
+                    //.lineLimit(nil)
              Spacer()
             }
         }
