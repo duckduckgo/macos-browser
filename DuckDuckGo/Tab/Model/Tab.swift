@@ -462,6 +462,9 @@ protocol NewWindowPolicyDecisionMaker {
             if navigationDelegate.currentNavigation == nil {
                 updateCanGoBackForward(withCurrentNavigation: nil)
             }
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didChangeTabProperties([.URL], for: self)
+            }
         }
     }
 
@@ -532,7 +535,13 @@ protocol NewWindowPolicyDecisionMaker {
 
     var lastSelectedAt: Date?
 
-    @Published var title: String?
+    @Published var title: String? {
+        didSet {
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didChangeTabProperties([.title], for: self)
+            }
+        }
+    }
 
     private func updateTitle() {
         if let error {
@@ -559,7 +568,13 @@ protocol NewWindowPolicyDecisionMaker {
     }
     let permissions: PermissionModel
 
-    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var isLoading: Bool = false {
+        didSet {
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didChangeTabProperties([.loading], for: self)
+            }
+        }
+    }
     @Published private(set) var loadingProgress: Double = 0.0
 
     /// an Interactive Dialog request (alert/open/save/print) made by a page to be published and presented asynchronously
@@ -836,6 +851,10 @@ protocol NewWindowPolicyDecisionMaker {
     func muteUnmuteTab() {
         webView.audioState.toggle()
         objectWillChange.send()
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didChangeTabProperties([.muted], for: self)
+        }
     }
 
     private enum ReloadIfNeededSource {
