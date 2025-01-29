@@ -62,25 +62,26 @@ public struct ManagementDialog: View {
     public var body: some View {
         content
             .alert(isPresented: $model.shouldShowErrorMessage) {
-                Alert(
-                    title: Text(errorTitle),
-                    message: Text(errorDescription),
-                    dismissButton: .default(Text(buttonTitle)) {
-                        model.endFlow()
-                    }
-                )
-            }
-            .alert(isPresented: $model.shouldShowSwitchAccountsMessage) {
-                Alert(
-                    title: Text(UserText.syncAlertSwitchAccountTitle),
-                    message: Text(UserText.syncAlertSwitchAccountMessage),
-                    primaryButton: .default(Text(UserText.syncAlertSwitchAccountButton)) {
-                        model.userConfirmedSwitchAccounts(recoveryCode: recoveryCodeModel.recoveryCode)
-                    },
-                    secondaryButton: .cancel {
-                        model.endFlow()
-                    }
-                )
+                if model.shouldShowSwitchAccountsMessage {
+                    Alert(
+                        title: Text(UserText.syncAlertSwitchAccountTitle),
+                        message: Text(UserText.syncAlertSwitchAccountMessage),
+                        primaryButton: .default(Text(UserText.syncAlertSwitchAccountButton)) {
+                            model.userConfirmedSwitchAccounts(recoveryCode: recoveryCodeModel.recoveryCode)
+                        },
+                        secondaryButton: .cancel {
+                            model.endFlow()
+                        }
+                    )
+                } else {
+                    Alert(
+                        title: Text(errorTitle),
+                        message: Text(errorDescription),
+                        dismissButton: .default(Text(buttonTitle)) {
+                            model.endFlow()
+                        }
+                    )
+                }
             }
     }
 
