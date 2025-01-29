@@ -18,7 +18,7 @@
 
 import AppKit
 import Combine
-import PreferencesViews
+import PreferencesUI_macOS
 
 protocol BookmarkManagementSidebarViewControllerDelegate: AnyObject {
 
@@ -90,7 +90,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         view.addSubview(scrollView)
 
         tabSwitcherButton.translatesAutoresizingMaskIntoConstraints = false
-        tabSwitcherButton.font = PreferencesViews.Const.Fonts.popUpButton
+        tabSwitcherButton.font = PreferencesUI_macOS.Const.Fonts.popUpButton
         tabSwitcherButton.setButtonType(.momentaryLight)
         tabSwitcherButton.isBordered = false
         tabSwitcherButton.target = self
