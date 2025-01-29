@@ -162,10 +162,8 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
 
     private static func relativeTime(_ date: Date) -> String {
         let interval = date.timeIntervalSinceNow
-        if interval > -60 {
-            return UserText.justNow
-        }
-        return relativeDateFormatter.localizedString(fromTimeInterval: date.timeIntervalSinceNow)
+        let isWithinLastMinute = interval > -60
+        return isWithinLastMinute ? UserText.justNow : relativeDateFormatter.localizedString(fromTimeInterval: interval)
     }
 }
 
@@ -232,19 +230,17 @@ extension NewTabPageDataModel.DomainActivity {
     }
 
     mutating func prettifyTitles(_ duckPlayerHistoryItemTitleProvider: DuckPlayerHistoryEntryTitleProviding) {
-        var searches = Set<String>()
-        var urlsToRemove = [String]()
+        var searchQueries = Set<String>()
 
-        let fixedHistory = history.map { historyItem -> NewTabPageDataModel.HistoryEntry in
-
+        history = history.compactMap { historyItem -> NewTabPageDataModel.HistoryEntry? in
             var fixedHistoryItem = NewTabPageDataModel.HistoryEntry(relativeTime: historyItem.relativeTime, title: historyItem.title, url: historyItem.url)
 
             if let url = historyItem.url.url, url.isDuckDuckGoSearch == true {
-                if searches.insert(url.searchQuery ?? "?").inserted {
-                    fixedHistoryItem.title = url.searchQuery ?? "?"
-                } else {
-                    urlsToRemove.append(url.absoluteString)
+                let searchQuery = url.searchQuery ?? "?"
+                guard searchQueries.insert(searchQuery).inserted else {
+                    return nil // Ignore history items for duplicated search queries
                 }
+                fixedHistoryItem.title = url.searchQuery ?? "?"
             } else if let title = duckPlayerHistoryItemTitleProvider.title(for: historyItem) {
                 fixedHistoryItem.title = title
             } else {
@@ -255,8 +251,6 @@ extension NewTabPageDataModel.DomainActivity {
             }
             return fixedHistoryItem
         }
-
-        history = fixedHistory.filter { !urlsToRemove.contains($0.url) }
     }
 
     mutating func sortTrackingEntities(using comparator: TrackerEntityPrevalenceComparing) {
