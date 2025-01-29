@@ -74,16 +74,24 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-    var appExclusionsFeatureEnabled: Bool {
+    private var isAppExclusionsFeatureEnabled: Bool {
         featureFlagger.isFeatureOn(.networkProtectionAppExclusions)
     }
 
-    /// Whether the excluded sites section in preferences is shown.
-    ///
-    /// Only necessary because this is feature flagged to internal users.
-    ///
-    var exclusionsAvailable: Bool {
+    private var isExclusionsFeatureAvailableInBuild: Bool {
         proxySettings.proxyAvailable
+    }
+
+    /// Whether legacy app exclusions should be shown
+    ///
+    var showLegacyExclusionsFeature: Bool {
+        isExclusionsFeatureAvailableInBuild && !isAppExclusionsFeatureEnabled
+    }
+
+    /// Whether new app exclusions should be shown
+    ///
+    var showNewExclusionsFeature: Bool {
+        isExclusionsFeatureAvailableInBuild && isAppExclusionsFeatureEnabled
     }
 
     var excludedDomainsCount: Int {
