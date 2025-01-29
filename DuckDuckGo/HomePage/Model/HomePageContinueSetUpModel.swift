@@ -480,21 +480,3 @@ extension AppVersion {
         return "\(components[0]).\(components[1])"
     }
 }
-
-// This is just temporarily here to run an A/A test to check the new experiment framework works as expected
-//public struct CredentialsSavingFlag: FeatureFlagExperimentDescribing {
-//    public var supportsLocalOverriding: Bool = true
-//
-//    public init() {}
-//
-//    public typealias CohortType = Cohort
-//
-//    public var rawValue = "credentialSaving"
-//
-//    public var source: FeatureFlagSource = .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
-//
-//    public enum Cohort: String, FlagCohort {
-//        case control
-//        case blue
-//    }
-//}

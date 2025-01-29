@@ -93,14 +93,14 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .textExperiment:
             return true
         case .debugMenu,
-                .sslCertificatesBypass,
-                .appendAtbToSerpQueries,
-                .freemiumDBP,
-                .contextualOnboarding,
-                .unknownUsernameCategorization,
-                .credentialsImportPromotionForExistingUsers,
-                .networkProtectionUserTips,
-                .networkProtectionEnforceRoutes:
+             .sslCertificatesBypass,
+             .appendAtbToSerpQueries,
+             .freemiumDBP,
+             .contextualOnboarding,
+             .unknownUsernameCategorization,
+             .credentialsImportPromotionForExistingUsers,
+             .networkProtectionUserTips,
+             .networkProtectionEnforceRoutes:
             return false
         }
     }
@@ -141,7 +141,6 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
         }
     }
-
 }
 
 public extension FeatureFlagger {
