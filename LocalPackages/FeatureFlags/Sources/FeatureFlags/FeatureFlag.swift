@@ -55,9 +55,27 @@ public enum FeatureFlag: String, CaseIterable {
 
     case autofillPartialFormSaves
     case autcompleteTabs
+
+    case textExperiment
+
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
+
+    public var cohortType: (any FlagCohort.Type)? {
+        switch self {
+        case .textExperiment:
+            return TextEperimentCohort.self
+        default:
+            return nil
+        }
+    }
+
+    public enum TextEperimentCohort: String, FlagCohort {
+        case control
+        case treatment
+    }
+
     public var supportsLocalOverriding: Bool {
         switch self {
         case .historyView:
@@ -72,15 +90,17 @@ extension FeatureFlag: FeatureFlagDescribing {
             return true
         case .networkProtectionAppExclusions:
             return true
+        case .textExperiment:
+            return true
         case .debugMenu,
-             .sslCertificatesBypass,
-             .appendAtbToSerpQueries,
-             .freemiumDBP,
-             .contextualOnboarding,
-             .unknownUsernameCategorization,
-             .credentialsImportPromotionForExistingUsers,
-             .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes:
+                .sslCertificatesBypass,
+                .appendAtbToSerpQueries,
+                .freemiumDBP,
+                .contextualOnboarding,
+                .unknownUsernameCategorization,
+                .credentialsImportPromotionForExistingUsers,
+                .networkProtectionUserTips,
+                .networkProtectionEnforceRoutes:
             return false
         }
     }
@@ -117,41 +137,16 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         case .autcompleteTabs:
             return .remoteReleasable(.feature(.autocompleteTabs))
+        case .textExperiment:
+            return .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
         }
     }
+
 }
 
 public extension FeatureFlagger {
 
     func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
         isFeatureOn(for: featureFlag)
-    }
-}
-
-public enum ExperimentFeature: String, CaseIterable {
-    case credentialSaving
-
-    public var flag: any FeatureFlagExperimentDescribing {
-        switch self {
-        case .credentialSaving:
-            return CredentialsSavingFlag()
-        }
-    }
-}
-
-public struct CredentialsSavingFlag: FeatureFlagExperimentDescribing {
-    public var supportsLocalOverriding: Bool = true
-
-    public init() {}
-
-    public typealias CohortType = Cohort
-
-    public var rawValue = "credentialSaving"
-
-    public var source: FeatureFlagSource = .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
-
-    public enum Cohort: String, FlagCohort {
-        case control
-        case blue
     }
 }

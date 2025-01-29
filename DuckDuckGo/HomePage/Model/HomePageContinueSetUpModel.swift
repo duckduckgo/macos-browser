@@ -23,6 +23,7 @@ import Common
 import Foundation
 import PixelKit
 import Subscription
+import FeatureFlags
 
 import NetworkProtection
 import NetworkProtectionUI
@@ -76,6 +77,8 @@ extension HomePage.Models {
                 shouldShowAllFeaturesSubject.send(shouldShowAllFeatures)
             }
         }
+
+        private var cancellables: Set<AnyCancellable> = []
 
         let shouldShowAllFeaturesPublisher: AnyPublisher<Bool, Never>
         private let shouldShowAllFeaturesSubject = PassthroughSubject<Bool, Never>()
@@ -160,7 +163,36 @@ extension HomePage.Models {
             NotificationCenter.default.addObserver(self, selector: #selector(refreshFeaturesForHTMLNewTabPage(_:)), name: .newTabPageWebViewDidAppear, object: nil)
 
             // This is just temporarily here to run an A/A test to check the new experiment framework works as expected
-            _ = Application.appDelegate.featureFlagger.getCohortIfEnabled(for: CredentialsSavingFlag(), allowOverride: true)
+            guard let cohort = Application.appDelegate.featureFlagger.getCohortIfEnabled(for: FeatureFlag.textExperiment, allowOverride: true) as? FeatureFlag.TextEperimentCohort else { return }
+            switch cohort {
+
+            case .control:
+                print("COHORT A")
+            case .treatment:
+                print("COHORT B")
+            }
+            subscribeToTextExperimentFeatureFlagChanges()
+
+        }
+
+        private func subscribeToTextExperimentFeatureFlagChanges() {
+            guard let overridesHandler = Application.appDelegate.featureFlagger.localOverrides?.actionHandler as? FeatureFlagOverridesPublishingHandler<FeatureFlag> else {
+                return
+            }
+
+            overridesHandler.experimentFlagDidChangePublisher
+                .filter { $0.0 == .textExperiment }
+                .sink { (_, cohort) in
+                    guard let newCohort = FeatureFlag.TextEperimentCohort.cohort(for: cohort) else { return }
+                    switch newCohort {
+                    case .control:
+                        print("COHORT A")
+                    case .treatment:
+                        print("COHORT B")
+                    }
+                }
+
+                .store(in: &cancellables)
         }
 
         @MainActor func performAction(for featureType: FeatureType) {
@@ -450,19 +482,19 @@ extension AppVersion {
 }
 
 // This is just temporarily here to run an A/A test to check the new experiment framework works as expected
-public struct CredentialsSavingFlag: FeatureFlagExperimentDescribing {
-    public var supportsLocalOverriding: Bool = true
-
-    public init() {}
-
-    public typealias CohortType = Cohort
-
-    public var rawValue = "credentialSaving"
-
-    public var source: FeatureFlagSource = .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
-
-    public enum Cohort: String, FlagCohort {
-        case control
-        case blue
-    }
-}
+//public struct CredentialsSavingFlag: FeatureFlagExperimentDescribing {
+//    public var supportsLocalOverriding: Bool = true
+//
+//    public init() {}
+//
+//    public typealias CohortType = Cohort
+//
+//    public var rawValue = "credentialSaving"
+//
+//    public var source: FeatureFlagSource = .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
+//
+//    public enum Cohort: String, FlagCohort {
+//        case control
+//        case blue
+//    }
+//}
