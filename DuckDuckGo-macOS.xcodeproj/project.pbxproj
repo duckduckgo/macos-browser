@@ -15379,7 +15379,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "alessandro/malicious-site-protection-ios";
+				branch = "alessandro/malicious-site-protection-pixels-client-side-hit-param";
 				kind = branch;
 			};
 		};

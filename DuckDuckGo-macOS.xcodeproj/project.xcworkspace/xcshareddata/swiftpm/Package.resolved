@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "alessandro/malicious-site-protection-ios",
-        "revision" : "e3520f7f4c1957524d76ac658b60d3e61d216cbb"
+        "branch" : "alessandro/malicious-site-protection-pixels-client-side-hit-param",
+        "revision" : "0e76b07ce86427b0f39754046830b2df237eca91"
       }
     },
     {
