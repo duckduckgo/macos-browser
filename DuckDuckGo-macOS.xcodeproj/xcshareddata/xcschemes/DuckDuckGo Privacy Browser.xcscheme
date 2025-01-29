@@ -154,6 +154,9 @@
                   Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsSuccess()">
                </Test>
                <Test
+                  Identifier = "SyncPreferencesTests/test_recoverDevice_accountAlreadyExists_twoOrMoreDevices_showsAccountSwitchingMessage()">
+               </Test>
+               <Test
                   Identifier = "TabSnapshotExtensionTests/testWhenSnapshotIsRestored_ThenRenderingIsSkippedAfterLoading()">
                </Test>
                <Test
@@ -171,6 +174,9 @@
                ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
             <SkippedTests>
+               <Test
+                  Identifier = "AutoconsentIntegrationTests/testFilterlistRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden()">
+               </Test>
                <Test
                   Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
                </Test>

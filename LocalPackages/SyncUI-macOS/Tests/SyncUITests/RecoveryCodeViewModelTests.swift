@@ -17,7 +17,7 @@
 //
 
 import XCTest
-@testable import SyncUI
+@testable import SyncUI_macOS
 
 final class RecoveryCodeViewModelTests: XCTestCase {
 

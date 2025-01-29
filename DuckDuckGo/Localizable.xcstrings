@@ -63561,49 +63561,49 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tabs und Lesezeichenleiste im Vollbild anzeigen"
+            "value" : "Tabs und Lesezeichenleiste im Vollbildmodus anzeigen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mostrar Pestañas y Barra de Marcadores en Pantalla Completa"
+            "value" : "Mostrar barra de pestañas y marcadores en pantalla completa"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Afficher les Onglets et la Barre de Favoris en Plein Écran"
+            "value" : "Afficher les onglets et la barre des signets en plein écran"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mostra Schede e Barra dei Segnalibri a Schermo Intero"
+            "value" : "Mostra le schede e la barra dei segnalibri a schermo intero"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toon Tabbladen en Bladwijzerbalk in Volledig Scherm"
+            "value" : "Tabbladen en bladwijzerbalk in volledig scherm weergeven"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pokaż Karty i Pasek Zakładek w Pełnym Ekranie"
+            "value" : "Pokaż karty i pasek zakładek na pełnym ekranie"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mostrar Abas e Barra de Favoritos em Tela Cheia"
+            "value" : "Mostrar separadores e barra de marcadores em ecrã inteiro"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Показать вкладки и панель закладок на полном экране"
+            "value" : "Показывать вкладки и панель закладок в полноэкранном режиме"
           }
         }
       }

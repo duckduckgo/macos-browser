@@ -19,7 +19,7 @@
 import Bookmarks
 import Combine
 import Persistence
-import SyncUI
+import SyncUI_macOS
 import XCTest
 import PersistenceTestingUtils
 @testable import BrowserServicesKit
