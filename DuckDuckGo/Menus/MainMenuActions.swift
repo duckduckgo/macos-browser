@@ -913,8 +913,10 @@ extension MainViewController {
     }
 
     @objc func resetAddToDockFeatureNotification(_ sender: Any?) {
+#if SPARKLE
         guard var dockCustomizer = Application.appDelegate.dockCustomization else { return }
         dockCustomizer.wasFeatureShownFromMoreOptionsMenu = false
+#endif
     }
 
     @objc func resetTipKit(_ sender: Any?) {
