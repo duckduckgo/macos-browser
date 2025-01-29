@@ -672,14 +672,17 @@ final class ZoomSubMenu: NSMenu {
         removeAllItems()
 
         let fullScreenItem = (NSApp.mainMenuTyped.toggleFullscreenMenuItem.copy() as? NSMenuItem)!
+            .withImage(.zoomFullScreen)
         addItem(fullScreenItem)
 
         addItem(.separator())
 
         let zoomInItem = (NSApp.mainMenuTyped.zoomInMenuItem.copy() as? NSMenuItem)!
+            .withImage(.zoomIn)
         addItem(zoomInItem)
 
         let zoomOutItem = (NSApp.mainMenuTyped.zoomOutMenuItem.copy() as? NSMenuItem)!
+            .withImage(.zoomOut)
         addItem(zoomOutItem)
 
         let actualSizeItem = (NSApp.mainMenuTyped.actualSizeMenuItem.copy() as? NSMenuItem)!
@@ -687,8 +690,10 @@ final class ZoomSubMenu: NSMenu {
 
         addItem(.separator())
 
-        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem, action: #selector(MoreOptionsMenu.openAccessibilityPreferences(_:)), keyEquivalent: "")
-            .targetting(target)
+        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem,
+                                               action: #selector(MoreOptionsMenu.openAccessibilityPreferences(_:)),
+                                               target: target)
+            .withImage(.zoomChangeDefault)
         addItem(globalZoomSettingItem)
     }
 }
