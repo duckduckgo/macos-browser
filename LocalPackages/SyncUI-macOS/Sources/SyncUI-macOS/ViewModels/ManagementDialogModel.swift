@@ -57,6 +57,7 @@ public final class ManagementDialogModel: ObservableObject {
             .sink { [weak self] hasError in
                 self?.shouldShowErrorMessage = hasError
             }
+
     }
 
     @MainActor
@@ -70,6 +71,12 @@ public final class ManagementDialogModel: ObservableObject {
     @MainActor
     public func userConfirmedSwitchAccounts(recoveryCode: String) {
         delegate?.userConfirmedSwitchAccounts(recoveryCode: recoveryCode)
+    }
+
+    @MainActor
+    public func showSwitchAccountsMessage() {
+        shouldShowSwitchAccountsMessage = true
+        shouldShowErrorMessage = true
     }
 
     @MainActor
