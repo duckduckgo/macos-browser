@@ -120,7 +120,7 @@ final class WindowControllersManagerMock: WindowControllersManagerProtocol {
     var openNewWindowCalled: OpenNewWindowArgs?
     @discardableResult
     func openNewWindow(with tabCollectionViewModel: DuckDuckGo_Privacy_Browser.TabCollectionViewModel?, burnerMode: DuckDuckGo_Privacy_Browser.BurnerMode, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool, popUp: Bool, lazyLoadTabs: Bool, isMiniaturized: Bool, isMaximized: Bool, isFullscreen: Bool) -> DuckDuckGo_Privacy_Browser.MainWindow? {
-        openNewWindowCalled = .init(contents: tabCollectionViewModel?.tabs.map(\.content), burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized, isMaximized: isMaximized, isFullscreen:isFullscreen)
+        openNewWindowCalled = .init(contents: tabCollectionViewModel?.tabs.map(\.content), burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized, isMaximized: isMaximized, isFullscreen: isFullscreen)
         return nil
     }
     func showTab(with content: DuckDuckGo_Privacy_Browser.Tab.TabContent) { }
