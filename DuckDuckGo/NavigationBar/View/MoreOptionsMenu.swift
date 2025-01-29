@@ -170,8 +170,8 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
                         image: .addToDockMenuItem) {
                             if let target = addToDockMenuItem.target {
                                 _ = target.perform(addToDockMenuItem.action, with: addToDockMenuItem)
-                                // TODO: Need to close the menu when this happens
                             }
+                            self.cancelTracking()
                         }
                     addItem(addToDockMenuItem)
                 }
