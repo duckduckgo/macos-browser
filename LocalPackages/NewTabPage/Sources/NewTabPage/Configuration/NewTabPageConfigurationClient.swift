@@ -65,7 +65,11 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
         self.linkOpener = linkOpener
         super.init()
 
-        Publishers.Merge(sectionsVisibilityProvider.isFavoritesVisiblePublisher, sectionsVisibilityProvider.isPrivacyStatsVisiblePublisher)
+        Publishers.Merge3(
+            sectionsVisibilityProvider.isFavoritesVisiblePublisher,
+            sectionsVisibilityProvider.isPrivacyStatsVisiblePublisher,
+            sectionsVisibilityProvider.isRecentActivityVisiblePublisher
+        )
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.notifyWidgetConfigsDidChange()
