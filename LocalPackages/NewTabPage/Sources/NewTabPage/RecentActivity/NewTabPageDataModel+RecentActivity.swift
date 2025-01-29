@@ -31,19 +31,17 @@ public extension NewTabPageDataModel {
         public var etldPlusOne: String?
         public var favicon: ActivityFavicon?
         public var favorite: Bool
-        public var fireproof: Bool
         public var trackersFound: Bool
         public var trackingStatus: TrackingStatus
         public var history: [HistoryEntry]
 
-        public init(id: String, title: String, url: String, etldPlusOne: String?, favicon: ActivityFavicon?, favorite: Bool, fireproof: Bool, trackersFound: Bool, trackingStatus: TrackingStatus, history: [HistoryEntry]) {
+        public init(id: String, title: String, url: String, etldPlusOne: String?, favicon: ActivityFavicon?, favorite: Bool, trackersFound: Bool, trackingStatus: TrackingStatus, history: [HistoryEntry]) {
             self.id = id
             self.title = title
             self.url = url
             self.etldPlusOne = etldPlusOne
             self.favicon = favicon
             self.favorite = favorite
-            self.fireproof = fireproof
             self.trackersFound = trackersFound
             self.trackingStatus = trackingStatus
             self.history = history

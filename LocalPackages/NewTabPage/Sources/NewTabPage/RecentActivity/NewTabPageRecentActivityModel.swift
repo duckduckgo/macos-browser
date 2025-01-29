@@ -124,11 +124,6 @@ public final class NewTabPageRecentActivityModel {
         return await actionsHandler.confirmBurn(url)
     }
 
-    @MainActor func burn(_ url: String) async {
-        guard let url = URL(string: url), url.isValid else { return }
-        await actionsHandler.burn(url)
-    }
-
     @MainActor func open(_ url: String, target: LinkOpenTarget) async {
         guard let url = URL(string: url), url.isValid else { return }
         await actionsHandler.open(url, target: target)

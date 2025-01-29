@@ -97,7 +97,6 @@ final class NewTabPageRecentActivityClientTests: XCTestCase {
                 etldPlusOne: "example.com",
                 favicon: .init(maxAvailableSize: 32, src: "duck://favicon/http%3A//example.com"),
                 favorite: false,
-                fireproof: false,
                 trackersFound: true,
                 trackingStatus: .init(totalCount: 5, trackerCompanies: [.init(displayName: "Facebook")]),
                 history: [
@@ -162,16 +161,6 @@ final class NewTabPageRecentActivityClientTests: XCTestCase {
         let response: NewTabPageDataModel.ConfirmBurnResponse = try await messageHelper.handleMessage(named: .confirmBurn, parameters: action)
         XCTAssertEqual(actionsHandler.confirmBurnCalls, [url])
         XCTAssertEqual(response.action, .none)
-    }
-
-    // MARK: - burn
-
-    func testThatBurnIsPassedToTheModel() async throws {
-        let url = try XCTUnwrap(URL(string: "https://en.wikipedia.org/wiki/index.html"))
-        let action: NewTabPageDataModel.ActivityItemAction = .init(url: url.absoluteString)
-
-        try await messageHelper.handleMessageExpectingNilResponse(named: .burn, parameters: action)
-        XCTAssertEqual(actionsHandler.burnCalls, [url])
     }
 
     // MARK: - open

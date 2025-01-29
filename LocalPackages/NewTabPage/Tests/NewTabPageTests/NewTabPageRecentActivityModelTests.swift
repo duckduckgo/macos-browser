@@ -71,16 +71,16 @@ final class NewTabPageRecentActivityModelTests: XCTestCase {
         XCTAssertEqual(actionsHandler.removeFavoriteCalls, [])
     }
 
-    func testThatBurnForwardsTheCallToActionsHandler() async throws {
+    func testThatConfirmBurnForwardsTheCallToActionsHandler() async throws {
         let validURLString = "https://example.com"
-        await model.burn(validURLString)
-        XCTAssertEqual(actionsHandler.burnCalls, [try XCTUnwrap(URL(string: validURLString))])
+        _ = await model.confirmBurn(validURLString)
+        XCTAssertEqual(actionsHandler.confirmBurnCalls, [try XCTUnwrap(URL(string: validURLString))])
     }
 
-    func testWhenURLIsInvalidThenBurnDoesNotForwardTheCallToActionsHandler() async throws {
+    func testWhenURLIsInvalidThenConfirmBurnDoesNotForwardTheCallToActionsHandler() async throws {
         let invalidURLString = "aaaa"
-        await model.burn(invalidURLString)
-        XCTAssertEqual(actionsHandler.burnCalls, [])
+        _ = await model.confirmBurn(invalidURLString)
+        XCTAssertEqual(actionsHandler.confirmBurnCalls, [])
     }
 
     func testThatOpenForwardsTheCallToActionsHandler() async throws {

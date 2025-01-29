@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 
 public protocol RecentActivityActionsHandling {
@@ -24,5 +25,6 @@ public protocol RecentActivityActionsHandling {
     @MainActor func addFavorite(_ url: URL) async
     @MainActor func removeFavorite(_ url: URL) async
     @MainActor func confirmBurn(_ url: URL) async -> Bool
-    @MainActor func burn(_ url: URL) async
+
+    var burnDidCompletePublisher: AnyPublisher<Void, Never> { get }
 }

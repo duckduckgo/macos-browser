@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import NewTabPage
 
@@ -37,9 +38,7 @@ final class CapturingRecentActivityActionsHandler: RecentActivityActionsHandling
         return _confirmBurn(url)
     }
 
-    func burn(_ url: URL) async {
-        burnCalls.append(url)
-    }
+    let burnDidCompletePublisher: AnyPublisher<Void, Never> = Empty<Void, Never>().eraseToAnyPublisher()
 
     struct Open: Equatable {
         let url: URL
@@ -53,5 +52,4 @@ final class CapturingRecentActivityActionsHandler: RecentActivityActionsHandling
     var addFavoriteCalls: [URL] = []
     var removeFavoriteCalls: [URL] = []
     var confirmBurnCalls: [URL] = []
-    var burnCalls: [URL] = []
 }

@@ -16,69 +16,147 @@
 //  limitations under the License.
 //
 
+import Combine
 import Common
 import Foundation
 import NewTabPage
 
-final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
+protocol URLFireproofStatusProviding: AnyObject {
+    func isDomainFireproof(forURL url: URL) -> Bool
+}
 
-    let bookmarkManager: BookmarkManager
-    let fireproofDomains: FireproofDomains
-    let fire: () async -> Fire
+extension FireproofDomains: URLFireproofStatusProviding {
+    func isDomainFireproof(forURL url: URL) -> Bool {
+        guard let domain = url.host?.droppingWwwPrefix() else {
+            return false
+        }
+        return isFireproof(fireproofDomain: domain)
+    }
+}
+
+protocol RecentActivityFavoritesHandling: AnyObject {
+    func getBookmark(for url: URL) -> Bookmark?
+    func getFavorite(for url: URL) -> Bookmark?
+    func markAsFavorite(_ bookmark: Bookmark)
+    func unmarkAsFavorite(_ bookmark: Bookmark)
+    func addNewFavorite(for url: URL)
+}
+
+extension LocalBookmarkManager: RecentActivityFavoritesHandling {
+
+    func getFavorite(for url: URL) -> Bookmark? {
+        guard let favorite = getBookmark(for: url), favorite.isFavorite else {
+            return nil
+        }
+        return favorite
+    }
+
+    func markAsFavorite(_ bookmark: Bookmark) {
+        guard !bookmark.isFavorite else {
+            return
+        }
+        bookmark.isFavorite = true
+        update(bookmark: bookmark)
+    }
+
+    func unmarkAsFavorite(_ bookmark: Bookmark) {
+        guard bookmark.isFavorite else {
+            return
+        }
+        bookmark.isFavorite = false
+        update(bookmark: bookmark)
+    }
+
+    func addNewFavorite(for url: URL) {
+        makeBookmark(for: url, title: url.host?.droppingWwwPrefix() ?? url.absoluteString, isFavorite: true)
+    }
+}
+
+protocol RecentActivityItemBurning: AnyObject {
+    @MainActor func burn(_ url: URL, burningDidComplete: @escaping () -> Void) async -> Bool
+}
+
+final class RecentActivityItemBurner: RecentActivityItemBurning {
+
     let tld: TLD
+    let fire: () async -> Fire
+    let fireproofStatusProvider: URLFireproofStatusProviding
 
     init(
-        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-        fireproofDomains: FireproofDomains = FireproofDomains.shared,
-        fire: (() async -> (Fire))? = nil,
-        tld: TLD = ContentBlocking.shared.tld
+        fireproofStatusProvider: URLFireproofStatusProviding = FireproofDomains.shared,
+        tld: TLD = ContentBlocking.shared.tld,
+        fire: (() async -> Fire)? = nil
     ) {
-        self.bookmarkManager = bookmarkManager
-        self.fireproofDomains = fireproofDomains
-        self.fire = fire ?? { @MainActor in FireCoordinator.fireViewModel.fire }
+        self.fireproofStatusProvider = fireproofStatusProvider
         self.tld = tld
+        self.fire = fire ?? { @MainActor in FireCoordinator.fireViewModel.fire }
+    }
+
+    @MainActor func burn(_ url: URL, burningDidComplete: @escaping () -> Void) async -> Bool {
+        guard let domain = url.host?.droppingWwwPrefix() else {
+            return false
+        }
+        guard await confirmBurningFireproofDomainIfNeeded(url) else {
+            return false
+        }
+        let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
+
+        // This only starts burning and returns immediately (the await here is to retrieve Fire instance).
+        // completion is called when burning completes.
+        await fire().burnEntity(entity: .none(selectedDomains: domains), completion: burningDidComplete)
+
+        return true
+    }
+
+    @MainActor
+    func confirmBurningFireproofDomainIfNeeded(_ url: URL) async -> Bool {
+        if fireproofStatusProvider.isDomainFireproof(forURL: url) {
+            guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
+                return false
+            }
+        }
+        return true
+    }
+}
+
+final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
+
+    let favoritesHandler: RecentActivityFavoritesHandling
+    let burner: RecentActivityItemBurning
+    let burnDidCompletePublisher: AnyPublisher<Void, Never>
+    private let burnDidCompleteSubject = PassthroughSubject<Void, Never>()
+
+    init(
+        favoritesHandler: RecentActivityFavoritesHandling = LocalBookmarkManager.shared,
+        burner: RecentActivityItemBurning = RecentActivityItemBurner()
+    ) {
+        self.favoritesHandler = favoritesHandler
+        self.burner = burner
+        self.burnDidCompletePublisher = burnDidCompleteSubject.eraseToAnyPublisher()
     }
 
     @MainActor
     func addFavorite(_ url: URL) {
-        if let bookmark = bookmarkManager.getBookmark(for: url) {
-            guard !bookmark.isFavorite else {
-                return
-            }
-            bookmark.isFavorite = true
-            bookmarkManager.update(bookmark: bookmark)
+        if let bookmark = favoritesHandler.getBookmark(for: url) {
+            favoritesHandler.markAsFavorite(bookmark)
         } else {
-            bookmarkManager.makeBookmark(for: url, title: url.host?.droppingWwwPrefix() ?? url.absoluteString, isFavorite: true)
+            favoritesHandler.addNewFavorite(for: url)
         }
     }
 
     @MainActor
     func removeFavorite(_ url: URL) {
-        guard let favorite = bookmarkManager.getBookmark(for: url), favorite.isFavorite else {
+        guard let favorite = favoritesHandler.getFavorite(for: url) else {
             return
         }
-        favorite.isFavorite = false
-        bookmarkManager.update(bookmark: favorite)
+        favoritesHandler.unmarkAsFavorite(favorite)
     }
 
     @MainActor
     func confirmBurn(_ url: URL) async -> Bool {
-        guard let domain = url.host?.droppingWwwPrefix(), fireproofDomains.isFireproof(fireproofDomain: domain) else {
-            return false
+        await burner.burn(url) { [weak self] in
+            self?.burnDidCompleteSubject.send()
         }
-        guard case .OK = await NSAlert.burnFireproofSiteAlert().runModal() else {
-            return false
-        }
-        return true
-    }
-
-    @MainActor
-    func burn(_ url: URL) async {
-        guard let domain = url.host?.droppingWwwPrefix() else {
-            return
-        }
-        let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
-        await fire().burnEntity(entity: .none(selectedDomains: domains))
     }
 
     @MainActor
@@ -96,11 +174,6 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
         } else {
             tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url, source: .bookmark))
         }
-    }
-
-    @MainActor
-    private var window: NSWindow? {
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.view.window
     }
 
     @MainActor
