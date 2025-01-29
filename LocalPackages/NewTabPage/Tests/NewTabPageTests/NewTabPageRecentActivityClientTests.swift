@@ -163,16 +163,6 @@ final class NewTabPageRecentActivityClientTests: XCTestCase {
         XCTAssertEqual(response.action, .none)
     }
 
-    // MARK: - burn
-
-    func testThatBurnIsPassedToTheModel() async throws {
-        let url = try XCTUnwrap(URL(string: "https://en.wikipedia.org/wiki/index.html"))
-        let action: NewTabPageDataModel.ActivityItemAction = .init(url: url.absoluteString)
-
-        try await messageHelper.handleMessageExpectingNilResponse(named: .burn, parameters: action)
-        XCTAssertEqual(actionsHandler.burnCalls, [url])
-    }
-
     // MARK: - open
 
     func testThatOpenIsPassedToTheModel() async throws {

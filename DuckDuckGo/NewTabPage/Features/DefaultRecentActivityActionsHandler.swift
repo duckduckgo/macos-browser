@@ -34,7 +34,7 @@ extension FireproofDomains: URLFireproofStatusProviding {
     }
 }
 
-protocol RecentActivityActionsHandlerBookmarkManaging: AnyObject {
+protocol RecentActivityFavoritesHandling: AnyObject {
     func getBookmark(for url: URL) -> Bookmark?
     func getFavorite(for url: URL) -> Bookmark?
     func markAsFavorite(_ bookmark: Bookmark)
@@ -42,7 +42,7 @@ protocol RecentActivityActionsHandlerBookmarkManaging: AnyObject {
     func addNewFavorite(for url: URL)
 }
 
-extension LocalBookmarkManager: RecentActivityActionsHandlerBookmarkManaging {
+extension LocalBookmarkManager: RecentActivityFavoritesHandling {
 
     func getFavorite(for url: URL) -> Bookmark? {
         guard let favorite = getBookmark(for: url), favorite.isFavorite else {
@@ -100,7 +100,11 @@ final class RecentActivityItemBurner: RecentActivityItemBurning {
             return false
         }
         let domains = Set([domain]).convertedToETLDPlus1(tld: tld)
+
+        // This only starts burning and returns immediately (the await here is to retrieve Fire instance).
+        // completion is called when burning completes.
         await fire().burnEntity(entity: .none(selectedDomains: domains), completion: burningDidComplete)
+
         return true
     }
 
@@ -117,35 +121,35 @@ final class RecentActivityItemBurner: RecentActivityItemBurning {
 
 final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
 
-    let bookmarkManager: RecentActivityActionsHandlerBookmarkManaging
+    let favoritesHandler: RecentActivityFavoritesHandling
     let burner: RecentActivityItemBurning
     let burnDidCompletePublisher: AnyPublisher<Void, Never>
     private let burnDidCompleteSubject = PassthroughSubject<Void, Never>()
 
     init(
-        bookmarkManager: RecentActivityActionsHandlerBookmarkManaging = LocalBookmarkManager.shared,
+        favoritesHandler: RecentActivityFavoritesHandling = LocalBookmarkManager.shared,
         burner: RecentActivityItemBurning = RecentActivityItemBurner()
     ) {
-        self.bookmarkManager = bookmarkManager
+        self.favoritesHandler = favoritesHandler
         self.burner = burner
         self.burnDidCompletePublisher = burnDidCompleteSubject.eraseToAnyPublisher()
     }
 
     @MainActor
     func addFavorite(_ url: URL) {
-        if let bookmark = bookmarkManager.getBookmark(for: url) {
-            bookmarkManager.markAsFavorite(bookmark)
+        if let bookmark = favoritesHandler.getBookmark(for: url) {
+            favoritesHandler.markAsFavorite(bookmark)
         } else {
-            bookmarkManager.addNewFavorite(for: url)
+            favoritesHandler.addNewFavorite(for: url)
         }
     }
 
     @MainActor
     func removeFavorite(_ url: URL) {
-        guard let favorite = bookmarkManager.getFavorite(for: url) else {
+        guard let favorite = favoritesHandler.getFavorite(for: url) else {
             return
         }
-        bookmarkManager.unmarkAsFavorite(favorite)
+        favoritesHandler.unmarkAsFavorite(favorite)
     }
 
     @MainActor
