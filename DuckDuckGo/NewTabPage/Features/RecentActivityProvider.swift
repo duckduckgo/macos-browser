@@ -133,14 +133,23 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
 
                 guard let host = historyEntry.url.host else { return }
 
-                var activityItem = activityItemsByDomain[host]
-                let newItem = NewTabPageDataModel.DomainActivity(historyEntry, urlFavoriteStatusProvider: urlFavoriteStatusProvider, urlFireproofStatusProvider: urlFireproofStatusProvider)
-                if activityItem == nil, let newItem {
+                let activityItem: DomainActivityRef? = {
+                    let cachedItem = activityItemsByDomain[host]
+                    if let cachedItem {
+                        return cachedItem
+                    }
+                    guard let newItem = NewTabPageDataModel.DomainActivity(
+                        historyEntry,
+                        urlFavoriteStatusProvider: urlFavoriteStatusProvider,
+                        urlFireproofStatusProvider: urlFireproofStatusProvider
+                    ) else {
+                        return nil
+                    }
                     let newItemRef = DomainActivityRef(newItem)
                     activityItems.append(newItemRef)
                     activityItemsByDomain[host] = newItemRef
-                    activityItem = newItemRef
-                }
+                    return newItemRef
+                }()
 
                 activityItem?.activity.addBlockedEntities(historyEntry.blockedTrackingEntities)
                 activityItem?.activity.addPage(fromHistory: historyEntry, dateFormatter: Self.relativeTime)
