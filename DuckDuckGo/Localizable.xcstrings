@@ -39863,7 +39863,6 @@
     },
     "newTab.privacy.stats.section.title" : {
       "comment" : "Title of the Privacy Stats section in the home page",
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
