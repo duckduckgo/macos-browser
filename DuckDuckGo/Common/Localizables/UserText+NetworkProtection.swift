@@ -175,7 +175,11 @@ extension UserText {
 
     static let vpnLocationTitle = NSLocalizedString("vpn.location.title", value: "Location", comment: "Location section title in VPN settings")
 
+    static let vpnExclusionsTitle = NSLocalizedString("vpn.exclusions.title", value: "Exclusions", comment: "Exclusions section title in VPN settings")
+
     static let vpnExcludedSitesTitle = NSLocalizedString("vpn.excluded.sites.title", value: "Excluded Websites", comment: "Excluded Sites title in VPN settings")
+
+    static let vpnExcludedAppsTitle = NSLocalizedString("vpn.excluded.apps.title", value: "Excluded Apps", comment: "Excluded Apps title in VPN settings")
 
     static let vpnGeneralTitle = NSLocalizedString("vpn.general.title", value: "General", comment: "General section title in VPN settings")
 
@@ -211,6 +215,12 @@ extension UserText {
         let message = NSLocalizedString("network.protection.vpn.location.country.item.formatted.cities.count", value: "%d cities", comment: "Subtitle of countries item when there are multiple cities, example: '5 cities'")
         return String(format: message, count)
     }
+
+    // MARK: - Exclusions
+
+    static let vpnSettingsExclusionsDescription = NSLocalizedString("vpn.setting.exclusions.description", value: "Some websites and apps are not compatible with VPNs. Exclude these sites and apps to use them while connected to the VPN.", comment: "The description shown for the exclusions section in VPN settings")
+
+    static let vpnSettingsManageExclusionsButtonTitle = NSLocalizedString("vpn.setting.exclusions.manage.button.title", value: "Manage...", comment: "Title for the button to manage exclusions")
 
     // MARK: - Excluded Domains
 

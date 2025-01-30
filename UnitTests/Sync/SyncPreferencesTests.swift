@@ -346,6 +346,7 @@ final class SyncPreferencesTests: XCTestCase {
 
         await fulfillment(of: [loginCalledExpectation], timeout: 5.0)
 
+        XCTAssert(managementDialogModel.shouldShowErrorMessage)
         XCTAssert(managementDialogModel.shouldShowSwitchAccountsMessage)
     }
 

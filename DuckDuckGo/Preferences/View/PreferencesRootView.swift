@@ -17,7 +17,7 @@
 //
 
 import Common
-import PreferencesViews
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI_macOS
