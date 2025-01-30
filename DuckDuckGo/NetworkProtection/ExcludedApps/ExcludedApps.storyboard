@@ -20,7 +20,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="addDomain:" target="Clu-Bo-JRW" id="JMt-9k-Pgn"/>
+                                    <action selector="addApp:" target="Clu-Bo-JRW" id="Ba6-XA-ipe"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KAc-ZW-ZAV" userLabel="Remove Domain Button">
@@ -30,7 +30,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="removeSelectedDomain:" target="Clu-Bo-JRW" id="SDb-ij-rx7"/>
+                                    <action selector="removeSelected:" target="Clu-Bo-JRW" id="Plq-Rt-WFe"/>
                                 </connections>
                             </button>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPG-Pg-rGL">

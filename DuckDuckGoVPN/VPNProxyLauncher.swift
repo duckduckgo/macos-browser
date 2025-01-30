@@ -50,7 +50,7 @@ final class VPNProxyLauncher {
     private func subscribeToStatusChanges() {
         notificationCenter.publisher(for: .NEVPNStatusDidChange)
             .receive(on: DispatchQueue.main)
-            .removeDuplicates()
+            //.removeDuplicates()
             .sink(receiveValue: statusChanged(notification:))
             .store(in: &cancellables)
     }

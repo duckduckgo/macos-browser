@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import AppInfoRetriever
 
 final class ExcludedAppsViewController: NSViewController {
     typealias Model = ExcludedAppsModel
@@ -47,10 +48,10 @@ final class ExcludedAppsViewController: NSViewController {
 
     private let faviconManagement: FaviconManagement = FaviconManager.shared
 
-    private var allApps = [String]()
-    private var filteredApps: [String]?
+    private var allApps = [AppInfo]()
+    private var filteredApps: [AppInfo]?
 
-    private var visibleApps: [String] {
+    private var visibleApps: [AppInfo] {
         return filteredApps ?? allApps
     }
 
@@ -88,6 +89,8 @@ final class ExcludedAppsViewController: NSViewController {
     fileprivate func reloadData() {
         allApps = model.excludedApps.sorted { (lhs, rhs) -> Bool in
             return lhs < rhs
+        }.map { bundleID in
+            model.getAppInfo(bundleID: bundleID)
         }
 
         tableView.reloadData()
@@ -99,36 +102,42 @@ final class ExcludedAppsViewController: NSViewController {
     }
 
     @IBAction func addApp(_ sender: NSButton) {
-        AddExcludedDomainView(title: UserText.vpnAddExcludedDomainTitle, buttonsState: .compressed, cancelActionTitle: UserText.vpnAddExcludedDomainCancelButtonTitle, cancelAction: { dismiss in
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.applicationBundle]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.canChooseFiles = true
+        panel.directoryURL = URL(fileURLWithPath: "/Applications")
 
-            dismiss()
-        }, defaultActionTitle: UserText.vpnAddExcludedDomainActionButtonTitle) { [weak self] bundleID, dismiss in
-            guard let self else { return }
+        guard panel.runModal() == .OK,
+              let appURL = panel.url else {
+            return
+        }
 
-            addApp(bundleID)
-            dismiss()
-        }.show(in: view.window)
+        add(appURL: appURL)
     }
 
-    private func addApp(_ bundleID: String) {
+    private func add(appURL: URL) {
         Task {
-            model.add(bundleID: bundleID)
+            guard let appInfo = model.add(appURL: appURL) else {
+                return
+            }
             reloadData()
 
-            if let newRowIndex = allApps.firstIndex(of: bundleID) {
+            if let newRowIndex = allApps.firstIndex(of: appInfo) {
                 tableView.scrollRowToVisible(newRowIndex)
             }
         }
     }
 
-    @IBAction func removeSelectedDomain(_ sender: NSButton) {
+    @IBAction func removeSelected(_ sender: NSButton) {
         guard tableView.selectedRow > -1 else {
             updateRemoveButtonState()
             return
         }
 
-        let bundleID = visibleApps[tableView.selectedRow]
-        model.remove(bundleID: bundleID)
+        let appInfo = visibleApps[tableView.selectedRow]
+        model.remove(bundleID: appInfo.bundleID)
         reloadData()
     }
 }
@@ -149,10 +158,10 @@ extension ExcludedAppsViewController: NSTableViewDataSource, NSTableViewDelegate
             return nil
         }
 
-        let domain = visibleApps[row]
+        let appInfo = visibleApps[row]
 
-        cell.textField?.stringValue = domain
-        cell.imageView?.image = faviconManagement.getCachedFavicon(forDomainOrAnySubdomain: domain, sizeCategory: .small)?.image
+        cell.textField?.stringValue = appInfo.name
+        cell.imageView?.image = appInfo.icon
         cell.imageView?.applyFaviconStyle()
 
         return cell
@@ -171,10 +180,11 @@ extension ExcludedAppsViewController: NSTextFieldDelegate {
         if field.stringValue.isEmpty {
             filteredApps = nil
         } else {
-            filteredApps = allApps.filter { $0.contains(field.stringValue) }
+            filteredApps = allApps.filter {
+                $0.name.contains(field.stringValue) || $0.bundleID.contains(field.stringValue)
+            }
         }
 
         reloadData()
     }
-
 }

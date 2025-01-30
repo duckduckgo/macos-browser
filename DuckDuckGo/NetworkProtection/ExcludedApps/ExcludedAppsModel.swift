@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppInfoRetriever
 import Foundation
 import NetworkProtectionProxy
 import NetworkProtectionUI
@@ -23,12 +24,14 @@ import PixelKit
 
 protocol ExcludedAppsModel {
     var excludedApps: [String] { get }
+    func getAppInfo(bundleID: String) -> AppInfo
 
-    func add(bundleID: String)
+    func add(appURL: URL) -> AppInfo?
     func remove(bundleID: String)
 }
 
 final class DefaultExcludedAppsModel {
+    private let appInfoRetriever: AppInfoRetrieveing = AppInfoRetriever()
     let proxySettings = TransparentProxySettings(defaults: .netP)
     private let pixelKit: PixelFiring?
 
@@ -42,12 +45,13 @@ extension DefaultExcludedAppsModel: ExcludedAppsModel {
         proxySettings.excludedApps
     }
 
-    func add(bundleID: String) {
-        guard proxySettings.appRoutingRules[bundleID] != .exclude else {
-            return
+    func add(appURL: URL) -> AppInfo? {
+        guard let appInfo = appInfoRetriever.getAppInfo(appURL: appURL) else {
+            return nil
         }
 
-        proxySettings.appRoutingRules[bundleID] = .exclude
+        proxySettings.appRoutingRules[appInfo.bundleID] = .exclude
+        return appInfo
     }
 
     func remove(bundleID: String) {
@@ -56,5 +60,17 @@ extension DefaultExcludedAppsModel: ExcludedAppsModel {
         }
 
         proxySettings.appRoutingRules.removeValue(forKey: bundleID)
+    }
+
+    /// Provides AppInfo for the specified bundleID for the scope of presenting the information to the user.
+    ///
+    /// Since this method is specific to show app information to the user, it's IMPORTANT to make sure
+    /// we always return AppInfo for the bundleID provided.  This ensures that the user can always remove
+    /// an exclusion through the UI, even if the app has been deleted from the system.  For this purpose
+    /// when the app information cannot be retrieved, this method will return AppInfor with the bundleID
+    /// as the app's name.
+    ///
+    func getAppInfo(bundleID: String) -> AppInfo {
+        appInfoRetriever.getAppInfo(bundleID: bundleID) ?? AppInfo(bundleID: bundleID, name: bundleID, icon: NSImage.window16)
     }
 }
