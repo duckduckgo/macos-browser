@@ -112,8 +112,9 @@ class MainMenuTests: XCTestCase {
         XCTAssertTrue(duckDuckGoMenu.items[3].isHidden)
     }
 
+#if SPARKLE || DEBUG
     @MainActor
-    func testWhenBrowserIsNotInTheDockAndIsSparkleBuildThenMenuItemIsVisible() throws {
+    func testWhenBrowserIsNotInTheDockThenMenuItemIsVisible() throws {
         let dockCustomizer = DockCustomizerMock()
 
         let sut = MainMenu(
@@ -128,12 +129,31 @@ class MainMenuTests: XCTestCase {
 
         let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
 
-        XCTAssertEqual(duckDuckGoMenu.items[3].isHidden, NSApp.isSandboxed)
-
-        if !NSApp.isSandboxed {
-            XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.addDuckDuckGoToDock)
-        }
+        XCTAssertEqual(duckDuckGoMenu.items[3].isHidden, false)
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.addDuckDuckGoToDock)
     }
+
+    @MainActor
+    func testWhenBrowserIsInTheDockThenMenuItemIsNotVisible() throws {
+        let dockCustomizer = DockCustomizerMock()
+        dockCustomizer.dockStatus = true
+
+        let sut = MainMenu(
+            featureFlagger: DummyFeatureFlagger(),
+            bookmarkManager: MockBookmarkManager(),
+            faviconManager: FaviconManagerMock(),
+            dockCustomizer: dockCustomizer,
+            aiChatMenuConfig: DummyAIChatConfig()
+        )
+
+        sut.update()
+
+        let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
+
+        XCTAssertEqual(duckDuckGoMenu.items[3].isHidden, true)
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.addDuckDuckGoToDock)
+    }
+#endif
 
     // MARK: - Default Browser Action
 

@@ -304,12 +304,10 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     // MARK: - Default Browser Action and Add To Dock
 
+
+#if SPARKLE || DEBUG
     @MainActor
     func testWhenBrowserIsNotAddedToDockThenMenuItemIsVisible() {
-        if NSApp.isSandboxed {
-            return
-        }
-
         dockCustomizer.wasFeatureShownFromMoreOptionsMenu = true
         dockCustomizer.dockStatus = false
 
@@ -318,6 +316,20 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.addDuckDuckGoToDock)
     }
+
+    @MainActor
+    func testWhenBrowserIsNotInTheDockAndIsNotSetAsDefaultThenTheOrderIsCorrect() {
+        dockCustomizer.wasFeatureShownFromMoreOptionsMenu = true
+        dockCustomizer.dockStatus = false
+        defaultBrowserProvider.isDefault = false
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.addDuckDuckGoToDock)
+        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.setAsDefaultBrowser)
+    }
+#endif
 
     @MainActor
     func testWhenBrowserIsAddedToDockThenMenuItemIsNotVisible() {
@@ -347,23 +359,6 @@ final class MoreOptionsMenuTests: XCTestCase {
         moreOptionsMenu.update()
 
         XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
-    }
-
-    @MainActor
-    func testWhenBrowserIsNotInTheDockAndIsNotSetAsDefaultThenTheOrderIsCorrect() {
-        if NSApp.isSandboxed {
-            return
-        }
-
-        dockCustomizer.wasFeatureShownFromMoreOptionsMenu = true
-        dockCustomizer.dockStatus = false
-        defaultBrowserProvider.isDefault = false
-
-        setupMoreOptionsMenu()
-        moreOptionsMenu.update()
-
-        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.addDuckDuckGoToDock)
-        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.setAsDefaultBrowser)
     }
 }
 
