@@ -112,7 +112,7 @@ class MainMenuTests: XCTestCase {
         XCTAssertTrue(duckDuckGoMenu.items[3].isHidden)
     }
 
-#if SPARKLE || DEBUG
+#if SPARKLE
     @MainActor
     func testWhenBrowserIsNotInTheDockThenMenuItemIsVisible() throws {
         let dockCustomizer = DockCustomizerMock()
