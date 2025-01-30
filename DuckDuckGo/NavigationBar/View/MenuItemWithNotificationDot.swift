@@ -27,35 +27,35 @@ struct MenuItemWithNotificationDot: View {
     @State private var isHovered: Bool = false
 
     var body: some View {
-            ZStack {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(isHovered ? .menuItemHover : Color.clear)
-                    .padding([.leading, .trailing], 5)
-                    .frame(maxWidth: .infinity)
+        ZStack {
+            RoundedRectangle(cornerRadius: 4)
+                .fill(isHovered ? .menuItemHover : Color.clear)
+                .padding([.leading, .trailing], 5)
+                .frame(maxWidth: .infinity)
 
-                HStack(spacing: 0) {
-                    Image(nsImage: leftImage)
-                        .resizable()
-                        .foregroundColor(isHovered ? .white : .blackWhite100)
-                        .frame(width: 16, height: 16)
-                        .padding(.trailing, 6)
-                        .padding(.leading, 14)
+            HStack(spacing: 0) {
+                Image(nsImage: leftImage)
+                    .resizable()
+                    .foregroundColor(isHovered ? .white : .blackWhite100)
+                    .frame(width: 16, height: 16)
+                    .padding(.trailing, 6)
+                    .padding(.leading, 14)
 
-                    Text(title)
-                        .foregroundColor(isHovered ? .white : .blackWhite100.opacity(0.9))
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                Text(title)
+                    .foregroundColor(isHovered ? .white : .blackWhite100.opacity(0.9))
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Circle()
-                        .fill(isHovered ? .white : .updateIndicator)
-                        .frame(width: 7, height: 7)
-                        .padding(.trailing, 14)
-                }
-            }
-            .onHover { hovering in
-                isHovered = hovering
-            }
-            .onTapGesture {
-                onTapMenuItem()
+                Circle()
+                    .fill(isHovered ? .white : .updateIndicator)
+                    .frame(width: 7, height: 7)
+                    .padding(.trailing, 14)
             }
         }
+        .onHover { hovering in
+            isHovered = hovering
+        }
+        .onTapGesture {
+            onTapMenuItem()
+        }
+    }
 }
