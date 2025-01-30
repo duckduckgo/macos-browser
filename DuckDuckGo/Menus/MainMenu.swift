@@ -443,7 +443,7 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
-#if !APPSTORE
+#if SPARKLE
         addToDockMenuItem.isHidden = dockCustomizer.isAddedToDock
 #else
         addToDockMenuItem.isHidden = true
