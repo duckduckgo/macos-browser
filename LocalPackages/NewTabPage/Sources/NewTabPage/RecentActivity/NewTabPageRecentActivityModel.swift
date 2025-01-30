@@ -44,7 +44,7 @@ public protocol NewTabPageRecentActivitySettingsPersistor: AnyObject {
     var isViewExpanded: Bool { get set }
 }
 
-final class UserDefaultsNewTabPageRecentActivitySettingsPersistor: NewTabPagePrivacyStatsSettingsPersistor {
+final class UserDefaultsNewTabPageRecentActivitySettingsPersistor: NewTabPageRecentActivitySettingsPersistor {
     enum Keys {
         static let isViewExpanded = "new-tab-page.recent-activity.is-view-expanded"
     }
@@ -80,7 +80,7 @@ public final class NewTabPageRecentActivityModel {
         }
     }
 
-    private let settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
+    private let settingsPersistor: NewTabPageRecentActivitySettingsPersistor
 
     public convenience init(
         activityProvider: NewTabPageRecentActivityProviding,
@@ -91,14 +91,14 @@ public final class NewTabPageRecentActivityModel {
         self.init(
             activityProvider: activityProvider,
             actionsHandler: actionsHandler,
-            settingsPersistor: UserDefaultsNewTabPagePrivacyStatsSettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
+            settingsPersistor: UserDefaultsNewTabPageRecentActivitySettingsPersistor(keyValueStore, getLegacySetting: getLegacyIsViewExpandedSetting())
         )
     }
 
     init(
         activityProvider: NewTabPageRecentActivityProviding,
         actionsHandler: RecentActivityActionsHandling,
-        settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
+        settingsPersistor: NewTabPageRecentActivitySettingsPersistor
     ) {
         self.activityProvider = activityProvider
         self.actionsHandler = actionsHandler
