@@ -304,7 +304,6 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     // MARK: - Default Browser Action and Add To Dock
 
-
 #if SPARKLE || DEBUG
     @MainActor
     func testWhenBrowserIsNotAddedToDockThenMenuItemIsVisible() {
