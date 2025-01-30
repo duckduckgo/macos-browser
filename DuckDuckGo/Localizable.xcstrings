@@ -69057,6 +69057,66 @@
         }
       }
     },
+    "vpn.excluded.apps.title" : {
+      "comment" : "Excluded Apps title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeschlossene Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Excluded Apps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicaciones excluidas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applications exclues"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App escluse"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uitgesloten apps"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wykluczone aplikacje"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicações excluídas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Исключенные приложения"
+          }
+        }
+      }
+    },
     "vpn.excluded.domains.add.domain" : {
       "comment" : "Add Domain button for the excluded sites view",
       "extractionState" : "extracted_with_value",
@@ -69233,6 +69293,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Исключенные сайты"
+          }
+        }
+      }
+    },
+    "vpn.exclusions.title" : {
+      "comment" : "Exclusions section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausschlüsse"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Exclusions"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exclusiones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exclusions"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esclusioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uitsluitingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wykluczenia"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exclusões"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Исключения"
           }
         }
       }
@@ -71753,6 +71873,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Управление исключенными сайтами…"
+          }
+        }
+      }
+    },
+    "vpn.setting.exclusions.description" : {
+      "comment" : "The description shown for the exclusions section in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Websites und Apps sind nicht mit VPNs kompatibel. Schließe diese Websites und Apps aus, um sie zu verwenden, während du mit dem VPN verbunden bist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some websites and apps are not compatible with VPNs. Exclude these sites and apps to use them while connected to the VPN."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos sitios web y aplicaciones no son compatibles con VPN. Excluye estos sitios y aplicaciones para poder usarlos mientras estás conectado a la VPN."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains sites Web et applications ne sont pas compatibles avec les VPN. Excluez ces sites et applications pour les utiliser lorsque vous êtes connecté(e) au VPN."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni siti web e app non sono compatibili con le VPN. Escludili per poterli usare mentre sei connesso alla VPN."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige websites en apps zijn niet compatibel met VPN's. Sluit deze sites en apps uit om ze te gebruiken terwijl je bent verbonden met de VPN."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre strony internetowe i aplikacje nie są zgodne z sieciami VPN. Wyklucz te witryny i aplikacje, aby móc z nich korzystać podczas połączenia z siecią VPN."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alguns sites e aplicações não são compatíveis com VPNs. Exclui estes sites e aplicações para os poderes utilizar enquanto estás ligado à VPN."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые сайты и приложения несовместимы с VPN. Внесите их в исключения, чтобы пользоваться ими при подключении к VPN."
+          }
+        }
+      }
+    },
+    "vpn.setting.exclusions.manage.button.title" : {
+      "comment" : "Title for the button to manage exclusions",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwalten ..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manage..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer..."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestisci..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beheren ..."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zarządzaj..."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerir…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроить..."
           }
         }
       }

@@ -1,7 +1,7 @@
 //
-//  RoundedBorder.swift
+//  View+RoundedBorder.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 import SwiftUI
 
-public extension View {
-    func roundedBorder() -> some View {
+extension View {
+    public func roundedBorder() -> some View {
         background(ZStack {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color(.blackWhite10), lineWidth: 1)

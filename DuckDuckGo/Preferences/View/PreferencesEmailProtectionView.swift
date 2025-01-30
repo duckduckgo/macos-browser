@@ -18,7 +18,7 @@
 
 import AppKit
 import Combine
-import PreferencesViews
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 import BrowserServicesKit

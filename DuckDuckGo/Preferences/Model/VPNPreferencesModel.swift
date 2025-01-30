@@ -74,12 +74,34 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-    /// Whether the excluded sites section in preferences is shown.
-    ///
-    /// Only necessary because this is feature flagged to internal users.
-    ///
-    var showExcludedSites: Bool {
+    private var isAppExclusionsFeatureEnabled: Bool {
+        featureFlagger.isFeatureOn(.networkProtectionAppExclusions)
+    }
+
+    private var isExclusionsFeatureAvailableInBuild: Bool {
         proxySettings.proxyAvailable
+    }
+
+    /// Whether legacy app exclusions should be shown
+    ///
+    var showLegacyExclusionsFeature: Bool {
+        isExclusionsFeatureAvailableInBuild && !isAppExclusionsFeatureEnabled
+    }
+
+    /// Whether new app exclusions should be shown
+    ///
+    var showNewExclusionsFeature: Bool {
+        isExclusionsFeatureAvailableInBuild && isAppExclusionsFeatureEnabled
+    }
+
+    var excludedDomainsCount: Int {
+        proxySettings.excludedDomains.count
+    }
+
+    var excludedAppsCount: Int {
+        proxySettings.appRoutingRules.filter { (_, rule) in
+            rule == .exclude
+        }.count
     }
 
     @Published var notifyStatusChanges: Bool {
@@ -104,18 +126,21 @@ final class VPNPreferencesModel: ObservableObject {
     private let settings: VPNSettings
     private let proxySettings: TransparentProxySettings
     private let pinningManager: PinningManager
+    private let featureFlagger: FeatureFlagger
     private var cancellables = Set<AnyCancellable>()
 
     init(vpnXPCClient: VPNControllerXPCClient = .shared,
          settings: VPNSettings = .init(defaults: .netP),
          proxySettings: TransparentProxySettings = .init(defaults: .netP),
          pinningManager: PinningManager = LocalPinningManager.shared,
-         defaults: UserDefaults = .netP) {
+         defaults: UserDefaults = .netP,
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
 
         self.vpnXPCClient = vpnXPCClient
         self.settings = settings
         self.proxySettings = proxySettings
         self.pinningManager = pinningManager
+        self.featureFlagger = featureFlagger
 
         connectOnLogin = settings.connectOnLogin
         excludeLocalNetworks = settings.excludeLocalNetworks

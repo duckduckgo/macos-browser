@@ -653,6 +653,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let source = "browser-dmg"
 #endif
 
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let trimmedOSVersion = "\(osVersion.majorVersion).\(osVersion.minorVersion)"
+        let userAgent = UserAgent.duckDuckGoUserAgent(systemVersion: trimmedOSVersion)
+
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
                        source: source,
@@ -660,7 +664,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
+            let apiHeaders = APIRequest.Headers(userAgent: userAgent, additionalHeaders: headers)
             let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
             let request = APIRequest(configuration: configuration)
 
