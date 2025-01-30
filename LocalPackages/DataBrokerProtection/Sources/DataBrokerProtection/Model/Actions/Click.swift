@@ -64,7 +64,6 @@ struct ClickAction: Action {
         self.choices = try container.decodeIfPresent([Choice].self, forKey: .choices)
         self.default = try container.decodeIfPresent(Default.self, forKey: .default)
         self.hasDefault = container.contains(.default)
-        
         self.failSilently = try container.decodeIfPresent(Bool.self, forKey: .failSilently)
     }
 
