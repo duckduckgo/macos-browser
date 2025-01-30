@@ -67,7 +67,7 @@ final class MoreOptionsMenuButton: MouseOverButton {
     private func subscribeToUpdateInfo() {
 #if SPARKLE
         guard let updateController, let dockCustomization else { return }
-        cancellable = Publishers.CombineLatest3(updateController.hasPendingUpdatePublisher, updateController.notificationDotPublisher, dockCustomization.wasFeatureShownPublisher)
+        cancellable = Publishers.CombineLatest3(updateController.hasPendingUpdatePublisher, updateController.notificationDotPublisher, dockCustomization.didShowPublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] hasPendingUpdate, needsNotificationDot, wasAddToDockFeatureShown in
                 self?.isNotificationVisible = hasPendingUpdate && needsNotificationDot || !wasAddToDockFeatureShown

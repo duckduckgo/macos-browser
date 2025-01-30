@@ -915,7 +915,7 @@ extension MainViewController {
     @objc func resetAddToDockFeatureNotification(_ sender: Any?) {
 #if SPARKLE
         guard var dockCustomizer = Application.appDelegate.dockCustomization else { return }
-        dockCustomizer.wasFeatureShownFromMoreOptionsMenu = false
+        dockCustomizer.didShowFeatureFromMoreOptionsMenu = false
 #endif
     }
 

@@ -23,11 +23,11 @@ import Foundation
 class CapturingDockCustomizer: DockCustomization {
     private var featureShownSubject = CurrentValueSubject<Bool, Never>(false)
 
-    var wasFeatureShownPublisher: AnyPublisher<Bool, Never> {
+    var didShowPublisher: AnyPublisher<Bool, Never> {
         featureShownSubject.eraseToAnyPublisher()
     }
 
-    var wasFeatureShownFromMoreOptionsMenu: Bool {
+    var didShowFeatureFromMoreOptionsMenu: Bool {
         get { featureShownSubject.value }
         set { featureShownSubject.send(newValue) }
     }

@@ -24,8 +24,8 @@ import Persistence
 
 protocol DockCustomization {
     var isAddedToDock: Bool { get }
-    var wasFeatureShownFromMoreOptionsMenu: Bool { get set }
-    var wasFeatureShownPublisher: AnyPublisher<Bool, Never> { get }
+    var didShowFeatureFromMoreOptionsMenu: Bool { get set }
+    var didShowPublisher: AnyPublisher<Bool, Never> { get }
 
     @discardableResult
     func addToDock() -> Bool
@@ -39,9 +39,9 @@ final class DockCustomizer: DockCustomization {
     private let positionProvider: DockPositionProviding
     private let keyValueStore: KeyValueStoring
 
-    @Published private var isFeatureShownFromMoreOptionsMenu: Bool = false
-    var wasFeatureShownPublisher: AnyPublisher<Bool, Never> {
-        $isFeatureShownFromMoreOptionsMenu.eraseToAnyPublisher()
+    @Published private var didShowFeatureFromMoreOptionsMenuPrivate: Bool = false
+    var didShowPublisher: AnyPublisher<Bool, Never> {
+        $didShowFeatureFromMoreOptionsMenuPrivate.eraseToAnyPublisher()
     }
 
     init(positionProvider: DockPositionProviding = DockPositionProvider(),
@@ -49,7 +49,7 @@ final class DockCustomizer: DockCustomization {
         self.positionProvider = positionProvider
         self.keyValueStore = keyValueStore
 
-        isFeatureShownFromMoreOptionsMenu = keyValueStore.object(forKey: Keys.wasAddToDockFeatureShown) as? Bool ?? false
+        didShowFeatureFromMoreOptionsMenuPrivate = keyValueStore.object(forKey: Keys.wasAddToDockFeatureShown) as? Bool ?? false
     }
 
     private var dockPlistURL: URL = URL(fileURLWithPath: NSString(string: "~/Library/Preferences/com.apple.dock.plist").expandingTildeInPath)
@@ -70,10 +70,10 @@ final class DockCustomizer: DockCustomization {
         return persistentApps.contains(where: { ($0["tile-data"] as? [String: AnyObject])?["bundle-identifier"] as? String == bundleIdentifier })
     }
 
-    var wasFeatureShownFromMoreOptionsMenu: Bool {
-        get { return isFeatureShownFromMoreOptionsMenu }
+    var didShowFeatureFromMoreOptionsMenu: Bool {
+        get { return didShowFeatureFromMoreOptionsMenuPrivate }
         set {
-            isFeatureShownFromMoreOptionsMenu = newValue
+            didShowFeatureFromMoreOptionsMenuPrivate = newValue
             keyValueStore.set(newValue, forKey: Keys.wasAddToDockFeatureShown)
         }
     }

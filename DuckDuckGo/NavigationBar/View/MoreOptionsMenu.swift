@@ -157,7 +157,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 #if SPARKLE
         if let dockCustomizer = self.dockCustomizer {
             if dockCustomizer.isAddedToDock == false {
-                if dockCustomizer.wasFeatureShownFromMoreOptionsMenu {
+                if dockCustomizer.didShowFeatureFromMoreOptionsMenu {
                     let addToDockMenuItem = NSMenuItem(title: UserText.addDuckDuckGoToDock, action: #selector(addToDock(_:)))
                         .targetting(self)
                         .withImage(.addToDockMenuItem)
@@ -559,7 +559,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     }
 
     func menuDidClose(_ menu: NSMenu) {
-        dockCustomizer?.wasFeatureShownFromMoreOptionsMenu = true
+        dockCustomizer?.didShowFeatureFromMoreOptionsMenu = true
     }
 }
 
