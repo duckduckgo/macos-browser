@@ -177,6 +177,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return firstLaunchDate >= Date.weekAgo
     }
 
+    static var twoDaysPassedSinceFirstLaunch: Bool {
+        return firstLaunchDate.daysSinceNow() >= 2
+    }
+
     @MainActor
     override init() {
         // will not add crash handlers and will fire pixel on applicationDidFinishLaunching if didCrashDuringCrashHandlersSetUp == true

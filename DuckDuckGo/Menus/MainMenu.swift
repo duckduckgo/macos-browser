@@ -685,6 +685,8 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Contextual Onboarding", action: #selector(MainViewController.resetContextualOnboarding(_:)))
                 NSMenuItem(title: "Reset Sync Promo prompts", action: #selector(MainViewController.resetSyncPromoPrompts))
                 NSMenuItem(title: "Reset Add To Dock more options menu notification", action: #selector(MainViewController.resetAddToDockFeatureNotification))
+                NSMenuItem(title: "Reset Launch Date To Today", action: #selector(MainViewController.resetLaunchDateToToday))
+                NSMenuItem(title: "Set Launch Date A Week In the Past", action: #selector(MainViewController.setLaunchDayAWeekInThePast))
 
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {

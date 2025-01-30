@@ -157,12 +157,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 #if SPARKLE
         if let dockCustomizer = self.dockCustomizer {
             if dockCustomizer.isAddedToDock == false {
-                if dockCustomizer.didShowFeatureFromMoreOptionsMenu {
-                    let addToDockMenuItem = NSMenuItem(title: UserText.addDuckDuckGoToDock, action: #selector(addToDock(_:)))
-                        .targetting(self)
-                        .withImage(.addToDockMenuItem)
-                    addItem(addToDockMenuItem)
-                } else {
+                if dockCustomizer.shouldShowNotification {
                     let addToDockMenuItem = NSMenuItem(action: #selector(addToDock(_:)))
                         .targetting(self)
                     addToDockMenuItem.view = createMenuItemWithFeatureIndicator(
@@ -173,6 +168,11 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
                             }
                             self.cancelTracking()
                         }
+                    addItem(addToDockMenuItem)
+                } else {
+                    let addToDockMenuItem = NSMenuItem(title: UserText.addDuckDuckGoToDock, action: #selector(addToDock(_:)))
+                        .targetting(self)
+                        .withImage(.addToDockMenuItem)
                     addItem(addToDockMenuItem)
                 }
             }
@@ -559,7 +559,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     }
 
     func menuDidClose(_ menu: NSMenu) {
-        dockCustomizer?.didShowFeatureFromMoreOptionsMenu = true
+        dockCustomizer?.didCloseMoreOptionsMenu()
     }
 }
 

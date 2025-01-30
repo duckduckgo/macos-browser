@@ -24,11 +24,11 @@ import XCTest
 class DockCustomizerMock: DockCustomization {
     private var featureShownSubject = CurrentValueSubject<Bool, Never>(false)
 
-    var didShowPublisher: AnyPublisher<Bool, Never> {
+    var shouldShowNotificationPublisher: AnyPublisher<Bool, Never> {
         featureShownSubject.eraseToAnyPublisher()
     }
 
-    var didShowFeatureFromMoreOptionsMenu: Bool {
+    var shouldShowNotification: Bool {
         get { featureShownSubject.value }
         set { featureShownSubject.send(newValue) }
     }
@@ -47,5 +47,13 @@ class DockCustomizerMock: DockCustomization {
         } else {
             return false
         }
+    }
+
+    func didCloseMoreOptionsMenu() {
+        // No-op
+    }
+
+    func resetData() {
+        // No-op
     }
 }

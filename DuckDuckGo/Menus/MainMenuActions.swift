@@ -914,9 +914,17 @@ extension MainViewController {
 
     @objc func resetAddToDockFeatureNotification(_ sender: Any?) {
 #if SPARKLE
-        guard var dockCustomizer = Application.appDelegate.dockCustomization else { return }
-        dockCustomizer.didShowFeatureFromMoreOptionsMenu = false
+        guard let dockCustomizer = Application.appDelegate.dockCustomization else { return }
+        dockCustomizer.resetData()
 #endif
+    }
+
+    @objc func resetLaunchDateToToday(_ sender: Any?) {
+        UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Any>.Key.firstLaunchDate.rawValue)
+    }
+
+    @objc func setLaunchDayAWeekInThePast(_ sender: Any?) {
+        UserDefaults.standard.set(Date.weekAgo, forKey: UserDefaultsWrapper<Any>.Key.firstLaunchDate.rawValue)
     }
 
     @objc func resetTipKit(_ sender: Any?) {
