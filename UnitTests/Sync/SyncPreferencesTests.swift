@@ -19,7 +19,7 @@
 import Bookmarks
 import Combine
 import Persistence
-import SyncUI
+import SyncUI_macOS
 import XCTest
 import PersistenceTestingUtils
 @testable import BrowserServicesKit
@@ -346,6 +346,7 @@ final class SyncPreferencesTests: XCTestCase {
 
         await fulfillment(of: [loginCalledExpectation], timeout: 5.0)
 
+        XCTAssert(managementDialogModel.shouldShowErrorMessage)
         XCTAssert(managementDialogModel.shouldShowSwitchAccountsMessage)
     }
 

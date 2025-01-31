@@ -4,22 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "SyncUI",
+    name: "SyncUI-macOS",
     defaultLocalization: "en",
     platforms: [ .macOS("11.4") ],
     products: [
         .library(
-            name: "SyncUI",
-            targets: ["SyncUI"]),
+            name: "SyncUI-macOS",
+            targets: ["SyncUI-macOS"]),
     ],
     dependencies: [
+        .package(path: "../PreferencesUI-macOS"),
         .package(path: "../SwiftUIExtensions"),
     ],
     targets: [
         .target(
-            name: "SyncUI",
+            name: "SyncUI-macOS",
             dependencies: [
-                .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
+                .product(name: "PreferencesUI-macOS", package: "PreferencesUI-macOS"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
             ],
             resources: [
@@ -32,7 +33,7 @@ let package = Package(
         .testTarget(
             name: "SyncUITests",
             dependencies: [
-                "SyncUI",
+                "SyncUI-macOS",
             ]
         ),
     ]

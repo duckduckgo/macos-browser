@@ -1132,7 +1132,6 @@
 		373B2F862C387B840013A94B /* ActiveRemoteMessageModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373B2F802C384DEB0013A94B /* ActiveRemoteMessageModelTests.swift */; };
 		373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */; };
 		373D9B4929EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */; };
-		373FB4B32B4D6C4B004C88D6 /* PreferencesViews in Frameworks */ = {isa = PBXBuildFile; productRef = 373FB4B22B4D6C4B004C88D6 /* PreferencesViews */; };
 		374286252CC5940100E66323 /* HomePageSettingsVisibilityModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374286242CC593F900E66323 /* HomePageSettingsVisibilityModelTests.swift */; };
 		374286262CC5940100E66323 /* HomePageSettingsVisibilityModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374286242CC593F900E66323 /* HomePageSettingsVisibilityModelTests.swift */; };
 		37445F992A1566420029F789 /* SyncDataProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37445F982A1566420029F789 /* SyncDataProviders.swift */; };
@@ -1239,8 +1238,6 @@
 		37AFCE8B27DB69BC00471A10 /* PreferencesGeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */; };
 		37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */; };
 		37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B11B3828095E6600CBB621 /* TabLazyLoader.swift */; };
-		37BA812D29B3CD690053F1A3 /* SyncUI in Frameworks */ = {isa = PBXBuildFile; productRef = 37BA812C29B3CD690053F1A3 /* SyncUI */; };
-		37BA812F29B3CD6E0053F1A3 /* SyncUI in Frameworks */ = {isa = PBXBuildFile; productRef = 37BA812E29B3CD6E0053F1A3 /* SyncUI */; };
 		37BE087A2D09C0F200C77B8E /* NewTabPageNextStepsCardsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE08792D09C0EA00C77B8E /* NewTabPageNextStepsCardsProvider.swift */; };
 		37BE087B2D09C0F200C77B8E /* NewTabPageNextStepsCardsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE08792D09C0EA00C77B8E /* NewTabPageNextStepsCardsProvider.swift */; };
 		37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */; };
@@ -1494,6 +1491,8 @@
 		4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */; };
 		4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */; };
 		4B9292DB2667125D00AD2C21 /* BookmarksContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292DA2667125D00AD2C21 /* BookmarksContextMenu.swift */; };
+		4B94B7992D4731E80014AAB8 /* SyncUI-macOS in Frameworks */ = {isa = PBXBuildFile; productRef = 4B94B7982D4731E80014AAB8 /* SyncUI-macOS */; };
+		4B94B79B2D4731F00014AAB8 /* SyncUI-macOS in Frameworks */ = {isa = PBXBuildFile; productRef = 4B94B79A2D4731F00014AAB8 /* SyncUI-macOS */; };
 		4B9579212AC687170062CA31 /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9579202AC687170062CA31 /* HardwareModel.swift */; };
 		4B9579222AC687170062CA31 /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9579202AC687170062CA31 /* HardwareModel.swift */; };
 		4B9754EC2984300100D7B834 /* EmailManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3B848F297A0E1000A384BD /* EmailManagerExtension.swift */; };
@@ -1926,6 +1925,8 @@
 		7BEC20432B0F505F00243D3E /* AddBookmarkPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEC20402B0F505F00243D3E /* AddBookmarkPopoverView.swift */; };
 		7BEC20452B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEC20412B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift */; };
 		7BEC20462B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEC20412B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift */; };
+		7BECF1A92D4905DA00C1D691 /* PreferencesUI-macOS in Frameworks */ = {isa = PBXBuildFile; productRef = 7BECF1A82D4905DA00C1D691 /* PreferencesUI-macOS */; };
+		7BECF1AB2D4905E000C1D691 /* PreferencesUI-macOS in Frameworks */ = {isa = PBXBuildFile; productRef = 7BECF1AA2D4905E000C1D691 /* PreferencesUI-macOS */; };
 		7BEEA5122AD1235B00A9E72B /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5112AD1235B00A9E72B /* NetworkProtectionIPC */; };
 		7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5132AD1236300A9E72B /* NetworkProtectionIPC */; };
 		7BEEA5162AD1236E00A9E72B /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */; };
@@ -3424,7 +3425,7 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		4B2D065D2A11D2AE00DE1F49 /* Embed Login Items */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
@@ -3771,7 +3772,6 @@
 		37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesGeneralView.swift; sourceTree = "<group>"; };
 		37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAboutView.swift; sourceTree = "<group>"; };
 		37B11B3828095E6600CBB621 /* TabLazyLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoader.swift; sourceTree = "<group>"; };
-		37BA812B29B3CB8A0053F1A3 /* SyncUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SyncUI; sourceTree = "<group>"; };
 		37BE08792D09C0EA00C77B8E /* NewTabPageNextStepsCardsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageNextStepsCardsProvider.swift; sourceTree = "<group>"; };
 		37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManager.swift; sourceTree = "<group>"; };
 		37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsViewModel.swift; sourceTree = "<group>"; };
@@ -3972,6 +3972,7 @@
 		4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementDetailViewController.swift; sourceTree = "<group>"; };
 		4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerDataSource.swift; sourceTree = "<group>"; };
 		4B9292DA2667125D00AD2C21 /* BookmarksContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksContextMenu.swift; sourceTree = "<group>"; };
+		4B94B7512D471E7E0014AAB8 /* SyncUI-macOS */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "SyncUI-macOS"; sourceTree = "<group>"; };
 		4B9579202AC687170062CA31 /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
 		4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+Debug.swift"; sourceTree = "<group>"; };
 		4B98D27928D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumFaviconsReaderTests.swift; sourceTree = "<group>"; };
@@ -4195,6 +4196,7 @@
 		7BB4BC622C5BC13D00E06FC8 /* ActiveSiteInfoPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSiteInfoPublisher.swift; sourceTree = "<group>"; };
 		7BB4BC692C5CD96200E06FC8 /* ActiveDomainPublisher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveDomainPublisher.swift; sourceTree = "<group>"; };
 		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
+		7BC5F7DF2D49044C0005B3D9 /* PreferencesUI-macOS */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "PreferencesUI-macOS"; sourceTree = "<group>"; };
 		7BCB90C12C18626E008E3543 /* VPNControllerXPCClient+ConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VPNControllerXPCClient+ConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkExtensionController.swift; sourceTree = "<group>"; };
 		7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainType+ClientDefault.swift"; sourceTree = "<group>"; };
@@ -5056,7 +5058,6 @@
 			files = (
 				F1DF95E42BD1807C0045E591 /* Crashes in Frameworks */,
 				37DF37072CF38B9F005ED34B /* PrivacyStats in Frameworks */,
-				373FB4B32B4D6C4B004C88D6 /* PreferencesViews in Frameworks */,
 				4BF97AD32B43C43F00EB4240 /* NetworkProtectionUI in Frameworks */,
 				7B1459572B7D43E500047F2C /* NetworkProtectionProxy in Frameworks */,
 				B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */,
@@ -5076,6 +5077,7 @@
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
 				C18BF9CE2C73678C00ED6B8A /* Freemium in Frameworks */,
 				3129788A2B64131200B67619 /* DataBrokerProtection in Frameworks */,
+				7BECF1AB2D4905E000C1D691 /* PreferencesUI-macOS in Frameworks */,
 				F198C7202BD18D92000BF24D /* SwiftLintTool in Frameworks */,
 				4BCBE4582BA7E17800FC75A1 /* SubscriptionUI in Frameworks */,
 				379230962D3852860019E130 /* HistoryView in Frameworks */,
@@ -5092,13 +5094,13 @@
 				5641734D2CFE169400F4B716 /* PixelExperimentKit in Frameworks */,
 				85E2BBD02B8F534A00DBEC7A /* History in Frameworks */,
 				4BF97AD52B43C43F00EB4240 /* NetworkProtection in Frameworks */,
+				4B94B79B2D4731F00014AAB8 /* SyncUI-macOS in Frameworks */,
 				560EB9372C78974C0080DBC8 /* Onboarding in Frameworks */,
 				3739326529AE4B39009346AE /* DDGSync in Frameworks */,
 				D6BC8AC82C5A95B10025375B /* DuckPlayer in Frameworks */,
 				37DF000729F9C061002B7D3E /* SyncDataProviders in Frameworks */,
 				9D9DE5752C63AA0C00D20B15 /* AppKitExtensions in Frameworks */,
 				371BBC592D00C897008FA0C7 /* NewTabPage in Frameworks */,
-				37BA812F29B3CD6E0053F1A3 /* SyncUI in Frameworks */,
 				3706FCAF293F65D500E42796 /* PrivacyDashboard in Frameworks */,
 				CD34F0C42C8869FF006826BE /* MaliciousSiteProtection in Frameworks */,
 			);
@@ -5335,6 +5337,7 @@
 				379230942D38527E0019E130 /* HistoryView in Frameworks */,
 				B6F7128129F681EB00594A45 /* QuickLookUI.framework in Frameworks */,
 				EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */,
+				7BECF1A92D4905DA00C1D691 /* PreferencesUI-macOS in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				D6BC8AC62C5A95AA0025375B /* DuckPlayer in Frameworks */,
 				987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */,
@@ -5364,7 +5367,6 @@
 				85D44B862BA08D29001B4AB5 /* Suggestions in Frameworks */,
 				37DF000529F9C056002B7D3E /* SyncDataProviders in Frameworks */,
 				374EFDEB2D01A1D800B30939 /* Utilities in Frameworks */,
-				37BA812D29B3CD690053F1A3 /* SyncUI in Frameworks */,
 				9D9DE5732C63AA0700D20B15 /* AppKitExtensions in Frameworks */,
 				F1DF95E72BD188B60045E591 /* LoginItems in Frameworks */,
 				CBECDB8A2CDBD616005B8B87 /* PageRefreshMonitor in Frameworks */,
@@ -5373,6 +5375,7 @@
 				CBECDB8C2CDBD61C005B8B87 /* BrokenSitePrompt in Frameworks */,
 				371BBC572D00C891008FA0C7 /* NewTabPage in Frameworks */,
 				98A50964294B691800D10880 /* Persistence in Frameworks */,
+				4B94B7992D4731E80014AAB8 /* SyncUI-macOS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6021,9 +6024,10 @@
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
 				7B25FE322AD12C990012AFAB /* NetworkProtectionMac */,
 				374F18B32D006F940032EA4E /* NewTabPage */,
+				7BC5F7DF2D49044C0005B3D9 /* PreferencesUI-macOS */,
 				378F44E229B4B7B600899924 /* SwiftUIExtensions */,
-				37BA812B29B3CB8A0053F1A3 /* SyncUI */,
 				1E862A882A9FC01200F84D4B /* SubscriptionUI */,
+				4B94B7512D471E7E0014AAB8 /* SyncUI-macOS */,
 				7BEC182D2AD5D89C00D30536 /* SystemExtensionManager */,
 				7B8594172B5B25FB0007EB3E /* UDSHelper */,
 				373DE97A2D3916FD000577EE /* UserScriptActionsManager */,
@@ -9998,7 +10002,6 @@
 				37F44A5E298C17830025E7FE /* Navigation */,
 				984FD3BE299ACF35007334DD /* Bookmarks */,
 				3739326429AE4B39009346AE /* DDGSync */,
-				37BA812E29B3CD6E0053F1A3 /* SyncUI */,
 				378F44E529B4BDEE00899924 /* SwiftUIExtensions */,
 				B6EC37FE29B8D915001ACE79 /* Configuration */,
 				37DF000629F9C061002B7D3E /* SyncDataProviders */,
@@ -10007,7 +10010,6 @@
 				4BF97AD02B43C43F00EB4240 /* NetworkProtectionIPC */,
 				4BF97AD22B43C43F00EB4240 /* NetworkProtectionUI */,
 				4BF97AD42B43C43F00EB4240 /* NetworkProtection */,
-				373FB4B22B4D6C4B004C88D6 /* PreferencesViews */,
 				312978892B64131200B67619 /* DataBrokerProtection */,
 				7B1459562B7D43E500047F2C /* NetworkProtectionProxy */,
 				85E2BBCF2B8F534A00DBEC7A /* History */,
@@ -10036,6 +10038,8 @@
 				374EFDEC2D01A1DE00B30939 /* Utilities */,
 				5641734C2CFE169400F4B716 /* PixelExperimentKit */,
 				379230952D3852860019E130 /* HistoryView */,
+				4B94B79A2D4731F00014AAB8 /* SyncUI-macOS */,
+				7BECF1AA2D4905E000C1D691 /* PreferencesUI-macOS */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -10484,7 +10488,6 @@
 				B6B77BE7297973D4001E68A1 /* Navigation */,
 				987799EC299998B1005D8EB6 /* Bookmarks */,
 				3739326629AE4B42009346AE /* DDGSync */,
-				37BA812C29B3CD690053F1A3 /* SyncUI */,
 				378F44E329B4BDE900899924 /* SwiftUIExtensions */,
 				371D00E029D8509400EC8598 /* OpenSSL */,
 				37DF000429F9C056002B7D3E /* SyncDataProviders */,
@@ -10522,6 +10525,8 @@
 				374EFDEA2D01A1D800B30939 /* Utilities */,
 				5641734A2CFE168700F4B716 /* PixelExperimentKit */,
 				379230932D38527E0019E130 /* HistoryView */,
+				4B94B7982D4731E80014AAB8 /* SyncUI-macOS */,
+				7BECF1A82D4905DA00C1D691 /* PreferencesUI-macOS */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -15372,7 +15377,7 @@
 		};
 		9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
+			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
 				version = 232.1.2;
@@ -15681,10 +15686,6 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = DDGSync;
 		};
-		373FB4B22B4D6C4B004C88D6 /* PreferencesViews */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PreferencesViews;
-		};
 		374EFDEA2D01A1D800B30939 /* Utilities */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Utilities;
@@ -15721,14 +15722,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Persistence;
-		};
-		37BA812C29B3CD690053F1A3 /* SyncUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SyncUI;
-		};
-		37BA812E29B3CD6E0053F1A3 /* SyncUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SyncUI;
 		};
 		37DB56EC2C3B314F0093D4DC /* BrowserServicesKit */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -15823,6 +15816,14 @@
 		4B5F14FD2A1529230060320F /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
+		};
+		4B94B7982D4731E80014AAB8 /* SyncUI-macOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "SyncUI-macOS";
+		};
+		4B94B79A2D4731F00014AAB8 /* SyncUI-macOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "SyncUI-macOS";
 		};
 		4BA7C4DC2B3F64E500AFE511 /* LoginItems */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -16000,6 +16001,14 @@
 		7BEC182E2AD5D8DC00D30536 /* SystemExtensionManager */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SystemExtensionManager;
+		};
+		7BECF1A82D4905DA00C1D691 /* PreferencesUI-macOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "PreferencesUI-macOS";
+		};
+		7BECF1AA2D4905E000C1D691 /* PreferencesUI-macOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "PreferencesUI-macOS";
 		};
 		7BEEA5112AD1235B00A9E72B /* NetworkProtectionIPC */ = {
 			isa = XCSwiftPackageProductDependency;
