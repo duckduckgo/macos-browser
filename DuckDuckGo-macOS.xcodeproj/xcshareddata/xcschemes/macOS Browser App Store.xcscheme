@@ -43,8 +43,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FE9B293F662100E42796"
-               BuildableName = "macOS Integration Tests App Store.xctest"
-               BlueprintName = "macOS Integration Tests App Store"
+               BuildableName = "Integration Tests App Store.xctest"
+               BlueprintName = "Integration Tests App Store"
                ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -137,8 +137,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FE9B293F662100E42796"
-               BuildableName = "macOS Integration Tests App Store.xctest"
-               BlueprintName = "macOS Integration Tests App Store"
+               BuildableName = "Integration Tests App Store.xctest"
+               BlueprintName = "Integration Tests App Store"
                ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
             <SkippedTests>
