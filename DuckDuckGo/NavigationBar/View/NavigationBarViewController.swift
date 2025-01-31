@@ -968,6 +968,7 @@ final class NavigationBarViewController: NSViewController {
             Logger.passwordManager.debug("Presenting Save Credentials popover")
             popovers.displaySaveCredentials(credentials,
                                             automaticallySaved: data.automaticallySavedCredentials,
+                                            backfilled: data.backfilled,
                                             usingView: passwordManagementButton,
                                             withDelegate: self)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
@@ -1351,7 +1352,9 @@ extension NavigationBarViewController {
         let account = SecureVaultModels.WebsiteAccount(title: nil, username: "example-username", domain: "example.com")
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
 
-        popovers.displaySaveCredentials(mockCredentials, automaticallySaved: false,
+        popovers.displaySaveCredentials(mockCredentials,
+                                        automaticallySaved: false,
+                                        backfilled: false,
                                         usingView: passwordManagementButton,
                                         withDelegate: self)
     }
@@ -1362,6 +1365,7 @@ extension NavigationBarViewController {
 
         popovers.displaySaveCredentials(mockCredentials,
                                         automaticallySaved: true,
+                                        backfilled: false,
                                         usingView: passwordManagementButton,
                                         withDelegate: self)
     }
