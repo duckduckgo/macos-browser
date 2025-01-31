@@ -18,6 +18,7 @@
 
 import SwiftUI
 import Combine
+import SwiftUIExtensions
 
 struct StatusBarPopoverView: View {
     let viewModel: StatusBarMenuDebugInfoViewModel
