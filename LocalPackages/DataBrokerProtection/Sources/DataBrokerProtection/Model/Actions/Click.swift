@@ -71,7 +71,6 @@ struct ClickAction: Action {
         case dataSource
         case choices
         case `default`
-        case failSilently
     }
 
     func encode(to encoder: any Encoder) throws {
