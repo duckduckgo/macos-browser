@@ -70,8 +70,7 @@ final class DockCustomizer: DockCustomization {
     }
 
     private func startTimer() {
-        // We will check every 12 hours: 12 * 60 * 60
-        Timer.publish(every: 60, on: .main, in: .common)
+        Timer.publish(every: 12 * 60 * 60, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 guard let self = self else { return }
