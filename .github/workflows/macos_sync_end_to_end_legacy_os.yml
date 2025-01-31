@@ -108,7 +108,7 @@ jobs:
         sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo-macOS.xcodeproj/project.pbxproj
         sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo-macOS.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
-          -scheme "SyncE2EUITestsOldVersions" \
+          -scheme "macOS Sync End-to-End UI Tests Old Versions" \
           -derivedDataPath DerivedData \
           -configuration Review
 
@@ -125,7 +125,7 @@ jobs:
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
         set -o pipefail && xcodebuild test \
-          -scheme "SyncE2EUITestsOldVersions" \
+          -scheme "macOS Sync End-to-End UI Tests Old Versions" \
           -derivedDataPath DerivedData \
           -configuration Review \
           -test-iterations 2 \
