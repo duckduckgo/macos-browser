@@ -31,7 +31,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case crashReportCRCIDMissing
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
-    case launch(isDefault: Bool, isAddedToDock: Bool)
+    case launch(isDefault: Bool, isAddedToDock: Bool?)
 
     case serp(cohort: String?)
     case serpInitial(cohort: String)
@@ -1197,8 +1197,14 @@ enum GeneralPixel: PixelKitEventV2 {
             return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
 
         case .launch(let isDefault, let isAddedToDock):
-            return ["default_browser": isDefault ? "1" : "0", "dock": isAddedToDock ? "1" : "0"]
+            var params = [String: String]()
+            params["default_browser"] = isDefault ? "1" : "0"
 
+            if let isAddedToDock = isAddedToDock {
+                params["dock"] = isAddedToDock ? "1" : "0"
+            }
+
+            return params
         case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
             var params = error.pixelParameters
 
