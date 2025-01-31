@@ -54,7 +54,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
     ],
 
-    "Integration Tests": []
+    "macOS Integration Tests": []
 ]
 
 typealias TargetName = String
@@ -98,7 +98,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
             case .other("com.apple.product-type.bundle.unit-test"):
                 if target.displayName.starts(with: "Unit Tests") {
                     unitTestsTargets.append(target)
-                } else if target.displayName.starts(with: "Integration Tests") {
+                } else if target.displayName.starts(with: "macOS Integration Tests") {
                     integrationTestsTargets.append(target)
                 }
             default:
