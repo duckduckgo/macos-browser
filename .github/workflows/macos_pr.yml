@@ -110,9 +110,9 @@ jobs:
             flavor: Non-Sandbox
           - active-arch: NO
             flavor: Sandbox
-          - integration-tests-target: macOS Integration Tests
+          - integration-tests-target: Integration Tests
             flavor: Non-Sandbox
-          - integration-tests-target: macOS Integration Tests App Store
+          - integration-tests-target: Integration Tests App Store
             flavor: Sandbox
           - cache-key:
             flavor: Non-Sandbox
