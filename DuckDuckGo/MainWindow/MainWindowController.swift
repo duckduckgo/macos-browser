@@ -62,6 +62,10 @@ final class MainWindowController: NSWindowController {
         subscribeToBurningData()
         subscribeToResolutionChange()
         subscribeToFullScreenToolbarChanges()
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didOpenWindow(self)
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -236,6 +240,10 @@ extension MainWindowController: NSWindowDelegate {
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didFocusWindow(self)
+        }
     }
 
     func windowDidResignKey(_ notification: Notification) {
@@ -340,6 +348,10 @@ extension MainWindowController: NSWindowDelegate {
         // Push the Window Controller into current autorelease pool so it‘s released when the event loop pass ends
         _=Unmanaged.passRetained(self).autorelease()
         WindowControllersManager.shared.unregister(self)
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didCloseWindow(self)
+        }
     }
 
     func windowShouldClose(_ window: NSWindow) -> Bool {

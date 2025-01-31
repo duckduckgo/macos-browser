@@ -35,6 +35,7 @@ extension Tab {
         case subscription(URL)
         case identityTheftRestoration(URL)
         case releaseNotes
+        case webExtensionUrl(URL)
     }
     typealias TabContent = Tab.Content
 
@@ -138,6 +139,10 @@ extension TabContent {
         }
 
         if let url {
+            if url.isWebExtensionUrl {
+                return .webExtensionUrl(url)
+            }
+
             let subscriptionManager = Application.appDelegate.subscriptionManager
             let environment = subscriptionManager.currentEnvironment.serviceEnvironment
             let subscriptionBaseURL = subscriptionManager.url(for: .baseURL)
@@ -210,7 +215,7 @@ extension TabContent {
 
     var title: String? {
         switch self {
-        case .url, .newtab, .onboarding, .none: return nil
+        case .url, .newtab, .onboarding, .none, .webExtensionUrl: return nil
         case .settings: return UserText.tabPreferencesTitle
         case .bookmarks: return UserText.tabBookmarksTitle
         case .history: return UserText.mainMenuHistory
@@ -257,7 +262,7 @@ extension TabContent {
             return .dataBrokerProtection
         case .releaseNotes:
             return .releaseNotes
-        case .subscription(let url), .identityTheftRestoration(let url):
+        case .subscription(let url), .identityTheftRestoration(let url), .webExtensionUrl(let url):
             return url
         case .none:
             return nil
@@ -269,7 +274,7 @@ extension TabContent {
         case .url(_, _, source: let source):
             return source
         case .newtab, .settings, .bookmarks, .history, .onboardingDeprecated, .onboarding, .releaseNotes, .dataBrokerProtection,
-                .subscription, .identityTheftRestoration, .none:
+                .subscription, .identityTheftRestoration, .webExtensionUrl, .none:
             return .ui
         }
     }
@@ -330,7 +335,7 @@ extension TabContent {
         switch self {
         case .newtab, .onboardingDeprecated, .onboarding, .none:
             return false
-        case .url, .settings, .bookmarks, .history, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
+        case .url, .settings, .bookmarks, .history, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes, .webExtensionUrl:
             return true
         }
     }
