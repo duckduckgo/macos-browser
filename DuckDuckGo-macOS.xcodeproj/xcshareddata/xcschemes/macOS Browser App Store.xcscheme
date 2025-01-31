@@ -193,16 +193,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SyncUITests"
-               BuildableName = "SyncUITests"
-               BlueprintName = "SyncUITests"
-               ReferencedContainer = "container:LocalPackages/SyncUI">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "NetworkProtectionUITests"
                BuildableName = "NetworkProtectionUITests"
                BlueprintName = "NetworkProtectionUITests"
@@ -237,6 +227,16 @@
                BuildableName = "HistoryViewTests"
                BlueprintName = "HistoryViewTests"
                ReferencedContainer = "container:LocalPackages/HistoryView">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SyncUITests"
+               BuildableName = "SyncUITests"
+               BlueprintName = "SyncUITests"
+               ReferencedContainer = "container:LocalPackages/SyncUI-macOS">
             </BuildableReference>
          </TestableReference>
       </Testables>
