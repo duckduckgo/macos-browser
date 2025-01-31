@@ -31,7 +31,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case crashReportCRCIDMissing
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
-    case launch(isDefault: Bool)
+    case launch(isDefault: Bool, isAddedToDock: Bool)
 
     case serp(cohort: String?)
     case serpInitial(cohort: String)
@@ -492,8 +492,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
 
-        case .launch(let isDefault):
-            return isDefault ? "ml_mac_app-launch_as-default" : "ml_mac_app-launch_as-nondefault"
+        case .launch:
+            return  "m_mac_daily_active_user"
 
         case .serp:
             return "m_mac_navigation_search"
@@ -1195,6 +1195,9 @@ enum GeneralPixel: PixelKitEventV2 {
         switch self {
         case .loginItemUpdateError(let loginItemBundleID, let action, let buildType, let osVersion):
             return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
+
+        case .launch(let isDefault, let isAddedToDock):
+            return ["default_browser": isDefault ? "1" : "0", "dock": isAddedToDock ? "1" : "0"]
 
         case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
             var params = error.pixelParameters
