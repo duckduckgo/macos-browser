@@ -1272,9 +1272,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func webContentProcessDidTerminate(with reason: WKProcessTerminationReason?) {
         guard (error?.code.rawValue ?? WKError.Code.unknown.rawValue) != WKError.Code.webContentProcessTerminated.rawValue else { return }
 
+        let terminationReason = reason?.rawValue ?? -1
+
         let error = WKError(.webContentProcessTerminated, userInfo: [
-            WKProcessTerminationReason.userInfoKey: reason?.rawValue ?? -1,
-            NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
+            WKProcessTerminationReason.userInfoKey: terminationReason,
+            NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage,
+            NSUnderlyingErrorKey: NSError(domain: WKErrorDomain, code: terminationReason)
         ])
 
         let isInternalUser = internalUserDecider?.isInternalUser == true
