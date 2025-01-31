@@ -940,7 +940,7 @@ class AddressBarTests: XCTestCase {
 
         // THEN
         let zoomButton = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.zoomButton!
-        XCTAssertFalse(zoomButton.isHidden)
+        XCTAssertTrue(zoomButton.isVisible)
     }
 
     @MainActor
@@ -958,7 +958,7 @@ class AddressBarTests: XCTestCase {
 
         // THEN
         let zoomButton = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.zoomButton!
-        XCTAssertTrue(zoomButton.isHidden)
+        XCTAssertFalse(zoomButton.isVisible)
     }
 
     @MainActor
