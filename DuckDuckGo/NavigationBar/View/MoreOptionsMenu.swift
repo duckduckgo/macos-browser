@@ -126,7 +126,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         setupMenuItems()
     }
 
-    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
+    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.zoomIn)
 
     @MainActor
     private func setupMenuItems() {

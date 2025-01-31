@@ -16,20 +16,20 @@
 //  limitations under the License.
 //
 
+import BrokenSitePrompt
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
-import BrowserServicesKit
-import PixelKit
-import os.log
+import Freemium
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import os.log
+import PageRefreshMonitor
+import PixelKit
 import Subscription
 import SubscriptionUI
-import Freemium
-import BrokenSitePrompt
-import PageRefreshMonitor
 
 final class NavigationBarViewController: NSViewController {
 

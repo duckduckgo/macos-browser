@@ -289,14 +289,17 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         show(bookmarkPopover, positionedBelow: button)
     }
 
-    func showZoomPopover(for tabViewModel: TabViewModel, from button: NSButton, withDelegate delegate: NSPopoverDelegate) {
+    func showZoomPopover(for tabViewModel: TabViewModel, from button: NSButton, addressBar: NSView?, withDelegate delegate: NSPopoverDelegate, closeAfterDelay: Bool) {
         guard closeTransientPopovers() else { return }
 
-        let zoomPopover = ZoomPopover(tabViewModel: tabViewModel)
-        zoomPopover.delegate = self
+        let zoomPopover = ZoomPopover(tabViewModel: tabViewModel, addressBar: addressBar, delegate: self)
         self.zoomPopover = zoomPopover
         self.zoomPopoverDelegate = delegate
         show(zoomPopover, positionedBelow: button)
+
+        if closeAfterDelay {
+            zoomPopover.scheduleCloseTimer()
+        }
     }
 
     func closeEditBookmarkPopover() {

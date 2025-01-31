@@ -56,8 +56,14 @@ final class AddressBarButtonsViewController: NSViewController {
         }()
     }
 
-    @IBOutlet weak var zoomButton: NSButton!
+    @IBOutlet var zoomButtonWrapper: NSView!
+    @IBOutlet weak var zoomButton: AddressBarButton! {
+        didSet {
+            zoomButton.position = .free
+        }
+    }
     @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
+    @IBOutlet weak var separator: NSView!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
@@ -117,6 +123,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var tabCollectionViewModel: TabCollectionViewModel
     private var tabViewModel: TabViewModel? {
         didSet {
+            popovers?.closeZoomPopover()
             subscribeToTabZoomLevel()
         }
     }
@@ -148,16 +155,12 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
     private var urlCancellable: AnyCancellable?
-    private var bookmarkListCancellable: AnyCancellable?
-    private var effectiveAppearanceCancellable: AnyCancellable?
-    private var accessibilityPreferencesCancellable: AnyCancellable?
+    private var zoomLevelCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
-    private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
-    private var privacyEntryPointIsMouseOverCancellable: AnyCancellable?
 
     private lazy var buttonsBadgeAnimator = {
         let animator = NavigationBarBadgeAnimator()
@@ -194,6 +197,8 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
         subscribeToPrivacyEntryPointIsMouseOver()
+        subscribeToButtonsVisibility()
+
         bookmarkButton.sendAction(on: .leftMouseDown)
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
@@ -207,7 +212,7 @@ final class AddressBarButtonsViewController: NSViewController {
         if !isAnyShieldAnimationPlaying {
             buttonsBadgeAnimator.showNotification(withType: type,
                                                   buttonsContainer: buttonsContainer,
-                                                  and: notificationAnimationView)
+                                                  notificationBadgeContainer: notificationAnimationView)
         } else {
             buttonsBadgeAnimator.queuedAnimation = NavigationBarBadgeAnimator.QueueData(selectedTab: tabViewModel?.tab,
                                                                                         animationType: type)
@@ -302,24 +307,28 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updateZoomButtonVisibility(animation: Bool = false) {
-        zoomButton.isHidden = true
         let hasURL = tabViewModel?.tab.url != nil
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
 
-        var hasNonDefaultZoom = false
-        if tabViewModel?.zoomLevel != accessibilityPreferences.defaultPageZoom {
-            hasNonDefaultZoom = true
+        enum ZoomState { case zoomedIn, zoomedOut }
+        var zoomState: ZoomState?
+        if let zoomLevel = tabViewModel?.zoomLevel, zoomLevel != accessibilityPreferences.defaultPageZoom {
+            zoomState = (zoomLevel > accessibilityPreferences.defaultPageZoom) ? .zoomedIn : .zoomedOut
         }
 
+        let isPopoverShown = popovers?.isZoomPopoverShown == true
         let shouldShowZoom = hasURL
         && !isEditingMode
         && !isTextFieldValueText
         && !isTextFieldEditorFirstResponder
         && !animation
-        && (hasNonDefaultZoom || popovers?.isZoomPopoverShown == true || popovers?.zoomPopover != nil)
+        && (zoomState != .none || isPopoverShown)
 
-        zoomButton.isHidden = !shouldShowZoom
+        zoomButton.image = (zoomState == .zoomedOut) ? .zoomOut : .zoomIn
+        zoomButton.backgroundColor = isPopoverShown ? .buttonMouseDown : nil
+        zoomButton.mouseOverColor = isPopoverShown ? nil : .buttonMouseOver
+        zoomButtonWrapper.isHidden = !shouldShowZoom
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
@@ -389,6 +398,21 @@ final class AddressBarButtonsViewController: NSViewController {
         popovers?.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton, entryPoint: .dashboard)
     }
 
+    func openZoomPopover(closeAfterDelay: Bool = false) {
+        guard let popovers,
+              let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+
+        if let zoomPopover = popovers.zoomPopover, zoomPopover.isShown {
+            // reschedule close timer for already shown popover
+            zoomPopover.rescheduleCloseTimerIfNeeded()
+            return
+        }
+
+        zoomButton.isShown = true
+        popovers.showZoomPopover(for: tabViewModel, from: zoomButton, addressBar: parent?.view, withDelegate: self, closeAfterDelay: closeAfterDelay)
+        updateZoomButtonVisibility()
+    }
+
     func updateButtons() {
         stopAnimationsAfterFocus()
 
@@ -402,14 +426,11 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func zoomButtonAction(_ sender: Any) {
-        guard let popovers else {
-            return
-        }
+        guard let popovers else { return }
         if popovers.isZoomPopoverShown {
             popovers.closeZoomPopover()
         } else {
-            guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
-            popovers.showZoomPopover(for: tabViewModel, from: zoomButton, withDelegate: self)
+            openZoomPopover()
         }
     }
 
@@ -613,7 +634,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.sink { [weak self] tabViewModel in
+        tabCollectionViewModel.$selectedTabViewModel.sink { [weak self] tabViewModel in
             guard let self else { return }
 
             stopAnimations()
@@ -625,7 +646,7 @@ final class AddressBarButtonsViewController: NSViewController {
             subscribeToPrivacyEntryPointIconUpdateTrigger()
 
             updatePrivacyEntryPointIcon()
-        }
+        }.store(in: &cancellables)
     }
 
     private func subscribeToUrl() {
@@ -672,11 +693,23 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func subscribeToBookmarkList() {
-        bookmarkListCancellable = bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
             guard let self else { return }
             updateBookmarkButtonImage()
             updateBookmarkButtonVisibility()
-        }
+        }.store(in: &cancellables)
+    }
+
+    // update Separator on Privacy Entry Point and other buttons appearance change
+    private func subscribeToButtonsVisibility() {
+        privacyEntryPointButton.publisher(for: \.isHidden).asVoid()
+            .merge(with: permissionButtons.publisher(for: \.frame).asVoid())
+            .merge(with: zoomButton.publisher(for: \.isHidden).asVoid())
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.updateSeparator()
+            }
+            .store(in: &cancellables)
     }
 
     private func updatePermissionButtons() {
@@ -829,6 +862,12 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
+    private func updateSeparator() {
+        separator.isShown = privacyEntryPointButton.isVisible && (
+            (permissionButtons.subviews.contains(where: { $0.isVisible })) || zoomButton.isVisible
+        )
+    }
+
     // MARK: Tracker Animation
 
     let trackerAnimationImageProvider = TrackerAnimationImageProvider()
@@ -963,7 +1002,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func subscribeToEffectiveAppearance() {
-        effectiveAppearanceCancellable = NSApp.publisher(for: \.effectiveAppearance)
+        NSApp.publisher(for: \.effectiveAppearance)
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -971,17 +1010,18 @@ final class AddressBarButtonsViewController: NSViewController {
                 self?.updatePrivacyEntryPointIcon()
                 self?.updateZoomButtonVisibility()
             }
+            .store(in: &cancellables)
     }
 
     private func subscribeToTabZoomLevel() {
-        accessibilityPreferencesCancellable = tabViewModel?.zoomLevelSubject
+        zoomLevelCancellable = tabViewModel?.zoomLevelSubject
             .sink { [weak self] _ in
                 self?.updateZoomButtonVisibility()
             }
     }
 
     private func subscribeToIsMouseOverAnimationVisible() {
-        isMouseOverAnimationVisibleCancellable = privacyEntryPointButton.$isAnimationViewVisible
+        privacyEntryPointButton.$isAnimationViewVisible
             .dropFirst()
             .sink { [weak self] isAnimationViewVisible in
 
@@ -991,14 +1031,16 @@ final class AddressBarButtonsViewController: NSViewController {
                     self?.updatePrivacyEntryPointIcon()
                 }
             }
+            .store(in: &cancellables)
     }
 
     private func subscribeToPrivacyEntryPointIsMouseOver() {
-        privacyEntryPointIsMouseOverCancellable = privacyEntryPointButton.publisher(for: \.isMouseOver)
+        privacyEntryPointButton.publisher(for: \.isMouseOver)
             .first(where: { $0 }) // only interested when mouse is over
             .sink(receiveValue: { [weak self] _ in
                 self?.stopHighlightingPrivacyShield()
             })
+            .store(in: &cancellables)
     }
 
 }

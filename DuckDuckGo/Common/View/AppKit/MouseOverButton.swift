@@ -53,6 +53,16 @@ internal class MouseOverButton: NSButton, Hoverable {
         }
     }
 
+    @IBInspectable var horizontalPadding: CGFloat = 0
+    @IBInspectable var verticalPadding: CGFloat = 0
+
+    override var intrinsicContentSize: NSSize {
+        var size = super.intrinsicContentSize
+        size.width += self.horizontalPadding
+        size.height += self.verticalPadding
+        return size
+    }
+
     var normalTintColor: NSColor? {
         didSet {
             updateTintColor()

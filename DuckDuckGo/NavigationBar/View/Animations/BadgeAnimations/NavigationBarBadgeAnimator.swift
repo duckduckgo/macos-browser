@@ -40,7 +40,7 @@ final class NavigationBarBadgeAnimator: NSObject {
 
     func showNotification(withType type: NavigationBarBadgeAnimationView.AnimationType,
                           buttonsContainer: NSView,
-                          and notificationBadgeContainer: NavigationBarBadgeAnimationView) {
+                          notificationBadgeContainer: NavigationBarBadgeAnimationView) {
         queuedAnimation = nil
 
         isAnimating = true

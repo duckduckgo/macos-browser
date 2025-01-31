@@ -8326,22 +8326,22 @@
 			isa = PBXGroup;
 			children = (
 				31F7F2A4288AD299001C0D64 /* BadgeAnimations */,
-				AA3439732754D55100B241FA /* trackers-1.json */,
-				AA3439742754D55100B241FA /* trackers-2.json */,
-				AA3439752754D55100B241FA /* trackers-3.json */,
-				AA34396A2754D4E200B241FA /* shield.json */,
-				AA34396B2754D4E300B241FA /* shield-dot.json */,
-				AA7EB6E027E7D05500036718 /* flame-mouse-over.json */,
-				AA7EB6E627E8809D00036718 /* shield-mouse-over.json */,
-				AA7EB6E827E880A600036718 /* shield-dot-mouse-over.json */,
+				AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */,
+				AA34396F2754D4E900B241FA /* dark-shield.json */,
+				AA34396E2754D4E900B241FA /* dark-shield-dot.json */,
+				AA7EB6EC27E880B600036718 /* dark-shield-dot-mouse-over.json */,
+				AA7EB6EA27E880AE00036718 /* dark-shield-mouse-over.json */,
 				AA3439762754D55100B241FA /* dark-trackers-1.json */,
 				AA3439722754D55100B241FA /* dark-trackers-2.json */,
 				AA3439772754D55100B241FA /* dark-trackers-3.json */,
-				AA34396F2754D4E900B241FA /* dark-shield.json */,
-				AA34396E2754D4E900B241FA /* dark-shield-dot.json */,
-				AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */,
-				AA7EB6EA27E880AE00036718 /* dark-shield-mouse-over.json */,
-				AA7EB6EC27E880B600036718 /* dark-shield-dot-mouse-over.json */,
+				AA7EB6E027E7D05500036718 /* flame-mouse-over.json */,
+				AA34396A2754D4E200B241FA /* shield.json */,
+				AA34396B2754D4E300B241FA /* shield-dot.json */,
+				AA7EB6E827E880A600036718 /* shield-dot-mouse-over.json */,
+				AA7EB6E627E8809D00036718 /* shield-mouse-over.json */,
+				AA3439732754D55100B241FA /* trackers-1.json */,
+				AA3439742754D55100B241FA /* trackers-2.json */,
+				AA3439752754D55100B241FA /* trackers-3.json */,
 			);
 			path = Animations;
 			sourceTree = "<group>";
@@ -8428,23 +8428,23 @@
 		AA86491624D8339A001BABEE /* View */ = {
 			isa = PBXGroup;
 			children = (
-				BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift */,
 				AA7EB6EE27E880EA00036718 /* Animations */,
 				AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */,
 				AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */,
-				5614B3A02BBD639D009B5031 /* ZoomPopover.swift */,
-				AABEE6AE24AD22B90043105B /* AddressBarTextField.swift */,
 				B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */,
+				AABEE6AE24AD22B90043105B /* AddressBarTextField.swift */,
 				B60D64482AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift */,
 				14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */,
+				D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */,
 				AAA0CC462533833C0079BC96 /* MoreOptionsMenu.swift */,
 				1DEDB3632C19934C006B6D1B /* MoreOptionsMenuButton.swift */,
 				85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */,
-				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */,
 				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
+				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				B60293E52BA19ECD0033186B /* NetPPopoverManagerMock.swift */,
-				D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */,
+				BBB9314C2D1F0F1700D50AC1 /* ShowToolbarsOnFullScreenMenuCoordinator.swift */,
+				5614B3A02BBD639D009B5031 /* ZoomPopover.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";

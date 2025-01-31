@@ -534,7 +534,7 @@
                                             <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="LBz-Pz-Fw5">
                                                 <rect key="frame" x="10" y="4" width="75" height="14"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Switch to Tab" id="xUQ-xN-fdL">
-                                                    <font key="font" metaFont="system" size="11"/>
+                                                    <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -733,7 +733,7 @@
                                 </connections>
                             </button>
                             <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HEu-ro-RSA">
-                                <rect key="frame" x="0.0" y="1" width="194" height="32"/>
+                                <rect key="frame" x="0.0" y="1" width="225" height="32"/>
                                 <subviews>
                                     <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
@@ -761,8 +761,31 @@
                                             <action selector="privacyEntryPointButtonAction:" target="mcr-nj-GmC" id="YFW-MB-o9A"/>
                                         </connections>
                                     </button>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="lbX-yW-2eM" userLabel="Separator">
+                                        <rect key="frame" x="0.0" y="0.0" width="5" height="32"/>
+                                        <subviews>
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="CtU-Gd-KHM" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="2" y="8" width="1" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="1" id="Skm-Q0-ubi"/>
+                                                    <constraint firstAttribute="height" constant="16" id="vnk-Hg-Wd7"/>
+                                                </constraints>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                        <color key="value" name="BlackWhite10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </customView>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="32" id="Dnx-hJ-3A9"/>
+                                            <constraint firstItem="CtU-Gd-KHM" firstAttribute="centerY" secondItem="lbX-yW-2eM" secondAttribute="centerY" id="bY5-af-X8A"/>
+                                            <constraint firstAttribute="width" constant="5" id="plW-zK-Tdb"/>
+                                            <constraint firstItem="CtU-Gd-KHM" firstAttribute="centerX" secondItem="lbX-yW-2eM" secondAttribute="centerX" id="xbv-n3-TR6"/>
+                                        </constraints>
+                                    </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Iv-YW-zn2">
-                                        <rect key="frame" x="0.0" y="0.0" width="34" height="32"/>
+                                        <rect key="frame" x="5" y="0.0" width="34" height="32"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="psi-hX-Kh9">
                                                 <rect key="frame" x="15" y="8" width="16" height="16"/>
@@ -783,32 +806,45 @@
                                             <constraint firstAttribute="height" constant="32" id="fQf-sl-KYI"/>
                                         </constraints>
                                     </customView>
-                                    <button hidden="YES" id="b30-aJ-fvG" userLabel="ZoomButton" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="84" y="0.0" width="32" height="32"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ZoomIncrease" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Rfs-eh-Yrh">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <color key="contentTintColor" name="ButtonColor"/>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="gER-z0-blI" userLabel="Zoom Button Wrapper">
+                                        <rect key="frame" x="39" y="0.0" width="26" height="32"/>
+                                        <subviews>
+                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="b30-aJ-fvG" userLabel="ZoomButton" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="2" width="24" height="28"/>
+                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ZoomIn" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Rfs-eh-Yrh">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <color key="contentTintColor" name="ButtonColor"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="28" id="6TS-h0-8pK"/>
+                                                    <constraint firstAttribute="width" constant="24" id="JvZ-46-TUe"/>
+                                                </constraints>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                        <color key="value" name="ButtonMouseOverColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                        <color key="value" name="ButtonMouseDownColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                        <real key="value" value="4"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="zoomButtonAction:" target="mcr-nj-GmC" id="xCK-4c-baX"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="32" id="6TS-h0-8pK"/>
-                                            <constraint firstAttribute="width" constant="32" id="JvZ-46-TUe"/>
+                                            <constraint firstItem="b30-aJ-fvG" firstAttribute="centerY" secondItem="gER-z0-blI" secondAttribute="centerY" id="8aR-8w-Vh0"/>
+                                            <constraint firstAttribute="height" constant="32" id="8tv-6E-nVN"/>
+                                            <constraint firstItem="b30-aJ-fvG" firstAttribute="leading" secondItem="gER-z0-blI" secondAttribute="leading" id="Jcm-pU-3Ez"/>
+                                            <constraint firstAttribute="trailing" secondItem="b30-aJ-fvG" secondAttribute="trailing" constant="2" id="wpq-4G-3RY"/>
                                         </constraints>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                                <color key="value" name="ButtonMouseOverColor"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                                <color key="value" name="ButtonMouseDownColor"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <action selector="zoomButtonAction:" target="mcr-nj-GmC" id="xCK-4c-baX"/>
-                                        </connections>
-                                    </button>
+                                    </customView>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8UU-A8-1nD">
-                                        <rect key="frame" x="34" y="0.0" width="160" height="32"/>
+                                        <rect key="frame" x="65" y="0.0" width="160" height="32"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CN6-fJ-o2J" userLabel="Geolocation Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
@@ -944,8 +980,10 @@
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -981,7 +1019,9 @@
                         <outlet property="permissionButtons" destination="8UU-A8-1nD" id="gYJ-VW-MEG"/>
                         <outlet property="popupsButton" destination="qqY-h9-UQ7" id="1QY-I6-oNC"/>
                         <outlet property="privacyEntryPointButton" destination="nOW-iY-XmO" id="r0A-EO-srN"/>
+                        <outlet property="separator" destination="lbX-yW-2eM" id="b3h-JB-tja"/>
                         <outlet property="zoomButton" destination="b30-aJ-fvG" id="24G-cW-Qmg"/>
+                        <outlet property="zoomButtonWrapper" destination="gER-z0-blI" id="gbd-By-2NP"/>
                     </connections>
                 </viewController>
                 <customObject id="PAh-HG-vQt" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -1013,7 +1053,7 @@
         <image name="Refresh" width="16" height="16"/>
         <image name="Search" width="14" height="14"/>
         <image name="Settings" width="16" height="16"/>
-        <image name="ZoomIncrease" width="16" height="16"/>
+        <image name="ZoomIn" width="16" height="16"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
@@ -1025,6 +1065,9 @@
         </namedColor>
         <namedColor name="AddressBarShadowColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.15000000596046448" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
+        <namedColor name="BlackWhite10">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
