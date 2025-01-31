@@ -33,8 +33,12 @@ final class FeatureFlagOverridesMenu: NSMenu {
         buildItems {
             internalUserStateMenuItem()
             NSMenuItem.separator()
+
+            sectionHeader(title: "Feature Flags")
             featureFlagMenuItems()
             NSMenuItem.separator()
+
+            sectionHeader(title: "Experiments")
             experimentFeatureMenuItems()
             NSMenuItem.separator()
             resetAllOverridesMenuItem()
@@ -169,12 +173,32 @@ final class FeatureFlagOverridesMenu: NSMenu {
 
     private func resetOverrideSubmenu(for flag: FeatureFlag) -> NSMenu {
         let submenu = NSMenu()
+
+        // Add cohort switch options
+        let cohorts = getCohorts(for: flag).filter { $0.rawValue != overrideValue(for: flag) }
+        if !cohorts.isEmpty {
+            for cohort in cohorts {
+                let cohortItem = NSMenuItem(
+                    title: "Switch to: \(cohort.rawValue)",
+                    action: #selector(toggleExperimentFeatureFlag(_:)),
+                    target: self
+                )
+                cohortItem.representedObject = (flag, cohort.rawValue)
+                submenu.addItem(cohortItem)
+            }
+        }
+
+        // Separator
+        submenu.addItem(NSMenuItem.separator())
+
+        // "Remove Override" option
         submenu.addItem(NSMenuItem(
             title: "Remove Override",
             action: #selector(resetOverride(_:)),
             target: self,
             representedObject: flag
         ))
+
         return submenu
     }
 
@@ -198,5 +222,11 @@ final class FeatureFlagOverridesMenu: NSMenu {
             }
             return override
         }
+    }
+
+    private func sectionHeader(title: String) -> NSMenuItem {
+        let headerItem = NSMenuItem(title: title)
+        headerItem.isEnabled = false
+        return headerItem
     }
 }
