@@ -103,11 +103,13 @@ final class MainMenu: NSMenu {
 
     let helpMenu = NSMenu(title: UserText.mainMenuHelp)
     let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
+    let addToDockMenuItem = NSMenuItem(title: UserText.addDuckDuckGoToDock, action: #selector(AppDelegate.addToDock))
     let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser + "…", action: #selector(AppDelegate.setAsDefault))
     let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
     let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
     let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
 
+    private let dockCustomizer: DockCustomization
     private let defaultBrowserPreferences: DefaultBrowserPreferences
     private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
 
@@ -117,9 +119,11 @@ final class MainMenu: NSMenu {
     init(featureFlagger: FeatureFlagger,
          bookmarkManager: BookmarkManager,
          faviconManager: FaviconManagement,
+         dockCustomizer: DockCustomization = DockCustomizer(),
          defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
          aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
 
+        self.dockCustomizer = dockCustomizer
         self.defaultBrowserPreferences = defaultBrowserPreferences
         self.aiChatMenuConfig = aiChatMenuConfig
         super.init(title: UserText.duckDuckGo)
@@ -149,6 +153,7 @@ final class MainMenu: NSMenu {
             NSMenuItem.separator()
 
             preferencesMenuItem
+            addToDockMenuItem
             setAsDefaultMenuItem
 
             NSMenuItem.separator()
@@ -438,6 +443,11 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
+#if SPARKLE
+        addToDockMenuItem.isHidden = dockCustomizer.isAddedToDock
+#else
+        addToDockMenuItem.isHidden = true
+#endif
         setAsDefaultMenuItem.isHidden = defaultBrowserPreferences.isDefault
 
         // To be safe, hide the NetP shortcut menu item by default.
@@ -674,6 +684,9 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Home Page Settings Onboarding", action: #selector(MainViewController.resetHomePageSettingsOnboarding(_:)))
                 NSMenuItem(title: "Reset Contextual Onboarding", action: #selector(MainViewController.resetContextualOnboarding(_:)))
                 NSMenuItem(title: "Reset Sync Promo prompts", action: #selector(MainViewController.resetSyncPromoPrompts))
+                NSMenuItem(title: "Reset Add To Dock more options menu notification", action: #selector(MainViewController.resetAddToDockFeatureNotification))
+                NSMenuItem(title: "Reset Launch Date To Today", action: #selector(MainViewController.resetLaunchDateToToday))
+                NSMenuItem(title: "Set Launch Date A Week In the Past", action: #selector(MainViewController.setLaunchDayAWeekInThePast))
 
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {

@@ -311,12 +311,17 @@ final class NavigationBarViewController: NSViewController {
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
+        var dockCustomization: DockCustomization?
+#if SPARKLE
+        dockCustomization = Application.appDelegate.dockCustomization
+#endif
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),
                                    internalUserDecider: internalUserDecider,
                                    subscriptionManager: subscriptionManager,
-                                   freemiumDBPFeature: freemiumDBPFeature)
+                                   freemiumDBPFeature: freemiumDBPFeature,
+                                   dockCustomizer: dockCustomization)
 
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
