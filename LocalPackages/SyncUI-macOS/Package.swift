@@ -13,13 +13,14 @@ let package = Package(
             targets: ["SyncUI-macOS"]),
     ],
     dependencies: [
+        .package(path: "../PreferencesUI-macOS"),
         .package(path: "../SwiftUIExtensions"),
     ],
     targets: [
         .target(
             name: "SyncUI-macOS",
             dependencies: [
-                .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
+                .product(name: "PreferencesUI-macOS", package: "PreferencesUI-macOS"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
             ],
             resources: [
