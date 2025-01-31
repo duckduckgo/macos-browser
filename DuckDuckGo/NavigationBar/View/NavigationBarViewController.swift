@@ -54,6 +54,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
+    @IBOutlet weak var menuButtons: NSStackView!
 
     @IBOutlet weak var aiChatButton: MouseOverButton!
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
@@ -191,6 +192,12 @@ final class NavigationBarViewController: NSViewController {
 #endif
 
         subscribeToAIChatOnboarding()
+
+        if #available(macOS 14.4, *), !burnerMode.isBurner {
+            WebExtensionManager.shared.toolbarButtons().enumerated().forEach { (index, button) in
+                menuButtons.insertArrangedSubview(button, at: index)
+            }
+        }
     }
 
     override func viewWillAppear() {
