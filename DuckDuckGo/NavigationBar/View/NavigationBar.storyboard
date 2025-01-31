@@ -391,6 +391,7 @@
                         <outlet property="homeButton" destination="s7D-YB-p00" id="sjk-Af-Zl4"/>
                         <outlet property="homeButtonSeparator" destination="X5m-gH-M1N" id="n3f-Wi-jae"/>
                         <outlet property="logoWidthConstraint" destination="jSz-y8-vaJ" id="BbD-cr-Hyv"/>
+                        <outlet property="menuButtons" destination="aWu-Jm-Oaz" id="gb7-KP-Q3h"/>
                         <outlet property="navigationBarButtonsLeadingConstraint" destination="eSb-tj-UdD" id="Jnt-Xd-aUU"/>
                         <outlet property="navigationButtons" destination="eEh-kf-smR" id="XC4-bo-89V"/>
                         <outlet property="networkProtectionButton" destination="iKf-yR-au9" id="HWJ-gT-EXa"/>

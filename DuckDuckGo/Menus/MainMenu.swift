@@ -749,7 +749,13 @@ final class MainMenu: NSMenu {
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
 
+            if #available(macOS 14.4, *) {
+                NSMenuItem.separator()
+                NSMenuItem(title: "Web Extensions").submenu(WebExtensionsDebugMenu())
+                NSMenuItem.separator()
+            }
         }
+
         debugMenu.addItem(internalUserItem)
         debugMenu.autoenablesItems = false
         return debugMenu

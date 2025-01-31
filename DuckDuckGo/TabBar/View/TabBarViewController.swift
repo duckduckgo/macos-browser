@@ -703,7 +703,12 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         updateEmptyTabArea()
         hideTabPreview()
         if tabMode == .overflow {
-            collectionView.scroll(to: IndexPath(item: index))
+            let isLastItem = collectionView.numberOfItems(inSection: 0) == index + 1
+            if isLastItem {
+                scrollCollectionViewToEnd()
+            } else {
+                collectionView.scroll(to: IndexPath(item: index))
+            }
         }
     }
 

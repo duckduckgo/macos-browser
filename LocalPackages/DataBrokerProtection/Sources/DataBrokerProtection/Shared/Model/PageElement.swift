@@ -24,6 +24,7 @@ struct PageElement: Codable, Sendable {
     let multiple: Bool?
     let min: String?
     let max: String?
+    let failSilently: Bool?
 }
 
 struct ProfileMatch: Codable, Sendable {
