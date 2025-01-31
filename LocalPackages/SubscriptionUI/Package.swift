@@ -23,7 +23,7 @@ let package = Package(
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "Subscription", package: "BrowserServicesKit"),
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
+                .product(name: "PreferencesUI-macOS", package: "PreferencesUI-macOS"),
                 .product(name: "FeatureFlags", package: "FeatureFlags")
             ],
             resources: [
