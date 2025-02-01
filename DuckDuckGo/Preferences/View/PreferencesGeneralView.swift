@@ -49,7 +49,7 @@ extension Preferences {
                         HStack {
                             if isAddedToDock || dockCustomizer.isAddedToDock {
                                 HStack {
-                                    Image(.successCheckmark)
+                                    Image(.checkCircle).foregroundColor(Color(.successGreen))
                                     Text(UserText.isAddedToDock)
                                 }
                                 .transition(.opacity)

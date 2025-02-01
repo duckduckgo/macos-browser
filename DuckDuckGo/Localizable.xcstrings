@@ -56804,55 +56804,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zum Dock hinzufügen …"
+            "value" : "DuckDuckGo zum Dock hinzufügen…"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Add to Dock…"
+            "value" : "Add DuckDuckGo To Dock…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir al Dock…"
+            "value" : "Añadir DuckDuckGo al Dock…"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter au Dock…"
+            "value" : "Ajouter DuckDuckGo au Dock…"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiungi al dock…"
+            "value" : "Aggiungi DuckDuckGo al Dock…"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App toevoegen aan je dock…"
+            "value" : "Voeg DuckDuckGo toe aan Dock…"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaj do Docka…"
+            "value" : "Dodaj DuckDuckGo do Dock…"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adicionar à Dock…"
+            "value" : "Adicionar DuckDuckGo ao Dock…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавить на док-панель…"
+            "value" : "Добавить DuckDuckGo в док-панель…"
           }
         }
       }

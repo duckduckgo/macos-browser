@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1520"
+   LastUpgradeVersion = "1620"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Intercom"
-               BuildableName = "Intercom"
-               BlueprintName = "Intercom"
-               ReferencedContainer = "container:">
+               BlueprintIdentifier = "4B2537592A11BE7300610219"
+               BuildableName = "com.duckduckgo.macos.vpn.network-extension.systemextension"
+               BlueprintName = "NetworkProtectionSystemExtension"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -49,10 +50,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "Intercom"
-            BuildableName = "Intercom"
-            BlueprintName = "Intercom"
-            ReferencedContainer = "container:">
+            BlueprintIdentifier = "4B2537592A11BE7300610219"
+            BuildableName = "com.duckduckgo.macos.vpn.network-extension.systemextension"
+            BlueprintName = "NetworkProtectionSystemExtension"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
