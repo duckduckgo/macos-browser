@@ -55,25 +55,14 @@ public enum FeatureFlag: String, CaseIterable {
 
     case autofillPartialFormSaves
     case autcompleteTabs
+    case webExtensions
     case syncSeamlessAccountSwitching
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .historyView:
-            return true
-        case .htmlNewTabPage:
-            return true
-        case .maliciousSiteProtection:
-            return false
-        case .autofillPartialFormSaves:
-            return true
-        case .autcompleteTabs:
-            return true
-        case .networkProtectionAppExclusions:
-            return true
-        case .syncSeamlessAccountSwitching:
+        case .htmlNewTabPage, .autofillPartialFormSaves, .autcompleteTabs, .networkProtectionAppExclusions, .syncSeamlessAccountSwitching, .historyView, .webExtensions:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -83,7 +72,8 @@ extension FeatureFlag: FeatureFlagDescribing {
              .unknownUsernameCategorization,
              .credentialsImportPromotionForExistingUsers,
              .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes:
+             .networkProtectionEnforceRoutes,
+             .maliciousSiteProtection:
             return false
         }
     }
@@ -109,9 +99,9 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .networkProtectionAppExclusions:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.appExclusions))
         case .networkProtectionUserTips:
-            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
+            return .remoteReleasable(.subfeature(NetworkProtectionSubfeature.userTips))
         case .networkProtectionEnforceRoutes:
-            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
+            return .remoteReleasable(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
             return .remoteReleasable(.subfeature(HTMLNewTabPageSubfeature.isLaunched))
         case .historyView:
@@ -120,6 +110,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         case .autcompleteTabs:
             return .remoteReleasable(.feature(.autocompleteTabs))
+        case .webExtensions:
+            return .internalOnly()
         case .syncSeamlessAccountSwitching:
             return .remoteReleasable(.subfeature(SyncSubfeature.seamlessAccountSwitching))
         }

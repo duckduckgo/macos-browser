@@ -26,6 +26,7 @@ final class MoreOptionsMenuButton: MouseOverButton {
 
 #if SPARKLE
     private var updateController: UpdateControllerProtocol?
+    private var dockCustomization: DockCustomization?
 #endif
 
     private var notificationLayer: CALayer?
@@ -52,6 +53,7 @@ final class MoreOptionsMenuButton: MouseOverButton {
 #if SPARKLE
         if NSApp.runType != .uiTests {
             updateController = Application.appDelegate.updateController
+            dockCustomization = Application.appDelegate.dockCustomization
         }
         subscribeToUpdateInfo()
 #endif
@@ -64,11 +66,11 @@ final class MoreOptionsMenuButton: MouseOverButton {
 
     private func subscribeToUpdateInfo() {
 #if SPARKLE
-        guard let updateController else { return }
-        cancellable = Publishers.CombineLatest(updateController.hasPendingUpdatePublisher, updateController.notificationDotPublisher)
+        guard let updateController, let dockCustomization else { return }
+        cancellable = Publishers.CombineLatest3(updateController.hasPendingUpdatePublisher, updateController.notificationDotPublisher, dockCustomization.shouldShowNotificationPublisher)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] hasPendingUpdate, needsNotificationDot in
-                self?.isNotificationVisible = hasPendingUpdate && needsNotificationDot
+            .sink { [weak self] hasPendingUpdate, needsNotificationDot, shouldNotificationForAddToDock in
+                self?.isNotificationVisible = hasPendingUpdate && needsNotificationDot || shouldNotificationForAddToDock
             }
 #endif
     }

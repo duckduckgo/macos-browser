@@ -102,9 +102,9 @@ jobs:
       matrix:
         flavor: [ "Sandbox", "Non-Sandbox" ]
         include:
-          - scheme: DuckDuckGo Privacy Browser
+          - scheme: macOS Browser
             flavor: Non-Sandbox
-          - scheme: DuckDuckGo Privacy Browser App Store
+          - scheme: macOS Browser App Store
             flavor: Sandbox
           - active-arch: YES
             flavor: Non-Sandbox
@@ -368,7 +368,7 @@ jobs:
       run: |
         export OS_ACTIVITY_MODE=debug
         set -o pipefail && xcodebuild \
-          -scheme "DuckDuckGo Privacy Browser" \
+          -scheme "macOS Browser" \
           -derivedDataPath "DerivedData" \
           -configuration "Release" \
           -skipPackagePluginValidation -skipMacroValidation \

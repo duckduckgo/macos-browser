@@ -16,14 +16,34 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 class CapturingDockCustomizer: DockCustomization {
+    private var featureShownSubject = CurrentValueSubject<Bool, Never>(false)
+
+    var shouldShowNotificationPublisher: AnyPublisher<Bool, Never> {
+        featureShownSubject.eraseToAnyPublisher()
+    }
+
+    var shouldShowNotification: Bool {
+        get { featureShownSubject.value }
+        set { featureShownSubject.send(newValue) }
+    }
+
     var isAddedToDock = false
 
     func addToDock() -> Bool {
         isAddedToDock = true
         return true
+    }
+
+    func didCloseMoreOptionsMenu() {
+        // No-op
+    }
+
+    func resetData() {
+        // No-op
     }
 }

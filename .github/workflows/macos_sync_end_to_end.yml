@@ -114,7 +114,7 @@ jobs:
     - name: Build Sync e2e tests
       run: |
         set -o pipefail && xcodebuild build-for-testing \
-          -scheme "Sync End-to-End UI Tests CI" \
+          -scheme "macOS Sync End-to-End UI Tests CI" \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
           -skipMacroValidation \
@@ -138,13 +138,13 @@ jobs:
           -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "key" -v "CODE" \
           -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "value" -v "$CODE" \
           -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "isEnabled" -v "YES" \
-          "DuckDuckGo-macOS.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme" > updated.xcscheme
-        mv -f updated.xcscheme "DuckDuckGo-macOS.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests CI.xcscheme"
+          "DuckDuckGo-macOS.xcodeproj/xcshareddata/xcschemes/macOS Sync End-to-End UI Tests CI.xcscheme" > updated.xcscheme
+        mv -f updated.xcscheme "DuckDuckGo-macOS.xcodeproj/xcshareddata/xcschemes/macOS Sync End-to-End UI Tests CI.xcscheme"
 
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         set -o pipefail && xcodebuild test-without-building \
-          -scheme "Sync End-to-End UI Tests CI" \
+          -scheme "macOS Sync End-to-End UI Tests CI" \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
           -skipMacroValidation \

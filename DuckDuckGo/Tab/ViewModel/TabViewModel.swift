@@ -86,6 +86,10 @@ final class TabViewModel {
             if oldValue != zoomLevel {
                 zoomLevelSubject.send(zoomLevel)
             }
+
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didChangeTabProperties([.zoomFactor], for: tab)
+            }
         }
     }
 
@@ -102,7 +106,7 @@ final class TabViewModel {
         switch tab.content {
         case .url(let url, _, _):
             return !(url.isDuckPlayer || url.isDuckURLScheme)
-        case .subscription, .identityTheftRestoration, .releaseNotes:
+        case .subscription, .identityTheftRestoration, .releaseNotes, .webExtensionUrl:
             return true
 
         case .newtab, .settings, .bookmarks, .history, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
@@ -185,7 +189,8 @@ final class TabViewModel {
                      .dataBrokerProtection,
                      .subscription,
                      .identityTheftRestoration,
-                     .releaseNotes:
+                     .releaseNotes,
+                     .webExtensionUrl:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
                     return Just( () ).eraseToAnyPublisher()
                 }
@@ -375,7 +380,7 @@ final class TabViewModel {
                 .duckPlayerTrustedIndicator
         case .url(let url, _, _) where url.isEmailProtection:
                 .emailProtectionTrustedIndicator
-        case .url(let url, _, _):
+        case .url(let url, _, _), .webExtensionUrl(let url):
             NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
         }
     }
@@ -433,7 +438,7 @@ final class TabViewModel {
             }
         case .onboardingDeprecated:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription, .identityTheftRestoration, .onboarding:
+        case .url, .none, .subscription, .identityTheftRestoration, .onboarding, .webExtensionUrl:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
@@ -482,7 +487,7 @@ final class TabViewModel {
             Favicon.duckPlayer
         case .url(let url, _, _) where url.isEmailProtection:
             Favicon.emailProtection
-        case .url, .onboardingDeprecated, .onboarding, .none:
+        case .url, .onboardingDeprecated, .onboarding, .webExtensionUrl, .none:
             tabFavicon ?? tab.favicon
         }
     }

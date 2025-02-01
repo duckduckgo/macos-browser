@@ -110,7 +110,7 @@ jobs:
         cd main
         launchctl setenv PRIVACYPRO_STAGING_TOKEN '${{ secrets.PRIVACYPRO_STAGING_TOKEN }}'
         set -o pipefail && xcodebuild test \
-          -scheme "DBPE2ETests" \
+          -scheme "macOS PIR E2E Tests" \
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
           -skipPackagePluginValidation -skipMacroValidation \
