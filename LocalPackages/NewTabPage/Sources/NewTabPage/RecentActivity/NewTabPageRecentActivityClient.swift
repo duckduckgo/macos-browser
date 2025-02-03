@@ -84,7 +84,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
 
     private func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = model.isViewExpanded ? .expanded : .collapsed
-        return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        return NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: expansion)
     }
 
     @MainActor
@@ -95,7 +95,7 @@ public final class NewTabPageRecentActivityClient: NewTabPageUserScriptClient {
     @MainActor
     private func notifyConfigUpdated(_ isViewExpanded: Bool) {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = isViewExpanded ? .expanded : .collapsed
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: expansion)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
     }
 

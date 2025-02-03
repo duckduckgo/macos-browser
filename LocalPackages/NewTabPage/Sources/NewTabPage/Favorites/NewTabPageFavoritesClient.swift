@@ -84,7 +84,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
 
     private func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.isViewExpanded ? .expanded : .collapsed
-        return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        return NewTabPageUserScript.WidgetConfig(animation: .viewTransitions, expansion: expansion)
     }
 
     @MainActor
@@ -115,7 +115,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     private func notifyConfigUpdated(_ showAllFavorites: Bool) {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = showAllFavorites ? .expanded : .collapsed
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .viewTransitions, expansion: expansion)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
     }
 

@@ -76,14 +76,14 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
 
     func testWhenSetConfigContainsExpandedStateThenModelSettingIsSetToExpanded() async throws {
         model.isViewExpanded = false
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .expanded)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: .expanded)
         try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(model.isViewExpanded, true)
     }
 
     func testWhenSetConfigContainsCollapsedStateThenModelSettingIsSetToCollapsed() async throws {
         model.isViewExpanded = true
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .collapsed)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: .collapsed)
         try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(model.isViewExpanded, false)
     }
