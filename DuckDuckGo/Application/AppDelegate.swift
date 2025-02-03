@@ -164,6 +164,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if SPARKLE
     var updateController: UpdateController!
+    var dockCustomization: DockCustomization!
 #endif
 
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
@@ -174,6 +175,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     static var isNewUser: Bool {
         return firstLaunchDate >= Date.weekAgo
+    }
+
+    static var twoDaysPassedSinceFirstLaunch: Bool {
+        return firstLaunchDate.daysSinceNow() >= 2
     }
 
     @MainActor
@@ -349,6 +354,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if SPARKLE
         if NSApp.runType != .uiTests {
             updateController = UpdateController(internalUserDecider: internalUserDecider)
+            dockCustomization = DockCustomizer()
             stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
         }
 #endif
@@ -516,7 +522,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPScanResultPolling = DefaultFreemiumDBPScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPScanResultPolling?.startPollingOrObserving()
 
-        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault)))
+#if SPARKLE
+        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault, isAddedToDock: DockCustomizer().isAddedToDock)), frequency: .daily)
+#else
+        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault, isAddedToDock: nil)), frequency: .daily)
+#endif
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -850,7 +860,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpAutofillPixelReporter() {
         autofillPixelReporter = AutofillPixelReporter(
-            userDefaults: .standard,
+            standardUserDefaults: .standard,
+            appGroupUserDefaults: nil,
             autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
             eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
                 switch event {

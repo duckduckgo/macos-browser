@@ -1,5 +1,5 @@
 //
-//  BWCommunicator.swift
+//  NativeMessagingCommunicator.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,39 +20,44 @@ import Common
 import Foundation
 import os.log
 
-protocol BWCommunicatorDelegate: AnyObject {
+protocol NativeMessagingCommunicatorDelegate: AnyObject {
 
-    func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication,
-                               didReceiveMessageData messageData: Data)
-    func bitwardenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication)
+    func nativeMessagingCommunicator(_ nativeMessagingCommunicator: NativeMessagingCommunication, didReceiveMessageData messageData: Data)
+    func nativeMessagingCommunicatorProcessDidTerminate(_ nativeMessagingCommunicator: NativeMessagingCommunication)
 
 }
 
-protocol BWCommunication {
+protocol NativeMessagingCommunication {
 
     func runProxyProcess() throws
     func terminateProxyProcess()
 
-    var delegate: BWCommunicatorDelegate? { get set }
+    var delegate: NativeMessagingCommunicatorDelegate? { get set }
     func send(messageData: Data)
 
 }
 
-final class BWCommunicator: BWCommunication {
+final class NativeMessagingCommunicator: NSObject, NativeMessagingCommunication {
 
-    static let appPath = "/Applications/Bitwarden.app/Contents/MacOS/Bitwarden"
+    let appPath: String
+    let arguments: [String]
 
-    weak var delegate: BWCommunicatorDelegate?
+    weak var delegate: NativeMessagingCommunicatorDelegate?
 
     // MARK: - Running Proxy Process
 
-    private struct BitwardenProcess {
+    private struct ProcessWrapper {
         let process: Process
         let readingHandle: FileHandle
         let writingHandle: FileHandle
     }
 
-    private var process: BitwardenProcess?
+    private var process: ProcessWrapper?
+
+    init(appPath: String, arguments: [String]) {
+        self.appPath = appPath
+        self.arguments = arguments
+    }
 
     func runProxyProcess() throws {
         if process != nil {
@@ -68,16 +73,16 @@ final class BWCommunicator: BWCommunication {
         let inputPipe = Pipe()
         let inputHandle = inputPipe.fileHandleForWriting
 
-        process.executableURL = URL(fileURLWithPath: Self.appPath)
-        process.arguments = ["chrome-extension://bitwarden"]
+        process.executableURL = URL(fileURLWithPath: appPath)
+        process.arguments = arguments
         process.standardOutput = outputPipe
         process.standardInput = inputPipe
         process.terminationHandler = processDidTerminate(_:)
 
         try process.run()
-        Logger.bitWarden.log("BWCommunicator: Proxy process running")
+        Logger.webExtensions.log("NativeMessagingCommunicator: Proxy process running")
 
-        self.process = BitwardenProcess(process: process, readingHandle: outHandle, writingHandle: inputHandle)
+        self.process = ProcessWrapper(process: process, readingHandle: outHandle, writingHandle: inputHandle)
     }
 
     func terminateProxyProcess() {
@@ -86,7 +91,7 @@ final class BWCommunicator: BWCommunication {
     }
 
     private func processDidTerminate(_ process: Process) {
-        Logger.bitWarden.log("BWCommunicator: Proxy process terminated")
+        Logger.webExtensions.log("NativeMessagingCommunicator: Proxy process terminated")
 
         if let runningProcess = self.process?.process {
             if process != runningProcess {
@@ -97,7 +102,7 @@ final class BWCommunicator: BWCommunication {
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.delegate?.bitwardenCommunicatorProcessDidTerminate(self)
+            self.delegate?.nativeMessagingCommunicatorProcessDidTerminate(self)
         }
     }
 
@@ -125,7 +130,7 @@ final class BWCommunicator: BWCommunication {
 
     private let realisticMessageLength = 200000
     private var accumulatedData = Data()
-    private let dataQueue = DispatchQueue(label: "BWCommunicator.queue")
+    private let dataQueue = DispatchQueue(label: "NativeMessagingCommunicator.queue")
 
     func receiveData(_ fileHandle: FileHandle) {
         let newData = fileHandle.availableData
@@ -148,7 +153,7 @@ final class BWCommunicator: BWCommunication {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
 
-                    self.delegate?.bitwardenCommunicator(self, didReceiveMessageData: messageData)
+                    self.delegate?.nativeMessagingCommunicator(self, didReceiveMessageData: messageData)
                 }
             } while self.accumulatedData.count >= 2 /*EOF*/
         }
