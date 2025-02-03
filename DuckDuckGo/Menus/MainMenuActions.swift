@@ -459,17 +459,17 @@ extension MainViewController {
 
     @objc func zoomIn(_ sender: Any) {
         getActiveTabAndIndex()?.tab.webView.zoomIn()
-        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.openZoomPopover(closeAfterDelay: true)
+        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.openZoomPopover(source: .menu)
     }
 
     @objc func zoomOut(_ sender: Any) {
         getActiveTabAndIndex()?.tab.webView.zoomOut()
-        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.openZoomPopover(closeAfterDelay: true)
+        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.openZoomPopover(source: .menu)
     }
 
     @objc func actualSize(_ sender: Any) {
         getActiveTabAndIndex()?.tab.webView.resetZoomLevel()
-        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.openZoomPopover(closeAfterDelay: true)
+        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.openZoomPopover(source: .menu)
     }
 
     @objc func toggleDownloads(_ sender: Any) {

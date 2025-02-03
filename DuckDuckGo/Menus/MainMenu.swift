@@ -748,6 +748,7 @@ final class MainMenu: NSMenu {
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
+            NSMenuItem(title: "Zoom UI popover").submenu(ZoomPopoverDebugMenu())
 
         }
         debugMenu.addItem(internalUserItem)

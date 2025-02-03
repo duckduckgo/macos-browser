@@ -398,7 +398,7 @@ final class AddressBarButtonsViewController: NSViewController {
         popovers?.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton, entryPoint: .dashboard)
     }
 
-    func openZoomPopover(closeAfterDelay: Bool = false) {
+    func openZoomPopover(source: ZoomPopover.Source) {
         guard let popovers,
               let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
@@ -408,8 +408,8 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        zoomButton.isShown = true
-        popovers.showZoomPopover(for: tabViewModel, from: zoomButton, addressBar: parent?.view, withDelegate: self, closeAfterDelay: closeAfterDelay)
+        zoomButtonWrapper.isShown = true
+        popovers.showZoomPopover(for: tabViewModel, from: zoomButton, addressBar: parent?.view, withDelegate: self, source: source)
         updateZoomButtonVisibility()
     }
 
@@ -430,7 +430,7 @@ final class AddressBarButtonsViewController: NSViewController {
         if popovers.isZoomPopoverShown {
             popovers.closeZoomPopover()
         } else {
-            openZoomPopover()
+            openZoomPopover(source: .toolbar)
         }
     }
 
@@ -789,7 +789,6 @@ final class AddressBarButtonsViewController: NSViewController {
         default:
             imageButton.image = nil
         }
-
     }
 
     private func updatePrivacyEntryPointButton() {
@@ -816,7 +815,8 @@ final class AddressBarButtonsViewController: NSViewController {
         && !isTextFieldValueText
         && !isLocalUrl
 
-        imageButtonWrapper.isShown = view.window?.isPopUpWindow != true
+        imageButtonWrapper.isShown = imageButton.image != nil
+        && view.window?.isPopUpWindow != true
         && (isHypertextUrl || isTextFieldEditorFirstResponder || isEditingMode || isNewTabOrOnboarding)
         && privacyEntryPointButton.isHidden
         && !isAnyTrackerAnimationPlaying

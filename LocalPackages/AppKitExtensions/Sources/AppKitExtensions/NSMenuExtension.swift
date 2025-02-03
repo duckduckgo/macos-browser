@@ -50,6 +50,10 @@ public extension NSMenu {
         return indexOfItem(with: action).map { self.items[$0] }
     }
 
+    func item(with identifier: NSUserInterfaceItemIdentifier) -> NSMenuItem? {
+        return indexOfItem(withIdentifier: identifier.rawValue).map { self.items[$0] }
+    }
+
     func replaceItem(at index: Int, with newItem: NSMenuItem) {
         removeItem(at: index)
         insertItem(newItem, at: index)

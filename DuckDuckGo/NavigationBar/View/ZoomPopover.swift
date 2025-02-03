@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import AppKitExtensions
 import Combine
 
 final class ZoomPopoverViewModel: ObservableObject {
@@ -63,8 +64,12 @@ final class ZoomPopoverViewController: NSViewController {
     private let mouseOverView = MouseOverView()
     private let zoomLevelLabel = NSTextField(labelWithString: "")
     private lazy var resetButton = MouseOverButton(title: UserText.resetZoom, target: self, action: #selector(resetZoom))
-    private lazy var zoomOutButton = MouseOverButton(title: "􀅽", target: self, action: #selector(zoomOut))
-    private lazy var zoomInButton = MouseOverButton(title: "􀅼", target: self, action: #selector(zoomIn))
+    private lazy var zoomOutButton = MouseOverButton(image: NSImage(systemSymbolName: "minus", accessibilityDescription: UserText.mainMenuViewZoomOut)!,
+                                                     target: self,
+                                                     action: #selector(zoomOut))
+    private lazy var zoomInButton = MouseOverButton(image: NSImage(systemSymbolName: "plus", accessibilityDescription: UserText.mainMenuViewZoomIn)!,
+                                                    target: self,
+                                                    action: #selector(zoomIn))
 
     init(viewModel: ZoomPopoverViewModel) {
         self.viewModel = viewModel
@@ -95,6 +100,7 @@ final class ZoomPopoverViewController: NSViewController {
             button.backgroundColor = .blackWhite10
             button.mouseOverColor = .buttonMouseOver
             button.mouseDownColor = .buttonMouseDown
+            button.imagePosition = (button === resetButton) ? .noImage : .imageOnly
             button.translatesAutoresizingMaskIntoConstraints = false
         }
 
@@ -188,18 +194,42 @@ extension ZoomPopoverViewController: MouseOverViewDelegate {
 
 }
 
+private extension UserDefaultsWrapperKey {
+    static let zoomToolbarHideUiInterval = Self(rawValue: "zoom_toolbar_hide_ui_interval")
+    static let zoomMenuHideUiInterval = Self(rawValue: "zoom_menu_hide_ui_interval")
+}
+
 final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
 
-    private enum Constants {
-        static let delayBeforeClose: TimeInterval = 4
+    fileprivate enum Constants {
+        static let defaultToolbarHideUiInterval: TimeInterval = 2
+        static let defaultMenuHideUiInterval: TimeInterval = 4
     }
 
     private var tabViewModel: TabViewModel
     private weak var addressBar: NSView?
-    private var closeTimer: Timer? {
-        willSet {
-            closeTimer?.invalidate()
+    private var autoCloseCancellables = Set<AnyCancellable>()
+
+    @UserDefaultsWrapper(key: .zoomToolbarHideUiInterval, defaultValue: Constants.defaultToolbarHideUiInterval)
+    private var zoomToolbarHideUiInterval: TimeInterval
+
+    @UserDefaultsWrapper(key: .zoomMenuHideUiInterval, defaultValue: Constants.defaultMenuHideUiInterval)
+    private var zoomMenuHideUiInterval: TimeInterval
+
+    enum Source { case toolbar, menu }
+    private var source: Source?
+
+    private var hideUiInterval: TimeInterval? {
+        let interval = switch source {
+        case .toolbar:
+            zoomToolbarHideUiInterval
+        case .menu:
+            zoomMenuHideUiInterval
+        case .none:
+            -1.0
         }
+        guard interval > 0 else { return nil } // no auto-hide
+        return interval
     }
 
     /// offset from the address bar x to avoid popover arrow clipping if positioning view is too close to the edge
@@ -255,25 +285,124 @@ final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
             let frame = positioningView.convert(positioningRect, to: addressBar)
             offsetX = -max(24 - frame.minX, 0)
         }
-        closeTimer = nil
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
 
-    func scheduleCloseTimer() {
-        closeTimer = Timer.scheduledTimer(withTimeInterval: Constants.delayBeforeClose, repeats: false) { [weak self] _ in
-            self?.close()
+    func scheduleCloseTimer(source: Source) {
+        self.source = source
+        autoCloseCancellables = []
+
+        // don‘t close while mouse is inside bounds
+        guard contentViewController?.view.isMouseLocationInsideBounds() != true else { return }
+
+        // close after interval for the [menu|toolbar] source
+        if let hideUiInterval, hideUiInterval > 0 {
+            let timer = Timer.scheduledTimer(withTimeInterval: hideUiInterval, repeats: false) { [weak self] _ in
+                self?.close()
+            }
+            autoCloseCancellables.insert(AnyCancellable { timer.invalidate() })
         }
+        // close when scrolling elsewhere
+        NSEvent.publisher(forEvents: .local, matching: .scrollWheel)
+            .sink { [weak self] event in
+                guard let self,
+                      let window = event.window,
+                      let contentView = window.contentView,
+                      let pointInView = contentView.mouseLocationInsideBounds(event.locationInWindow),
+                      let scrolledView = contentView.hitTest(pointInView),
+                      scrolledView is WKWebView else { return }
+
+                self.close()
+            }
+            .store(in: &autoCloseCancellables)
     }
 
+    /// Restart close timer on zoom level change while open
     func rescheduleCloseTimerIfNeeded() {
-        if closeTimer != nil {
-            scheduleCloseTimer()
+        if let source, contentViewController?.view.isMouseLocationInsideBounds() != true {
+            scheduleCloseTimer(source: source)
         }
     }
 
     func invalidateCloseTimer() {
-        // leave the variable set to reschedule the timer after mouse is out
-        closeTimer?.invalidate()
+        autoCloseCancellables = []
+    }
+
+    override func close() {
+        invalidateCloseTimer()
+        super.close()
+    }
+
+}
+
+private extension NSUserInterfaceItemIdentifier {
+    static let menuCloseIntervalItem = NSUserInterfaceItemIdentifier("menuCloseIntervalItem")
+    static let toolbarCloseIntervalItem = NSUserInterfaceItemIdentifier("toolbarCloseIntervalItem")
+}
+
+final class ZoomPopoverDebugMenu: NSMenu {
+
+    @UserDefaultsWrapper(key: .zoomToolbarHideUiInterval, defaultValue: ZoomPopover.Constants.defaultToolbarHideUiInterval)
+    private var zoomToolbarHideUiInterval: TimeInterval
+
+    @UserDefaultsWrapper(key: .zoomMenuHideUiInterval, defaultValue: ZoomPopover.Constants.defaultMenuHideUiInterval)
+    private var zoomMenuHideUiInterval: TimeInterval
+
+    init() {
+        super.init(title: "")
+
+        buildItems {
+            NSMenuItem(title: "Close Interval – Menu") {
+                NSMenuItem(title: "0.5s", action: #selector(menuHideIntervalSelected), target: self, representedObject: NSNumber(0.5))
+                NSMenuItem(title: "1s", action: #selector(menuHideIntervalSelected), target: self, representedObject: NSNumber(1))
+                NSMenuItem(title: "2s", action: #selector(menuHideIntervalSelected), target: self, representedObject: NSNumber(2))
+                NSMenuItem(title: "3s", action: #selector(menuHideIntervalSelected), target: self, representedObject: NSNumber(3))
+                NSMenuItem(title: "4s", action: #selector(menuHideIntervalSelected), target: self, representedObject: NSNumber(4))
+                NSMenuItem(title: "5s", action: #selector(menuHideIntervalSelected), target: self, representedObject: NSNumber(5))
+                NSMenuItem.separator()
+                NSMenuItem(title: "No auto-hide", action: #selector(menuHideIntervalSelected), target: self, representedObject: NSNumber(-1))
+            }.withIdentifier(.menuCloseIntervalItem)
+
+            NSMenuItem(title: "Close Interval – Toolbar") {
+                NSMenuItem(title: "0.5s", action: #selector(toolbarHideIntervalSelected), target: self, representedObject: NSNumber(0.5))
+                NSMenuItem(title: "1s", action: #selector(toolbarHideIntervalSelected), target: self, representedObject: NSNumber(1))
+                NSMenuItem(title: "2s", action: #selector(toolbarHideIntervalSelected), target: self, representedObject: NSNumber(2))
+                NSMenuItem(title: "3s", action: #selector(toolbarHideIntervalSelected), target: self, representedObject: NSNumber(3))
+                NSMenuItem(title: "4s", action: #selector(toolbarHideIntervalSelected), target: self, representedObject: NSNumber(4))
+                NSMenuItem(title: "5s", action: #selector(toolbarHideIntervalSelected), target: self, representedObject: NSNumber(5))
+                NSMenuItem.separator()
+                NSMenuItem(title: "No auto-hide", action: #selector(toolbarHideIntervalSelected), target: self, representedObject: NSNumber(-1))
+            }.withIdentifier(.toolbarCloseIntervalItem)
+        }
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Menu State Update
+
+    override func update() {
+        for item in item(with: .menuCloseIntervalItem)?.submenu?.items ?? [] {
+            item.state = (zoomMenuHideUiInterval == ((item.representedObject as? NSNumber)?.doubleValue ?? 0)) ? .on: .off
+        }
+        for item in item(with: .toolbarCloseIntervalItem)?.submenu?.items ?? [] {
+            item.state = (zoomToolbarHideUiInterval == ((item.representedObject as? NSNumber)?.doubleValue ?? 0)) ? .on: .off
+        }
+    }
+
+    @objc func menuHideIntervalSelected(_ sender: NSMenuItem) {
+        guard let interval = (sender.representedObject as? NSNumber)?.doubleValue else {
+            fatalError("Unexpected \(sender.representedObject.map(String.init(describing:)) ?? "<nil>") expected NSNumber")
+        }
+        zoomMenuHideUiInterval = interval
+    }
+
+    @objc func toolbarHideIntervalSelected(_ sender: NSMenuItem) {
+        guard let interval = (sender.representedObject as? NSNumber)?.doubleValue else {
+            fatalError("Unexpected \(sender.representedObject.map(String.init(describing:)) ?? "<nil>") expected NSNumber")
+        }
+        zoomToolbarHideUiInterval = interval
     }
 
 }
