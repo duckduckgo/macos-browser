@@ -113,13 +113,13 @@ final class FeatureFlagOverridesMenu: NSMenu {
     private func updateFeatureFlagItem(_ item: NSMenuItem, flag: FeatureFlag) {
         let override = featureFlagger.localOverrides?.override(for: flag)
         item.state = override == true ? .on : .off
-        item.submenu = override != nil ? resetOverrideSubmenu(for: flag) : nil
+        item.submenu = override != nil ? cohortSubmenu(for: flag) : nil
     }
 
     private func updateExperimentFeatureItem(_ item: NSMenuItem, flag: FeatureFlag) {
         let override = featureFlagger.localOverrides?.experimentOverride(for: flag)
         item.state = override != nil ? .on : .off
-        item.submenu = override != nil ? resetOverrideSubmenu(for: flag) : cohortSubmenu(for: flag)
+        item.submenu = override != nil ? cohortSubmenu(for: flag) : cohortSubmenu(for: flag)
     }
 
     // MARK: - Actions
@@ -150,56 +150,48 @@ final class FeatureFlagOverridesMenu: NSMenu {
         return "\(flag.rawValue) (default: \(defaultValue(for: flag)), override: \(overrideValue(for: flag)))"
     }
 
-    private func cohortSubmenu(for experiment: FeatureFlag) -> NSMenu {
+    private func cohortSubmenu(for flag: FeatureFlag) -> NSMenu {
         let submenu = NSMenu()
-        let cohorts = getCohorts(for: experiment)
 
+        // Get the current override cohort
+        let currentOverride = featureFlagger.localOverrides?.experimentOverride(for: flag)
+
+        // Get all possible cohorts for this flag
+        let cohorts = cohorts(for: flag)
+
+        // Add cohort options
         for cohort in cohorts {
             let cohortItem = NSMenuItem(
-                title: "Cohort: \(cohort)",
+                title: "Cohort: \(cohort.rawValue)",
                 action: #selector(toggleExperimentFeatureFlag(_:)),
                 target: self
             )
-            cohortItem.representedObject = (experiment, cohort.rawValue)
+            cohortItem.representedObject = (flag, cohort.rawValue)
+
+            // Mark the selected override with a checkmark
+            cohortItem.state = (cohort.rawValue == currentOverride) ? .on : .off
+
             submenu.addItem(cohortItem)
         }
 
-        return submenu
-    }
-
-    private func getCohorts<Flag: FeatureFlagDescribing>(for featureFlag: Flag) -> [any FeatureFlagCohortDescribing] {
-        return featureFlag.cohortType?.cohorts ?? []
-    }
-
-    private func resetOverrideSubmenu(for flag: FeatureFlag) -> NSMenu {
-        let submenu = NSMenu()
-
-        // Add cohort switch options
-        let cohorts = getCohorts(for: flag).filter { $0.rawValue != overrideValue(for: flag) }
-        if !cohorts.isEmpty {
-            for cohort in cohorts {
-                let cohortItem = NSMenuItem(
-                    title: "Switch to: \(cohort.rawValue)",
-                    action: #selector(toggleExperimentFeatureFlag(_:)),
-                    target: self
-                )
-                cohortItem.representedObject = (flag, cohort.rawValue)
-                submenu.addItem(cohortItem)
-            }
-        }
-
-        // Separator
         submenu.addItem(NSMenuItem.separator())
 
-        // "Remove Override" option
-        submenu.addItem(NSMenuItem(
+        // "Remove Override" only if an override exists
+        let removeOverrideItem = NSMenuItem(
             title: "Remove Override",
             action: #selector(resetOverride(_:)),
-            target: self,
-            representedObject: flag
-        ))
+            target: self
+        )
+        removeOverrideItem.representedObject = flag
+        removeOverrideItem.isHidden = currentOverride == nil
+
+        submenu.addItem(removeOverrideItem)
 
         return submenu
+    }
+
+    private func cohorts<Flag: FeatureFlagDescribing>(for featureFlag: Flag) -> [any FeatureFlagCohortDescribing] {
+        return featureFlag.cohortType?.cohorts ?? []
     }
 
     private func defaultValue(for flag: FeatureFlag) -> String {
