@@ -21,7 +21,6 @@ import XCTest
 
 final class DataBrokerProtectionBackendServicePixelsTests: XCTestCase {
     let mockHandler = MockDataBrokerProtectionPixelsHandler()
-    let mockRepository = MockAuthenticationRepository()
     var settings: DataBrokerProtectionSettings!
 
     override func setUpWithError() throws {
@@ -32,17 +31,14 @@ final class DataBrokerProtectionBackendServicePixelsTests: XCTestCase {
 
     override func tearDownWithError() throws {
         mockHandler.clear()
-        mockRepository.reset()
         settings = nil
     }
 
     func testSendHTTPErrorOnStagingAndNotWaitlist_thenValidatePixelSent() {
         settings.selectedEnvironment = .staging
-        mockRepository.shouldSendNilWaitlistTimeStamp = true
 
         let backendPixel = DefaultDataBrokerProtectionBackendServicePixels(pixelHandler: mockHandler,
-                                                                           settings: settings,
-                                                                           authRepository: mockRepository)
+                                                                           settings: settings)
 
         backendPixel.fireGenerateEmailHTTPError(statusCode: 200)
         let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last
@@ -56,8 +52,7 @@ final class DataBrokerProtectionBackendServicePixelsTests: XCTestCase {
     func testSendHTTPErrorOnProductionAndWaitlist_thenValidatePixelSent() {
         settings.selectedEnvironment = .production
         let backendPixel = DefaultDataBrokerProtectionBackendServicePixels(pixelHandler: mockHandler,
-                                                                           settings: settings,
-                                                                           authRepository: mockRepository)
+                                                                           settings: settings)
 
         backendPixel.fireGenerateEmailHTTPError(statusCode: 123)
         let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last
@@ -65,14 +60,12 @@ final class DataBrokerProtectionBackendServicePixelsTests: XCTestCase {
         XCTAssertNotNil(lastPixel)
         XCTAssertEqual(lastPixel?.params?[DataBrokerProtectionPixels.Consts.httpCode], "123", "Incorrect statusCode")
         XCTAssertEqual(lastPixel?.params?[DataBrokerProtectionPixels.Consts.environmentKey], "production", "Incorrect environment")
-        XCTAssertEqual(lastPixel?.params?[DataBrokerProtectionPixels.Consts.wasOnWaitlist], "true", "should be true")
     }
 
     func testSendEmptyAccessTokenOnProductionAndWaitlistFromEmailCallsite_thenValidatePixelSent() {
         settings.selectedEnvironment = .production
         let backendPixel = DefaultDataBrokerProtectionBackendServicePixels(pixelHandler: mockHandler,
-                                                                           settings: settings,
-                                                                           authRepository: mockRepository)
+                                                                           settings: settings)
 
         backendPixel.fireEmptyAccessToken(callSite: .getEmail)
 
@@ -80,18 +73,15 @@ final class DataBrokerProtectionBackendServicePixelsTests: XCTestCase {
 
         XCTAssertNotNil(lastPixel)
         XCTAssertEqual(lastPixel?.params?[DataBrokerProtectionPixels.Consts.environmentKey], "production", "Incorrect environment")
-        XCTAssertEqual(lastPixel?.params?[DataBrokerProtectionPixels.Consts.wasOnWaitlist], "true", "should be true")
         XCTAssertEqual(lastPixel?.params?[DataBrokerProtectionPixels.Consts.backendServiceCallSite], "getEmail", "Should be getEmail")
 
     }
 
     func testSendEmptyAccessTokenOnStagingAndNotOnWaitlistFromCaptchaCallsite_thenValidatePixelSent() {
         settings.selectedEnvironment = .staging
-        mockRepository.shouldSendNilWaitlistTimeStamp = true
 
         let backendPixel = DefaultDataBrokerProtectionBackendServicePixels(pixelHandler: mockHandler,
-                                                                           settings: settings,
-                                                                           authRepository: mockRepository)
+                                                                           settings: settings)
 
         backendPixel.fireEmptyAccessToken(callSite: .submitCaptchaInformationRequest)
 
