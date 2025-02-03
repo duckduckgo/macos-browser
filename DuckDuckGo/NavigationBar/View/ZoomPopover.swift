@@ -50,7 +50,7 @@ final class ZoomPopoverViewModel: ObservableObject {
 }
 
 protocol ZoomPopoverViewControllerDelegate: AnyObject {
-    func invalidateCloseTimer()
+    func isMouseOverDidChange()
     func rescheduleCloseTimerIfNeeded()
 }
 
@@ -185,11 +185,7 @@ final class ZoomPopoverViewController: NSViewController {
 extension ZoomPopoverViewController: MouseOverViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        if isMouseOver {
-            delegate?.invalidateCloseTimer()
-        } else {
-            delegate?.rescheduleCloseTimerIfNeeded()
-        }
+        delegate?.isMouseOverDidChange()
     }
 
 }
@@ -208,6 +204,7 @@ final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
 
     private var tabViewModel: TabViewModel
     private weak var addressBar: NSView?
+    private var positioningViewIsMouseOverCancellable: NSKeyValueObservation?
     private var autoCloseCancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .zoomToolbarHideUiInterval, defaultValue: Constants.defaultToolbarHideUiInterval)
@@ -274,6 +271,10 @@ final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
     var viewController: ZoomPopoverViewController { contentViewController as! ZoomPopoverViewController }
     // swiftlint:enable force_cast
 
+    private var isMouseLocationInsideButtonOrContentViewBounds: Bool {
+        contentViewController?.view.isMouseLocationInsideBounds() == true || positioningView?.isMouseLocationInsideBounds() == true
+    }
+
     private func setupContentController() {
         let controller = ZoomPopoverViewController(viewModel: ZoomPopoverViewModel(tabViewModel: tabViewModel))
         controller.delegate = self
@@ -286,6 +287,15 @@ final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
             offsetX = -max(24 - frame.minX, 0)
         }
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+
+        //
+        if let positioningView = positioningView as? MouseOverButton {
+            positioningViewIsMouseOverCancellable = positioningView.observe(\.isMouseOver) { [weak self] _, _ in
+                self?.isMouseOverDidChange()
+            }
+        } else {
+            assertionFailure("\(positioningView) expected to be MouseOverButton to observe its isMouseOver state")
+        }
     }
 
     func scheduleCloseTimer(source: Source) {
@@ -293,7 +303,7 @@ final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
         autoCloseCancellables = []
 
         // don‘t close while mouse is inside bounds
-        guard contentViewController?.view.isMouseLocationInsideBounds() != true else { return }
+        guard !isMouseLocationInsideButtonOrContentViewBounds else { return }
 
         // close after interval for the [menu|toolbar] source
         if let hideUiInterval, hideUiInterval > 0 {
@@ -319,12 +329,20 @@ final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
 
     /// Restart close timer on zoom level change while open
     func rescheduleCloseTimerIfNeeded() {
-        if let source, contentViewController?.view.isMouseLocationInsideBounds() != true {
+        if let source, !isMouseLocationInsideButtonOrContentViewBounds {
             scheduleCloseTimer(source: source)
         }
     }
 
-    func invalidateCloseTimer() {
+    func isMouseOverDidChange() {
+        if !isShown || isMouseLocationInsideButtonOrContentViewBounds {
+            invalidateCloseTimer()
+        } else {
+            rescheduleCloseTimerIfNeeded()
+        }
+    }
+
+    private func invalidateCloseTimer() {
         autoCloseCancellables = []
     }
 

@@ -64,6 +64,10 @@ final class AppKitPrivateMethodsAvailabilityTests: XCTestCase {
         }
     }
 
+    func testNSPopoverPositioningView() {
+        XCTAssertTrue(NSPopover.instancesRespond(to: NSPopover.Selector.positioningView))
+    }
+
 }
 
 private class TestHitViewController: NSViewController {

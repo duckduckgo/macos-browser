@@ -45,6 +45,11 @@ extension NSPopover {
         self.contentViewController?.view.window?.parent ?? Self.mainWindow
     }
 
+    @nonobjc var positioningView: NSView? {
+        guard self.responds(to: Selector.positioningView) else { return nil }
+        return self.perform(Selector.positioningView).takeUnretainedValue() as? NSView
+    }
+
     /// prefferred bounding box for the popover positioning
     @objc var boundingFrame: NSRect {
         guard let mainWindow else { return .infinite }
@@ -120,6 +125,10 @@ extension NSPopover {
     open override func value(forUndefinedKey key: String) -> Any? {
         assertionFailure("valueForUndefinedKey: \(key)")
         return nil
+    }
+
+    enum Selector {
+        static let positioningView = NSSelectorFromString("positioningView")
     }
 
 }
