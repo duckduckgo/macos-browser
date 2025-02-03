@@ -59,14 +59,14 @@ final class NewTabPageRecentActivityClientTests: XCTestCase {
     func testWhenRecentActivityViewIsExpandedThenGetConfigReturnsExpandedState() async throws {
         model.isViewExpanded = true
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .noAnimation)
         XCTAssertEqual(config.expansion, .expanded)
     }
 
     func testWhenRecentActivityViewIsCollapsedThenGetConfigReturnsCollapsedState() async throws {
         model.isViewExpanded = false
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .noAnimation)
         XCTAssertEqual(config.expansion, .collapsed)
     }
 

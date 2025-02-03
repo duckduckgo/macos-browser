@@ -63,14 +63,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     func testWhenFavoritesViewIsExpandedThenGetConfigReturnsExpandedState() async throws {
         favoritesModel.isViewExpanded = true
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .viewTransitions)
         XCTAssertEqual(config.expansion, .expanded)
     }
 
     func testWhenFavoritesViewIsCollapsedThenGetConfigReturnsCollapsedState() async throws {
         favoritesModel.isViewExpanded = false
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .viewTransitions)
         XCTAssertEqual(config.expansion, .collapsed)
     }
 

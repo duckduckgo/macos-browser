@@ -62,14 +62,14 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
     func testWhenPrivacyStatsViewIsExpandedThenGetConfigReturnsExpandedState() async throws {
         model.isViewExpanded = true
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .noAnimation)
         XCTAssertEqual(config.expansion, .expanded)
     }
 
     func testWhenPrivacyStatsViewIsCollapsedThenGetConfigReturnsCollapsedState() async throws {
         model.isViewExpanded = false
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .noAnimation)
         XCTAssertEqual(config.expansion, .collapsed)
     }
 
