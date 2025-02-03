@@ -56260,7 +56260,7 @@
     },
     "preferences.about.duckduckgo-tagline" : {
       "comment" : "About screen",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -56314,6 +56314,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ваша защита — наш приоритет."
+          }
+        }
+      }
+    },
+    "preferences.about.duckduckgo-tagline-new" : {
+      "comment" : "About screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Protection. Privacy. Peace of Mind."
           }
         }
       }
