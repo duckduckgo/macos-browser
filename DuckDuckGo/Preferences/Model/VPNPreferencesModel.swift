@@ -94,15 +94,11 @@ final class VPNPreferencesModel: ObservableObject {
         isExclusionsFeatureAvailableInBuild && isAppExclusionsFeatureEnabled
     }
 
-    var excludedDomainsCount: Int {
-        proxySettings.excludedDomains.count
-    }
+    @Published
+    private(set) var excludedDomainsCount: Int
 
-    var excludedAppsCount: Int {
-        proxySettings.appRoutingRules.filter { (_, rule) in
-            rule == .exclude
-        }.count
-    }
+    @Published
+    private(set) var excludedAppsCount: Int
 
     @Published var notifyStatusChanges: Bool {
         didSet {
@@ -143,6 +139,10 @@ final class VPNPreferencesModel: ObservableObject {
         self.featureFlagger = featureFlagger
 
         connectOnLogin = settings.connectOnLogin
+        excludedAppsCount = proxySettings.appRoutingRules.filter { (_, rule) in
+            rule == .exclude
+        }.count
+        excludedDomainsCount = proxySettings.excludedDomains.count
         excludeLocalNetworks = settings.excludeLocalNetworks
         notifyStatusChanges = settings.notifyStatusChanges
         showInMenuBar = settings.showInMenuBar
@@ -151,8 +151,10 @@ final class VPNPreferencesModel: ObservableObject {
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
+        subscribeToAppRoutingRulesChanges()
         subscribeToOnboardingStatusChanges(defaults: defaults)
         subscribeToConnectOnLoginSettingChanges()
+        subscribeToExcludedDomainsCountChanges()
         subscribeToExcludeLocalNetworksSettingChanges()
         subscribeToShowInMenuBarSettingChanges()
         subscribeToShowInBrowserToolbarSettingsChanges()
@@ -160,32 +162,50 @@ final class VPNPreferencesModel: ObservableObject {
         subscribeToDNSSettingsChanges()
     }
 
-    func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
+    private func subscribeToAppRoutingRulesChanges() {
+        proxySettings.appRoutingRulesPublisher
+            .map { rules in
+                rules.filter { (_, rule) in
+                    rule == .exclude
+                }.count
+            }
+            .assign(to: \.excludedAppsCount, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
         defaults.networkProtectionOnboardingStatusPublisher
             .assign(to: \.onboardingStatus, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
-    func subscribeToConnectOnLoginSettingChanges() {
+    private func subscribeToConnectOnLoginSettingChanges() {
         settings.connectOnLoginPublisher
             .assign(to: \.connectOnLogin, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
-    func subscribeToExcludeLocalNetworksSettingChanges() {
+    private func subscribeToExcludedDomainsCountChanges() {
+        proxySettings.excludedDomainsPublisher
+            .map { $0.count }
+            .assign(to: \.excludedDomainsCount, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToExcludeLocalNetworksSettingChanges() {
         settings.excludeLocalNetworksPublisher
             .assign(to: \.excludeLocalNetworks, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
-    func subscribeToShowInMenuBarSettingChanges() {
+    private func subscribeToShowInMenuBarSettingChanges() {
         settings.showInMenuBarPublisher
             .removeDuplicates()
             .assign(to: \.showInMenuBar, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
-    func subscribeToShowInBrowserToolbarSettingsChanges() {
+    private func subscribeToShowInBrowserToolbarSettingsChanges() {
         NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] notification in
             guard let self = self else {
                 return
@@ -203,14 +223,14 @@ final class VPNPreferencesModel: ObservableObject {
         .store(in: &cancellables)
     }
 
-    func subscribeToLocationSettingChanges() {
+    private func subscribeToLocationSettingChanges() {
         settings.selectedLocationPublisher
             .map(VPNLocationPreferenceItemModel.init(selectedLocation:))
             .assign(to: \.locationItem, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
-    func subscribeToDNSSettingsChanges() {
+    private func subscribeToDNSSettingsChanges() {
         settings.dnsSettingsPublisher
             .assign(to: \.dnsSettings, onWeaklyHeld: self)
             .store(in: &cancellables)

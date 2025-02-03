@@ -67,6 +67,10 @@ public final class TransparentProxySettings {
         }
     }
 
+    public var appRoutingRulesPublisher: AnyPublisher<VPNAppRoutingRules, Never> {
+        defaults.vpnProxyAppRoutingRulesPublisher
+    }
+
     public var excludedApps: [String] {
         appRoutingRules.compactMap { (bundleID, rule) in
             guard rule == .exclude else {
@@ -85,6 +89,10 @@ public final class TransparentProxySettings {
         set {
             defaults.vpnProxyExcludedDomains = newValue
         }
+    }
+
+    public var excludedDomainsPublisher: AnyPublisher<[String], Never> {
+        defaults.vpnProxyExcludedDomainsPublisher
     }
 
     public var proxyAvailable: Bool {
