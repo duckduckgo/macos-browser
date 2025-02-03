@@ -27,7 +27,7 @@ jobs:
         BODY: ${{ github.event.pull_request.body }}
       run: |
         task_id=$(grep -i "task/issue url.*https://app.asana.com/" <<< "$BODY" \
-          | sed -E 's|.*https://(.*)|\1|' \
+          | sed -E 's|.*https://(.*)\b|\1|' \
           | cut -d '/' -f 4)
         echo "task_id=$task_id" >> $GITHUB_OUTPUT
 
