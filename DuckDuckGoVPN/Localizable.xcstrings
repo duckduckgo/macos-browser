@@ -243,7 +243,7 @@
     },
     "network.protection.status.menu.share.feedback" : {
       "comment" : "The status menu 'Share VPN Feedback' menu item",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -723,6 +723,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Ближайшее)"
+          }
+        }
+      }
+    },
+    "vpn.status-view.excluded-apps.menu-item.title" : {
+      "comment" : "The VPN status view's 'Excluded Apps' menu item for our status menu app. The number shown is how many Apps are excluded.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Excluded Apps (%d)"
+          }
+        }
+      }
+    },
+    "vpn.status-view.excluded-domains.menu-item.title" : {
+      "comment" : "The VPN status view's 'Excluded Websites' menu item for our status menu app. The number shown is how many websites are excluded.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Excluded Websites (%d)"
+          }
+        }
+      }
+    },
+    "vpn.status-view.faq.menu-item.title" : {
+      "comment" : "The VPN status view's 'FAQ' menu item for our status menu app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "FAQs and Support"
+          }
+        }
+      }
+    },
+    "vpn.status-view.send-feedback.menu-item.title" : {
+      "comment" : "The VPN status view's 'Send Feedback' menu item for our status menu app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Feedback"
+          }
+        }
+      }
+    },
+    "vpn.status-view.vpn-settings.menu-item.title" : {
+      "comment" : "The VPN status view's 'VPN Settings' menu item for our status menu app. The number shown is how many Apps are excluded.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN Settings"
           }
         }
       }
