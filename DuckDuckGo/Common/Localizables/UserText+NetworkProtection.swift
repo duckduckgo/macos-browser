@@ -222,6 +222,12 @@ extension UserText {
 
     static let vpnSettingsManageExclusionsButtonTitle = NSLocalizedString("vpn.setting.exclusions.manage.button.title", value: "Manage...", comment: "Title for the button to manage exclusions")
 
+    static let vpnNoExclusionsFoundText = NSLocalizedString("vpn.no.exclusions.found.text", value: "None", comment: "Text shown in VPN settings when no exclusions are configured")
+
+    // MARK: - Excluded Apps
+
+    static let vpnExcludedAppsAddApp = NSLocalizedString("vpn.excluded.apps.add.app", value: "Add Application", comment: "Add Application button for the excluded apps view")
+
     // MARK: - Excluded Domains
 
     static let vpnExcludedDomainsDescription = NSLocalizedString("vpn.setting.excluded.domains.description", value: "Excluded websites will bypass the VPN.", comment: "Excluded Sites description")

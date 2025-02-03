@@ -5,32 +5,32 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Excluded Domains View Controller-->
+        <!--Excluded Apps View Controller-->
         <scene sceneID="YwQ-9C-eXK">
             <objects>
-                <viewController storyboardIdentifier="ExcludedDomainsViewController" id="Clu-Bo-JRW" customClass="ExcludedDomainsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ExcludedAppsViewController" id="Clu-Bo-JRW" userLabel="Excluded Apps View Controller" customClass="ExcludedAppsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="fBT-ND-Nbh">
                         <rect key="frame" x="0.0" y="0.0" width="475" height="307"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DEQ-Uh-Y7p" userLabel="Add Domain Button">
-                                <rect key="frame" x="13" y="13" width="111" height="32"/>
-                                <buttonCell key="cell" type="push" title="Add Website" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Dz-eI-5jh">
+                                <rect key="frame" x="13" y="13" width="130" height="32"/>
+                                <buttonCell key="cell" type="push" title="Add Application" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Dz-eI-5jh">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="addDomain:" target="Clu-Bo-JRW" id="JMt-9k-Pgn"/>
+                                    <action selector="addApp:" target="Clu-Bo-JRW" id="Ba6-XA-ipe"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KAc-ZW-ZAV" userLabel="Remove Domain Button">
-                                <rect key="frame" x="122" y="13" width="83" height="32"/>
+                                <rect key="frame" x="141" y="13" width="83" height="32"/>
                                 <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atA-bI-IOY">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="removeSelectedDomain:" target="Clu-Bo-JRW" id="SDb-ij-rx7"/>
+                                    <action selector="removeSelected:" target="Clu-Bo-JRW" id="Plq-Rt-WFe"/>
                                 </connections>
                             </button>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPG-Pg-rGL">
@@ -58,7 +58,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView identifier="ExcludedDomainCell" id="SIf-3r-xTz">
+                                                        <tableCellView identifier="ExcludedAppCell" id="SIf-3r-xTz">
                                                             <rect key="frame" x="8" y="0.0" width="416" height="24"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
@@ -71,8 +71,8 @@
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Web" id="NnR-kL-cYY"/>
                                                                 </imageView>
                                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Rk-8Bn">
-                                                                    <rect key="frame" x="18" y="4" width="109" height="16"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Excluded Domain" id="DUF-uC-HJj">
+                                                                    <rect key="frame" x="18" y="4" width="94" height="16"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Excluded Apps" id="DUF-uC-HJj">
                                                                         <font key="font" usesAppearanceFont="YES"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -115,9 +115,9 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
-                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aur-0h-QzR" userLabel="Excluded Sites Label">
-                                <rect key="frame" x="18" y="271" width="95" height="16"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Excluded Sites" id="s7t-C5-auR">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aur-0h-QzR" userLabel="Title Label">
+                                <rect key="frame" x="18" y="271" width="97" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Excluded Apps" id="s7t-C5-auR">
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -169,11 +169,11 @@ DQ
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="addDomainButton" destination="DEQ-Uh-Y7p" id="Qkv-iR-eiu"/>
+                        <outlet property="addAppButton" destination="DEQ-Uh-Y7p" id="WrZ-Qw-Wzu"/>
                         <outlet property="doneButton" destination="goL-jl-7Gp" id="8Yb-2X-umJ"/>
-                        <outlet property="excludedDomainsLabel" destination="aur-0h-QzR" id="B5V-iN-MUj"/>
-                        <outlet property="removeDomainButton" destination="KAc-ZW-ZAV" id="8KQ-H9-MnP"/>
+                        <outlet property="removeAppButton" destination="KAc-ZW-ZAV" id="mSg-jy-HD8"/>
                         <outlet property="tableView" destination="pIp-Qw-5G1" id="kNl-PR-zGb"/>
+                        <outlet property="titleLabel" destination="aur-0h-QzR" id="qDn-Xs-MB9"/>
                     </connections>
                 </viewController>
                 <customObject id="fm2-qY-a3s" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
