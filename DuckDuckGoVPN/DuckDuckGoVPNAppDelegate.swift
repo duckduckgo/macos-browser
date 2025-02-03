@@ -29,11 +29,12 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionProxy
 import NetworkProtectionUI
-import ServiceManagement
-import PixelKit
-import Subscription
-import VPNAppLauncher
 import os.log
+import PixelKit
+import ServiceManagement
+import Subscription
+import SwiftUICore
+import VPNAppLauncher
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -330,23 +331,23 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
             menuItems.append(
-                .text(title: UserText.vpnStatusViewVPNSettingsMenuItemTitle, action: {
+                .text(icon: Image(.settings16), title: UserText.vpnStatusViewVPNSettingsMenuItemTitle, action: {
                     try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
                 }))
         }
 
         menuItems.append(contentsOf: [
-            .text(title: excludedAppsTitle, action: { [weak self] in
+            .text(icon: Image(.window16), title: excludedAppsTitle, action: { [weak self] in
                 try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.manageExcludedApps)
             }),
-            .text(title: excludedWebsitesTitle, action: { [weak self] in
+            .text(icon: Image(.globe16), title: excludedWebsitesTitle, action: { [weak self] in
                 try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.manageExcludedDomains)
             }),
             .divider(),
-            .text(title: UserText.vpnStatusViewFAQMenuItemTitle, action: { [weak self] in
+            .text(icon: Image(.help16), title: UserText.vpnStatusViewFAQMenuItemTitle, action: { [weak self] in
                 try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
             }),
-            .text(title: UserText.vpnStatusViewSendFeedbackMenuItemTitle, action: { [weak self] in
+            .text(icon: Image(.support16), title: UserText.vpnStatusViewSendFeedbackMenuItemTitle, action: { [weak self] in
                 try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
             })
         ])

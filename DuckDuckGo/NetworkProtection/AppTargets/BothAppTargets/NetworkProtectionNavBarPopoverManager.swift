@@ -108,23 +108,23 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
         if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
             menuItems.append(
-                .text(title: UserText.networkProtectionNavBarStatusViewVPNSettings, action: {
+                .text(icon: Image(.settings16), title: UserText.vpnStatusViewVPNSettingsMenuItemTitle, action: {
                     try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
                 }))
         }
 
         menuItems.append(contentsOf: [
-            .text(title: excludedAppsTitle, action: { [weak self] in
+            .text(icon: Image(.window16), title: excludedAppsTitle, action: { [weak self] in
                 self?.manageExcludedApps()
             }),
-            .text(title: excludedWebsitesTitle, action: { [weak self] in
+            .text(icon: Image(.globe16), title: excludedWebsitesTitle, action: { [weak self] in
                 self?.manageExcludedSites()
             }),
             .divider(),
-            .text(title: UserText.vpnStatusViewFAQMenuItemTitle, action: {
+            .text(icon: Image(.help16), title: UserText.vpnStatusViewFAQMenuItemTitle, action: {
                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
             }),
-            .text(title: UserText.vpnStatusViewSendFeedbackMenuItemTitle, action: {
+            .text(icon: Image(.support16), title: UserText.vpnStatusViewSendFeedbackMenuItemTitle, action: {
                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
             })
         ])
