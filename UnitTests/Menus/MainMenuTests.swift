@@ -205,7 +205,7 @@ private class DummyFeatureFlagger: FeatureFlagger {
         return nil
     }
 
-    func getCohortIfEnabled<Flag>(for featureFlag: Flag, allowOverride: Bool) -> (any FlagCohort)? where Flag: FeatureFlagDescribing {
+    func getCohortIfEnabled<Flag>(for featureFlag: Flag, allowOverride: Bool) -> (any FeatureFlagCohortDescribing)? where Flag: FeatureFlagDescribing {
         return nil
     }
 

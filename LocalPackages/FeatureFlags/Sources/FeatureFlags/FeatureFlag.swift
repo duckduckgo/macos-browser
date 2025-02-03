@@ -57,20 +57,20 @@ public enum FeatureFlag: String, CaseIterable {
     case autcompleteTabs
     case syncSeamlessAccountSwitching
 
-    case textExperiment
+    case testExperiment
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
-    public var cohortType: (any FlagCohort.Type)? {
+    public var cohortType: (any FeatureFlagCohortDescribing.Type)? {
         switch self {
-        case .textExperiment:
-            return TextEperimentCohort.self
+        case .testExperiment:
+            return TestExperimentCohort.self
         default:
             return nil
         }
     }
 
-    public enum TextEperimentCohort: String, FlagCohort {
+    public enum TestExperimentCohort: String, FeatureFlagCohortDescribing {
         case control
         case treatment
     }
@@ -91,7 +91,7 @@ extension FeatureFlag: FeatureFlagDescribing {
             return true
         case .syncSeamlessAccountSwitching:
             return true
-        case.textExperiment:
+        case .testExperiment:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -140,7 +140,7 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.feature(.autocompleteTabs))
         case .syncSeamlessAccountSwitching:
             return .remoteReleasable(.subfeature(SyncSubfeature.seamlessAccountSwitching))
-        case .textExperiment:
+        case .testExperiment:
             return .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
         }
     }

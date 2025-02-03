@@ -167,7 +167,7 @@ final class FeatureFlagOverridesMenu: NSMenu {
         return submenu
     }
 
-    private func getCohorts<Flag: FeatureFlagDescribing>(for featureFlag: Flag) -> [any FlagCohort] {
+    private func getCohorts<Flag: FeatureFlagDescribing>(for featureFlag: Flag) -> [any FeatureFlagCohortDescribing] {
         return featureFlag.cohortType?.cohorts ?? []
     }
 

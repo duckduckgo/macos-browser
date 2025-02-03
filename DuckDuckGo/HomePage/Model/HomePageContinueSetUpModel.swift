@@ -162,7 +162,7 @@ extension HomePage.Models {
             NotificationCenter.default.addObserver(self, selector: #selector(refreshFeaturesForHTMLNewTabPage(_:)), name: .newTabPageWebViewDidAppear, object: nil)
 
             // This is just temporarily here to run an A/A test to check the new experiment framework works as expected
-            guard let cohort = Application.appDelegate.featureFlagger.getCohortIfEnabled(for: FeatureFlag.textExperiment, allowOverride: true) as? FeatureFlag.TextEperimentCohort else { return }
+            guard let cohort = Application.appDelegate.featureFlagger.resolveCohort(for: FeatureFlag.testExperiment) as? FeatureFlag.TestExperimentCohort else { return }
             switch cohort {
 
             case .control:
@@ -170,19 +170,19 @@ extension HomePage.Models {
             case .treatment:
                 print("COHORT B")
             }
-            subscribeToTextExperimentFeatureFlagChanges()
+            subscribeToTestExperimentFeatureFlagChanges()
 
         }
 
-        private func subscribeToTextExperimentFeatureFlagChanges() {
+        private func subscribeToTestExperimentFeatureFlagChanges() {
             guard let overridesHandler = Application.appDelegate.featureFlagger.localOverrides?.actionHandler as? FeatureFlagOverridesPublishingHandler<FeatureFlag> else {
                 return
             }
 
             overridesHandler.experimentFlagDidChangePublisher
-                .filter { $0.0 == .textExperiment }
+                .filter { $0.0 == .testExperiment }
                 .sink { (_, cohort) in
-                    guard let newCohort = FeatureFlag.TextEperimentCohort.cohort(for: cohort) else { return }
+                    guard let newCohort = FeatureFlag.TestExperimentCohort.cohort(for: cohort) else { return }
                     switch newCohort {
                     case .control:
                         print("COHORT A")
