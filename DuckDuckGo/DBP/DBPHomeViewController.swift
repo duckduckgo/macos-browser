@@ -168,18 +168,6 @@ final class DBPHomeViewController: NSViewController {
     }
 }
 
-extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDelegate {
-    func dataBrokerProtectionInviteDialogsViewModelDidReedemSuccessfully(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
-        presentedWindowController?.window?.close()
-        presentedWindowController = nil
-        setupUIWithCurrentStatus()
-    }
-
-    func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
-      closeUI()
-    }
-}
-
 // MARK: - Error UI
 
 extension DBPHomeViewController {
