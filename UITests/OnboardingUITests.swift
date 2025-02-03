@@ -103,7 +103,7 @@ final class OnboardingUITests: UITestCase {
         // AfterOnboarding
         let ddgLogo = app.windows.webViews.groups.containing(.image, identifier: "DuckDuckGo Logo").element
         XCTAssertTrue(ddgLogo.waitForExistence(timeout: UITests.Timeouts.elementExistence))
-        let homePageSubTitle = app.windows.webViews.groups.containing(.staticText, identifier: "Your protection, our priority.").element
+        let homePageSubTitle = app.windows.webViews.groups.containing(.staticText, identifier: "Protection. Privacy. Peace of Mind.").element
         XCTAssertTrue(homePageSubTitle.waitForExistence(timeout: UITests.Timeouts.elementExistence))
     }
 
