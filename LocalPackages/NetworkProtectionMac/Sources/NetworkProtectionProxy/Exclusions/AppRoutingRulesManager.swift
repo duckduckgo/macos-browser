@@ -1,11 +1,24 @@
 //
-//  ExclusionsManager.swift
-//  NetworkProtectionMac
+//  AppExclusionsManager.swift
 //
-//  Created by ddg on 2/4/25.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 
 import AppInfoRetriever
+import Foundation
+import Combine
 
 /// Manages App routing rules.
 ///
@@ -15,16 +28,21 @@ import AppInfoRetriever
 ///
 final class AppExclusionsManager {
 
-    let appRoutingRules: VPNAppRoutingRules
-    private let settings: TransparentProxySettings
+    private(set) var appRoutingRules: VPNAppRoutingRules
+    private var cancellables = Set<AnyCancellable>()
 
     init(settings: TransparentProxySettings) {
-        self.settings = settings
+        self.appRoutingRules = Self.expandAppRoutingRules(settings.appRoutingRules)
+
+        subscribeToAppRoutingRulesChanges(settings)
+    }
+
+    static func expandAppRoutingRules(_ rules: VPNAppRoutingRules) -> VPNAppRoutingRules {
 
         let appInfoRetriever = AppInfoRetriever()
-        var expandedRules = settings.appRoutingRules
+        var expandedRules = rules
 
-        for (bundleID, rule) in settings.appRoutingRules {
+        for (bundleID, rule) in rules {
             guard let bundleURL = appInfoRetriever.getAppURL(bundleID: bundleID) else {
                 continue
             }
@@ -36,6 +54,16 @@ final class AppExclusionsManager {
             }
         }
 
-        self.appRoutingRules = expandedRules
+        return expandedRules
+    }
+
+    private func subscribeToAppRoutingRulesChanges(_ settings: TransparentProxySettings) {
+        settings.appRoutingRulesPublisher
+            .receive(on: DispatchQueue.main)
+            .map { rules in
+                return Self.expandAppRoutingRules(rules)
+            }
+            .assign(to: \.appRoutingRules, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 }
