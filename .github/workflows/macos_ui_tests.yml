@@ -119,7 +119,7 @@ jobs:
     - name: Build for testing
       run: |
         set -o pipefail && xcodebuild build-for-testing \
-          -scheme "UI Tests CI" \
+          -scheme "macOS UI Tests CI" \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
           -skipMacroValidation \
@@ -135,7 +135,7 @@ jobs:
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         set -o pipefail && xcodebuild test-without-building \
-          -scheme "UI Tests CI" \
+          -scheme "macOS UI Tests CI" \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
           -skipMacroValidation \

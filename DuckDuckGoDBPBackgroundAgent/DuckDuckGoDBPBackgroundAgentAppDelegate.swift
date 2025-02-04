@@ -99,10 +99,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         Logger.dbpBackgroundAgent.log("DuckDuckGoAgent started")
 
-        let redeemUseCase = RedeemUseCase(authenticationService: AuthenticationService(),
-                                          authenticationRepository: KeychainAuthenticationData())
-        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                                                      subscriptionManager: subscriptionManager)
+        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: subscriptionManager)
         manager = DataBrokerProtectionAgentManagerProvider.agentManager(authenticationManager: authenticationManager,
                                                                         accountManager: subscriptionManager.accountManager)
         manager?.agentFinishedLaunching()

@@ -13,7 +13,8 @@ let package = Package(
             targets: ["SubscriptionUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "232.1.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "235.2.0"),
+        .package(path: "../PreferencesUI-macOS"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../FeatureFlags")
     ],
@@ -23,8 +24,8 @@ let package = Package(
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "Subscription", package: "BrowserServicesKit"),
+                .product(name: "PreferencesUI-macOS", package: "PreferencesUI-macOS"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
-                .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
                 .product(name: "FeatureFlags", package: "FeatureFlags")
             ],
             resources: [

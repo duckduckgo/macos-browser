@@ -55,25 +55,32 @@ public enum FeatureFlag: String, CaseIterable {
 
     case autofillPartialFormSaves
     case autcompleteTabs
+    case webExtensions
     case syncSeamlessAccountSwitching
+
+    case testExperiment
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
+    public var cohortType: (any FeatureFlagCohortDescribing.Type)? {
+        switch self {
+        case .testExperiment:
+            return TestExperimentCohort.self
+        default:
+            return nil
+        }
+    }
+
+    public enum TestExperimentCohort: String, FeatureFlagCohortDescribing {
+        case control
+        case treatment
+    }
+
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .historyView:
+        case .htmlNewTabPage, .autofillPartialFormSaves, .autcompleteTabs, .networkProtectionAppExclusions, .syncSeamlessAccountSwitching, .historyView, .webExtensions:
             return true
-        case .htmlNewTabPage:
-            return true
-        case .maliciousSiteProtection:
-            return false
-        case .autofillPartialFormSaves:
-            return true
-        case .autcompleteTabs:
-            return true
-        case .networkProtectionAppExclusions:
-            return true
-        case .syncSeamlessAccountSwitching:
+        case .testExperiment:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -83,7 +90,8 @@ extension FeatureFlag: FeatureFlagDescribing {
              .unknownUsernameCategorization,
              .credentialsImportPromotionForExistingUsers,
              .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes:
+             .networkProtectionEnforceRoutes,
+             .maliciousSiteProtection:
             return false
         }
     }
@@ -120,8 +128,12 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
         case .autcompleteTabs:
             return .remoteReleasable(.feature(.autocompleteTabs))
+        case .webExtensions:
+            return .internalOnly()
         case .syncSeamlessAccountSwitching:
             return .remoteReleasable(.subfeature(SyncSubfeature.seamlessAccountSwitching))
+        case .testExperiment:
+            return .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
         }
     }
 }

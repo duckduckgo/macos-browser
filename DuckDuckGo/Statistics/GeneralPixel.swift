@@ -31,7 +31,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case crashReportCRCIDMissing
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
-    case launch(isDefault: Bool)
+    case launch(isDefault: Bool, isAddedToDock: Bool?)
 
     case serp(cohort: String?)
     case serpInitial(cohort: String)
@@ -105,8 +105,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case importDataInitial
 
     // New Tab section removed
-    case favoriteSectionHidden
-    case recentActivitySectionHidden
     case continueSetUpSectionHidden
 
     // Fire Button
@@ -239,6 +237,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case addToDockNewTabPageCardPresented
     case userAddedToDockFromNewTabPageCard
     case userAddedToDockFromSettings
+    case userAddedToDockFromMainMenu
+    case userAddedToDockFromMoreOptionsMenu
+    case userAddedToDockFromDefaultBrowserSection
     case serpAddedToDock
 
     case protectionToggledOffBreakageReport
@@ -472,6 +473,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case siteNotWorkingShown
     case siteNotWorkingWebsiteIsBroken
 
+    // Enhanced statistics
+    case usageSegments
+
     var name: String {
         switch self {
         case .crash:
@@ -492,8 +496,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
 
-        case .launch(let isDefault):
-            return isDefault ? "ml_mac_app-launch_as-default" : "ml_mac_app-launch_as-nondefault"
+        case .launch:
+            return  "m_mac_daily_active_user"
 
         case .serp:
             return "m_mac_navigation_search"
@@ -627,10 +631,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_import-data_initial"
         case .newTabInitial:
             return "m_mac_new-tab-opened_initial"
-        case .favoriteSectionHidden:
-            return "m_mac_favorite-section-hidden"
-        case .recentActivitySectionHidden:
-            return "m_mac_recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac_continue-setup-section-hidden"
 
@@ -830,6 +830,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .addToDockNewTabPageCardPresented: return "m_mac_add_to_dock_new_tab_page_card_presented_u"
         case .userAddedToDockFromNewTabPageCard: return "m_mac_user_added_to_dock_from_new_tab_page_card"
         case .userAddedToDockFromSettings: return "m_mac_user_added_to_dock_from_settings"
+        case .userAddedToDockFromMainMenu: return "m_mac_user_added_to_dock_from_main_menu"
+        case .userAddedToDockFromMoreOptionsMenu: return "m_mac_user_added_to_dock_from_more_options_menu"
+        case .userAddedToDockFromDefaultBrowserSection: return "m_mac_user_added_to_dock_from_default_browser_section"
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
@@ -1162,6 +1165,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
+
+            // Enhanced statistics
+        case .usageSegments: return "retention_segments"
         }
     }
 
@@ -1196,6 +1202,15 @@ enum GeneralPixel: PixelKitEventV2 {
         case .loginItemUpdateError(let loginItemBundleID, let action, let buildType, let osVersion):
             return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
 
+        case .launch(let isDefault, let isAddedToDock):
+            var params = [String: String]()
+            params["default_browser"] = isDefault ? "1" : "0"
+
+            if let isAddedToDock = isAddedToDock {
+                params["dock"] = isAddedToDock ? "1" : "0"
+            }
+
+            return params
         case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
             var params = error.pixelParameters
 

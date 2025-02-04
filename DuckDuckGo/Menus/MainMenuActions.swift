@@ -161,6 +161,12 @@ extension AppDelegate {
     }
 
     @MainActor
+    @objc func addToDock(_ sender: Any?) {
+        DockCustomizer().addToDock()
+        PixelKit.fire(GeneralPixel.userAddedToDockFromMainMenu)
+    }
+
+    @MainActor
     @objc func setAsDefault(_ sender: Any?) {
         PixelKit.fire(GeneralPixel.defaultRequestedFromMainMenu)
         DefaultBrowserPreferences.shared.becomeDefault()
@@ -846,7 +852,8 @@ extension MainViewController {
         }
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
 
-        let autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard,
+        let autofillPixelReporter = AutofillPixelReporter(standardUserDefaults: .standard,
+                                                          appGroupUserDefaults: nil,
                                                           autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
@@ -907,6 +914,21 @@ extension MainViewController {
 
     @objc func resetSyncPromoPrompts(_ sender: Any?) {
         SyncPromoManager().resetPromos()
+    }
+
+    @objc func resetAddToDockFeatureNotification(_ sender: Any?) {
+#if SPARKLE
+        guard let dockCustomizer = Application.appDelegate.dockCustomization else { return }
+        dockCustomizer.resetData()
+#endif
+    }
+
+    @objc func resetLaunchDateToToday(_ sender: Any?) {
+        UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Any>.Key.firstLaunchDate.rawValue)
+    }
+
+    @objc func setLaunchDayAWeekInThePast(_ sender: Any?) {
+        UserDefaults.standard.set(Date.weekAgo, forKey: UserDefaultsWrapper<Any>.Key.firstLaunchDate.rawValue)
     }
 
     @objc func resetTipKit(_ sender: Any?) {

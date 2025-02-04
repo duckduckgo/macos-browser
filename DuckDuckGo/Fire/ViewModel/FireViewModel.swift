@@ -19,6 +19,21 @@
 import WebKit
 import Combine
 
+extension Fire.BurningData {
+    /**
+     * We want to delay showing modal dialog by 1s while burn animation is being played
+     * on the New Tab Page (i.e. when "specific domains" are burned without all-window fire animation).
+     */
+    var shouldDelayShowingDialog: Bool {
+        switch self {
+        case .specificDomains(_, false):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 final class FireViewModel {
 
     let fire: Fire
@@ -28,10 +43,15 @@ final class FireViewModel {
     /// Publisher that emits true if burning animation or burning process is in progress
     var isFirePresentationInProgress: AnyPublisher<Bool, Never> {
         Publishers
-            .CombineLatest($isAnimationPlaying, fire.$burningData)
-            .map { (isAnimationPlaying, burningData) -> (Bool) in
-                return isAnimationPlaying || burningData != nil
+            .CombineLatest($isAnimationPlaying.removeDuplicates(), fire.$burningData.removeDuplicates())
+            .map { (isAnimationPlaying, burningData) in
+                let shouldDisplayDialog = isAnimationPlaying || burningData != nil
+                if burningData?.shouldDelayShowingDialog == true {
+                    return Just(shouldDisplayDialog).delay(for: .seconds(1), scheduler: RunLoop.main).eraseToAnyPublisher()
+                }
+                return Just(shouldDisplayDialog).eraseToAnyPublisher()
             }
+            .switchToLatest()
             .eraseToAnyPublisher()
     }
 

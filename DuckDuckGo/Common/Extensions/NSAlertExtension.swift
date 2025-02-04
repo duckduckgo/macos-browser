@@ -43,6 +43,14 @@ extension NSAlert {
         return alert
     }
 
+    static func burnFireproofSiteAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.homePageBurnFireproofSiteAlert
+        alert.addButton(withTitle: UserText.homePageClearHistory, response: .OK)
+        alert.addButton(withTitle: UserText.cancel, response: .cancel)
+        return alert
+    }
+
     static func clearAllHistoryAndDataAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.clearAllDataQuestion

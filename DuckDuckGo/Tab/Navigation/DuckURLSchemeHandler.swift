@@ -291,11 +291,19 @@ private extension DuckURLSchemeHandler {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
             return nil
         }
-        let response = URLResponse(url: url, mimeType: mimeType(for: fileExtension), expectedContentLength: data.count, textEncodingName: nil)
+
+        let headerFields: [String: String] = [
+            "Content-type": mimeType(for: fileExtension),
+            "Content-length": String(data.count)
+        ]
+        guard let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: headerFields) else {
+            return nil
+        }
+
         return (response, data)
     }
 
-    func mimeType(for fileExtension: String) -> String? {
+    func mimeType(for fileExtension: String) -> String {
         switch fileExtension {
         case "html": return "text/html"
         case "css": return "text/css"
@@ -306,7 +314,10 @@ private extension DuckURLSchemeHandler {
         case "svg": return "image/svg+xml"
         case "ico": return "image/x-icon"
         case "riv": return "application/octet-stream"
-        default: return nil
+        case "json": return "application/json"
+        default:
+            assertionFailure("Unknown MIME type for \"\(fileExtension)\" file extension")
+            return "application/octet-stream"
         }
     }
 

@@ -54,6 +54,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
+    @IBOutlet weak var menuButtons: NSStackView!
 
     @IBOutlet weak var aiChatButton: MouseOverButton!
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
@@ -191,6 +192,12 @@ final class NavigationBarViewController: NSViewController {
 #endif
 
         subscribeToAIChatOnboarding()
+
+        if #available(macOS 14.4, *), !burnerMode.isBurner {
+            WebExtensionManager.shared.toolbarButtons().enumerated().forEach { (index, button) in
+                menuButtons.insertArrangedSubview(button, at: index)
+            }
+        }
     }
 
     override func viewWillAppear() {
@@ -304,12 +311,17 @@ final class NavigationBarViewController: NSViewController {
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
+        var dockCustomization: DockCustomization?
+#if SPARKLE
+        dockCustomization = Application.appDelegate.dockCustomization
+#endif
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),
                                    internalUserDecider: internalUserDecider,
                                    subscriptionManager: subscriptionManager,
-                                   freemiumDBPFeature: freemiumDBPFeature)
+                                   freemiumDBPFeature: freemiumDBPFeature,
+                                   dockCustomizer: dockCustomization)
 
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
@@ -961,6 +973,7 @@ final class NavigationBarViewController: NSViewController {
             Logger.passwordManager.debug("Presenting Save Credentials popover")
             popovers.displaySaveCredentials(credentials,
                                             automaticallySaved: data.automaticallySavedCredentials,
+                                            backfilled: data.backfilled,
                                             usingView: passwordManagementButton,
                                             withDelegate: self)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
@@ -1344,7 +1357,9 @@ extension NavigationBarViewController {
         let account = SecureVaultModels.WebsiteAccount(title: nil, username: "example-username", domain: "example.com")
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
 
-        popovers.displaySaveCredentials(mockCredentials, automaticallySaved: false,
+        popovers.displaySaveCredentials(mockCredentials,
+                                        automaticallySaved: false,
+                                        backfilled: false,
                                         usingView: passwordManagementButton,
                                         withDelegate: self)
     }
@@ -1355,6 +1370,7 @@ extension NavigationBarViewController {
 
         popovers.displaySaveCredentials(mockCredentials,
                                         automaticallySaved: true,
+                                        backfilled: false,
                                         usingView: passwordManagementButton,
                                         withDelegate: self)
     }

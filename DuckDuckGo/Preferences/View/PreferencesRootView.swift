@@ -17,7 +17,7 @@
 //
 
 import Common
-import PreferencesViews
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI_macOS
@@ -86,6 +86,7 @@ enum Preferences {
                 switch model.selectedPane {
                 case .defaultBrowser:
                     DefaultBrowserView(defaultBrowserModel: DefaultBrowserPreferences.shared,
+                                       dockCustomizer: DockCustomizer(),
                                        status: PrivacyProtectionStatus.status(for: .defaultBrowser))
                 case .privateSearch:
                     PrivateSearchView(model: SearchPreferences.shared)

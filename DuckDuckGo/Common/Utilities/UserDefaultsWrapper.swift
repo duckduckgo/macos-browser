@@ -135,6 +135,7 @@ public struct UserDefaultsWrapper<T> {
         case continueSetUpCardsNumberOfDaysDemonstrated = "home.page.contiune.setup.demo.days"
         case continueSetUpCardsClosed = "home.page.contiune.setup.cards.closed"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
+        case homePageIsPrivacyStatsVisible = "home.page.is.privacy.stats.visible"
         case homePageIsSearchBarVisible = "home.page.is.search.bar.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
         case homePageDidShowSettingsOnboarding = "home.page.did.show.settings.onboarding"
@@ -237,6 +238,9 @@ public struct UserDefaultsWrapper<T> {
 
         case lastBrokenSiteToastShownDate = "brokenSitePrompt.last-broken-site-toast-shown-date"
         case toastDismissStreakCounter = "brokenSitePrompt.toast-dismiss-streak-counter"
+
+        // Web Extensions
+        case webExtensionPathsCache = "com.duckduckgo.web.extension.paths.cache"
     }
 
     enum RemovedKeys: String, CaseIterable {
