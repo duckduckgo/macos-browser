@@ -18,7 +18,6 @@
 
 import Combine
 import Common
-import BrowserServicesKit
 import LoginItems
 import NetworkExtension
 import NetworkProtection
