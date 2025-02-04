@@ -105,8 +105,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case importDataInitial
 
     // New Tab section removed
-    case favoriteSectionHidden
-    case recentActivitySectionHidden
     case continueSetUpSectionHidden
 
     // Fire Button
@@ -633,10 +631,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_import-data_initial"
         case .newTabInitial:
             return "m_mac_new-tab-opened_initial"
-        case .favoriteSectionHidden:
-            return "m_mac_favorite-section-hidden"
-        case .recentActivitySectionHidden:
-            return "m_mac_recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac_continue-setup-section-hidden"
 

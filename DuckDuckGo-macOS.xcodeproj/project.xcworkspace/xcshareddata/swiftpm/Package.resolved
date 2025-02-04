@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "8ea6cdb74fed2e9ff9d60aafe636291dff8024dc",
-        "version" : "235.0.0"
+        "revision" : "bd4691f789bbfd48347339cf8bd09f44487e596b",
+        "version" : "235.1.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "5a463e35ce86fc11394fe62392d32960de22f7d7",
-        "version" : "7.11.0"
+        "revision" : "78cb93809c05ed9b9f58131ac90fa66d16393ae5",
+        "version" : "7.14.0"
       }
     },
     {
@@ -201,7 +201,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "5de0a610a7927b638a5fd463a53032c9934a2c3b",
         "version" : "3.0.0"

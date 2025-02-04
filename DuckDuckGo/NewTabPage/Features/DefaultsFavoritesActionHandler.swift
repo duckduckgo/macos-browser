@@ -29,7 +29,7 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     }
 
     @MainActor
-    func open(_ url: URL, target: FavoriteOpenTarget) {
+    func open(_ url: URL, target: LinkOpenTarget) {
         guard let tabCollectionViewModel else {
             return
         }
