@@ -113,7 +113,7 @@ final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
         }
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
 
-        //
+        // auto-close the popover after X seconds when mouse is out from the popover or Zoom button
         if let positioningView = positioningView as? MouseOverButton {
             positioningViewIsMouseOverCancellable = positioningView.observe(\.isMouseOver) { [weak self] _, _ in
                 self?.isMouseOverDidChange()
