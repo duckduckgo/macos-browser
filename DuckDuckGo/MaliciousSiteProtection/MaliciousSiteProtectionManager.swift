@@ -149,9 +149,10 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
              .visitSite,
              .iframeLoaded,
              .settingToggled,
-             .matchesApiTimeout,
-             .failedToDownloadInitialDataSets:
+             .matchesApiTimeout:
             PixelKit.fire(event)
+        case .failedToDownloadInitialDataSets:
+            PixelKit.fire(DebugEvent(event), frequency: .dailyAndCount)
         case .matchesApiFailure(let error):
             Logger.maliciousSiteProtection.error("Error fetching matches from API: \(error)")
         }
