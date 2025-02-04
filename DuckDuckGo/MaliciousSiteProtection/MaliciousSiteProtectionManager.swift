@@ -137,7 +137,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
         let apiEnvironment = apiEnvironment ?? MaliciousSiteDetector.APIEnvironment.production
         self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, eventMapping: Self.debugEvents)
-        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider ?? Self.updateInterval)
+        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, eventMapping: Self.debugEvents, updateIntervalProvider: updateIntervalProvider ?? Self.updateInterval)
         self.detectionPreferences = detectionPreferences
 
         self.setupBindings()
@@ -149,13 +149,11 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
              .visitSite,
              .iframeLoaded,
              .settingToggled,
-             .matchesApiTimeout:
+             .matchesApiTimeout,
+             .failedToDownloadInitialDataSets:
             PixelKit.fire(event)
         case .matchesApiFailure(let error):
             Logger.maliciousSiteProtection.error("Error fetching matches from API: \(error)")
-        case .failedToDownloadInitialDataSets:
-            // `.failedToDownloadInitialDataSets` Pixel is sent within the BSK library
-            break
         }
     }
 
