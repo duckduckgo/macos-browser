@@ -98,10 +98,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     private(set) lazy var historyViewActionsManager: HistoryViewActionsManager = HistoryViewActionsManager()
-    private(set) lazy var newTabPageActionsManager: NewTabPageActionsManager = NewTabPageActionsManager(
+    private(set) lazy var newTabPageCoordinator: NewTabPageCoordinator = NewTabPageCoordinator(
         appearancePreferences: .shared,
+        settingsModel: homePageSettingsModel,
         activeRemoteMessageModel: activeRemoteMessageModel,
-        privacyStats: privacyStats
+        historyCoordinator: HistoryCoordinator.shared,
+        privacyStats: privacyStats,
+        freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator
     )
     let privacyStats: PrivacyStatsCollecting
     let activeRemoteMessageModel: ActiveRemoteMessageModel

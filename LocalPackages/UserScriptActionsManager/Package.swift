@@ -31,7 +31,7 @@ let package = Package(
             targets: ["UserScriptActionsManager"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "234.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "235.2.0"),
     ],
     targets: [
         .target(
