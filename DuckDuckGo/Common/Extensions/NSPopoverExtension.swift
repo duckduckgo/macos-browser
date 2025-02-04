@@ -45,9 +45,20 @@ extension NSPopover {
         self.contentViewController?.view.window?.parent ?? Self.mainWindow
     }
 
+    private static let positioningViewKey = UnsafeRawPointer(bitPattern: "positioningViewKey".hashValue)!
+    private final class WeakPositioningViewRef: NSObject {
+        weak var view: NSView?
+        init(_ view: NSView? = nil) {
+            self.view = view
+        }
+    }
     @nonobjc var positioningView: NSView? {
-        guard self.responds(to: Selector.positioningView) else { return nil }
-        return self.perform(Selector.positioningView).takeUnretainedValue() as? NSView
+        get {
+            (objc_getAssociatedObject(self, Self.positioningViewKey) as? WeakPositioningViewRef)?.view
+        }
+        set {
+            objc_setAssociatedObject(self, Self.positioningViewKey, newValue.map { WeakPositioningViewRef($0) }, .OBJC_ASSOCIATION_RETAIN)
+        }
     }
 
     /// prefferred bounding box for the popover positioning
@@ -70,6 +81,7 @@ extension NSPopover {
     /// Shows the popover below the specified rect inside the view bounds with the popover's pin positioned in the middle of the rect
     public func show(positionedBelow positioningRect: NSRect, in positioningView: NSView) {
         assert(!positioningView.isHidden && positioningView.alphaValue > 0)
+        self.positioningView = positioningView
 
         // We tap into `_currentFrameOnScreenWithContentSize:outAnchorEdge:` to adjust popover position
         // inside bounds of its owner Main Window.
@@ -125,10 +137,6 @@ extension NSPopover {
     open override func value(forUndefinedKey key: String) -> Any? {
         assertionFailure("valueForUndefinedKey: \(key)")
         return nil
-    }
-
-    enum Selector {
-        static let positioningView = NSSelectorFromString("positioningView")
     }
 
 }
