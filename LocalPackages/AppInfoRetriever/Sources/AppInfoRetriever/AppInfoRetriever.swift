@@ -86,6 +86,10 @@ public class AppInfoRetriever: AppInfoRetrieveing {
         return nil
     }
 
+    public func getAppURL(bundleID: String) -> URL? {
+        NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
+    }
+
     public func getBundleID(appURL: URL) -> String? {
         let infoPlistURL = appURL.appendingPathComponent("Contents/Info.plist")
         if let plist = NSDictionary(contentsOf: infoPlistURL),
@@ -93,5 +97,30 @@ public class AppInfoRetriever: AppInfoRetrieveing {
             return bundleID
         }
         return nil
+    }
+
+    // MARK: - Embedded Bundle IDs
+
+    public func findEmbeddedBundleIDs(in bundleURL: URL) -> Set<String> {
+        var bundleIDs: [String] = []
+        let fileManager = FileManager.default
+
+        guard let enumerator = fileManager.enumerator(at: bundleURL,
+                                                      includingPropertiesForKeys: nil,
+                                                      options: [.skipsHiddenFiles],
+                                                      errorHandler: nil) else {
+            return []
+        }
+
+        for case let fileURL as URL in enumerator {
+            if fileURL.pathExtension == "app" {
+                let embeddedBundle = Bundle(url: fileURL)
+                if let bundleID = embeddedBundle?.bundleIdentifier {
+                    bundleIDs.append(bundleID)
+                }
+            }
+        }
+
+        return Set(bundleIDs)
     }
 }

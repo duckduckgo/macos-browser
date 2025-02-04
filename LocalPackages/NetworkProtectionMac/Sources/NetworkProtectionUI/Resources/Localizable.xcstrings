@@ -3718,18 +3718,6 @@
           }
         }
       }
-    },
-    "vpn.send-feedback.menu.item.title" : {
-      "comment" : "The VPN status view's 'Send Feedback' menu item for our status bar app",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Send Feedback"
-          }
-        }
-      }
     }
   },
   "version" : "1.0"
