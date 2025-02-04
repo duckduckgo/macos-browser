@@ -166,6 +166,78 @@ final class RecentActivityProviderTests: XCTestCase {
         )
     }
 
+    func testThatHistoryEntryDisplaysSumOfBlockedTrackersForVisitsToAllURLsOfTheSameDomain() throws {
+        let uuid = UUID()
+        let url = try XCTUnwrap("https://example.com".url)
+        let date = Date()
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url.appending("index1.html"), lastVisit: date, numberOfTrackersBlocked: 1, blockedTrackingEntities: ["a"]),
+            .make(identifier: uuid, url: url.appending("index2.html"), lastVisit: date.addingTimeInterval(-1), numberOfTrackersBlocked: 2, blockedTrackingEntities: ["b"]),
+            .make(identifier: uuid, url: url.appending("index3.html"), lastVisit: date.addingTimeInterval(-2), numberOfTrackersBlocked: 4, blockedTrackingEntities: ["c", "d"])
+        ]
+
+        XCTAssertEqual(
+            provider.refreshActivity(),
+            [
+                .init(
+                    id: uuid.uuidString,
+                    title: "example.com",
+                    url: "https://example.com",
+                    etldPlusOne: "example.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
+                    favorite: false,
+                    trackersFound: false,
+                    trackingStatus: .init(
+                        totalCount: 7,
+                        trackerCompanies: [
+                            .init(displayName: "a"), .init(displayName: "b"), .init(displayName: "c"), .init(displayName: "d")
+                        ]
+                    ),
+                    history: [
+                        .init(relativeTime: UserText.justNow, title: "/index1.html", url: "https://example.com/index1.html"),
+                        .init(relativeTime: UserText.justNow, title: "/index2.html", url: "https://example.com/index2.html"),
+                        .init(relativeTime: UserText.justNow, title: "/index3.html", url: "https://example.com/index3.html")
+                    ]
+                )
+            ]
+        )
+    }
+
+    func testThatHistoryEntryFiltersOutEmptyTrackerCompanies() throws {
+        let uuid = UUID()
+        let url = try XCTUnwrap("https://example.com".url)
+        let date = Date()
+
+        historyCoordinator.history = [
+            .make(identifier: uuid, url: url.appending("index1.html"), lastVisit: date, numberOfTrackersBlocked: 10, blockedTrackingEntities: ["", "a"])
+        ]
+
+        XCTAssertEqual(
+            provider.refreshActivity(),
+            [
+                .init(
+                    id: uuid.uuidString,
+                    title: "example.com",
+                    url: "https://example.com",
+                    etldPlusOne: "example.com",
+                    favicon: .init(maxAvailableSize: 32, src: try XCTUnwrap(URL.duckFavicon(for: url)?.absoluteString)),
+                    favorite: false,
+                    trackersFound: false,
+                    trackingStatus: .init(
+                        totalCount: 10,
+                        trackerCompanies: [
+                            .init(displayName: "a")
+                        ]
+                    ),
+                    history: [
+                        .init(relativeTime: UserText.justNow, title: "/index1.html", url: "https://example.com/index1.html"),
+                    ]
+                )
+            ]
+        )
+    }
+
     func testWhenHistoryEntryHasVisitsToTwoDifferentDomainsThenActivityHasTwoEntries() throws {
         let uuid = UUID()
         let url1 = try XCTUnwrap("https://example.com".url)

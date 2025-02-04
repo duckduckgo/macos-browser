@@ -1099,6 +1099,8 @@
 		370C230F2C76A3D600A80A3E /* SettingsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23042C76A31F00A80A3E /* SettingsGrid.swift */; };
 		370C23112C7747E200A80A3E /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23102C7747E200A80A3E /* ImageProcessor.swift */; };
 		370C23122C7747E200A80A3E /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23102C7747E200A80A3E /* ImageProcessor.swift */; };
+		370DB6E22D521D130055D988 /* NewTabPageConfigurationErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370DB6E12D521D0A0055D988 /* NewTabPageConfigurationErrorHandler.swift */; };
+		370DB6E32D521D130055D988 /* NewTabPageConfigurationErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370DB6E12D521D0A0055D988 /* NewTabPageConfigurationErrorHandler.swift */; };
 		370E70A32D4691560077D4F3 /* RecentActivityProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E70A22D46914A0077D4F3 /* RecentActivityProviderTests.swift */; };
 		370E70A42D4691560077D4F3 /* RecentActivityProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E70A22D46914A0077D4F3 /* RecentActivityProviderTests.swift */; };
 		371209212C232E3F003ADF3D /* RemoteMessagingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */; };
@@ -3767,6 +3769,7 @@
 		370C23082C76A39900A80A3E /* BackgroundCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundCategoryView.swift; sourceTree = "<group>"; };
 		370C230A2C76A3BC00A80A3E /* BackgroundThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundThumbnailView.swift; sourceTree = "<group>"; };
 		370C23102C7747E200A80A3E /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
+		370DB6E12D521D0A0055D988 /* NewTabPageConfigurationErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageConfigurationErrorHandler.swift; sourceTree = "<group>"; };
 		370E70A22D46914A0077D4F3 /* RecentActivityProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentActivityProviderTests.swift; sourceTree = "<group>"; };
 		371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingClient.swift; sourceTree = "<group>"; };
 		371209292C2333A0003ADF3D /* RemoteMessagingDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingDatabase.swift; sourceTree = "<group>"; };
@@ -6238,6 +6241,7 @@
 		379E4D632D439F9A00A901B1 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				370DB6E12D521D0A0055D988 /* NewTabPageConfigurationErrorHandler.swift */,
 				376E8C192D41186200D5D2EC /* DefaultRecentActivityActionsHandler.swift */,
 				37F9AEB02D1316FE007FD19B /* DefaultHomePageSettingsModelNavigator+NewTabPageLinkOpening.swift */,
 				3758A38B2D108229001CEAA1 /* NewTabPageFreemiumDBPBannerProvider.swift */,
@@ -11618,6 +11622,7 @@
 				F1D042A22BFBB4DD00A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				370270BD2C78B6D3002E44E4 /* NewTabBackgroundPixel.swift in Sources */,
 				BB7BA64C2D11FC170020B47E /* TabBarRemoteMessagePresenting.swift in Sources */,
+				370DB6E32D521D130055D988 /* NewTabPageConfigurationErrorHandler.swift in Sources */,
 				3706FAA3293F65D500E42796 /* CrashReportPromptViewController.swift in Sources */,
 				BD88A83F2C4F3E4300460A26 /* FeedbackCategoryProviding.swift in Sources */,
 				3706FAA4293F65D500E42796 /* ContextMenuManager.swift in Sources */,
@@ -13774,6 +13779,7 @@
 				316C48F02CC2B232000B08C1 /* AIChatPreferencesStorage.swift in Sources */,
 				B6830961274CDE99004B46BB /* FireproofDomainsContainer.swift in Sources */,
 				85B49AFA2CD1B7C5007FAA2A /* SystemInfo.swift in Sources */,
+				370DB6E22D521D130055D988 /* NewTabPageConfigurationErrorHandler.swift in Sources */,
 				B687B7CC2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift in Sources */,
 				B65536AE2685E17200085A79 /* GeolocationService.swift in Sources */,
 				4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */,

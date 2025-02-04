@@ -82,7 +82,7 @@ class BookmarksAndFavoritesTests: UITestCase {
         contextualMenuRemoveBookmarkFromFavoritesMenuItem = app.menuItems["ContextualMenu.removeBookmarkFromFavoritesMenuItem"]
         defaultBookmarkDialogButton = app.buttons["BookmarkDialogButtonsView.defaultButton"]
         defaultBookmarkOtherButton = app.buttons["BookmarkDialogButtonsView.otherButton"]
-        favoriteGridAddFavoriteButton = app.staticTexts["HomePage.Models.FavoriteModel.addButton"]
+        favoriteGridAddFavoriteButton = app.buttons["Add Favorite"]
         favoriteThisPageMenuItem = app.menuItems["MainMenu.favoriteThisPage"]
         manageBookmarksMenuItem = app.menuItems["MainMenu.manageBookmarksMenuItem"]
         openBookmarksMenuItem = app.menuItems["MoreOptionsMenu.openBookmarks"]
@@ -297,7 +297,7 @@ class BookmarksAndFavoritesTests: UITestCase {
         let urlForAddFavoriteDialog = try XCTUnwrap(urlForBookmarksBar, "Couldn't unwrap page url")
         app.typeText("\(pageTitleForAddFavoriteDialog)\t")
         app.typeURL(urlForAddFavoriteDialog)
-        let newFavorite = app.otherElements.staticTexts[pageTitleForAddFavoriteDialog]
+        let newFavorite = app.links[pageTitleForAddFavoriteDialog]
 
         XCTAssertTrue(
             newFavorite.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -433,7 +433,7 @@ class BookmarksAndFavoritesTests: UITestCase {
 
         toggleBookmarksBarShowFavoritesOn()
         let unwrappedPageTitle = try XCTUnwrap(pageTitle, "It wasn't possible to unwrap pageTitle")
-        let firstFavoriteInGridMatchingTitle = app.staticTexts["HomePage.Models.FavoriteModel.\(unwrappedPageTitle)"].firstMatch
+        let firstFavoriteInGridMatchingTitle = app.staticTexts[unwrappedPageTitle].firstMatch
 
         XCTAssertTrue(
             firstFavoriteInGridMatchingTitle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -545,7 +545,7 @@ class BookmarksAndFavoritesTests: UITestCase {
         app.typeKey("n", modifierFlags: .command) // New window
 
         let unwrappedPageTitle = try XCTUnwrap(pageTitle, "It wasn't possible to unwrap pageTitle")
-        let firstFavoriteInGridMatchingTitle = app.staticTexts["HomePage.Models.FavoriteModel.\(unwrappedPageTitle)"].firstMatch
+        let firstFavoriteInGridMatchingTitle = app.links[unwrappedPageTitle].firstMatch
         XCTAssertTrue(
             firstFavoriteInGridMatchingTitle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The favorited item in the grid did not become available in a reasonable timeframe."
