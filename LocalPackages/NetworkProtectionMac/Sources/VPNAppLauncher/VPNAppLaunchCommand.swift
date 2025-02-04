@@ -36,9 +36,9 @@ public enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
         case .justOpen:
             return "networkprotection://just-open"
         case .manageExcludedApps:
-            return "networkprotection://share-feedback"
+            return "networkprotection://excluded-apps"
         case .manageExcludedDomains:
-            return "networkprotection://share-feedback"
+            return "networkprotection://excluded-domains"
         case .shareFeedback:
             return "networkprotection://share-feedback"
         case .showFAQ:
