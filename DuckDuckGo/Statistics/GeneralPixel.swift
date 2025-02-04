@@ -473,6 +473,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case siteNotWorkingShown
     case siteNotWorkingWebsiteIsBroken
 
+    // Enhanced statistics
+    case usageSegments
+
     var name: String {
         switch self {
         case .crash:
@@ -1162,6 +1165,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
+
+            // Enhanced statistics
+        case .usageSegments: return "retention_segments"
         }
     }
 
