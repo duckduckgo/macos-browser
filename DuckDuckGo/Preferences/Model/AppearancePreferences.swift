@@ -22,6 +22,7 @@ import BrowserServicesKit
 import Common
 import FeatureFlags
 import Foundation
+import NewTabPage
 import PixelKit
 import os.log
 
@@ -35,6 +36,7 @@ protocol AppearancePreferencesPersistor {
     var continueSetUpCardsNumberOfDaysDemonstrated: Int { get set }
     var continueSetUpCardsClosed: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
+    var isPrivacyStatsVisible: Bool { get set }
     var isSearchBarVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
@@ -71,6 +73,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
+
+    @UserDefaultsWrapper(key: .homePageIsPrivacyStatsVisible, defaultValue: true)
+    var isPrivacyStatsVisible: Bool
 
     @UserDefaultsWrapper(key: .homePageIsSearchBarVisible, defaultValue: true)
     var isSearchBarVisible: Bool
@@ -230,9 +235,8 @@ final class AppearancePreferences: ObservableObject {
     @Published var isFavoriteVisible: Bool {
         didSet {
             persistor.isFavoriteVisible = isFavoriteVisible
-            // Temporary Pixel
             if !isFavoriteVisible {
-                PixelKit.fire(GeneralPixel.favoriteSectionHidden)
+                PixelKit.fire(NewTabPagePixel.favoriteSectionHidden, frequency: .dailyAndStandard)
             }
         }
     }
@@ -287,9 +291,17 @@ final class AppearancePreferences: ObservableObject {
     @Published var isRecentActivityVisible: Bool {
         didSet {
             persistor.isRecentActivityVisible = isRecentActivityVisible
-            // Temporary Pixel
             if !isRecentActivityVisible {
-                PixelKit.fire(GeneralPixel.recentActivitySectionHidden)
+                PixelKit.fire(NewTabPagePixel.recentActivitySectionHidden, frequency: .dailyAndStandard)
+            }
+        }
+    }
+
+    @Published var isPrivacyStatsVisible: Bool {
+        didSet {
+            persistor.isPrivacyStatsVisible = isPrivacyStatsVisible
+            if !isPrivacyStatsVisible {
+                PixelKit.fire(NewTabPagePixel.blockedTrackingAttemptsSectionHidden, frequency: .dailyAndStandard)
             }
         }
     }
@@ -353,6 +365,14 @@ final class AppearancePreferences: ObservableObject {
         return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp) && osVersion.majorVersion >= 12
     }
 
+    var isRecentActivityAvailable: Bool {
+        newTabPageSectionsAvailabilityProvider.isRecentActivityAvailable
+    }
+
+    var isPrivacyStatsAvailable: Bool {
+        newTabPageSectionsAvailabilityProvider.isPrivacyStatsAvailable
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -364,6 +384,7 @@ final class AppearancePreferences: ObservableObject {
     init(
         persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor(),
         homePageNavigator: HomePageNavigator = DefaultHomePageNavigator(),
+        newTabPageSectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding = NewTabPageModeDecider(),
         featureFlagger: @autoclosure @escaping () -> FeatureFlagger = NSApp.delegateTyped.featureFlagger,
         dateTimeProvider: @escaping () -> Date = Date.init
     ) {
@@ -372,12 +393,14 @@ final class AppearancePreferences: ObservableObject {
         self.dateTimeProvider = dateTimeProvider
         self.isContinueSetUpCardsViewOutdated = persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays
         self.featureFlagger = featureFlagger
+        self.newTabPageSectionsAvailabilityProvider = newTabPageSectionsAvailabilityProvider
         self.continueSetUpCardsClosed = persistor.continueSetUpCardsClosed
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
+        isPrivacyStatsVisible = persistor.isPrivacyStatsVisible
         isSearchBarVisible = persistor.isSearchBarVisible
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
@@ -389,6 +412,7 @@ final class AppearancePreferences: ObservableObject {
 
     private var persistor: AppearancePreferencesPersistor
     private var homePageNavigator: HomePageNavigator
+    private let newTabPageSectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding
     private let featureFlagger: () -> FeatureFlagger
     private let dateTimeProvider: () -> Date
 

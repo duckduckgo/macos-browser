@@ -140,7 +140,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageUserScriptClient {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = model.isViewExpanded ? .expanded : .collapsed
 
         getConfigSubject.send(model.isViewExpanded)
-        return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        return NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: expansion)
     }
 
     @MainActor
@@ -173,7 +173,7 @@ public final class NewTabPageNextStepsCardsClient: NewTabPageUserScriptClient {
     @MainActor
     private func notifyConfigUpdated(_ showAllCards: Bool) {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = showAllCards ? .expanded : .collapsed
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: expansion)
 
         notifyConfigUpdatedSubject.send(showAllCards)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
