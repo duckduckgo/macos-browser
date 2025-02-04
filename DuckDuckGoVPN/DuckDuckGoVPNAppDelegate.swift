@@ -17,22 +17,24 @@
 //
 
 import AppLauncher
+import BrowserServicesKit
 import Cocoa
 import Combine
-import BrowserServicesKit
 import Common
 import Configuration
+import FeatureFlags
 import LoginItems
 import Networking
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionProxy
 import NetworkProtectionUI
-import ServiceManagement
-import PixelKit
-import Subscription
-import VPNAppLauncher
 import os.log
+import PixelKit
+import ServiceManagement
+import Subscription
+import SwiftUICore
+import VPNAppLauncher
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -138,7 +140,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var featureFlagger = DefaultFeatureFlagger(
         internalUserDecider: privacyConfigurationManager.internalUserDecider,
         privacyConfigManager: privacyConfigurationManager,
-        experimentManager: nil)
+        localOverrides: FeatureFlagLocalOverrides(
+            keyValueStore: UserDefaults.appConfiguration,
+            actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
+        ),
+        experimentManager: nil,
+        for: FeatureFlag.self)
 
     public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
@@ -314,6 +321,57 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         makeStatusBarMenu()
     }()
 
+    private func statusViewSubmenu() -> [StatusBarMenu.MenuItem] {
+        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+        let proxySettings = TransparentProxySettings(defaults: .netP)
+        let excludedAppsTitle = UserText.vpnStatusViewExcludedAppsMenuItemTitle(proxySettings.excludedApps.count)
+        let excludedWebsitesTitle = UserText.vpnStatusViewExcludedDomainsMenuItemTitle(proxySettings.excludedDomains.count)
+
+        var menuItems = [StatusBarMenu.MenuItem]()
+
+        if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
+            menuItems.append(
+                .text(icon: Image(.settings16), title: UserText.vpnStatusViewVPNSettingsMenuItemTitle, action: {
+                    try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
+                }))
+        }
+
+        menuItems.append(contentsOf: [
+            .text(icon: Image(.window16), title: excludedAppsTitle, action: { [weak self] in
+                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.manageExcludedApps)
+            }),
+            .text(icon: Image(.globe16), title: excludedWebsitesTitle, action: { [weak self] in
+                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.manageExcludedDomains)
+            }),
+            .divider(),
+            .text(icon: Image(.help16), title: UserText.vpnStatusViewFAQMenuItemTitle, action: { [weak self] in
+                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
+            }),
+            .text(icon: Image(.support16), title: UserText.vpnStatusViewSendFeedbackMenuItemTitle, action: { [weak self] in
+                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+            })
+        ])
+
+        return menuItems
+    }
+
+    private func legacyStatusViewSubmenu() -> [StatusBarMenu.MenuItem] {
+        [
+            .text(title: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
+                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
+            }),
+            .text(title: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
+                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
+            }),
+            .text(title: UserText.networkProtectionStatusMenuSendFeedback, action: { [weak self] in
+                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+            }),
+            .text(title: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
+                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.justOpen)
+            }),
+        ]
+    }
+
     @MainActor
     private func makeStatusBarMenu() -> StatusBarMenu {
         #if DEBUG
@@ -340,21 +398,14 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             controller: tunnelController,
             iconProvider: iconProvider,
             uiActionHandler: uiActionHandler,
-            menuItems: {
-                [
-                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
-                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
-                    }),
-                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
-                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
-                    }),
-                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuSendFeedback, action: { [weak self] in
-                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
-                    }),
-                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
-                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.justOpen)
-                    }),
-                ]
+            menuItems: { [weak self] in
+                guard let self else { return [] }
+
+                guard featureFlagger.isFeatureOn(.networkProtectionAppExclusions) else {
+                    return legacyStatusViewSubmenu()
+                }
+
+                return statusViewSubmenu()
             },
             agentLoginItem: nil,
             isMenuBarStatusView: true,
