@@ -106,8 +106,6 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
         var activityItems = [DomainActivityRef]()
         var activityItemsByDomain = [String: DomainActivityRef]()
 
-        let oneWeekAgo = Date.weekAgo
-
         browsingHistory
             .filter(\.isValidForRecentActivity)
             .sorted(by: { $0.lastVisit > $1.lastVisit })
