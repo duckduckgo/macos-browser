@@ -56,6 +56,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
     let vpnUninstaller: VPNUninstalling
+    private let vpnUIPresenting: VPNUIPresenting
 
     @Published
     private var siteInfo: ActiveSiteInfo?
@@ -64,10 +65,12 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var cancellables = Set<AnyCancellable>()
 
     init(ipcClient: VPNControllerXPCClient,
-         vpnUninstaller: VPNUninstalling) {
+         vpnUninstaller: VPNUninstalling,
+         vpnUIPresenting: VPNUIPresenting) {
 
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller
+        self.vpnUIPresenting = vpnUIPresenting
 
         let activeDomainPublisher = ActiveDomainPublisher(windowControllersManager: .shared)
 
@@ -90,12 +93,12 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
     @MainActor
     func manageExcludedApps() {
-        WindowControllersManager.shared.showVPNAppExclusions()
+        vpnUIPresenting.showVPNAppExclusions()
     }
 
     @MainActor
     func manageExcludedSites() {
-        WindowControllersManager.shared.showVPNDomainExclusions()
+        vpnUIPresenting.showVPNDomainExclusions()
     }
 
     private func statusViewSubmenu() -> [StatusBarMenu.MenuItem] {
