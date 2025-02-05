@@ -38,13 +38,13 @@ final class HistoryMenu: NSMenu {
         .withAccessibilityIdentifier("HistoryMenu.clearAllHistory")
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
-    private let historyCoordinator: HistoryCoordinating
+    private let historyGroupingProvider: HistoryGroupingProvider
     @MainActor
     private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
 
     @MainActor
-    init(historyCoordinator: HistoryCoordinating = HistoryCoordinator.shared) {
-        self.historyCoordinator = historyCoordinator
+    init(historyGroupingProvider: HistoryGroupingProvider = .init(dataSource: HistoryCoordinator.shared)) {
+        self.historyGroupingProvider = historyGroupingProvider
 
         super.init(title: UserText.mainMenuHistory)
 
@@ -131,7 +131,7 @@ final class HistoryMenu: NSMenu {
 
     private func addRecentlyVisited() {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
-        let recentVisits = historyCoordinator.getRecentVisits(maxCount: 14)
+        let recentVisits = historyGroupingProvider.getRecentVisits(maxCount: 14)
         for (index, visit) in zip(
             recentVisits.indices, recentVisits
         ) {
@@ -154,7 +154,7 @@ final class HistoryMenu: NSMenu {
     private var historyGroupingsMenuItems = [NSMenuItem]()
 
     private func addHistoryGroupings() {
-        let groupings = historyCoordinator.getVisitGroupings()
+        let groupings = historyGroupingProvider.getVisitGroupings()
         var firstWeek = [HistoryGrouping](), older = [HistoryGrouping]()
         groupings.forEach { grouping in
             if grouping.date > Date.weekAgo.startOfDay {
@@ -337,42 +337,6 @@ private extension NSApplication {
 
     var canRestoreLastSessionState: Bool {
         delegateTyped.stateRestorationManager?.canRestoreLastSessionState ?? false
-    }
-
-}
-
-private extension HistoryCoordinating {
-
-    func getSortedArrayOfVisits() -> [Visit] {
-        guard let history = history else {
-            Logger.general.error("HistoryCoordinator: No history available")
-            return []
-        }
-
-        return Array(history
-            .flatMap { entry in
-                Array(entry.visits)
-            }
-            .sorted(by: { (visit1, visit2) in
-                visit1.date > visit2.date
-            }))
-    }
-
-    func getRecentVisits(maxCount: Int) -> [Visit] {
-        return Array(getSortedArrayOfVisits()
-            .prefix(maxCount)
-            .filter { NSCalendar.current.isDateInToday($0.date) }
-        )
-    }
-
-    func getVisitGroupings() -> [HistoryMenu.HistoryGrouping] {
-        return Dictionary(grouping: getSortedArrayOfVisits()) { visit in
-            return visit.date.startOfDay
-        } .map {
-            return HistoryMenu.HistoryGrouping(date: $0.key, visits: $0.value)
-        } .sorted(by: { (grouping1, grouping2) in
-            grouping1.date > grouping2.date
-        })
     }
 
 }
