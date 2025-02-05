@@ -16,15 +16,16 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
+import FeatureFlags
 import History
 import os.log
 
 final class HistoryMenu: NSMenu {
 
-    let historyItem = NSMenuItem(title: "Show History", action: #selector(MainViewController.showHistory), keyEquivalent: "y")
     let backMenuItem = NSMenuItem(title: UserText.navigateBack, action: #selector(MainViewController.back), keyEquivalent: "[")
     let forwardMenuItem = NSMenuItem(title: UserText.navigateForward, action: #selector(MainViewController.forward), keyEquivalent: "]")
 
@@ -32,6 +33,8 @@ final class HistoryMenu: NSMenu {
     private let reopenLastClosedMenuItem = NSMenuItem(title: UserText.reopenLastClosedTab, action: #selector(AppDelegate.reopenLastClosedTab))
     private let reopenAllWindowsFromLastSessionMenuItem = NSMenuItem(title: UserText.mainMenuHistoryReopenAllWindowsFromLastSession,
                                                                      action: #selector(AppDelegate.reopenAllWindowsFromLastSession))
+    private let showHistoryMenuItem = NSMenuItem(title: "Show All History…", action: #selector(MainViewController.showHistory), keyEquivalent: "y")
+    private let showHistorySeparator = NSMenuItem.separator()
     private let clearAllHistoryMenuItem = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
                                                      action: #selector(MainViewController.clearAllHistory),
                                                      keyEquivalent: [.command, .shift, .backspace])
@@ -39,19 +42,18 @@ final class HistoryMenu: NSMenu {
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
     private let historyGroupingProvider: HistoryGroupingProvider
+    private let featureFlagger: FeatureFlagger
     @MainActor
     private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
 
     @MainActor
-    init(historyGroupingProvider: HistoryGroupingProvider = .init(dataSource: HistoryCoordinator.shared)) {
+    init(historyGroupingProvider: HistoryGroupingProvider = .init(dataSource: HistoryCoordinator.shared), featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.historyGroupingProvider = historyGroupingProvider
+        self.featureFlagger = featureFlagger
 
         super.init(title: UserText.mainMenuHistory)
 
         self.buildItems {
-            historyItem
-            NSMenuItem.separator()
-
             backMenuItem
             forwardMenuItem
             NSMenuItem.separator()
@@ -60,6 +62,8 @@ final class HistoryMenu: NSMenu {
             recentlyClosedMenuItem
             reopenAllWindowsFromLastSessionMenuItem
 
+            showHistorySeparator
+            showHistoryMenuItem
             clearAllHistorySeparator
             clearAllHistoryMenuItem
         }
@@ -77,7 +81,7 @@ final class HistoryMenu: NSMenu {
     override func update() {
         super.update()
 
-        historyItem.isHidden = !NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView)
+        showHistoryMenuItem.isHidden = !featureFlagger.isFeatureOn(.historyView)
 
         updateRecentlyClosedMenu()
         updateReopenLastClosedMenuItem()
@@ -85,14 +89,15 @@ final class HistoryMenu: NSMenu {
         clearOldVariableMenuItems()
         addRecentlyVisited()
         addHistoryGroupings()
-        addClearAllHistoryOnTheBottom()
+        addClearAllAndShowHistoryOnTheBottom()
     }
 
     private func clearOldVariableMenuItems() {
         items.removeAll { menuItem in
             recentlyVisitedMenuItems.contains(menuItem) ||
             historyGroupingsMenuItems.contains(menuItem) ||
-            menuItem == clearAllHistoryMenuItem
+            menuItem == clearAllHistoryMenuItem ||
+            menuItem == showHistoryMenuItem
         }
     }
 
@@ -159,7 +164,7 @@ final class HistoryMenu: NSMenu {
         groupings.forEach { grouping in
             if grouping.date > Date.weekAgo.startOfDay {
                 firstWeek.append(grouping)
-            } else {
+            } else if !featureFlagger.isFeatureOn(.historyView) {
                 older.append(grouping)
             }
         }
@@ -269,7 +274,14 @@ final class HistoryMenu: NSMenu {
 
     // MARK: - Clear All History
 
-    private func addClearAllHistoryOnTheBottom() {
+    private func addClearAllAndShowHistoryOnTheBottom() {
+        if featureFlagger.isFeatureOn(.historyView) {
+            if showHistorySeparator.menu != nil {
+                removeItem(showHistorySeparator)
+            }
+            addItem(showHistorySeparator)
+            addItem(showHistoryMenuItem)
+        }
         if clearAllHistorySeparator.menu != nil {
             removeItem(clearAllHistorySeparator)
         }
