@@ -149,7 +149,7 @@
           "expectations": [
             {
               "type": "element",
-              "selector": ".srp-table-item"
+              "selector": ".container"
             }
           ],
           "id": "8a632c01-a405-49ee-90c0-e2d40e1eb69d"
@@ -160,7 +160,8 @@
             {
               "type": "button",
               "selector": ".srp-view-more",
-              "multiple": true
+              "multiple": true,
+              "failSilently": true
             }
           ],
           "id": "f69b3a3d-aa7b-457f-971a-f910905f3992"
