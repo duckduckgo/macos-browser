@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import BrowserServicesKit
 import Foundation
 import History
 
@@ -67,10 +68,26 @@ final class ClearThisHistoryMenuItem: NSMenuItem {
     }
 
     // Getting visits for the whole menu section in order to perform burning
-    func getVisits() -> [Visit] {
-        return menu?.items.compactMap({ menuItem in
+    func getVisits(featureFlagger: FeatureFlagger) -> [Visit] {
+        let visits = menu?.items.compactMap({ menuItem in
             return (menuItem as? VisitMenuItem)?.visit
         }) ?? []
+
+        guard featureFlagger.isFeatureOn(.historyView) else {
+            // historyView feature flag enables history items deduplication
+            // where menu items don't represent all visits on a given day.
+            // If disabled, we're free to just return visits represented by
+            // menu items.
+            return visits
+        }
+
+        // If historyView flag is enabled, we have to find all visits from a given day,
+        // by querying their respective history entries.
+        let allVisitsForGivenDay = visits.flatMap { visit in
+            let date = visit.date
+            return visit.historyEntry?.visits.filter { $0.date.isSameDay(date) } ?? []
+        }
+        return allVisitsForGivenDay
     }
 
 }

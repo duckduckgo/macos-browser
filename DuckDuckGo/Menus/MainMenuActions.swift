@@ -584,7 +584,7 @@ extension MainViewController {
 
         let dateString = sender.dateString
         let isToday = sender.isToday
-        let visits = sender.getVisits()
+        let visits = sender.getVisits(featureFlagger: featureFlagger)
         let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
         alert.beginSheetModal(for: window, completionHandler: { response in
             guard case .alertFirstButtonReturn = response else {
