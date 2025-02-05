@@ -188,7 +188,7 @@ final class TabBarItemCellView: NSView {
         layer.borderWidth = TabShadowConfig.dividerSize
         layer.opacity = TabShadowConfig.alpha
         layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-        layer.cornerRadius = 11
+        layer.cornerRadius = 8
         layer.mask = layerMask
         return layer
     }()
@@ -229,7 +229,7 @@ final class TabBarItemCellView: NSView {
 
         clipsToBounds = true
 
-        mouseOverView.cornerRadius = 11
+        mouseOverView.cornerRadius = 8
         mouseOverView.maskedCorners = [
             .layerMinXMaxYCorner,
             .layerMaxXMaxYCorner

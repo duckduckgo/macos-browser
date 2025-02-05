@@ -17,6 +17,8 @@
 //
 
 import AppKit
+import Combine
+import os.log
 
 extension NSPopover {
 
@@ -81,7 +83,6 @@ extension NSPopover {
     /// Shows the popover below the specified rect inside the view bounds with the popover's pin positioned in the middle of the rect
     public func show(positionedBelow positioningRect: NSRect, in positioningView: NSView) {
         assert(!positioningView.isHidden && positioningView.alphaValue > 0)
-        self.positioningView = positioningView
 
         // We tap into `_currentFrameOnScreenWithContentSize:outAnchorEdge:` to adjust popover position
         // inside bounds of its owner Main Window.
@@ -139,4 +140,36 @@ extension NSPopover {
         return nil
     }
 
+    static let swizzleShowRelativeToRectOnce: () = {
+        guard let originalMethod = class_getInstanceMethod(NSPopover.self, #selector(show(relativeTo:of:preferredEdge:))),
+              let swizzledMethod = class_getInstanceMethod(NSPopover.self, #selector(swizzled_show(relativeTo:of:preferredEdge:))) else {
+            assertionFailure("Methods not available")
+            return
+        }
+
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+    }()
+
+    // ignore popovers shown from a view not in view hierarchy
+    // https://app.asana.com/0/1201037661562251/1206407295280737/f
+    @objc(swizzled_showRelativeToRect:ofView:preferredEdge:)
+    private dynamic func swizzled_show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+        if positioningView.window == nil {
+            var observer: Cancellable?
+            observer = positioningView.observe(\.window) { positioningView, _ in
+                if positioningView.window != nil {
+                    self.swizzled_show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+                    observer?.cancel()
+                }
+            }
+            positioningView.onDeinit {
+                observer?.cancel()
+            }
+
+            Logger.general.error("trying to present \(self) from \(positioningView) not in view hierarchy")
+            return
+        }
+        self.positioningView = positioningView
+        self.swizzled_show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+    }
 }

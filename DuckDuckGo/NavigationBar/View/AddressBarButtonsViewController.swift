@@ -41,6 +41,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private func permissionAuthorizationPopoverCreatingIfNeeded() -> PermissionAuthorizationPopover {
         return permissionAuthorizationPopover ?? {
             let popover = PermissionAuthorizationPopover()
+            NotificationCenter.default.addObserver(self, selector: #selector(popoverDidClose), name: NSPopover.didCloseNotification, object: popover)
             self.permissionAuthorizationPopover = popover
             popover.setAccessibilityIdentifier("AddressBarButtonsViewController.permissionAuthorizationPopover")
             return popover
@@ -51,17 +52,13 @@ final class AddressBarButtonsViewController: NSViewController {
     private func popupBlockedPopoverCreatingIfNeeded() -> PopupBlockedPopover {
         return popupBlockedPopover ?? {
             let popover = PopupBlockedPopover()
+            popover.delegate = self
             self.popupBlockedPopover = popover
             return popover
         }()
     }
 
-    @IBOutlet var zoomButtonWrapper: NSView!
-    @IBOutlet weak var zoomButton: AddressBarButton! {
-        didSet {
-            zoomButton.position = .free
-        }
-    }
+    @IBOutlet weak var zoomButton: AddressBarButton!
     @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
     @IBOutlet weak var separator: NSView!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
@@ -328,7 +325,7 @@ final class AddressBarButtonsViewController: NSViewController {
         zoomButton.image = (zoomState == .zoomedOut) ? .zoomOut : .zoomIn
         zoomButton.backgroundColor = isPopoverShown ? .buttonMouseDown : nil
         zoomButton.mouseOverColor = isPopoverShown ? nil : .buttonMouseOver
-        zoomButtonWrapper.isHidden = !shouldShowZoom
+        zoomButton.isHidden = !shouldShowZoom
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
@@ -350,7 +347,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     func openPermissionAuthorizationPopover(for query: PermissionAuthorizationQuery) {
-        let button: NSButton
+        let button: PermissionButton
 
         lazy var popover: NSPopover = {
             let popover = self.permissionAuthorizationPopoverCreatingIfNeeded()
@@ -384,6 +381,8 @@ final class AddressBarButtonsViewController: NSViewController {
         }
         guard button.isVisible else { return }
 
+        button.backgroundColor = .buttonMouseDown
+        button.mouseOverColor = .buttonMouseDown
         (popover.contentViewController as? PermissionAuthorizationViewController)?.query = query
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
         query.wasShownOnce = true
@@ -408,7 +407,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        zoomButtonWrapper.isShown = true
+        zoomButton.isShown = true
         popovers.showZoomPopover(for: tabViewModel, from: zoomButton, addressBar: parent?.view, withDelegate: self, source: source)
         updateZoomButtonVisibility()
     }
@@ -1107,10 +1106,9 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
     func popoverDidClose(_ notification: Notification) {
-        guard let popovers else {
-            return
-        }
-        switch notification.object as? NSPopover {
+        guard let popovers, let popover = notification.object as? NSPopover else { return }
+
+        switch popover {
         case popovers.bookmarkPopover:
             if popovers.bookmarkPopover?.isNew == true {
                 NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
@@ -1118,6 +1116,14 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
             updateBookmarkButtonVisibility()
         case popovers.zoomPopover:
             updateZoomButtonVisibility()
+        case is PermissionAuthorizationPopover,
+             is PopupBlockedPopover:
+            if let button = popover.positioningView as? PermissionButton {
+                button.backgroundColor = .clear
+                button.mouseOverColor = .buttonMouseOver
+            } else {
+                assertionFailure("Unexpected popover positioningView: \(popover.positioningView?.description ?? "<nil>"), expected PermissionButton")
+            }
         default:
             break
         }
