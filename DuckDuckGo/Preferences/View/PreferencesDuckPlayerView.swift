@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import PreferencesViews
+import PreferencesUI_macOS
 import PixelKit
 import SwiftUI
 import SwiftUIExtensions
@@ -82,7 +82,7 @@ extension Preferences {
 
                     }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                    .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
 
                     TextMenuItemCaption(UserText.duckPlayerExplanation)
                 }.disabled(model.shouldDisplayContingencyMessage)

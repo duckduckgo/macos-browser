@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import PreferencesViews
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 
@@ -302,7 +302,7 @@ extension Preferences {
                             .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.manually")
                     }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                    .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                     .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker")
                     .onChange(of: areAutomaticUpdatesEnabled) { newValue in
                         model.areAutomaticUpdatesEnabled = newValue

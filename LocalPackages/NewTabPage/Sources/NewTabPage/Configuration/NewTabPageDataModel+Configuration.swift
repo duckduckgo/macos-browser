@@ -31,7 +31,7 @@ public extension NewTabPageDataModel {
 extension NewTabPageDataModel {
 
     enum WidgetId: String, Codable {
-        case rmf, freemiumPIRBanner, nextSteps, favorites, privacyStats
+        case rmf, freemiumPIRBanner, nextSteps, favorites, privacyStats, recentActivity = "activity"
     }
 
     struct ContextMenuParams: Codable {
@@ -41,6 +41,10 @@ extension NewTabPageDataModel {
             let id: WidgetId
             let title: String
         }
+    }
+
+    struct Exception: Codable, Equatable {
+        let message: String
     }
 
     struct NewTabPageConfiguration: Encodable {

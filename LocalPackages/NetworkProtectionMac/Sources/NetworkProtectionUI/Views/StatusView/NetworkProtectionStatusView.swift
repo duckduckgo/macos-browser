@@ -82,11 +82,17 @@ public struct NetworkProtectionStatusView: View {
 
     private func bottomMenuView() -> some View {
         VStack(spacing: 0) {
-            ForEach(model.menuItems(), id: \.name) { menuItem in
-                MenuItemButton(title: menuItem.name, textColor: Color(.defaultText)) {
-                    await menuItem.action()
-                    dismiss()
-                }.applyMenuAttributes()
+            ForEach(model.menuItems(), id: \.uuid) { item in
+                switch item {
+                case .divider:
+                    Divider()
+                        .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+                case .text(_, let icon, let title, let action):
+                    MenuItemButton(icon: icon, title: title, textColor: Color(.defaultText)) {
+                        await action()
+                        dismiss()
+                    }.applyMenuAttributes()
+                }
             }
         }
     }

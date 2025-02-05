@@ -38,7 +38,7 @@ enum UserText {
 
     // MARK: Preferences activate section
     static let activateSectionTitle = NSLocalizedString("subscription.preferences.subscription.activate.title", bundle: Bundle.module, value: "Activate on Other Devices", comment: "Title for the subscription preferences activate section")
-    static let activateSectionNoEmailCaption = NSLocalizedString("subscription.preferences.subscription.activate.no.email.caption", bundle: Bundle.module, value: "Add an optional email to your subscription or use your Apple ID to access Privacy Pro on other devices. [Learn more](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)", comment: "Caption for the subscription preferences activate section when email is not added to subscription")
+    static let activateSectionNoEmailCaption = NSLocalizedString("subscription.preferences.subscription.activate.no.email.caption", bundle: Bundle.module, value: "Add an optional email to your subscription or use your Apple Account to access Privacy Pro on other devices. [Learn more](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)", comment: "Caption for the subscription preferences activate section when email is not added to subscription")
     static let activateSectionWithEmailCaption = NSLocalizedString("subscription.preferences.subscription.activate.with.email.caption", bundle: Bundle.module, value: "Use this email to activate your subscription in Settings > Privacy Pro in the DuckDuckGo app on your other devices. [Learn more](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)", comment: "Caption for the subscription preferences activate section when email is added to subscription")
     static let addEmailButton = NSLocalizedString("subscription.preferences.subscription.activate.add.email.button", bundle: Bundle.module, value: "Add Email", comment: "Button for adding email address to subscription")
     static let editEmailButton = NSLocalizedString("subscription.preferences.subscription.activate.edit.email.button", bundle: Bundle.module, value: "Edit", comment: "Button for editing email address added to subscription")
@@ -55,7 +55,7 @@ enum UserText {
     static let preferencesSubscriptionFeedbackButton = NSLocalizedString("subscription.preferences.feedback.button", bundle: Bundle.module, value: "Send Feedback", comment: "Title for the subscription feedback button")
     static let preferencesPrivacyPolicyButton = NSLocalizedString("subscription.preferences.privacypolicy.button", bundle: Bundle.module, value: "Privacy Policy and Terms of Service", comment: "Title for the privacy policy button")
 
-    static func preferencesSubscriptionRenewingCaption(billingPeriod: Subscription.BillingPeriod, formattedDate: String) -> String {
+    static func preferencesSubscriptionRenewingCaption(billingPeriod: PrivacyProSubscription.BillingPeriod, formattedDate: String) -> String {
         let localized: String
 
         switch billingPeriod {
@@ -79,7 +79,7 @@ enum UserText {
         return String(format: localized, formattedDate)
     }
 
-    static func preferencesSubscriptionExpiringCaption(billingPeriod: Subscription.BillingPeriod, formattedDate: String) -> String {
+    static func preferencesSubscriptionExpiringCaption(billingPeriod: PrivacyProSubscription.BillingPeriod, formattedDate: String) -> String {
         let localized: String
 
         switch billingPeriod {
@@ -132,7 +132,7 @@ enum UserText {
     // MARK: - Change plan or billing dialogs
     static let changeSubscriptionDialogTitle = NSLocalizedString("subscription.dialog.change.title", bundle: Bundle.module, value: "Change Plan or Billing", comment: "Change plan or billing dialog title")
     static let changeSubscriptionGoogleDialogDescription = NSLocalizedString("subscription.dialog.change.google.description", bundle: Bundle.module, value: "Your subscription was purchased through the Google Play Store. To change your plan or billing settings, please open Google Play Store subscription settings on a device signed in to the same Google Account used to purchase your subscription.", comment: "Change plan or billing dialog subtitle description for subscription purchased via Google")
-    static let changeSubscriptionAppleDialogDescription = NSLocalizedString("subscription.dialog.change.apple.description", bundle: Bundle.module, value: "Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to System Settings > Apple ID > Media and Purchases > Subscriptions > Manage on a device signed in to the same Apple ID used to purchase your subscription.", comment: "Change plan or billing dialog subtitle description for subscription purchased via Apple")
+    static let changeSubscriptionAppleDialogDescription = NSLocalizedString("subscription.dialog.change.apple.description", bundle: Bundle.module, value: "Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to System Settings > Apple Account > Media and Purchases > Subscriptions > Manage on a device signed in to the same Apple Account used to purchase your subscription.", comment: "Change plan or billing dialog subtitle description for subscription purchased via Apple")
     static let changeSubscriptionDialogDone = NSLocalizedString("subscription.dialog.change.done.button", bundle: Bundle.module, value: "Done", comment: "Button to close the change subscription dialog")
 
     // MARK: - Remove from this device dialog
@@ -149,14 +149,14 @@ enum UserText {
     static func activateModalDescription(platform: SubscriptionEnvironment.PurchasePlatform) -> String {
         switch platform {
         case .appStore:
-            NSLocalizedString("subscription.appstore.activate.modal.description", bundle: Bundle.module, value: "Access your Privacy Pro subscription on this device via Apple ID or an email address.", comment: "Activate subscription modal view subtitle description")
+            NSLocalizedString("subscription.appstore.activate.modal.description", bundle: Bundle.module, value: "Access your Privacy Pro subscription on this device via Apple Account or an email address.", comment: "Activate subscription modal view subtitle description")
         case .stripe:
             NSLocalizedString("subscription.activate.modal.description", bundle: Bundle.module, value: "Access your Privacy Pro subscription via an email address.", comment: "Activate subscription modal view subtitle description")
         }
     }
 
     static let activateModalEmailDescription = NSLocalizedString("subscription.activate.modal.email.description", bundle: Bundle.module, value: "Use your email to activate your subscription on this device.", comment: "Activate subscription modal description for email address channel")
-    static let restorePurchaseDescription = NSLocalizedString("subscription.activate.modal.restore.purchase.description", bundle: Bundle.module, value: "Your subscription is automatically available in DuckDuckGo on any device signed in to your Apple ID.", comment: "Activate subscription modal description via restore purchase from Apple ID")
+    static let restorePurchaseDescription = NSLocalizedString("subscription.activate.modal.restore.purchase.description", bundle: Bundle.module, value: "Your subscription is automatically available in DuckDuckGo on any device signed in to your Apple Account.", comment: "Activate subscription modal description via restore purchase from Apple Account")
 
     // MARK: - Activate/share modal buttons
     static let restorePurchaseButton = NSLocalizedString("subscription.modal.restore.purchase.button", bundle: Bundle.module, value: "Restore Purchase", comment: "Button for restoring past subscription purchase")
@@ -173,13 +173,13 @@ enum UserText {
     static let somethingWentWrongAlertDescription = NSLocalizedString("subscription.alert.something.went.wrong.description", bundle: Bundle.module, value: "We’re having trouble connecting. Please try again later.", comment: "Alert message when unknown error has occurred")
 
     static let subscriptionNotFoundAlertTitle = NSLocalizedString("subscription.alert.subscription.not.found.title", bundle: Bundle.module, value: "Subscription Not Found", comment: "Alert title when subscription was not found")
-    static let subscriptionNotFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.not.found.description", bundle: Bundle.module, value: "We couldn’t find a subscription associated with this Apple ID.", comment: "Alert message when subscription was not found")
+    static let subscriptionNotFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.not.found.description", bundle: Bundle.module, value: "We couldn’t find a subscription associated with this Apple Account.", comment: "Alert message when subscription was not found")
 
     static let subscriptionInactiveAlertTitle = NSLocalizedString("subscription.alert.subscription.inactive.title", bundle: Bundle.module, value: "Subscription Not Found", comment: "Alert title when subscription was inactive")
-    static let subscriptionInactiveAlertDescription = NSLocalizedString("subscription.alert.subscription.inactive.description", bundle: Bundle.module, value: "The subscription associated with this Apple ID is no longer active.", comment: "Alert message when subscription was inactive")
+    static let subscriptionInactiveAlertDescription = NSLocalizedString("subscription.alert.subscription.inactive.description", bundle: Bundle.module, value: "The subscription associated with this Apple Account is no longer active.", comment: "Alert message when subscription was inactive")
 
     static let subscriptionFoundAlertTitle = NSLocalizedString("subscription.alert.subscription.found.title", bundle: Bundle.module, value: "Subscription Found", comment: "Alert title when subscription was found")
-    static let subscriptionFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.found.description", bundle: Bundle.module, value: "We found a subscription associated with this Apple ID.", comment: "Alert message when subscription was found")
+    static let subscriptionFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.found.description", bundle: Bundle.module, value: "We found a subscription associated with this Apple Account.", comment: "Alert message when subscription was found")
 
-    static let subscriptionAppleIDSyncFailedAlertTitle = NSLocalizedString("subscription.alert.subscription.apple-id.sync-failed.title", bundle: Bundle.module, value: "Something Went Wrong When Syncing Your Apple ID", comment: "Alert message when the subscription failed to restore")
+    static let subscriptionAppleIDSyncFailedAlertTitle = NSLocalizedString("subscription.alert.subscription.apple-id.sync-failed.title", bundle: Bundle.module, value: "Something Went Wrong When Syncing Your Apple Account", comment: "Alert message when the subscription failed to restore")
 }

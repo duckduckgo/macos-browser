@@ -17,28 +17,75 @@
 //
 
 import Foundation
+import Combine
 import Common
 import os.log
+import Persistence
 
 protocol DockCustomization {
     var isAddedToDock: Bool { get }
 
     @discardableResult
     func addToDock() -> Bool
+
+    /// The notification mentiond here is the blue dot notification shown in the more options menu.
+    /// The blue dot is also show in the Add To Dock menu item.
+    ///
+    /// The requriments for the blue dot show to shown are the following:
+    /// - Two days passed since first lauch.
+    /// - We didn't show it in the past (this means the blue dot was shown, the user opened the more options menu and then closed it)
+    var shouldShowNotification: Bool { get }
+    var shouldShowNotificationPublisher: AnyPublisher<Bool, Never> { get }
+    func didCloseMoreOptionsMenu()
+    func resetData()
 }
 
 final class DockCustomizer: DockCustomization {
+    enum Keys {
+        static let wasNotificationShownToUser = "was-dock-notification.show-to-users"
+    }
 
     private let positionProvider: DockPositionProviding
+    private let keyValueStore: KeyValueStoring
 
-    init(positionProvider: DockPositionProviding = DockPositionProvider()) {
+    @Published private var shouldShowNotificationPrivate: Bool = false
+    var shouldShowNotificationPublisher: AnyPublisher<Bool, Never> {
+        $shouldShowNotificationPrivate.eraseToAnyPublisher()
+    }
+    private var cancellables = Set<AnyCancellable>()
+
+    init(positionProvider: DockPositionProviding = DockPositionProvider(),
+         keyValueStore: KeyValueStoring = UserDefaults.standard) {
         self.positionProvider = positionProvider
+        self.keyValueStore = keyValueStore
+
+        shouldShowNotificationPrivate = shouldShowNotification
+        startTimer()
     }
 
     private var dockPlistURL: URL = URL(fileURLWithPath: NSString(string: "~/Library/Preferences/com.apple.dock.plist").expandingTildeInPath)
 
     private var dockPlistDict: [String: AnyObject]? {
         return NSDictionary(contentsOf: dockPlistURL) as? [String: AnyObject]
+    }
+
+    private func startTimer() {
+        Timer.publish(every: 12 * 60 * 60, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+
+                self.shouldShowNotificationPrivate = self.shouldShowNotification
+            }
+            .store(in: &cancellables)
+    }
+
+    private var didWeShowNotificationToUser: Bool {
+        keyValueStore.object(forKey: Keys.wasNotificationShownToUser) as? Bool ?? false
+    }
+
+    var shouldShowNotification: Bool {
+        AppDelegate.twoDaysPassedSinceFirstLaunch && !didWeShowNotificationToUser
     }
 
     // This checks whether the bundle identifier of the current bundle
@@ -51,6 +98,18 @@ final class DockCustomizer: DockCustomization {
         }
 
         return persistentApps.contains(where: { ($0["tile-data"] as? [String: AnyObject])?["bundle-identifier"] as? String == bundleIdentifier })
+    }
+
+    func didCloseMoreOptionsMenu() {
+        if AppDelegate.twoDaysPassedSinceFirstLaunch {
+            shouldShowNotificationPrivate = false
+            keyValueStore.set(true, forKey: Keys.wasNotificationShownToUser)
+        }
+    }
+
+    func resetData() {
+        keyValueStore.set(false, forKey: Keys.wasNotificationShownToUser)
+        shouldShowNotificationPrivate = shouldShowNotification
     }
 
     // Adds a dictionary representing the application, either by using an existing 

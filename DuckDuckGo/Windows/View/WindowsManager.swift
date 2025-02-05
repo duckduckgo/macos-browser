@@ -62,7 +62,9 @@ final class WindowsManager {
                              showWindow: Bool = true,
                              popUp: Bool = false,
                              lazyLoadTabs: Bool = false,
-                             isMiniaturized: Bool = false) -> MainWindow? {
+                             isMiniaturized: Bool = false,
+                             isMaximized: Bool = false,
+                             isFullscreen: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel,
                                                  popUp: popUp,
                                                  burnerMode: burnerMode,
@@ -73,6 +75,18 @@ final class WindowsManager {
         }
 
         mainWindowController.window?.setIsMiniaturized(isMiniaturized)
+
+        if isMaximized {
+            if let screen = NSScreen.main {
+                let screenFrame = screen.visibleFrame
+                mainWindowController.window?.setFrame(screenFrame, display: true, animate: true)
+                mainWindowController.window?.makeKeyAndOrderFront(nil)
+            }
+        }
+
+        if isFullscreen {
+            mainWindowController.window?.toggleFullScreen(self)
+        }
 
         if let droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)

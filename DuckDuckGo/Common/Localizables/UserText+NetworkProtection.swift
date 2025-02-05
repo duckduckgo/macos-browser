@@ -40,13 +40,48 @@ extension UserText {
 
     static let networkProtectionInviteSuccessMessage = NSLocalizedString("network.protection.invite.success.title", value: "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere.", comment: "Message for the VPN invite success view")
 
-    // MARK: - Navigation Bar Status View
+    // MARK: - VPN Status View submenu (legacy)
 
     static let networkProtectionNavBarStatusViewSendFeedback = NSLocalizedString("network.protection.navbar.status.view.send.feedback", value: "Send Feedback…", comment: "Menu item for 'Send Feedback' in the VPN status view that's shown in the navigation bar")
 
     static let networkProtectionNavBarStatusViewVPNSettings = NSLocalizedString("network.protection.navbar.status.view.vpn.settings", value: "VPN Settings…", comment: "The status menu 'VPN Settings' menu item")
 
     static let networkProtectionNavBarStatusViewFAQ = NSLocalizedString("network.protection.navbar.status.view.faq", value: "FAQs and Support…", comment: "The status menu 'FAQ' menu item")
+
+    // MARK: - VPN Status View submenu
+
+    static let vpnStatusViewVPNSettingsMenuItemTitle = NSLocalizedString(
+        "vpn.status-view.vpn-settings.menu-item.title",
+        value: "VPN Settings",
+        comment: "The VPN status view's 'VPN Settings' menu item for our main app. The number shown is how many Apps are excluded.")
+
+    static func vpnStatusViewExcludedAppsMenuItemTitle(_ count: Int) -> String {
+        let message = NSLocalizedString(
+            "vpn.status-view.excluded-apps.menu-item.title",
+            value: "Excluded Apps (%d)",
+            comment: "The VPN status view's 'Excluded Apps' menu item for our main app. The number shown is how many Apps are excluded.")
+
+        return String(format: message, count)
+    }
+
+    static func vpnStatusViewExcludedDomainsMenuItemTitle(_ count: Int) -> String {
+        let message = NSLocalizedString(
+            "vpn.status-view.excluded-domains.menu-item.title",
+            value: "Excluded Websites (%d)",
+            comment: "The VPN status view's 'Excluded Websites' menu item for our main app. The number shown is how many websites are excluded.")
+
+        return String(format: message, count)
+    }
+
+    static let vpnStatusViewSendFeedbackMenuItemTitle = NSLocalizedString(
+        "vpn.status-view.send-feedback.menu-item.title",
+        value: "Send Feedback",
+        comment: "The VPN status view's 'Send Feedback' menu item for our main app")
+
+    static let vpnStatusViewFAQMenuItemTitle = NSLocalizedString(
+        "vpn.status-view.faq.menu-item.title",
+        value: "FAQs and Support",
+        comment: "The VPN status view's 'FAQ' menu item for our main app")
 }
 
 extension UserText {
@@ -175,7 +210,11 @@ extension UserText {
 
     static let vpnLocationTitle = NSLocalizedString("vpn.location.title", value: "Location", comment: "Location section title in VPN settings")
 
+    static let vpnExclusionsTitle = NSLocalizedString("vpn.exclusions.title", value: "Exclusions", comment: "Exclusions section title in VPN settings")
+
     static let vpnExcludedSitesTitle = NSLocalizedString("vpn.excluded.sites.title", value: "Excluded Websites", comment: "Excluded Sites title in VPN settings")
+
+    static let vpnExcludedAppsTitle = NSLocalizedString("vpn.excluded.apps.title", value: "Excluded Apps", comment: "Excluded Apps title in VPN settings")
 
     static let vpnGeneralTitle = NSLocalizedString("vpn.general.title", value: "General", comment: "General section title in VPN settings")
 
@@ -211,6 +250,18 @@ extension UserText {
         let message = NSLocalizedString("network.protection.vpn.location.country.item.formatted.cities.count", value: "%d cities", comment: "Subtitle of countries item when there are multiple cities, example: '5 cities'")
         return String(format: message, count)
     }
+
+    // MARK: - Exclusions
+
+    static let vpnSettingsExclusionsDescription = NSLocalizedString("vpn.setting.exclusions.description", value: "Some websites and apps are not compatible with VPNs. Exclude these sites and apps to use them while connected to the VPN.", comment: "The description shown for the exclusions section in VPN settings")
+
+    static let vpnSettingsManageExclusionsButtonTitle = NSLocalizedString("vpn.setting.exclusions.manage.button.title", value: "Manage...", comment: "Title for the button to manage exclusions")
+
+    static let vpnNoExclusionsFoundText = NSLocalizedString("vpn.no.exclusions.found.text", value: "None", comment: "Text shown in VPN settings when no exclusions are configured")
+
+    // MARK: - Excluded Apps
+
+    static let vpnExcludedAppsAddApp = NSLocalizedString("vpn.excluded.apps.add.app", value: "Add Application", comment: "Add Application button for the excluded apps view")
 
     // MARK: - Excluded Domains
 

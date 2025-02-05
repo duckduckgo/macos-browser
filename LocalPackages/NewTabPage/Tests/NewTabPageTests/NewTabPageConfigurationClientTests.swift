@@ -23,20 +23,26 @@ import XCTest
 
 final class NewTabPageConfigurationClientTests: XCTestCase {
     private var client: NewTabPageConfigurationClient!
+    private var sectionsAvailabilityProvider: MockNewTabPageSectionsAvailabilityProvider!
     private var sectionsVisibilityProvider: MockNewTabPageSectionsVisibilityProvider!
     private var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
     private var userScript: NewTabPageUserScript!
     private var messageHelper: MessageHelper<NewTabPageConfigurationClient.MessageName>!
+    private var eventMapper: CapturingNewTabPageConfigurationEventHandler!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
+        sectionsAvailabilityProvider = MockNewTabPageSectionsAvailabilityProvider()
         sectionsVisibilityProvider = MockNewTabPageSectionsVisibilityProvider()
         contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
+        eventMapper = CapturingNewTabPageConfigurationEventHandler()
         client = NewTabPageConfigurationClient(
+            sectionsAvailabilityProvider: sectionsAvailabilityProvider,
             sectionsVisibilityProvider: sectionsVisibilityProvider,
             customBackgroundProvider: CapturingNewTabPageCustomBackgroundProvider(),
             contextMenuPresenter: contextMenuPresenter,
-            linkOpener: CapturingNewTabPageLinkOpener()
+            linkOpener: CapturingNewTabPageLinkOpener(),
+            eventMapper: eventMapper
         )
 
         userScript = NewTabPageUserScript()
@@ -76,6 +82,26 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
     // MARK: - initialSetup
 
     func testThatInitialSetupReturnsConfiguration() async throws {
+        sectionsAvailabilityProvider.isPrivacyStatsAvailable = false
+        sectionsAvailabilityProvider.isRecentActivityAvailable = false
+
+        let configuration: NewTabPageDataModel.NewTabPageConfiguration = try await messageHelper.handleMessage(named: .initialSetup)
+        XCTAssertEqual(configuration.widgets, [
+            .init(id: .rmf),
+            .init(id: .freemiumPIRBanner),
+            .init(id: .nextSteps),
+            .init(id: .favorites)
+        ])
+        XCTAssertEqual(configuration.widgetConfigs, [
+            .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible)
+        ])
+        XCTAssertEqual(configuration.platform, .init(name: "macos"))
+    }
+
+    func testThatInitialSetupContainsPrivacyStatsWhenAvailable() async throws {
+        sectionsAvailabilityProvider.isPrivacyStatsAvailable = true
+        sectionsAvailabilityProvider.isRecentActivityAvailable = false
+
         let configuration: NewTabPageDataModel.NewTabPageConfiguration = try await messageHelper.handleMessage(named: .initialSetup)
         XCTAssertEqual(configuration.widgets, [
             .init(id: .rmf),
@@ -91,26 +117,67 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         XCTAssertEqual(configuration.platform, .init(name: "macos"))
     }
 
+    func testThatInitialSetupContainsRecentActivityWhenAvailable() async throws {
+        sectionsAvailabilityProvider.isPrivacyStatsAvailable = false
+        sectionsAvailabilityProvider.isRecentActivityAvailable = true
+
+        let configuration: NewTabPageDataModel.NewTabPageConfiguration = try await messageHelper.handleMessage(named: .initialSetup)
+        XCTAssertEqual(configuration.widgets, [
+            .init(id: .rmf),
+            .init(id: .freemiumPIRBanner),
+            .init(id: .nextSteps),
+            .init(id: .favorites),
+            .init(id: .recentActivity)
+        ])
+        XCTAssertEqual(configuration.widgetConfigs, [
+            .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
+            .init(id: .recentActivity, isVisible: sectionsVisibilityProvider.isRecentActivityVisible)
+        ])
+        XCTAssertEqual(configuration.platform, .init(name: "macos"))
+    }
+
     // MARK: - widgetsSetConfig
 
     func testWhenWidgetsSetConfigIsReceivedThenWidgetConfigsAreUpdated() async throws {
         let configs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
             .init(id: .favorites, isVisible: false),
-            .init(id: .privacyStats, isVisible: true)
+            .init(id: .privacyStats, isVisible: true),
+            .init(id: .recentActivity, isVisible: false)
         ]
         try await messageHelper.handleMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
         XCTAssertEqual(sectionsVisibilityProvider.isFavoritesVisible, false)
         XCTAssertEqual(sectionsVisibilityProvider.isPrivacyStatsVisible, true)
+        XCTAssertEqual(sectionsVisibilityProvider.isRecentActivityVisible, false)
     }
 
     func testWhenWidgetsSetConfigIsReceivedWithPartialConfigThenOnlyIncludedWidgetsConfigsAreUpdated() async throws {
         let initialIsFavoritesVisible = sectionsVisibilityProvider.isFavoritesVisible
 
         let configs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
-            .init(id: .privacyStats, isVisible: false)
+            .init(id: .privacyStats, isVisible: false),
+            .init(id: .recentActivity, isVisible: true)
         ]
         try await messageHelper.handleMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
         XCTAssertEqual(sectionsVisibilityProvider.isFavoritesVisible, initialIsFavoritesVisible)
         XCTAssertEqual(sectionsVisibilityProvider.isPrivacyStatsVisible, false)
+        XCTAssertEqual(sectionsVisibilityProvider.isRecentActivityVisible, true)
+    }
+
+    // MARK: - reportInitException
+
+    func testThatReportInitExceptionForwardsEventToTheMapper() async throws {
+        let exception = NewTabPageDataModel.Exception(message: "sample message")
+        try await messageHelper.handleMessageExpectingNilResponse(named: .reportInitException, parameters: exception)
+
+        XCTAssertEqual(eventMapper.events, [.newTabPageError(message: "sample message")])
+    }
+
+    // MARK: - reportPageException
+
+    func testThatReportPageExceptionForwardsEventToTheMapper() async throws {
+        let exception = NewTabPageDataModel.Exception(message: "sample message")
+        try await messageHelper.handleMessageExpectingNilResponse(named: .reportPageException, parameters: exception)
+
+        XCTAssertEqual(eventMapper.events, [.newTabPageError(message: "sample message")])
     }
 }
