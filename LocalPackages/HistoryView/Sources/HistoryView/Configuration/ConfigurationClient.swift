@@ -1,5 +1,5 @@
 //
-//  HistoryViewConfigurationClient.swift
+//  ConfigurationClient.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -23,7 +23,7 @@ import os.log
 import UserScriptActionsManager
 import WebKit
 
-public final class HistoryViewConfigurationClient: HistoryViewUserScriptClient {
+public final class ConfigurationClient: HistoryViewUserScriptClient {
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -53,7 +53,7 @@ public final class HistoryViewConfigurationClient: HistoryViewUserScriptClient {
         let env = "production"
 #endif
 
-        let config = HistoryViewDataModel.HistoryViewConfiguration(
+        let config = DataModel.Configuration(
             env: env,
             locale: Bundle.main.preferredLocalizations.first ?? "en",
             platform: .init(name: "macos")

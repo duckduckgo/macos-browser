@@ -1,5 +1,5 @@
 //
-//  HistoryViewActionsManagerExtension.swift
+//  HistoryViewDataProvider.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -19,12 +19,16 @@
 import History
 import HistoryView
 
-extension HistoryViewActionsManager {
+final class HistoryViewDataProvider: HistoryView.DataProviding {
 
-    convenience init() {
-        self.init(scriptClients: [
-            ConfigurationClient(),
-            DataClient(dataProvider: HistoryViewDataProvider(historyCoordinator: HistoryCoordinator.shared))
-        ])
+    private let historyCoordinator: HistoryCoordinating
+
+    init(historyCoordinator: HistoryCoordinating) {
+        self.historyCoordinator = historyCoordinator
     }
+
+    func visits(for query: String?, filter: HistoryViewFilter, pageSize: UInt, offset: UInt) async -> [HistoryView.DataModel.HistoryItem] {
+        []
+    }
+
 }

@@ -1,5 +1,5 @@
 //
-//  HistoryViewDataModel+Configuration.swift
+//  DataModel+Configuration.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -18,9 +18,9 @@
 
 import Foundation
 
-extension HistoryViewDataModel {
+extension DataModel {
 
-    struct HistoryViewConfiguration: Encodable {
+    struct Configuration: Encodable {
         var env: String
         var locale: String
         var platform: Platform

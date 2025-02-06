@@ -1,5 +1,5 @@
 //
-//  HistoryViewDataModel+Data.swift
+//  DataModel+Data.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -18,20 +18,20 @@
 
 import Foundation
 
-extension HistoryViewDataModel {
+public extension DataModel {
 
-    struct HistoryViewQuery: Codable, Equatable {
+    struct Query: Codable, Equatable {
         let limit: Int
         let offset: Int
         let term: String
     }
 
-    struct HistoryViewQueryResponse: Codable, Equatable {
-        let info: HistoryViewQueryInfo
+    struct QueryResponse: Codable, Equatable {
+        let info: QueryInfo
         let value: [HistoryItem]
     }
 
-    struct HistoryViewQueryInfo: Codable, Equatable {
+    struct QueryInfo: Codable, Equatable {
         let finished: Bool
         let term: String
     }
@@ -45,5 +45,16 @@ extension HistoryViewDataModel {
         let time: TimeInterval
         let title: String
         let url: String
+
+        public init(dateRelativeDay: String, dateShort: String, dateTimeOfDay: String, domain: String, fallbackFaviconText: String, time: TimeInterval, title: String, url: String) {
+            self.dateRelativeDay = dateRelativeDay
+            self.dateShort = dateShort
+            self.dateTimeOfDay = dateTimeOfDay
+            self.domain = domain
+            self.fallbackFaviconText = fallbackFaviconText
+            self.time = time
+            self.title = title
+            self.url = url
+        }
     }
 }

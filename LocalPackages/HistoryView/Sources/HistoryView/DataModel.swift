@@ -1,5 +1,5 @@
 //
-//  HistoryViewDataModel.swift
+//  DataModel.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -16,4 +16,4 @@
 //  limitations under the License.
 //
 
-public enum HistoryViewDataModel {}
+public enum DataModel {}
