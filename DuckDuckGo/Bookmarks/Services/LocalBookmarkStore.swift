@@ -26,6 +26,7 @@ import Cocoa
 import Persistence
 import PixelKit
 import os.log
+import BrowserServicesKit
 
 protocol BookmarkEntityProtocol {
     var uuid: String? { get }

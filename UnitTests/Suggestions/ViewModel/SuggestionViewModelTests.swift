@@ -159,6 +159,50 @@ final class SuggestionViewModelTests: XCTestCase {
         XCTAssertEqual(suggestionViewModel.title, query)
     }
 
+    func testWhenSuggestionIsOpenTabWebsite_ThenSuggestionViewModelValuesAreCorrect() {
+        let url = URL(string: "https://spreadprivacy.com")!
+        let title = "Open Tab Title"
+        let suggestion = Suggestion.openTab(title: title, url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
+
+        XCTAssertEqual(suggestionViewModel.string, title)
+        XCTAssertEqual(suggestionViewModel.title, title)
+        XCTAssertEqual(suggestionViewModel.suffix, " – spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsOpenTabSERP_ThenSuggestionViewModelValuesAreCorrect() {
+        let url = URL.makeSearchUrl(from: "Test search")!
+        let title = "SERP Title"
+        let suggestion = Suggestion.openTab(title: title, url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
+
+        XCTAssertEqual(suggestionViewModel.string, title)
+        XCTAssertEqual(suggestionViewModel.title, title)
+        XCTAssertEqual(suggestionViewModel.suffix, " – \(UserText.duckDuckGoSearchSuffix)")
+    }
+
+    func testWhenSuggestionIsOpenTabSettings_ThenSuggestionViewModelValuesAreCorrect() {
+        let url = URL.settings
+        let title = "Settings"
+        let suggestion = Suggestion.openTab(title: title, url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
+
+        XCTAssertEqual(suggestionViewModel.string, title)
+        XCTAssertEqual(suggestionViewModel.title, title)
+        XCTAssertEqual(suggestionViewModel.suffix, " – \(UserText.duckDuckGo)")
+    }
+
+    func testWhenSuggestionIsOpenTabBookmarks_ThenSuggestionViewModelValuesAreCorrect() {
+        let url = URL.bookmarks
+        let title = "Bookmarks"
+        let suggestion = Suggestion.openTab(title: title, url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
+
+        XCTAssertEqual(suggestionViewModel.string, title)
+        XCTAssertEqual(suggestionViewModel.title, title)
+        XCTAssertEqual(suggestionViewModel.suffix, " – \(UserText.duckDuckGo)")
+    }
+
 }
 
 extension SuggestionViewModel {

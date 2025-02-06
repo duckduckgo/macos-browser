@@ -23,15 +23,15 @@ public protocol NewTabPageFavorite {
     var title: String { get }
     var url: String { get }
     var urlObject: URL? { get }
+    var etldPlusOne: String? { get }
 }
 
 public protocol FavoritesActionsHandling {
     associatedtype FavoriteType: NewTabPageFavorite
 
-    @MainActor func open(_ url: URL, target: FavoriteOpenTarget)
+    @MainActor func open(_ url: URL, target: LinkOpenTarget)
     @MainActor func addNewFavorite()
     @MainActor func edit(_ favorite: FavoriteType)
-    @MainActor func onFaviconMissing()
 
     func removeFavorite(_ favorite: FavoriteType)
     func deleteBookmark(for favorite: FavoriteType)

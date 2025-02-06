@@ -19,7 +19,7 @@
 import Combine
 import Foundation
 import DDGSync
-import SyncUI
+import SyncUI_macOS
 
 final class FaviconsFetcherOnboarding {
 

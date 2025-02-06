@@ -21,7 +21,7 @@ import SwiftUI
 
 struct MenuItemButton: View {
     @Environment(\.colorScheme) private var colorScheme
-    private let iconName: NetworkProtectionAsset?
+    private let icon: Image?
     private let title: String
     private let detailTitle: String?
     private let textColor: Color
@@ -32,8 +32,8 @@ struct MenuItemButton: View {
     @State private var isHovered = false
     @State private var animatingTap = false
 
-    init(iconName: NetworkProtectionAsset? = nil, title: String, detailTitle: String? = nil, textColor: Color, action: @escaping () async -> Void) {
-        self.iconName = iconName
+    init(icon: Image? = nil, title: String, detailTitle: String? = nil, textColor: Color, action: @escaping () async -> Void) {
+        self.icon = icon
         self.title = title
         self.detailTitle = detailTitle
         self.textColor = textColor
@@ -45,8 +45,8 @@ struct MenuItemButton: View {
             buttonTapped()
         }) {
             HStack {
-                if let iconName {
-                    Image(iconName)
+                if let icon {
+                    icon
                         .foregroundColor(isHovered ? .white : textColor)
                 }
                 Text(title)

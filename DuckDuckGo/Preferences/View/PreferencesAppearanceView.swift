@@ -17,7 +17,7 @@
 //
 
 import Bookmarks
-import PreferencesViews
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 
@@ -112,7 +112,12 @@ extension Preferences {
                             ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
                         }
                         ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
-                        ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
+                        if model.isRecentActivityAvailable {
+                            ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
+                        }
+                        if model.isPrivacyStatsAvailable {
+                            ToggleMenuItem(UserText.newTabPrivacyStatsSectionTitle, isOn: $model.isPrivacyStatsVisible)
+                        }
                     }
 
                     PreferencePaneSubSection {

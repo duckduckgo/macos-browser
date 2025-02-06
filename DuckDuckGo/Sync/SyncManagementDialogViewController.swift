@@ -18,7 +18,7 @@
 
 import AppKit
 import SwiftUI
-import SyncUI
+import SyncUI_macOS
 
 final class SyncManagementDialogViewController: NSViewController {
 

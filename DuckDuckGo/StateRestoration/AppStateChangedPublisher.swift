@@ -23,6 +23,7 @@ extension Tab {
     var stateChanged: AnyPublisher<Void, Never> {
         $content.asVoid()
             .merge(with: $favicon.asVoid())
+            .merge(with: $title.asVoid())
             .eraseToAnyPublisher()
     }
 }

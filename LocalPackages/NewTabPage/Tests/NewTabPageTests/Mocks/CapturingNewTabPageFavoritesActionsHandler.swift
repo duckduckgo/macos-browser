@@ -24,9 +24,9 @@ final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling
 
     struct OpenCall: Equatable {
         let url: URL
-        let target: FavoriteOpenTarget
+        let target: LinkOpenTarget
 
-        init(_ url: URL, _ target: FavoriteOpenTarget) {
+        init(_ url: URL, _ target: LinkOpenTarget) {
             self.url = url
             self.target = target
         }
@@ -50,7 +50,7 @@ final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling
     var deleteBookmarkCalls: [MockNewTabPageFavorite] = []
     var moveCalls: [MoveCall] = []
 
-    func open(_ url: URL, target: FavoriteOpenTarget) {
+    func open(_ url: URL, target: LinkOpenTarget) {
         openCalls.append(.init(url, target))
     }
 
@@ -60,10 +60,6 @@ final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling
 
     func edit(_ favorite: MockNewTabPageFavorite) {
         editCalls.append(favorite)
-    }
-
-    func onFaviconMissing() {
-        onFaviconMissingCallCount += 1
     }
 
     func removeFavorite(_ favorite: MockNewTabPageFavorite) {

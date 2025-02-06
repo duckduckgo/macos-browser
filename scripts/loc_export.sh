@@ -51,7 +51,7 @@ final_xliff_path="${script_dir}/assets/loc"
 mkdir -p "$final_xliff_path"
 
 # Export localizations
-xcodebuild -exportLocalizations -localizationPath "$export_path" -derivedDataPath "${script_dir}/DerivedData" -scheme "DuckDuckGo Privacy Browser" APP_STORE_PRODUCT_MODULE_NAME_OVERRIDE=DuckDuckGo_Privacy_Browser_App_Store PRIVACY_PRO_PRODUCT_MODULE_NAME_OVERRIDE=DuckDuckGo_Privacy_Browser_Privacy_Pro
+xcodebuild -exportLocalizations -localizationPath "$export_path" -derivedDataPath "${script_dir}/DerivedData" -scheme "macOS Browser" APP_STORE_PRODUCT_MODULE_NAME_OVERRIDE=DuckDuckGo_Privacy_Browser_App_Store PRIVACY_PRO_PRODUCT_MODULE_NAME_OVERRIDE=DuckDuckGo_Privacy_Browser_Privacy_Pro
 
 # Attempt to find the .xcloc package
 xcloc_package=$(find "$export_path" -type d -name "*.xcloc")

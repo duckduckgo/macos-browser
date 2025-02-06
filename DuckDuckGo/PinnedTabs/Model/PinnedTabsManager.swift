@@ -35,6 +35,10 @@ final class PinnedTabsManager {
         } else {
             tabCollection.append(tab: tab)
         }
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didChangeTabProperties([.pinned], for: tab)
+        }
     }
 
     func unpinTab(at index: Int, published: Bool = false) -> Tab? {
@@ -47,6 +51,10 @@ final class PinnedTabsManager {
             return nil
         }
         didUnpinTabSubject.send(index)
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didChangeTabProperties([.pinned], for: tab)
+        }
         return tab
     }
 

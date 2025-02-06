@@ -18,8 +18,9 @@
 
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
+@testable import BrowserServicesKit
 
-class MockBookmarkManager: BookmarkManager {
+class MockBookmarkManager: BookmarkManager, URLFavoriteStatusProviding {
     var bookmarksReturnedForSearch = [BaseBookmarkEntity]()
     var wasSearchByQueryCalled = false
 
@@ -130,7 +131,7 @@ class MockBookmarkManager: BookmarkManager {
 
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void) {}
 
-    func importBookmarks(_ bookmarks: DuckDuckGo_Privacy_Browser.ImportedBookmarks, source: DuckDuckGo_Privacy_Browser.BookmarkImportSource) -> DuckDuckGo_Privacy_Browser.BookmarksImportSummary {
+    func importBookmarks(_ bookmarks: DuckDuckGo_Privacy_Browser.ImportedBookmarks, source: DuckDuckGo_Privacy_Browser.BookmarkImportSource) -> BrowserServicesKit.BookmarksImportSummary {
         BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
     }
 

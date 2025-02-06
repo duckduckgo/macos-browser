@@ -18,13 +18,13 @@
 
 import Foundation
 import Combine
-import TestUtils
+import PersistenceTestingUtils
 @testable import DuckDuckGo_Privacy_Browser
 @testable import DDGSync
 
 class MockDDGSyncing: DDGSyncing {
 
-    let registeredDevices = [RegisteredDevice(id: "1", name: "Device 1", type: "desktop"), RegisteredDevice(id: "2", name: "Device 2", type: "mobile"), RegisteredDevice(id: "3", name: "Device 1", type: "desktop")]
+    var registeredDevices = [RegisteredDevice(id: "1", name: "Device 1", type: "desktop"), RegisteredDevice(id: "2", name: "Device 2", type: "mobile"), RegisteredDevice(id: "3", name: "Device 1", type: "desktop")]
     var disconnectCalled = false
 
     var dataProvidersSource: DataProvidersSource?
@@ -67,8 +67,13 @@ class MockDDGSyncing: DDGSyncing {
     func createAccount(deviceName: String, deviceType: String) async throws {
     }
 
+    var stubLogin: [RegisteredDevice] = []
+    lazy var spyLogin: (SyncCode.RecoveryKey, String, String) throws -> [RegisteredDevice] = { _, _, _ in
+        return self.stubLogin
+    }
+
     func login(_ recoveryKey: SyncCode.RecoveryKey, deviceName: String, deviceType: String) async throws -> [RegisteredDevice] {
-        return []
+        return try spyLogin(recoveryKey, deviceName, deviceType)
     }
 
     func remoteConnect() throws -> RemoteConnecting {

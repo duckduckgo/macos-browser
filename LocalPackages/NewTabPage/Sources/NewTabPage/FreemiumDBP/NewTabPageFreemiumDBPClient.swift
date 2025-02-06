@@ -18,7 +18,7 @@
 
 import Combine
 import Common
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
 public protocol NewTabPageFreemiumDBPBannerProviding {
@@ -32,15 +32,15 @@ public protocol NewTabPageFreemiumDBPBannerProviding {
     func action() async
 }
 
-public final class NewTabPageFreemiumDBPClient: NewTabPageScriptClient {
+public final class NewTabPageFreemiumDBPClient: NewTabPageUserScriptClient {
 
     let freemiumDBPBannerProvider: NewTabPageFreemiumDBPBannerProviding
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables = Set<AnyCancellable>()
 
     public init(provider: NewTabPageFreemiumDBPBannerProviding) {
         self.freemiumDBPBannerProvider = provider
+        super.init()
 
         freemiumDBPBannerProvider.bannerMessagePublisher
             .sink { [weak self] message in
@@ -56,7 +56,7 @@ public final class NewTabPageFreemiumDBPClient: NewTabPageScriptClient {
         case action = "freemiumPIRBanner_action"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.action.rawValue: { [weak self] in try await self?.action(params: $0, original: $1) },
             MessageName.dismiss.rawValue: { [weak self] in try await self?.dismiss(params: $0, original: $1) },

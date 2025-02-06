@@ -8,7 +8,6 @@ let package = Package(
     platforms: [ .macOS("11.4") ],
     products: [
         .library(name: "SwiftUIExtensions", targets: ["SwiftUIExtensions"]),
-        .library(name: "PreferencesViews", targets: ["PreferencesViews"]),
     ],
     dependencies: [
     ],
@@ -16,15 +15,6 @@ let package = Package(
         .target(
             name: "SwiftUIExtensions",
             dependencies: [
-            ],
-            swiftSettings: [
-                .define("DEBUG", .when(configuration: .debug))
-            ]
-        ),
-        .target(
-            name: "PreferencesViews",
-            dependencies: [
-                "SwiftUIExtensions",
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))

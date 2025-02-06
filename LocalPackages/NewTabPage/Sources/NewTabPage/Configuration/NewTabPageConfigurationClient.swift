@@ -20,43 +20,63 @@ import AppKit
 import Combine
 import Common
 import os.log
-import UserScript
+import UserScriptActionsManager
 import WebKit
+
+public protocol NewTabPageSectionsAvailabilityProviding: AnyObject {
+    var isPrivacyStatsAvailable: Bool { get }
+    var isRecentActivityAvailable: Bool { get }
+}
 
 public protocol NewTabPageSectionsVisibilityProviding: AnyObject {
     var isFavoritesVisible: Bool { get set }
     var isPrivacyStatsVisible: Bool { get set }
+    var isRecentActivityVisible: Bool { get set }
 
     var isFavoritesVisiblePublisher: AnyPublisher<Bool, Never> { get }
     var isPrivacyStatsVisiblePublisher: AnyPublisher<Bool, Never> { get }
+    var isRecentActivityVisiblePublisher: AnyPublisher<Bool, Never> { get }
 }
 
 public protocol NewTabPageLinkOpening {
     func openLink(_ target: NewTabPageDataModel.OpenAction.Target) async
 }
 
-public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
+public enum NewTabPageConfigurationEvent: Equatable {
+    case newTabPageError(message: String)
+}
 
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
+public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
 
     private var cancellables = Set<AnyCancellable>()
+    private let sectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding
     private let sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding
     private let customBackgroundProvider: NewTabPageCustomBackgroundProviding
     private let contextMenuPresenter: NewTabPageContextMenuPresenting
     private let linkOpener: NewTabPageLinkOpening
+    private let eventMapper: EventMapping<NewTabPageConfigurationEvent>?
 
     public init(
+        sectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding,
         sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding,
         customBackgroundProvider: NewTabPageCustomBackgroundProviding,
         contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
-        linkOpener: NewTabPageLinkOpening
+        linkOpener: NewTabPageLinkOpening,
+        eventMapper: EventMapping<NewTabPageConfigurationEvent>?
     ) {
+        self.sectionsAvailabilityProvider = sectionsAvailabilityProvider
         self.sectionsVisibilityProvider = sectionsVisibilityProvider
         self.customBackgroundProvider = customBackgroundProvider
         self.contextMenuPresenter = contextMenuPresenter
         self.linkOpener = linkOpener
+        self.eventMapper = eventMapper
+        super.init()
 
-        Publishers.Merge(sectionsVisibilityProvider.isFavoritesVisiblePublisher, sectionsVisibilityProvider.isPrivacyStatsVisiblePublisher)
+        Publishers.Merge3(
+            sectionsVisibilityProvider.isFavoritesVisiblePublisher,
+            sectionsVisibilityProvider.isPrivacyStatsVisiblePublisher,
+            sectionsVisibilityProvider.isRecentActivityVisiblePublisher
+        )
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.notifyWidgetConfigsDidChange()
@@ -74,7 +94,7 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         case widgetsOnConfigUpdated = "widgets_onConfigUpdated"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
             MessageName.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
@@ -85,12 +105,39 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         ])
     }
 
-    private func notifyWidgetConfigsDidChange() {
-        let widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
-            .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
-            .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible)
+    private func fetchWidgets() -> [NewTabPageDataModel.NewTabPageConfiguration.Widget] {
+        var widgets: [NewTabPageDataModel.NewTabPageConfiguration.Widget] = [
+            .init(id: .rmf),
+            .init(id: .freemiumPIRBanner),
+            .init(id: .nextSteps),
+            .init(id: .favorites),
         ]
+        if sectionsAvailabilityProvider.isPrivacyStatsAvailable {
+            widgets.append(.init(id: .privacyStats))
+        }
+        if sectionsAvailabilityProvider.isRecentActivityAvailable {
+            widgets.append(.init(id: .recentActivity))
+        }
 
+        return widgets
+    }
+
+    private func fetchWidgetConfigs() -> [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] {
+        var widgetConfigs: [NewTabPageDataModel.NewTabPageConfiguration.WidgetConfig] = [
+            .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible)
+        ]
+        if sectionsAvailabilityProvider.isPrivacyStatsAvailable {
+            widgetConfigs.append(.init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible))
+        }
+        if sectionsAvailabilityProvider.isRecentActivityAvailable {
+            widgetConfigs.append(.init(id: .recentActivity, isVisible: sectionsVisibilityProvider.isRecentActivityVisible))
+        }
+
+        return widgetConfigs
+    }
+
+    private func notifyWidgetConfigsDidChange() {
+        let widgetConfigs = fetchWidgetConfigs()
         pushMessage(named: MessageName.widgetsOnConfigUpdated.rawValue, params: widgetConfigs)
     }
 
@@ -114,6 +161,12 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
                 item.representedObject = menuItem.id
                 item.state = sectionsVisibilityProvider.isPrivacyStatsVisible ? .on : .off
                 menu.addItem(item)
+            case .recentActivity:
+                let item = NSMenuItem(title: menuItem.title, action: #selector(self.toggleVisibility(_:)), keyEquivalent: "")
+                item.target = self
+                item.representedObject = menuItem.id
+                item.state = sectionsVisibilityProvider.isRecentActivityVisible ? .on : .off
+                menu.addItem(item)
             default:
                 break
             }
@@ -132,6 +185,8 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
             sectionsVisibilityProvider.isFavoritesVisible.toggle()
         case .privacyStats:
             sectionsVisibilityProvider.isPrivacyStatsVisible.toggle()
+        case .recentActivity:
+            sectionsVisibilityProvider.isRecentActivityVisible.toggle()
         default:
             break
         }
@@ -145,19 +200,12 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         let env = "production"
 #endif
 
+        let widgets = fetchWidgets()
+        let widgetConfigs = fetchWidgetConfigs()
         let customizerData = customBackgroundProvider.customizerData
         let config = NewTabPageDataModel.NewTabPageConfiguration(
-            widgets: [
-                .init(id: .rmf),
-                .init(id: .freemiumPIRBanner),
-                .init(id: .nextSteps),
-                .init(id: .favorites),
-                .init(id: .privacyStats)
-            ],
-            widgetConfigs: [
-                .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
-                .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible)
-            ],
+            widgets: widgets,
+            widgetConfigs: widgetConfigs,
             env: env,
             locale: Bundle.main.preferredLocalizations.first ?? "en",
             platform: .init(name: "macos"),
@@ -178,6 +226,8 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
                 sectionsVisibilityProvider.isFavoritesVisible = widgetConfig.visibility.isVisible
             case .privacyStats:
                 sectionsVisibilityProvider.isPrivacyStatsVisible = widgetConfig.visibility.isVisible
+            case .recentActivity:
+                sectionsVisibilityProvider.isRecentActivityVisible = widgetConfig.visibility.isVisible
             default:
                 break
             }
@@ -194,10 +244,11 @@ public final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     }
 
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [String: String] else { return nil }
-        let message = params["message"] ?? ""
-        let id = params["id"] ?? ""
-        Logger.general.error("New Tab Page error: \("\(id): \(message)", privacy: .public)")
+        guard let exception: NewTabPageDataModel.Exception = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        eventMapper?.fire(.newTabPageError(message: exception.message))
+        Logger.general.error("New Tab Page error: \("\(exception.message)", privacy: .public)")
         return nil
     }
 }

@@ -18,12 +18,17 @@
 
 import Configuration
 import Foundation
+import BrowserServicesKit
+import os.log
 
 struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     // MARK: - Debug
-
-    internal init(customPrivacyConfiguration: URL? = nil) {
+    internal init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+                  featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger,
+                  customPrivacyConfiguration: URL? = nil) {
+        let trackerDataUrlProvider = TrackerDataURLOverrider(privacyConfigurationManager: privacyConfigurationManager, featureFlagger: featureFlagger)
+        self.init(trackerDataUrlProvider: trackerDataUrlProvider)
         if let customPrivacyConfiguration {
             // Overwrite custom privacy configuration if provided
             self.customPrivacyConfiguration = customPrivacyConfiguration.absoluteString
@@ -47,6 +52,23 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     // MARK: - Main
 
+    private var trackerDataUrlProvider: TrackerDataURLProviding
+
+    public enum Constants {
+        public static let baseTdsURLString = "https://staticcdn.duckduckgo.com/trackerblocking/"
+        public static let defaultTrackerDataURL = URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
+        public static let defaultPrivacyConfigurationURL = URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
+    }
+
+    init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+         featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger) {
+        self.trackerDataUrlProvider = TrackerDataURLOverrider(privacyConfigurationManager: privacyConfigurationManager, featureFlagger: featureFlagger)
+    }
+
+    init(trackerDataUrlProvider: TrackerDataURLProviding) {
+        self.trackerDataUrlProvider = trackerDataUrlProvider
+    }
+
     func url(for configuration: Configuration) -> URL {
         // URLs for privacyConfiguration and trackerDataSet shall match the ones in update_embedded.sh. 
         // Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
@@ -54,9 +76,10 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
         case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!
         case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
-        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
+        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? Constants.defaultPrivacyConfigurationURL
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
-        case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
+        case .trackerDataSet:
+            return trackerDataUrlProvider.trackerDataURL ?? Constants.defaultTrackerDataURL
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
         case .remoteMessagingConfig: return RemoteMessagingClient.Constants.endpoint
         }

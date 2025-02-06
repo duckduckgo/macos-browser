@@ -22,6 +22,7 @@ import Common
 import CryptoKit
 import GRDB
 import os.log
+import BrowserServicesKit
 
 final class SafariFaviconsReader {
 

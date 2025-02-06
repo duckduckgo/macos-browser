@@ -8,6 +8,7 @@
 #import "NSException+Catch.h"
 #import "NSObject+performSelector.h"
 #import "WKGeolocationProvider.h"
+#import "WebExtensions.h"
 
 #ifndef APPSTORE
 #import "BWEncryption.h"

@@ -20,6 +20,7 @@ import Foundation
 import XCTest
 import SwiftUI
 @testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
 
 @available(macOS 13.0, *)
 class FileImportViewLocalizationTests: XCTestCase {

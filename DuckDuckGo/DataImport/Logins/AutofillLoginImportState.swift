@@ -18,10 +18,6 @@
 
 import BrowserServicesKit
 
-protocol AutofillLoginImportStateStoring {
-    var isCredentialsImportPromptPermanantlyDismissed: Bool { get set }
-}
-
 final class AutofillLoginImportState: AutofillLoginImportStateProvider, AutofillLoginImportStateStoring {
     private enum Key {
         static let hasImportedLogins: String = "com.duckduckgo.logins.hasImportedLogins"

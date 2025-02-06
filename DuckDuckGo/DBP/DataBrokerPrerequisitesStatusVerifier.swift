@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import DataBrokerProtection
 import LoginItems
+import os.log
 
 enum DataBrokerPrerequisitesStatus {
     case invalidDirectory
@@ -40,10 +41,13 @@ final class DefaultDataBrokerPrerequisitesStatusVerifier: DataBrokerPrerequisite
 
     func checkStatus() -> DataBrokerPrerequisitesStatus {
         if !statusChecker.doesHaveNecessaryPermissions() {
+            Logger.dataBrokerProtection.log("Invalid system permissions")
             return .invalidSystemPermission
         } else if !statusChecker.isInCorrectDirectory() {
+            Logger.dataBrokerProtection.log("Invalid directory")
             return .invalidDirectory
         } else {
+            Logger.dataBrokerProtection.log("Valid system permissions")
             return .valid
         }
     }

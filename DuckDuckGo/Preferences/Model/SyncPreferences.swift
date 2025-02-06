@@ -21,12 +21,13 @@ import DDGSync
 import Combine
 import Common
 import SystemConfiguration
-import SyncUI
+import SyncUI_macOS
 import SwiftUI
 import PDFKit
 import Navigation
 import PixelKit
 import os.log
+import BrowserServicesKit
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -39,7 +40,7 @@ extension SyncDevice {
     }
 }
 
-final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
+final class SyncPreferences: ObservableObject, SyncUI_macOS.ManagementViewModel {
     var syncPausedTitle: String? {
         return syncPausedStateManager.syncPausedMessageData?.title
     }
@@ -167,6 +168,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService.account?.recoveryCode
     }
 
+    private let featureFlagger: FeatureFlagger
+
     init(
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
@@ -174,7 +177,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         appearancePreferences: AppearancePreferences = .shared,
         managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
-        syncPausedStateManager: any SyncPausedStateManaging
+        syncPausedStateManager: any SyncPausedStateManaging,
+        featureFlagger: FeatureFlagger = Application.appDelegate.featureFlagger
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
@@ -183,6 +187,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.syncFeatureFlags = syncService.featureFlags
         self.userAuthenticator = userAuthenticator
         self.syncPausedStateManager = syncPausedStateManager
+        self.featureFlagger = featureFlagger
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
@@ -409,11 +414,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             self.connector?.stopPolling()
             self.connector = nil
 
-            guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
-                assertionFailure("window or sheet parent not present")
-                return
+            Task { @MainActor in
+                guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
+                    assertionFailure("window or sheet parent not present")
+                    return
+                }
+                sheetParent.endSheet(window)
             }
-            sheetParent.endSheet(window)
         }
 
         parentWindowController.window?.beginSheet(syncWindow)
@@ -577,8 +584,15 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 do {
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)
                 } catch {
-                    managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToMergeTwoAccounts, description: "")
-                    PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
+                    if case SyncError.accountAlreadyExists = error,
+                        featureFlagger.isFeatureOn(.syncSeamlessAccountSwitching) {
+                        handleAccountAlreadyExists(recoveryKey)
+                    } else if case SyncError.accountAlreadyExists = error {
+                        managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToMergeTwoAccounts, description: "")
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
+                    } else {
+                        managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToSyncToOtherDevice)
+                    }
                 }
             } else if let connectKey = syncCode.connect {
                 do {
@@ -754,5 +768,50 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool) {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
+    }
+
+    private func handleAccountAlreadyExists(_ recoveryKey: SyncCode.RecoveryKey) {
+        Task { @MainActor in
+            if devices.count > 1 {
+                managementDialogModel.showSwitchAccountsMessage()
+                PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncAskUserToSwitchAccount.withoutMacPrefix)
+            } else {
+                await switchAccounts(recoveryKey: recoveryKey)
+                managementDialogModel.endFlow()
+            }
+            PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: SyncError.accountAlreadyExists)))
+        }
+    }
+
+    func userConfirmedSwitchAccounts(recoveryCode: String) {
+        PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserAcceptedSwitchingAccount.withoutMacPrefix)
+        guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
+            return
+        }
+        Task {
+            await switchAccounts(recoveryKey: recoveryKey)
+            await managementDialogModel.endFlow()
+        }
+    }
+
+    private func switchAccounts(recoveryKey: SyncCode.RecoveryKey) async {
+        do {
+            try await syncService.disconnect()
+        } catch {
+            PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedLogoutError.withoutMacPrefix)
+        }
+
+        do {
+            let device = deviceInfo()
+            let registeredDevices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
+            await mapDevices(registeredDevices)
+        } catch {
+            PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedLoginError.withoutMacPrefix)
+        }
+        PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserSwitchedAccount.withoutMacPrefix)
+    }
+
+    func switchAccountsCancelled() {
+        PixelKit.fire(SyncSwitchAccountPixelKitEvent.syncUserCancelledSwitchingAccount.withoutMacPrefix)
     }
 }

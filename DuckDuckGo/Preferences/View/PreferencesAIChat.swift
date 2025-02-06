@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import PreferencesViews
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 
@@ -30,23 +30,7 @@ extension Preferences {
                 TextMenuTitle(UserText.aiChat)
                 PreferencePaneSubSection {
                     VStack(alignment: .leading, spacing: 1) {
-                        if #available(macOS 12, *) {
-                            // Use Markdown for macOS 12 and newer
-                            // .init is required for markdown to be correctly parsed from NSLocalizedString
-                            Text(.init(UserText.aiChatPreferencesCaptionWithLinkMarkdown))
-                                .environment(\.openURL, OpenURLAction { _ in
-                                    model.openAIChatLink()
-                                    return .handled
-                                })
-                                .tint(Color(.linkBlue))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .fixMultilineScrollableText()
-                                .foregroundColor(Color(.greyText))
-                        } else {
-                            // Fallback for earlier macOS versions
-                            TextMenuItemCaption(UserText.aiChatPreferencesCaptionWithLinkFallback)
-                        }
-
+                        TextMenuItemCaption(UserText.aiChatPreferencesCaption)
                         TextButton(UserText.aiChatPreferencesLearnMoreButton) {
                             model.openLearnMoreLink()
                         }

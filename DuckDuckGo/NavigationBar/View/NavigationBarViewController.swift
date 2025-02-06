@@ -54,6 +54,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
+    @IBOutlet weak var menuButtons: NSStackView!
 
     @IBOutlet weak var aiChatButton: MouseOverButton!
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
@@ -85,7 +86,7 @@ final class NavigationBarViewController: NSViewController {
     var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
-    private let isBurner: Bool
+    private var burnerMode: BurnerMode { tabCollectionViewModel.burnerMode }
 
     // swiftlint:disable weak_delegate
     private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
@@ -124,7 +125,6 @@ final class NavigationBarViewController: NSViewController {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 
     static func create(tabCollectionViewModel: TabCollectionViewModel,
-                       isBurner: Bool,
                        networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
                        downloadListCoordinator: DownloadListCoordinator = .shared,
                        dragDropManager: BookmarkDragDropManager = .shared,
@@ -134,17 +134,16 @@ final class NavigationBarViewController: NSViewController {
                        aiChatMenuConfig: AIChatMenuVisibilityConfigurable,
                        brokenSitePromptLimiter: BrokenSitePromptLimiter) -> NavigationBarViewController {
         NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter, aiChatMenuConfig: aiChatMenuConfig, brokenSitePromptLimiter: brokenSitePromptLimiter)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter, aiChatMenuConfig: aiChatMenuConfig, brokenSitePromptLimiter: brokenSitePromptLimiter)
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter,
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter,
           aiChatMenuConfig: AIChatMenuVisibilityConfigurable, brokenSitePromptLimiter: BrokenSitePromptLimiter) {
 
-        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: isBurner)
+        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: tabCollectionViewModel.isBurner)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager, statusReporter: networkProtectionStatusReporter)
-        self.isBurner = isBurner
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.downloadListCoordinator = downloadListCoordinator
         self.dragDropManager = dragDropManager
@@ -193,6 +192,12 @@ final class NavigationBarViewController: NSViewController {
 #endif
 
         subscribeToAIChatOnboarding()
+
+        if #available(macOS 14.4, *), !burnerMode.isBurner {
+            WebExtensionManager.shared.toolbarButtons().enumerated().forEach { (index, button) in
+                menuButtons.insertArrangedSubview(button, at: index)
+            }
+        }
     }
 
     override func viewWillAppear() {
@@ -234,7 +239,7 @@ final class NavigationBarViewController: NSViewController {
         let onboardingPixelReporter = OnboardingPixelReporter()
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel,
-                                                                      isBurner: isBurner,
+                                                                      burnerMode: burnerMode,
                                                                       popovers: popovers,
                                                                       onboardingPixelReporter: onboardingPixelReporter) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
@@ -306,12 +311,17 @@ final class NavigationBarViewController: NSViewController {
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
+        var dockCustomization: DockCustomization?
+#if SPARKLE
+        dockCustomization = Application.appDelegate.dockCustomization
+#endif
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),
                                    internalUserDecider: internalUserDecider,
                                    subscriptionManager: subscriptionManager,
-                                   freemiumDBPFeature: freemiumDBPFeature)
+                                   freemiumDBPFeature: freemiumDBPFeature,
+                                   dockCustomizer: dockCustomization)
 
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
@@ -963,6 +973,7 @@ final class NavigationBarViewController: NSViewController {
             Logger.passwordManager.debug("Presenting Save Credentials popover")
             popovers.displaySaveCredentials(credentials,
                                             automaticallySaved: data.automaticallySavedCredentials,
+                                            backfilled: data.backfilled,
                                             usingView: passwordManagementButton,
                                             withDelegate: self)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
@@ -1346,7 +1357,9 @@ extension NavigationBarViewController {
         let account = SecureVaultModels.WebsiteAccount(title: nil, username: "example-username", domain: "example.com")
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
 
-        popovers.displaySaveCredentials(mockCredentials, automaticallySaved: false,
+        popovers.displaySaveCredentials(mockCredentials,
+                                        automaticallySaved: false,
+                                        backfilled: false,
                                         usingView: passwordManagementButton,
                                         withDelegate: self)
     }
@@ -1357,6 +1370,7 @@ extension NavigationBarViewController {
 
         popovers.displaySaveCredentials(mockCredentials,
                                         automaticallySaved: true,
+                                        backfilled: false,
                                         usingView: passwordManagementButton,
                                         withDelegate: self)
     }

@@ -1,0 +1,163 @@
+name: macOS - PIR E2E Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+     - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
+  pull_request:
+
+jobs:
+  pir-e2e-tests:
+    name: PIR e2e tests
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15-xlarge]
+        include:
+          - xcode-version: "16.2"
+            runner: macos-15-xlarge
+
+    if: |
+      startsWith(github.event.pull_request.base.ref, 'release/') ||
+      startsWith(github.event.pull_request.base.ref, 'hotfix/') ||
+      (contains(github.event.pull_request.body, '- [x] Run PIR E2E tests') && (github.event.action != 'edited' || !contains(github.event.changes.body.from, '- [x] Run PIR E2E tests'))) ||
+      github.event_name == 'schedule'
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.runner }}
+      cancel-in-progress: true
+
+    timeout-minutes: 40
+
+    steps:
+    - name: Register SSH keys for certificates repository and PIR fake broker repository access
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: |
+                        ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+                        ${{ secrets.SSH_PRIVATE_KEY_PIR_FAKE_BROKER }}
+
+    - name: Check out the PIR fake broker code
+      uses: actions/checkout@v4
+      with:
+        repository: DuckDuckGo/pir-fake-broker
+        ssh-key: ${{ secrets.SSH_PRIVATE_KEY_PIR_FAKE_BROKER }}
+        ref: main
+        path: pir-fake-broker
+
+    - name: Start PIR Fake Broker
+      run: |
+        cd pir-fake-broker
+        cd scripts
+        ./install-prerequisites.sh
+        ./setup-ci.sh
+        cd ..
+        pnpm start:all &
+
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        path: main
+
+    - name: Set up fastlane
+      run: |
+        cd main
+        bundle install
+
+    - name: Sync code signing assets
+      env:
+        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+      run: |
+        cd main
+        bundle exec fastlane sync_signing_ci
+
+    - name: Download and unzip artifact
+      uses: actions/download-artifact@v4
+
+    - name: Set cache key hash
+      run: |
+        cd main
+        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        if [[ "$has_only_tags" == "true" ]]; then
+          echo "cache_key_hash=${{ hashFiles('DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
+        else
+          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
+        fi
+
+    - name: Cache SPM
+      if: env.cache_key_hash
+      uses: actions/cache@v4
+      with:
+        path: main/DerivedData/SourcePackages
+        key: ${{ runner.os }}-spm-${{ env.cache_key_hash }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+
+    - name: Select Xcode
+      run: |
+        # Override .xcode_version because 15.4 is not available on macos 13
+        echo "${{ matrix.xcode-version }}" > .xcode-version
+        sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+
+    - name: Run PIR e2e Tests
+      run: |
+        cd main
+        launchctl setenv PRIVACYPRO_STAGING_TOKEN '${{ secrets.PRIVACYPRO_STAGING_TOKEN }}'
+        set -o pipefail && xcodebuild test \
+          -scheme "macOS PIR E2E Tests" \
+          -derivedDataPath "DerivedData" \
+          -configuration "CI" \
+          -skipPackagePluginValidation -skipMacroValidation \
+          ENABLE_TESTABILITY=true \
+          "-only-testing:DBPE2ETests" \
+          -retry-tests-on-failure \
+          | tee xcodebuild.log \
+          | tee pir-e2e-tests.log
+      env:
+          PRIVACYPRO_STAGING_TOKEN: ${{ secrets.PRIVACYPRO_STAGING_TOKEN }}
+
+    - name: Prepare test report
+      if: always()
+      run: |
+        cd main
+        xcbeautify --report junit --report-path . --junit-report-filename pir-e2e-tests.xml < pir-e2e-tests.log
+
+    - name: Publish tests report
+      uses: mikepenz/action-junit-report@v4
+      if: always()
+      with:
+        check_name: "Test Report ${{ matrix.runner }}"
+        report_paths: pir-e2e-tests.xml
+
+    - name: Upload logs when workflow failed
+      uses: actions/upload-artifact@v4
+      if: failure() || cancelled()
+      with:
+        name: "BuildLogs ${{ matrix.runner }}"
+        path: |
+          xcodebuild.log
+          DerivedData/Logs/Test/*.xcresult
+          ~/Library/Logs/DiagnosticReports/*
+        retention-days: 7
+
+  notify-failure:
+    name: Notify on failure
+    if: ${{ always() && github.event_name == 'schedule' && (needs.pir-e2e-tests.result == 'failure' || needs.pir-e2e-tests.result == 'cancelled') }}
+    needs: [pir-e2e-tests]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create Asana task when workflow failed
+      uses: duckduckgo/native-github-asana-sync@v1.1
+      with:
+        action: create-asana-task
+        asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
+        asana-task-name: GH Workflow Failure - PIR e2e Tests
+        asana-task-description: The PIR e2e Tests workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

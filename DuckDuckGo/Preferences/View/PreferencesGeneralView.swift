@@ -21,7 +21,7 @@ import Combine
 import FeatureFlags
 import MaliciousSiteProtection
 import PixelKit
-import PreferencesViews
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 
@@ -49,7 +49,7 @@ extension Preferences {
                         HStack {
                             if isAddedToDock || dockCustomizer.isAddedToDock {
                                 HStack {
-                                    Image(.successCheckmark)
+                                    Image(.checkCircle).foregroundColor(Color(.successGreen))
                                     Text(UserText.isAddedToDock)
                                 }
                                 .transition(.opacity)
@@ -89,7 +89,7 @@ extension Preferences {
                         }, label: {})
                         .pickerStyle(.radioGroup)
                         .disabled(dataClearingModel.isAutoClearEnabled)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                         .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
                         if dataClearingModel.isAutoClearEnabled {
                             VStack(alignment: .leading, spacing: 1) {
@@ -145,7 +145,7 @@ extension Preferences {
                             }.tag(true)
                         }
                         .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                     }
 
                     PreferencePaneSubSection {
@@ -196,7 +196,7 @@ extension Preferences {
                 }
 
                 // SECTION 7: Phishing Detection
-                if featureFlagger.isFeatureOn(.maliciousSiteProtection) {
+                if featureFlagger.maliciousSiteProtectionFeatureFlags().isMaliciousSiteProtectionEnabled {
                     PreferencePaneSection(UserText.maliciousSiteDetectionHeader, spacing: 0) {
                         PreferencePaneSubSection {
                             ToggleMenuItem(UserText.maliciousSiteDetectionIsEnabled,

@@ -22,6 +22,7 @@ import Foundation
 import Configuration
 import Persistence
 import PixelKit
+import PixelExperimentKit
 
 private extension Configuration {
     var fileName: String {
@@ -164,7 +165,15 @@ final class ConfigurationStore: ConfigurationStoring {
                 let nserror = error as NSError
 
                 if nserror.domain != NSCocoaErrorDomain || nserror.code != NSFileReadNoSuchFileError {
-                    PixelKit.fire(DebugEvent(GeneralPixel.trackerDataCouldNotBeLoaded, error: error))
+                    if config == .trackerDataSet, let experimentName = TDSOverrideExperimentMetrics.activeTDSExperimentNameWithCohort {
+                        let parameters = [
+                            "experimentName": experimentName,
+                            "etag": loadEtag(for: .trackerDataSet) ?? ""
+                        ]
+                        PixelKit.fire(DebugEvent(GeneralPixel.trackerDataCouldNotBeLoaded, error: error), withAdditionalParameters: parameters)
+                    } else {
+                        PixelKit.fire(DebugEvent(GeneralPixel.trackerDataCouldNotBeLoaded, error: error))
+                    }
                 }
             }
         }

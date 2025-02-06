@@ -25,12 +25,13 @@ import Configuration
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
+    case crashDaily
     case crashOnCrashHandlersSetUp
     case crashReportingSubmissionFailed
     case crashReportCRCIDMissing
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
-    case launch(isDefault: Bool)
+    case launch(isDefault: Bool, isAddedToDock: Bool?)
 
     case serp(cohort: String?)
     case serpInitial(cohort: String)
@@ -104,8 +105,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case importDataInitial
 
     // New Tab section removed
-    case favoriteSectionHidden
-    case recentActivitySectionHidden
     case continueSetUpSectionHidden
 
     // Fire Button
@@ -145,9 +144,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerYouTubeOverlayNavigationOutsideYoutube
     case duckPlayerYouTubeOverlayNavigationClosed
     case duckPlayerYouTubeNavigationIdle30
-
-    // Temporary Home Page Pixels
-    case privacyFeedHistoryLinkOpened
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -238,9 +234,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case addToDockNewTabPageCardPresented
     case userAddedToDockFromNewTabPageCard
     case userAddedToDockFromSettings
+    case userAddedToDockFromMainMenu
+    case userAddedToDockFromMoreOptionsMenu
+    case userAddedToDockFromDefaultBrowserSection
     case serpAddedToDock
 
     case protectionToggledOffBreakageReport
+    case debugBreakageExperiment
 
     // Password Import Keychain Prompt
     case passwordImportKeychainPrompt
@@ -252,6 +252,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case autocompleteClickBookmark(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteClickFavorite(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteClickHistory(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickOpenTab(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteToggledOff
     case autocompleteToggledOn
 
@@ -469,11 +470,16 @@ enum GeneralPixel: PixelKitEventV2 {
     case siteNotWorkingShown
     case siteNotWorkingWebsiteIsBroken
 
+    // Enhanced statistics
+    case usageSegments
+
     var name: String {
         switch self {
-
         case .crash:
             return "m_mac_crash"
+
+        case .crashDaily:
+            return "m_mac_crash_daily"
 
         case .crashOnCrashHandlersSetUp:
             return "m_mac_crash_on_handlers_setup"
@@ -487,8 +493,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
 
-        case .launch(let isDefault):
-            return isDefault ? "ml_mac_app-launch_as-default" : "ml_mac_app-launch_as-nondefault"
+        case .launch:
+            return  "m_mac_daily_active_user"
 
         case .serp:
             return "m_mac_navigation_search"
@@ -622,10 +628,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_import-data_initial"
         case .newTabInitial:
             return "m_mac_new-tab-opened_initial"
-        case .favoriteSectionHidden:
-            return "m_mac_favorite-section-hidden"
-        case .recentActivitySectionHidden:
-            return "m_mac_recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac_continue-setup-section-hidden"
 
@@ -697,9 +699,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_youtube_overlay_navigation_closed"
         case .duckPlayerYouTubeNavigationIdle30:
             return "duckplayer_youtube_overlay_idle-30"
-
-        case .privacyFeedHistoryLinkOpened:
-            return "privacy_feed_history_link_opened"
 
         case .dashboardProtectionAllowlistAdd:
             return "mp_wla"
@@ -825,9 +824,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .addToDockNewTabPageCardPresented: return "m_mac_add_to_dock_new_tab_page_card_presented_u"
         case .userAddedToDockFromNewTabPageCard: return "m_mac_user_added_to_dock_from_new_tab_page_card"
         case .userAddedToDockFromSettings: return "m_mac_user_added_to_dock_from_settings"
+        case .userAddedToDockFromMainMenu: return "m_mac_user_added_to_dock_from_main_menu"
+        case .userAddedToDockFromMoreOptionsMenu: return "m_mac_user_added_to_dock_from_more_options_menu"
+        case .userAddedToDockFromDefaultBrowserSection: return "m_mac_user_added_to_dock_from_default_browser_section"
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
+        case .debugBreakageExperiment: return "m_mac_debug_breakage_experiment_u"
 
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
@@ -839,6 +842,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autocompleteClickBookmark: return "m_mac_autocomplete_click_bookmark"
         case .autocompleteClickFavorite: return "m_mac_autocomplete_click_favorite"
         case .autocompleteClickHistory: return "m_mac_autocomplete_click_history"
+        case .autocompleteClickOpenTab: return "m_mac_autocomplete_click_opentab"
         case .autocompleteToggledOff: return "m_mac_autocomplete_toggled_off"
         case .autocompleteToggledOn: return "m_mac_autocomplete_toggled_on"
 
@@ -891,11 +895,11 @@ enum GeneralPixel: PixelKitEventV2 {
             return "cfgfetch"
 
         case .trackerDataParseFailed:
-            return "tds_p"
+            return "trackerata_parse_failed"
         case .trackerDataReloadFailed:
             return "tds_r"
         case .trackerDataCouldNotBeLoaded:
-            return "tds_l"
+            return "tracker_data_could_not_be_loaded"
 
         case .privacyConfigurationParseFailed:
             return "pcf_p"
@@ -1155,6 +1159,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
+
+            // Enhanced statistics
+        case .usageSegments: return "retention_segments"
         }
     }
 
@@ -1189,6 +1196,15 @@ enum GeneralPixel: PixelKitEventV2 {
         case .loginItemUpdateError(let loginItemBundleID, let action, let buildType, let osVersion):
             return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
 
+        case .launch(let isDefault, let isAddedToDock):
+            var params = [String: String]()
+            params["default_browser"] = isDefault ? "1" : "0"
+
+            if let isAddedToDock = isAddedToDock {
+                params["dock"] = isAddedToDock ? "1" : "0"
+            }
+
+            return params
         case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
             var params = error.pixelParameters
 
@@ -1339,7 +1355,8 @@ enum GeneralPixel: PixelKitEventV2 {
                 .autocompleteClickWebsite(let from, let cohort, let onboardingCohort),
                 .autocompleteClickBookmark(let from, let cohort, let onboardingCohort),
                 .autocompleteClickFavorite(let from, let cohort, let onboardingCohort),
-                .autocompleteClickHistory(let from, let cohort, let onboardingCohort):
+                .autocompleteClickHistory(let from, let cohort, let onboardingCohort),
+                .autocompleteClickOpenTab(let from, let cohort, let onboardingCohort):
             var parameters: [String: String] = [:]
             if let from {
                 parameters[NewTabSearchBoxExperimentPixel.Parameters.from] = from.rawValue

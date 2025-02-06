@@ -18,6 +18,7 @@
 
 import AppKit
 import PixelKit
+import BrowserServicesKit
 
 final class SafariDataImporter: DataImporter {
 

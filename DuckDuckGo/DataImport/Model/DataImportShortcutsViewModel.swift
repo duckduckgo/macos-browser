@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftUI
+import BrowserServicesKit
 
 final class DataImportShortcutsViewModel: ObservableObject {
     typealias DataType = DataImport.DataType

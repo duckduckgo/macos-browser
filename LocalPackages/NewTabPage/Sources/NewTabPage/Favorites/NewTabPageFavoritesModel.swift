@@ -38,7 +38,7 @@ final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavorite
     }
 
     var isViewExpanded: Bool {
-        get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
+        get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? true }
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
     }
 
@@ -48,10 +48,6 @@ final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavorite
         }
         isViewExpanded = legacySetting
     }
-}
-
-public enum FavoriteOpenTarget {
-    case current, newTab, newWindow
 }
 
 public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObject where FavoriteType: NewTabPageFavorite,
@@ -125,11 +121,6 @@ public final class NewTabPageFavoritesModel<FavoriteType, ActionHandler>: NSObje
     @MainActor
     func addNew() {
         actionsHandler.addNewFavorite()
-    }
-
-    @MainActor
-    func onFaviconMissing() {
-        actionsHandler.onFaviconMissing()
     }
 
     // MARK: Context Menu

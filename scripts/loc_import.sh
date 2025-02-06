@@ -82,7 +82,7 @@ for dir in "$input_path"/*; do
 
         echo "Importing ${dir}/${fileName} ..."
 
-        if ! xcodebuild -importLocalizations -project "${base_dir}/DuckDuckGo.xcodeproj" -localizationPath "${dir}/${fileName}" APP_STORE_PRODUCT_MODULE_NAME_OVERRIDE="DuckDuckGo_Privacy_Browser_App_Store" PRIVACY_PRO_PRODUCT_MODULE_NAME_OVERRIDE="DuckDuckGo_Privacy_Browser_Privacy_Pro"; then
+        if ! xcodebuild -importLocalizations -project "${base_dir}/DuckDuckGo-macOS.xcodeproj" -localizationPath "${dir}/${fileName}" APP_STORE_PRODUCT_MODULE_NAME_OVERRIDE="DuckDuckGo_Privacy_Browser_App_Store" PRIVACY_PRO_PRODUCT_MODULE_NAME_OVERRIDE="DuckDuckGo_Privacy_Browser_Privacy_Pro"; then
             echo "ERROR: Failed to import ${dir}/${fileName}"
             echo
             echo "Check translation folder and files then try again."

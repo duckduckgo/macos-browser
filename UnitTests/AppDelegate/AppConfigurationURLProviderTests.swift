@@ -17,9 +17,27 @@
 //
 
 import XCTest
+import BrowserServicesKit
+import Configuration
 @testable import DuckDuckGo_Privacy_Browser
 
 final class AppConfigurationURLProviderTests: XCTestCase {
+    private var urlProvider: AppConfigurationURLProvider!
+    private var mockTdsURLProvider: MockTrackerDataURLProvider!
+    let controlURL = "control/url.json"
+    let treatmentURL = "treatment/url.json"
+
+    override func setUp() {
+        super.setUp()
+        mockTdsURLProvider = MockTrackerDataURLProvider()
+        urlProvider = AppConfigurationURLProvider(trackerDataUrlProvider: mockTdsURLProvider)
+    }
+
+    override func tearDown() {
+        urlProvider = nil
+        mockTdsURLProvider = nil
+        super.tearDown()
+    }
 
     func testExternalURLDependenciesAreExpected() throws {
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .bloomFilterBinary).absoluteString, "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")
@@ -30,4 +48,31 @@ final class AppConfigurationURLProviderTests: XCTestCase {
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .trackerDataSet).absoluteString, "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")
     }
 
+    func testUrlForTrackerDataIsDefaultWhenTdsUrlProviderUrlIsNil() {
+        // GIVEN
+        mockTdsURLProvider.trackerDataURL = nil
+
+        // WHEN
+        let url = urlProvider.url(for: .trackerDataSet)
+
+        // THEN
+        XCTAssertEqual(url, AppConfigurationURLProvider.Constants.defaultTrackerDataURL)
+    }
+
+    func testUrlForTrackerDataIsTheOneProvidedByTdsUrlProvider() {
+        // GIVEN
+        let expectedURL = URL(string: "https://someurl.com")!
+        mockTdsURLProvider.trackerDataURL = expectedURL
+
+        // WHEN
+        let url = urlProvider.url(for: .trackerDataSet)
+
+        // THEN
+        XCTAssertEqual(url, expectedURL)
+    }
+
+}
+
+class MockTrackerDataURLProvider: TrackerDataURLProviding {
+    var trackerDataURL: URL?
 }

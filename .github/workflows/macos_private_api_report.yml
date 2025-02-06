@@ -1,0 +1,45 @@
+name: macOS - Private API Usage Report
+
+on:
+  workflow_call:
+    inputs:
+      report:
+        description: Private API check report
+        required: true
+        default: ''
+        type: string
+
+jobs:
+  private-api:
+
+    name: Update PR comment
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Format message
+      run: |
+        message="${{ inputs.report }}"
+
+        # restore newlines
+        message="${message//'%0A'/$'\n'}"
+
+        # format message body as code block
+        echo '```' > message.txt
+        echo "${message}" >> message.txt
+        echo '```' >> message.txt
+
+    - name: Comment on the PR
+      if: ${{ inputs.report != '' }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: status
+        path: message.txt
+
+    - name: Delete comment on the PR
+      if: ${{ inputs.report == '' }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: status
+        delete: true

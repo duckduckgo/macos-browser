@@ -26,6 +26,7 @@ import Subscription
 import os.log
 import Freemium
 import DataBrokerProtection
+import SwiftUI
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -65,6 +66,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     private let freemiumDBPFeature: FreemiumDBPFeature
     private let freemiumDBPPresenter: FreemiumDBPPresenter
     private let appearancePreferences: AppearancePreferences
+    private var dockCustomizer: DockCustomization?
     private let defaultBrowserPreferences: DefaultBrowserPreferences
 
     private let notificationCenter: NotificationCenter
@@ -93,6 +95,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
          freemiumDBPFeature: FreemiumDBPFeature,
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
+         dockCustomizer: DockCustomization? = nil,
          defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
          notificationCenter: NotificationCenter = .default,
          freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler(),
@@ -109,6 +112,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         self.freemiumDBPFeature = freemiumDBPFeature
         self.freemiumDBPPresenter = freemiumDBPPresenter
         self.appearancePreferences = appearancePreferences
+        self.dockCustomizer = dockCustomizer
         self.defaultBrowserPreferences = defaultBrowserPreferences
         self.notificationCenter = notificationCenter
         self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
@@ -150,6 +154,30 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
 #endif // FEEDBACK
 
+#if SPARKLE
+        if let dockCustomizer = self.dockCustomizer {
+            if dockCustomizer.isAddedToDock == false {
+                if dockCustomizer.shouldShowNotification {
+                    let addToDockMenuItem = NSMenuItem(action: #selector(addToDock(_:)))
+                        .targetting(self)
+                    addToDockMenuItem.view = createMenuItemWithFeatureIndicator(
+                        title: UserText.addDuckDuckGoToDock,
+                        image: .addToDockMenuItem) {
+                            if let target = addToDockMenuItem.target {
+                                _ = target.perform(addToDockMenuItem.action, with: addToDockMenuItem)
+                            }
+                            self.cancelTracking()
+                        }
+                    addItem(addToDockMenuItem)
+                } else {
+                    let addToDockMenuItem = NSMenuItem(title: UserText.addDuckDuckGoToDock, action: #selector(addToDock(_:)))
+                        .targetting(self)
+                        .withImage(.addToDockMenuItem)
+                    addItem(addToDockMenuItem)
+                }
+            }
+        }
+#endif
         if !defaultBrowserPreferences.isDefault {
             let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser, action: #selector(setAsDefault(_:)))
                 .targetting(self)
@@ -188,12 +216,28 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         addItem(preferencesItem)
     }
 
+    private func createMenuItemWithFeatureIndicator(title: String, image: NSImage, onTap: @escaping () -> Void) -> NSView {
+        let menuItem = MenuItemWithNotificationDot(leftImage: image, title: title, onTapMenuItem: onTap)
+
+        let hostingView = NSHostingView(rootView: menuItem)
+        hostingView.frame = NSRect(x: 0, y: 0, width: size.width, height: 22)
+        hostingView.autoresizingMask = [.width, .height]
+
+        return hostingView
+    }
+
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
     }
 
     @objc func showNetworkProtectionStatus(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
+    }
+
+    @MainActor
+    @objc func addToDock(_ sender: NSMenuItem) {
+        PixelKit.fire(GeneralPixel.userAddedToDockFromMoreOptionsMenu)
+        dockCustomizer?.addToDock()
     }
 
     @MainActor
@@ -512,6 +556,10 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
             updateController.needsNotificationDot = false
         }
 #endif
+    }
+
+    func menuDidClose(_ menu: NSMenu) {
+        dockCustomizer?.didCloseMoreOptionsMenu()
     }
 }
 

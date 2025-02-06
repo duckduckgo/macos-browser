@@ -21,7 +21,7 @@
           "noResultsSelector": "div[class^=ResultNotFound__NoResults]",
           "profile": {
             "name": {
-              "selector": "[class^='ResultsTable__Name-sc']"
+              "selector": ".//div[contains(@class, 'ResultsTable__Name')]/text()"
             },
             "age": {
               "selector": "[class^='ResultsTable__Age-sc']"
@@ -62,7 +62,7 @@
                   "selector": "[class^='ResultsTable__Record-sc']",
                   "profile": {
                     "name": {
-                      "selector": "[class^='ResultsTable__Name-sc']"
+                      "selector": ".//div[contains(@class, 'ResultsTable__Name')]/text()"
                     },
                     "age": {
                       "selector": "[class^='ResultsTable__Age-sc']"

@@ -50,8 +50,9 @@ final class VPNProxyLauncher {
     private func subscribeToStatusChanges() {
         notificationCenter.publisher(for: .NEVPNStatusDidChange)
             .receive(on: DispatchQueue.main)
-            .removeDuplicates()
-            .sink(receiveValue: statusChanged(notification:))
+            .sink { [weak self] notification in
+                self?.statusChanged(notification: notification)
+            }
             .store(in: &cancellables)
     }
 
@@ -67,7 +68,9 @@ final class VPNProxyLauncher {
 
     private func subscribeToProxySettingChanges() {
         proxyController.settings.changePublisher
-            .sink(receiveValue: proxySettingChanged(_:))
+            .sink { [weak self] notification in
+                self?.proxySettingChanged(notification)
+            }
             .store(in: &cancellables)
     }
 

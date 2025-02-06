@@ -20,6 +20,7 @@ import Foundation
 import CommonCrypto
 import CryptoKit
 import GRDB
+import BrowserServicesKit
 
 protocol FirefoxEncryptionKeyReading {
 

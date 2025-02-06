@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-import PreferencesViews
-import SwiftUI
-import SwiftUIExtensions
 import NetworkProtection
 import PixelKit
+import PreferencesUI_macOS
+import SwiftUI
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -55,9 +55,9 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
-                // SECTION: Excluded Sites
+                if model.showLegacyExclusionsFeature {
+                    // SECTION: Excluded Sites
 
-                if model.showExcludedSites {
                     PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
                         Text(UserText.vpnExcludedDomainsDescription)
                             .foregroundColor(.secondary)
@@ -112,6 +112,35 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
+                if model.showNewExclusionsFeature {
+                    // SECTION: Exclusions
+
+                    PreferencePaneSection {
+                        TextMenuItemHeader(UserText.vpnExclusionsTitle)
+                        TextMenuItemCaption(UserText.vpnSettingsExclusionsDescription)
+
+                        SubfeatureGroup {
+                            SubfeatureView(icon: Image(.globe16),
+                                           title: UserText.vpnExcludedSitesTitle,
+                                           description: exclusionCountString(value: model.excludedDomainsCount),
+                                           buttonName: UserText.vpnSettingsManageExclusionsButtonTitle,
+                                           buttonAction: { model.manageExcludedSites() },
+                                           enabled: true)
+
+                            Divider()
+                                .foregroundColor(Color.secondary)
+
+                            SubfeatureView(icon: Image(.window16),
+                                           title: UserText.vpnExcludedAppsTitle,
+                                           description: exclusionCountString(value: model.excludedAppsCount),
+                                           buttonName: UserText.vpnSettingsManageExclusionsButtonTitle,
+                                           buttonAction: { model.manageExcludedApps() },
+                                           enabled: true)
+                        }
+                    }
+                    .padding(.bottom, 12)
+                }
+
                 // SECTION: DNS Settings
 
                 PreferencePaneSection(UserText.vpnDnsServerTitle) {
@@ -133,7 +162,7 @@ extension Preferences {
                             }.tag(true)
                         }
                         .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                         .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
                             if isCustomDNSSelected {
                                 showsCustomDNSServerPageSheet.toggle()
@@ -173,6 +202,12 @@ extension Preferences {
                     }
                 }
             }
+        }
+
+        /// Resolves the text to be used for exclusion counts
+        ///
+        private func exclusionCountString(value: Int) -> String {
+            value > 0 ? String(value) : UserText.vpnNoExclusionsFoundText
         }
     }
 }

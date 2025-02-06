@@ -43,17 +43,12 @@ read_command_line_arguments() {
 	case "$1" in
 		review)
 			app_name="DuckDuckGo Review"
-			scheme="Product Review Release"
+			scheme="macOS Browser Review"
 			configuration="Review"
 			;;
 		release)
 			app_name="DuckDuckGo"
-			scheme="DuckDuckGo Privacy Browser"
-			configuration="Release"
-			;;
-		dbp)
-			app_name="DuckDuckGoDBP"
-			scheme="DuckDuckGo DBP"
+			scheme="macOS Browser"
 			configuration="Release"
 			;;
 		clear-keychain)

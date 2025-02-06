@@ -31,7 +31,7 @@ extension NetworkProtectionDeviceManager {
         let keyStore = NetworkProtectionKeychainKeyStore()
         let tokenStore = NetworkProtectionKeychainTokenStore()
         return NetworkProtectionDeviceManager(environment: settings.selectedEnvironment,
-                                              tokenStore: tokenStore,
+                                              tokenHandler: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents)
     }
@@ -63,7 +63,7 @@ extension NetworkProtectionLocationListCompositeRepository {
         let settings = Application.appDelegate.vpnSettings
         self.init(
             environment: settings.selectedEnvironment,
-            tokenStore: NetworkProtectionKeychainTokenStore(),
+            tokenHandler: NetworkProtectionKeychainTokenStore(),
             errorEvents: .networkProtectionAppDebugEvents
         )
     }

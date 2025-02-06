@@ -38,6 +38,9 @@ public enum FeatureFlag: String, CaseIterable {
 
     case credentialsImportPromotionForExistingUsers
 
+    /// https://app.asana.com/0/0/1209150117333883/f
+    case networkProtectionAppExclusions
+
     /// https://app.asana.com/0/72649045549333/1208231259093710/f
     case networkProtectionUserTips
 
@@ -47,17 +50,37 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/0/72649045549333/1208241266421040/f
     case htmlNewTabPage
 
+    /// https://app.asana.com/0/1201048563534612/1208850443048685/f
+    case historyView
+
     case autofillPartialFormSaves
+    case autcompleteTabs
+    case webExtensions
+    case syncSeamlessAccountSwitching
+
+    case testExperiment
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
+    public var cohortType: (any FeatureFlagCohortDescribing.Type)? {
+        switch self {
+        case .testExperiment:
+            return TestExperimentCohort.self
+        default:
+            return nil
+        }
+    }
+
+    public enum TestExperimentCohort: String, FeatureFlagCohortDescribing {
+        case control
+        case treatment
+    }
+
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .htmlNewTabPage:
+        case .htmlNewTabPage, .autofillPartialFormSaves, .autcompleteTabs, .networkProtectionAppExclusions, .syncSeamlessAccountSwitching, .historyView, .webExtensions:
             return true
-        case .maliciousSiteProtection:
-            return true
-        case .autofillPartialFormSaves:
+        case .testExperiment:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -67,7 +90,8 @@ extension FeatureFlag: FeatureFlagDescribing {
              .unknownUsernameCategorization,
              .credentialsImportPromotionForExistingUsers,
              .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes:
+             .networkProtectionEnforceRoutes,
+             .maliciousSiteProtection:
             return false
         }
     }
@@ -85,19 +109,31 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .freemiumDBP:
             return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
         case .maliciousSiteProtection:
-            return .remoteReleasable(.feature(.maliciousSiteProtection))
+            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.onByDefault))
         case .contextualOnboarding:
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
             return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
+        case .networkProtectionAppExclusions:
+            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.appExclusions))
         case .networkProtectionUserTips:
-            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
+            return .remoteReleasable(.subfeature(NetworkProtectionSubfeature.userTips))
         case .networkProtectionEnforceRoutes:
-            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
+            return .remoteReleasable(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
+            return .remoteReleasable(.subfeature(HTMLNewTabPageSubfeature.isLaunched))
+        case .historyView:
             return .disabled
         case .autofillPartialFormSaves:
             return .remoteReleasable(.subfeature(AutofillSubfeature.partialFormSaves))
+        case .autcompleteTabs:
+            return .remoteReleasable(.feature(.autocompleteTabs))
+        case .webExtensions:
+            return .internalOnly()
+        case .syncSeamlessAccountSwitching:
+            return .remoteReleasable(.subfeature(SyncSubfeature.seamlessAccountSwitching))
+        case .testExperiment:
+            return .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
         }
     }
 }

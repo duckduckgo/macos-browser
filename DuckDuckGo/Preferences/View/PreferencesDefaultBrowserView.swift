@@ -18,7 +18,7 @@
 
 import AppKit
 import Combine
-import PreferencesViews
+import PreferencesUI_macOS
 import SwiftUI
 import SwiftUIExtensions
 import PixelKit
@@ -27,6 +27,8 @@ extension Preferences {
 
     struct DefaultBrowserView: View {
         @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
+        @State private var isAddedToDock = false
+        var dockCustomizer: DockCustomizer
         let status: PrivacyProtectionStatus
 
         var body: some View {
@@ -63,6 +65,44 @@ extension Preferences {
                             }
                         }
                     }
+
+                    Spacer().frame(height: 16)
+
+#if SPARKLE
+                    PreferencePaneSection(UserText.shortcuts, spacing: 4) {
+                        PreferencePaneSubSection {
+                            HStack {
+                                if isAddedToDock || dockCustomizer.isAddedToDock {
+                                    HStack {
+                                        Image(.checkCircle).foregroundColor(Color(.successGreen))
+                                        Text(UserText.isAddedToDock)
+                                    }
+                                    .transition(.opacity)
+                                    .padding(.trailing, 8)
+                                } else {
+                                    HStack {
+                                        Image(.warning).foregroundColor(Color(.linkBlue))
+                                        Text(UserText.isNotAddedToDock)
+                                    }
+                                    .padding(.trailing, 8)
+                                    Button(action: {
+                                        withAnimation {
+                                            PixelKit.fire(GeneralPixel.userAddedToDockFromDefaultBrowserSection,
+                                                          includeAppVersionParameter: false)
+                                            dockCustomizer.addToDock()
+                                            isAddedToDock = true
+                                        }
+                                    }) {
+                                        Text(UserText.addToDock)
+                                            .fixedSize(horizontal: true, vertical: false)
+                                            .multilineTextAlignment(.center)
+                                    }
+                                }
+                            }
+                        }
+                    }
+#endif
+
                 }
             }
         }

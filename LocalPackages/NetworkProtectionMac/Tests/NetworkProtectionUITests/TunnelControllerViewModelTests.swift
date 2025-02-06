@@ -121,6 +121,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
+            proxySettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
             uiActionHandler: MockVPNUIActionHandler())
 
@@ -143,6 +144,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
+            proxySettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
             uiActionHandler: MockVPNUIActionHandler())
 
@@ -172,6 +174,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
+            proxySettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
             uiActionHandler: MockVPNUIActionHandler())
 
@@ -196,6 +199,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
+            proxySettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
             uiActionHandler: MockVPNUIActionHandler())
 
@@ -217,6 +221,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
+            proxySettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
             uiActionHandler: MockVPNUIActionHandler())
 
@@ -234,6 +239,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
+            proxySettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
             uiActionHandler: MockVPNUIActionHandler())
         let networkProtectionWasStarted = expectation(description: "The model started the VPN when appropriate")
@@ -266,6 +272,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
+            proxySettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
             uiActionHandler: MockVPNUIActionHandler())
 

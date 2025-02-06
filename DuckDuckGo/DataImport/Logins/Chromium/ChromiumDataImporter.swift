@@ -18,6 +18,7 @@
 
 import Foundation
 import PixelKit
+import BrowserServicesKit
 
 internal class ChromiumDataImporter: DataImporter {
 
@@ -73,7 +74,7 @@ internal class ChromiumDataImporter: DataImporter {
 
             let loginsSummary = try loginResult.flatMap { logins in
                 do {
-                    return try .success(loginImporter.importLogins(logins) { count in
+                    return try .success(loginImporter.importLogins(logins, reporter: SecureVaultReporter.shared) { count in
                         try updateProgress(.importingPasswords(numberOfPasswords: count,
                                                                fraction: dataTypeFraction * (0.5 + Double(count) / Double(logins.count))))
                     })

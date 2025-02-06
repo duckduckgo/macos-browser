@@ -19,6 +19,7 @@
 import Foundation
 import CommonCrypto
 import CryptoKit
+import BrowserServicesKit
 
 final class FirefoxLoginReader {
 

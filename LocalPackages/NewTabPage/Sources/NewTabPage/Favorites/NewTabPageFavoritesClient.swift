@@ -19,15 +19,14 @@
 import Bookmarks
 import Common
 import Combine
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
-public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTabPageScriptClient where FavoriteType: NewTabPageFavorite,
-                                                                                                        ActionHandler: FavoritesActionsHandling,
-                                                                                                        ActionHandler.FavoriteType == FavoriteType {
+public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTabPageUserScriptClient where FavoriteType: NewTabPageFavorite,
+                                                                                                            ActionHandler: FavoritesActionsHandling,
+                                                                                                            ActionHandler.FavoriteType == FavoriteType {
 
     let favoritesModel: NewTabPageFavoritesModel<FavoriteType, ActionHandler>
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables: Set<AnyCancellable> = []
     private let preferredFaviconSize: Int
@@ -35,6 +34,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     public init(favoritesModel: NewTabPageFavoritesModel<FavoriteType, ActionHandler>, preferredFaviconSize: Int) {
         self.favoritesModel = favoritesModel
         self.preferredFaviconSize = preferredFaviconSize
+        super.init()
 
         favoritesModel.$favorites.dropFirst()
             .sink { [weak self] favorites in
@@ -65,7 +65,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
         case setConfig = "favorites_setConfig"
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.add.rawValue: { [weak self] in try await self?.add(params: $0, original: $1) },
             MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
@@ -84,7 +84,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
 
     private func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.isViewExpanded ? .expanded : .collapsed
-        return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        return NewTabPageUserScript.WidgetConfig(animation: .viewTransitions, expansion: expansion)
     }
 
     @MainActor
@@ -99,7 +99,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let favorites = favoritesModel.favorites.map {
-            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize, onFaviconMissing: favoritesModel.onFaviconMissing)
+            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize)
         }
         return NewTabPageDataModel.FavoritesData(favorites: favorites)
     }
@@ -107,7 +107,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     private func notifyDataUpdated(_ favorites: [NewTabPageFavorite]) {
         let favorites = favoritesModel.favorites.map {
-            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize, onFaviconMissing: favoritesModel.onFaviconMissing)
+            NewTabPageDataModel.Favorite($0, preferredFaviconSize: preferredFaviconSize)
         }
         pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageDataModel.FavoritesData(favorites: favorites))
     }
@@ -115,7 +115,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     @MainActor
     private func notifyConfigUpdated(_ showAllFavorites: Bool) {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = showAllFavorites ? .expanded : .collapsed
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .viewTransitions, expansion: expansion)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
     }
 
@@ -147,7 +147,7 @@ public final class NewTabPageFavoritesClient<FavoriteType, ActionHandler>: NewTa
     }
 }
 
-extension URL {
+public extension URL {
     static func duckFavicon(for faviconURL: URL) -> URL? {
         let encodedURL = faviconURL.absoluteString.percentEncoded(withAllowedCharacters: .urlPathAllowed)
         return URL(string: "duck://favicon/\(encodedURL)")

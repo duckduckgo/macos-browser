@@ -20,6 +20,7 @@ import Foundation
 import LoginItems
 import Common
 import DataBrokerProtection
+import os.log
 
 struct DataBrokerProtectionAppEvents {
 
@@ -52,6 +53,7 @@ struct DataBrokerProtectionAppEvents {
             // In this case, let's disable the agent and delete any left-over data because there's nothing for it to do
             if let profileQueriesCount = try? DataBrokerProtectionManager.shared.dataManager.profileQueriesCount(),
                profileQueriesCount > 0 {
+                Logger.dataBrokerProtection.log("Found \(profileQueriesCount) profile queries in DB. Restarting agent.")
                 restartBackgroundAgent(loginItemsManager: loginItemsManager)
 
                 // Wait to make sure the agent has had time to restart before attempting to call a method on it

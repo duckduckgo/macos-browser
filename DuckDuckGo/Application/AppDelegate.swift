@@ -27,6 +27,7 @@ import Crashes
 import DDGSync
 import FeatureFlags
 import History
+import HistoryView
 import MetricKit
 import Networking
 import NewTabPage
@@ -96,10 +97,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private(set) lazy var newTabPageActionsManager: NewTabPageActionsManaging = NewTabPageActionsManager(
+    private(set) lazy var historyViewActionsManager: HistoryViewActionsManager = HistoryViewActionsManager()
+    private(set) lazy var newTabPageCoordinator: NewTabPageCoordinator = NewTabPageCoordinator(
         appearancePreferences: .shared,
+        settingsModel: homePageSettingsModel,
         activeRemoteMessageModel: activeRemoteMessageModel,
-        privacyStats: privacyStats
+        historyCoordinator: HistoryCoordinator.shared,
+        privacyStats: privacyStats,
+        freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator
     )
     let privacyStats: PrivacyStatsCollecting
     let activeRemoteMessageModel: ActiveRemoteMessageModel
@@ -162,6 +167,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if SPARKLE
     var updateController: UpdateController!
+    var dockCustomization: DockCustomization!
 #endif
 
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
@@ -172,6 +178,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     static var isNewUser: Bool {
         return firstLaunchDate >= Date.weekAgo
+    }
+
+    static var twoDaysPassedSinceFirstLaunch: Bool {
+        return firstLaunchDate.daysSinceNow() >= 2
     }
 
     @MainActor
@@ -197,8 +207,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
-
-        configurationManager = ConfigurationManager(store: configurationStore)
 
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
@@ -279,6 +287,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             )
         }
 
+        configurationManager = ConfigurationManager(store: configurationStore)
+
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
@@ -347,6 +357,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if SPARKLE
         if NSApp.runType != .uiTests {
             updateController = UpdateController(internalUserDecider: internalUserDecider)
+            dockCustomization = DockCustomizer()
             stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
         }
 #endif
@@ -450,6 +461,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
             pixelParameters.forEach { parameters in
                 PixelKit.fire(GeneralPixel.crash, withAdditionalParameters: parameters, includeAppVersionParameter: false)
+                PixelKit.fire(GeneralPixel.crashDaily, frequency: .legacyDaily)
             }
 
             guard let lastPayload = payloads.last else {
@@ -513,7 +525,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPScanResultPolling = DefaultFreemiumDBPScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPScanResultPolling?.startPollingOrObserving()
 
-        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault)))
+#if SPARKLE
+        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault, isAddedToDock: DockCustomizer().isAddedToDock)), frequency: .daily)
+#else
+        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault, isAddedToDock: nil)), frequency: .daily)
+#endif
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -647,6 +663,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let source = "browser-dmg"
 #endif
 
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let trimmedOSVersion = "\(osVersion.majorVersion).\(osVersion.minorVersion)"
+        let userAgent = UserAgent.duckDuckGoUserAgent(systemVersion: trimmedOSVersion)
+
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
                        source: source,
@@ -654,7 +674,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
+            let apiHeaders = APIRequest.Headers(userAgent: userAgent, additionalHeaders: headers)
             let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
             let request = APIRequest(configuration: configuration)
 
@@ -843,7 +863,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpAutofillPixelReporter() {
         autofillPixelReporter = AutofillPixelReporter(
-            userDefaults: .standard,
+            standardUserDefaults: .standard,
+            appGroupUserDefaults: nil,
             autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
             eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
                 switch event {

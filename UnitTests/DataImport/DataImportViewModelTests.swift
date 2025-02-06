@@ -20,6 +20,7 @@ import Common
 import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
 
 final class DataImportViewModelTests: XCTestCase {
 

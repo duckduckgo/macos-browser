@@ -22,6 +22,7 @@ import BrowserServicesKit
 import Common
 import FeatureFlags
 import Foundation
+import NewTabPage
 import PixelKit
 import os.log
 
@@ -35,12 +36,14 @@ protocol AppearancePreferencesPersistor {
     var continueSetUpCardsNumberOfDaysDemonstrated: Int { get set }
     var continueSetUpCardsClosed: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
+    var isPrivacyStatsVisible: Bool { get set }
     var isSearchBarVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
     var homeButtonPosition: HomeButtonPosition { get set }
     var homePageCustomBackground: String? { get set }
     var centerAlignedBookmarksBar: Bool { get set }
+    var showTabsAndBookmarksBarOnFullScreen: Bool { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -70,6 +73,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
+
+    @UserDefaultsWrapper(key: .homePageIsPrivacyStatsVisible, defaultValue: true)
+    var isPrivacyStatsVisible: Bool
 
     @UserDefaultsWrapper(key: .homePageIsSearchBarVisible, defaultValue: true)
     var isSearchBarVisible: Bool
@@ -103,6 +109,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .centerAlignedBookmarksBar, defaultValue: true)
     var centerAlignedBookmarksBar: Bool
+
+    @UserDefaultsWrapper(key: .showTabsAndBookmarksBarOnFullScreen, defaultValue: true)
+    var showTabsAndBookmarksBarOnFullScreen: Bool
 }
 
 protocol HomePageNavigator {
@@ -193,10 +202,12 @@ final class AppearancePreferences: ObservableObject {
         static let showBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
         static let bookmarksBarSettingAppearanceChanged = NSNotification.Name("BookmarksBarSettingAppearanceChanged")
         static let bookmarksBarAlignmentChanged = NSNotification.Name("BookmarksBarAlignmentChanged")
+        static let showTabsAndBookmarksBarOnFullScreenChanged = NSNotification.Name("ShowTabsAndBookmarksBarOnFullScreenChanged")
     }
 
     struct Constants {
         static let bookmarksBarAlignmentChangedIsCenterAlignedParameter = "isCenterAligned"
+        static let showTabsAndBookmarksBarOnFullScreenParameter = "showTabsAndBookmarksBarOnFullScreen"
         static let dismissNextStepsCardsAfterDays = 9
     }
 
@@ -224,9 +235,8 @@ final class AppearancePreferences: ObservableObject {
     @Published var isFavoriteVisible: Bool {
         didSet {
             persistor.isFavoriteVisible = isFavoriteVisible
-            // Temporary Pixel
             if !isFavoriteVisible {
-                PixelKit.fire(GeneralPixel.favoriteSectionHidden)
+                PixelKit.fire(NewTabPagePixel.favoriteSectionHidden, frequency: .dailyAndStandard)
             }
         }
     }
@@ -281,9 +291,17 @@ final class AppearancePreferences: ObservableObject {
     @Published var isRecentActivityVisible: Bool {
         didSet {
             persistor.isRecentActivityVisible = isRecentActivityVisible
-            // Temporary Pixel
             if !isRecentActivityVisible {
-                PixelKit.fire(GeneralPixel.recentActivitySectionHidden)
+                PixelKit.fire(NewTabPagePixel.recentActivitySectionHidden, frequency: .dailyAndStandard)
+            }
+        }
+    }
+
+    @Published var isPrivacyStatsVisible: Bool {
+        didSet {
+            persistor.isPrivacyStatsVisible = isPrivacyStatsVisible
+            if !isPrivacyStatsVisible {
+                PixelKit.fire(NewTabPagePixel.blockedTrackingAttemptsSectionHidden, frequency: .dailyAndStandard)
             }
         }
     }
@@ -331,11 +349,28 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var showTabsAndBookmarksBarOnFullScreen: Bool {
+        didSet {
+            persistor.showTabsAndBookmarksBarOnFullScreen = showTabsAndBookmarksBarOnFullScreen
+            NotificationCenter.default.post(name: Notifications.showTabsAndBookmarksBarOnFullScreenChanged,
+                                            object: nil,
+                                            userInfo: [Constants.showTabsAndBookmarksBarOnFullScreenParameter: showTabsAndBookmarksBarOnFullScreen])
+        }
+    }
+
     var isContinueSetUpAvailable: Bool {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
 
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp) && osVersion.majorVersion >= 12
+    }
+
+    var isRecentActivityAvailable: Bool {
+        newTabPageSectionsAvailabilityProvider.isRecentActivityAvailable
+    }
+
+    var isPrivacyStatsAvailable: Bool {
+        newTabPageSectionsAvailabilityProvider.isPrivacyStatsAvailable
     }
 
     func updateUserInterfaceStyle() {
@@ -349,6 +384,7 @@ final class AppearancePreferences: ObservableObject {
     init(
         persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor(),
         homePageNavigator: HomePageNavigator = DefaultHomePageNavigator(),
+        newTabPageSectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding = NewTabPageModeDecider(),
         featureFlagger: @autoclosure @escaping () -> FeatureFlagger = NSApp.delegateTyped.featureFlagger,
         dateTimeProvider: @escaping () -> Date = Date.init
     ) {
@@ -357,22 +393,26 @@ final class AppearancePreferences: ObservableObject {
         self.dateTimeProvider = dateTimeProvider
         self.isContinueSetUpCardsViewOutdated = persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays
         self.featureFlagger = featureFlagger
+        self.newTabPageSectionsAvailabilityProvider = newTabPageSectionsAvailabilityProvider
         self.continueSetUpCardsClosed = persistor.continueSetUpCardsClosed
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
+        isPrivacyStatsVisible = persistor.isPrivacyStatsVisible
         isSearchBarVisible = persistor.isSearchBarVisible
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
         homePageCustomBackground = persistor.homePageCustomBackground.flatMap(CustomBackground.init)
         centerAlignedBookmarksBarBool = persistor.centerAlignedBookmarksBar
+        showTabsAndBookmarksBarOnFullScreen = persistor.showTabsAndBookmarksBarOnFullScreen
     }
 
     private var persistor: AppearancePreferencesPersistor
     private var homePageNavigator: HomePageNavigator
+    private let newTabPageSectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding
     private let featureFlagger: () -> FeatureFlagger
     private let dateTimeProvider: () -> Date
 

@@ -391,10 +391,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         return savePopovers.contains(where: { $0?.isShown ?? false })
     }
 
-    func displaySaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+    func displaySaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool, backfilled: Bool, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         if !automaticallySaved {
             showSaveCredentialsPopover(usingView: view, withDelegate: delegate)
-            saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved)
+            saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved, backfilled: backfilled)
         } else {
             NotificationCenter.default.post(name: .loginAutoSaved, object: credentials.account)
         }

@@ -70,10 +70,9 @@ class MockMaliciousSiteFileStore: MaliciousSiteProtection.FileStoring {
     var didWriteToDisk: Bool = false
     var didReadFromDisk: Bool = false
 
-    func write(data: Data, to filename: String) -> Bool {
+    func write(data: Data, to filename: String) throws {
         didWriteToDisk = true
         storage[filename] = data
-        return true
     }
 
     func read(from filename: String) -> Data? {

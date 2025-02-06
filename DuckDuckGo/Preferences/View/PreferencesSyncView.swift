@@ -18,7 +18,7 @@
 
 import SwiftUI
 import Common
-import SyncUI
+import SyncUI_macOS
 import SwiftUIExtensions
 import BrowserServicesKit
 import os.log
@@ -33,7 +33,7 @@ struct SyncView: View {
                 syncCredentialsAdapter: syncDataProviders.credentialsAdapter,
                 syncPausedStateManager: syncDataProviders.syncErrorHandler
             )
-            SyncUI.ManagementView(model: syncPreferences)
+            SyncUI_macOS.ManagementView(model: syncPreferences)
                 .onAppear {
                     requestSync()
                 }

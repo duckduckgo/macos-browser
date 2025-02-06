@@ -121,8 +121,7 @@ protocol NewWindowPolicyDecisionMaker {
                      maliciousSiteDetector: MaliciousSiteDetecting = MaliciousSiteProtectionManager.shared,
                      tabsPreferences: TabsPreferences = TabsPreferences.shared,
                      onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter(),
-                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern,
-                                                                                    store: PageRefreshStore())
+                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern)
     ) {
 
         let duckPlayer = duckPlayer
@@ -233,7 +232,6 @@ protocol NewWindowPolicyDecisionMaker {
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
                                                  burnerMode: burnerMode,
                                                  earlyAccessHandlers: specialPagesUserScript.map { [$0] } ?? [])
-
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
@@ -460,6 +458,9 @@ protocol NewWindowPolicyDecisionMaker {
             if navigationDelegate.currentNavigation == nil {
                 updateCanGoBackForward(withCurrentNavigation: nil)
             }
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didChangeTabProperties([.URL], for: self)
+            }
         }
     }
 
@@ -530,7 +531,13 @@ protocol NewWindowPolicyDecisionMaker {
 
     var lastSelectedAt: Date?
 
-    @Published var title: String?
+    @Published var title: String? {
+        didSet {
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didChangeTabProperties([.title], for: self)
+            }
+        }
+    }
 
     private func updateTitle() {
         if let error {
@@ -557,7 +564,13 @@ protocol NewWindowPolicyDecisionMaker {
     }
     let permissions: PermissionModel
 
-    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var isLoading: Bool = false {
+        didSet {
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didChangeTabProperties([.loading], for: self)
+            }
+        }
+    }
     @Published private(set) var loadingProgress: Double = 0.0
 
     /// an Interactive Dialog request (alert/open/save/print) made by a page to be published and presented asynchronously
@@ -795,11 +808,7 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 #endif
-        if #available(macOS 13, *) {
-            setContent(PixelExperiment.cohort == .newOnboarding ? .onboarding : .onboardingDeprecated)
-        } else {
-            setContent(.onboardingDeprecated)
-        }
+        setContent(PixelExperiment.cohort == .newOnboarding ? .onboarding : .onboardingDeprecated)
     }
 
     @MainActor(unsafe)
@@ -838,6 +847,10 @@ protocol NewWindowPolicyDecisionMaker {
     func muteUnmuteTab() {
         webView.audioState.toggle()
         objectWillChange.send()
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didChangeTabProperties([.muted], for: self)
+        }
     }
 
     private enum ReloadIfNeededSource {
@@ -1277,15 +1290,24 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func webContentProcessDidTerminate(with reason: WKProcessTerminationReason?) {
         guard (error?.code.rawValue ?? WKError.Code.unknown.rawValue) != WKError.Code.webContentProcessTerminated.rawValue else { return }
 
+        let terminationReason = reason?.rawValue ?? -1
+
         let error = WKError(.webContentProcessTerminated, userInfo: [
-            WKProcessTerminationReason.userInfoKey: reason?.rawValue ?? -1,
-            NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
+            WKProcessTerminationReason.userInfoKey: terminationReason,
+            NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage,
+            NSUnderlyingErrorKey: NSError(domain: WKErrorDomain, code: terminationReason)
         ])
 
-        if case.url(let url, _, _) = content {
-            self.error = error
+        let isInternalUser = internalUserDecider?.isInternalUser == true
 
-            loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+        if isInternalUser {
+            self.webView.reload()
+        } else {
+            if case.url(let url, _, _) = content {
+                self.error = error
+
+                loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
+            }
         }
 
         Task {
@@ -1295,7 +1317,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             let additionalParameters = await SystemInfo.pixelParameters()
 #endif
 
-            PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error), withAdditionalParameters: additionalParameters)
+            PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error), frequency: .dailyAndStandard, withAdditionalParameters: additionalParameters)
         }
     }
 
@@ -1309,7 +1331,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             webView.setDocumentHtml(html)
         }
     }
-
 }
 
 extension Tab: NewWindowPolicyDecisionMaker {

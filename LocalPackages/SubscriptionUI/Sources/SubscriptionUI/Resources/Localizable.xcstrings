@@ -286,61 +286,61 @@
       }
     },
     "subscription.activate.modal.restore.purchase.description" : {
-      "comment" : "Activate subscription modal description via restore purchase from Apple ID",
+      "comment" : "Activate subscription modal description via restore purchase from Apple Account",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Abonnement ist automatisch in DuckDuckGo auf jedem Gerät verfügbar, das bei deinem Apple ID-Konto angemeldet ist."
+            "value" : "Dein Abonnement ist automatisch in DuckDuckGo auf jedem Gerät verfügbar, das bei deinem Apple-Konto angemeldet ist."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your subscription is automatically available in DuckDuckGo on any device signed in to your Apple ID."
+            "value" : "Your subscription is automatically available in DuckDuckGo on any device signed in to your Apple Account."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu suscripción está disponible automáticamente en DuckDuckGo en cualquier dispositivo que haya iniciado sesión en tu ID de Apple."
+            "value" : "Tu suscripción está disponible automáticamente en DuckDuckGo en cualquier dispositivo que haya iniciado sesión en tu cuenta de Apple."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre abonnement est automatiquement disponible dans DuckDuckGo sur n'importe quel appareil connecté à votre identifiant Apple."
+            "value" : "Votre abonnement est automatiquement disponible dans DuckDuckGo sur n'importe quel appareil connecté à votre compte Apple."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il tuo abbonamento è automaticamente disponibile in DuckDuckGo su qualsiasi dispositivo connesso al tuo ID Apple."
+            "value" : "Il tuo abbonamento è automaticamente disponibile in DuckDuckGo su qualsiasi dispositivo collegato al tuo account Apple."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je abonnement is automatisch beschikbaar in DuckDuckGo op elk apparaat dat is aangemeld bij je Apple-ID."
+            "value" : "Je abonnement is automatisch beschikbaar in DuckDuckGo op elk apparaat dat is aangemeld bij je Apple-account."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twoja subskrypcja jest automatycznie dostępna w DuckDuckGo na każdym urządzeniu, na którym zalogujesz się na konto Apple ID."
+            "value" : "Twoja subskrypcja jest automatycznie dostępna w DuckDuckGo na każdym urządzeniu, na którym zalogujesz się na konto Apple."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A tua subscrição está automaticamente disponível no DuckDuckGo em qualquer dispositivo com sessão iniciada com o teu Apple ID."
+            "value" : "A tua subscrição está automaticamente disponível no DuckDuckGo em qualquer dispositivo com sessão iniciada na tua conta Apple."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваша подписка на DuckDuckGo автоматически доступна на любом устройстве: просто войдите в учетную запись Apple ID."
+            "value" : "Ваша подписка на DuckDuckGo автоматически доступна на любом устройстве: просто войдите в аккаунт Apple."
           }
         }
       }
@@ -832,55 +832,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beim Synchronisieren deiner Apple-ID ist was schiefgelaufen"
+            "value" : "Beim Synchronisieren deines Apple-Kontos ist etwas schiefgelaufen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Something Went Wrong When Syncing Your Apple ID"
+            "value" : "Something Went Wrong When Syncing Your Apple Account"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se ha producido un error al sincronizar tu ID de Apple"
+            "value" : "Se ha producido un error al sincronizar tu cuenta de Apple"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une erreur s'est produite lors de la synchronisation de votre identifiant Apple"
+            "value" : "Une erreur s'est produite lors de la synchronisation de votre compte Apple"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si è verificato un errore durante la sincronizzazione del tuo ID Apple"
+            "value" : "Si è verificato un errore durante la sincronizzazione dell'account Apple"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Er is iets misgegaan bij het synchroniseren van je Apple-ID"
+            "value" : "Er is iets misgegaan bij het synchroniseren van je Apple-account"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wystąpił błąd podczas synchronizowania konta Apple ID"
+            "value" : "Wystąpił błąd podczas synchronizowania konta Apple"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ocorreu um erro ao sincronizar o teu Apple ID"
+            "value" : "Ocorreu um erro ao sincronizar a tua conta Apple"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "При синхронизации Apple ID что-то пошло не так"
+            "value" : "При синхронизации аккаунта Apple что-то пошло не так"
           }
         }
       }
@@ -892,55 +892,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wir haben ein Abonnement gefunden, das mit dieser Apple ID verknüpft ist."
+            "value" : "Wir haben ein Abonnement gefunden, das mit diesem Apple-Konto verknüpft ist."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "We found a subscription associated with this Apple ID."
+            "value" : "We found a subscription associated with this Apple Account."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hemos encontrado una suscripción asociada a esta ID de Apple."
+            "value" : "Hemos encontrado una suscripción asociada a esta cuenta de Apple."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nous avons trouvé un abonnement associé à cet identifiant Apple."
+            "value" : "Nous avons trouvé un abonnement associé à ce compte Apple."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abbiamo trovato un abbonamento associato a questo ID Apple."
+            "value" : "Abbiamo trovato un abbonamento associato a questo account Apple."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "We hebben een abonnement gevonden dat aan deze Apple-ID is gekoppeld."
+            "value" : "We hebben een abonnement gevonden dat aan dit Apple-account is gekoppeld."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Znaleźliśmy subskrypcję powiązaną z tym Apple ID."
+            "value" : "Znaleźliśmy subskrypcję powiązaną z tym kontem Apple."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Encontrámos uma subscrição associada a este Apple ID."
+            "value" : "Encontrámos uma subscrição associada a esta conta Apple."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Мы нашли подписку, привязанную к этой учетной записи Apple ID."
+            "value" : "Мы нашли подписку, привязанную к этому аккаунту Apple."
           }
         }
       }
@@ -1012,55 +1012,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das mit dieser Apple ID verknüpfte Abonnement ist nicht mehr aktiv."
+            "value" : "Das mit diesem Apple-Konto verknüpfte Abonnement ist nicht mehr aktiv."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The subscription associated with this Apple ID is no longer active."
+            "value" : "The subscription associated with this Apple Account is no longer active."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La suscripción asociada a esta ID de Apple ya no está activa."
+            "value" : "La suscripción asociada a esta cuenta de Apple ya no está activa."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'abonnement associé à cet identifiant Apple n'est plus actif."
+            "value" : "L'abonnement associé à ce compte Apple n'est plus actif."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'abbonamento associato a questo ID Apple non è più attivo."
+            "value" : "L'abbonamento associato a questo account Apple non è più attivo."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je abonnement dat aan deze Apple-ID is gekoppeld, is niet langer actief."
+            "value" : "Je abonnement dat aan dit Apple-account is gekoppeld, is niet langer actief."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Subskrypcja powiązana z tym kontem Apple ID nie jest już aktywna."
+            "value" : "Subskrypcja powiązana z tym kontem Apple nie jest już aktywna."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A tua subscrição associada a este ID Apple já não está ativa."
+            "value" : "A tua subscrição associada a esta conta Apple já não está ativa."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Подписка, закрепленная за этой учетной записью Apple ID, утратила активный статус."
+            "value" : "Подписка, закрепленная за этим аккаунтом Apple, утратила активный статус."
           }
         }
       }
@@ -1132,55 +1132,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wir konnten kein Abo finden, das mit dieser Apple ID verknüpft ist."
+            "value" : "Wir konnten kein Abonnement finden, das mit diesem Apple-Konto verknüpft ist."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "We couldn’t find a subscription associated with this Apple ID."
+            "value" : "We couldn’t find a subscription associated with this Apple Account."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No hemos podido encontrar una suscripción asociada a esta ID de Apple."
+            "value" : "No hemos podido encontrar una suscripción asociada a esta Cuenta de Apple."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nous n'avons pas trouvé d'abonnement associé à cet identifiant Apple."
+            "value" : "Nous n'avons pas trouvé d'abonnement associé à ce compte Apple."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Non siamo riusciti a trovare un abbonamento associato a questo ID Apple."
+            "value" : "Non siamo riusciti a trovare un abbonamento associato a questo account Apple."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "We kunnen geen abonnement vinden dat aan deze Apple-ID is gekoppeld."
+            "value" : "We konden geen abonnement vinden dat aan dit Apple-account is gekoppeld."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie znaleźliśmy subskrypcji powiązanej z tym Apple ID."
+            "value" : "Nie znaleźliśmy subskrypcji powiązanej z tym kontem Apple."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível encontrar uma subscrição associada a este Apple ID."
+            "value" : "Não foi possível encontrar uma subscrição associada a esta conta Apple."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Мы не нашли подписку, привязанную к этой учетной записи Apple ID."
+            "value" : "Подписка, привязанная к этому аккаунту Apple, не найдена."
           }
         }
       }
@@ -1252,55 +1252,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Greife auf diesem Gerät über Apple ID oder eine E-Mail Adresse auf dein Privacy-Pro-Abonnement zu."
+            "value" : "Greife auf diesem Gerät über dein Apple-Konto oder eine E-Mail-Adresse auf dein Privacy Pro-Abonnement zu."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Access your Privacy Pro subscription on this device via Apple ID or an email address."
+            "value" : "Access your Privacy Pro subscription on this device via Apple Account or an email address."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accede a tu suscripción a Privacy Pro en este dispositivo mediante la ID de Apple o una dirección de correo electrónico."
+            "value" : "Accede a tu suscripción a Privacy Pro en este dispositivo mediante tu cuenta de Apple o una dirección de correo electrónico."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accédez à votre abonnement Privacy Pro sur cet appareil via un identifiant Apple ou via une adresse e-mail."
+            "value" : "Accédez à votre abonnement Privacy Pro sur cet appareil via un compte Apple ou via une adresse e-mail."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accedi al tuo abbonamento Privacy Pro su questo dispositivo tramite ID Apple o un indirizzo e-mail."
+            "value" : "Accedi al tuo abbonamento Privacy Pro su questo dispositivo tramite un account Apple o un indirizzo e-mail."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Krijg toegang tot je Privacy Pro-abonnement op dit apparaat via je Apple-ID of e-mailadres."
+            "value" : "Krijg op dit apparaat toegang tot je Privacy Pro-abonnement via je Apple-account of e-mailadres."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uzyskaj dostęp do subskrypcji Privacy Pro na tym urządzeniu za pośrednictwem Apple ID lub adresu e-mail."
+            "value" : "Uzyskaj dostęp do subskrypcji Privacy Pro na tym urządzeniu za pośrednictwem konta Apple lub adresu e-mail."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acede à tua subscrição Privacy Pro neste dispositivo através do teu Apple ID ou de um endereço de e-mail."
+            "value" : "Acede à tua subscrição Privacy Pro neste dispositivo através da tua conta Apple ou de um endereço de e-mail."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Преимуществами подписки Privacy Pro можно пользоваться на этом устройстве с помощью Apple ID или адреса электронной почты."
+            "value" : "Подпиской Privacy Pro можно пользоваться на этом устройстве через аккаунт Apple или адрес электронной почты."
           }
         }
       }
@@ -1312,55 +1312,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Abonnement wurde über den Apple App Store erworben. Um deinen Tarif oder deine Rechnungseinstellungen zu ändern, öffne bitte auf einem Gerät, das mit der Apple-ID angemeldet ist, mit der du dein Abo gekauft hast, die Systemeinstellungen > Apple-ID > Medien und Käufe > Abos > Verwalten."
+            "value" : "Dein Abonnement wurde über den Apple App Store erworben. Um deinen Tarif oder deine Rechnungseinstellungen zu ändern, öffne bitte auf einem Gerät, das mit dem Apple-Konto angemeldet ist, mit der du dein Abo gekauft hast, die Systemeinstellungen > Apple-Konto > Medien und Käufe > Abos > Verwalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to System Settings > Apple ID > Media and Purchases > Subscriptions > Manage on a device signed in to the same Apple ID used to purchase your subscription."
+            "value" : "Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to System Settings > Apple Account > Media and Purchases > Subscriptions > Manage on a device signed in to the same Apple Account used to purchase your subscription."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Has adquirido tu suscripción a través de la App Store de Apple. Para cambiar el plan o la configuración de facturación, ve a Ajustes del sistema > ID de Apple > Multimedia y compras > Suscripciones > Gestionar en un dispositivo con la misma ID de Apple que usaste para comprar tu suscripción."
+            "value" : "Has adquirido tu suscripción a través de la App Store de Apple. Para cambiar el plan o la configuración de facturación, ve a Ajustes del sistema > Cuenta de Apple > Multimedia y compras > Suscripciones > Gestionar en un dispositivo con la misma Cuenta de Apple que usaste para comprar tu suscripción."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre abonnement a été souscrit via l'App Store d'Apple. Pour modifier votre forfait ou vos paramètres de facturation, allez dans Réglages système > ID Apple > Contenu multimédia et achats > Abonnements > Gérer sur un appareil connecté au même identifiant Apple que celui utilisé pour souscrire votre abonnement."
+            "value" : "Votre abonnement a été souscrit via l'App Store d'Apple. Pour modifier votre forfait ou vos paramètres de facturation, allez dans Réglages système > Compte Apple > Contenu multimédia et achats > Abonnements > Gérer sur un appareil connecté au même compte Apple que celui utilisé pour souscrire votre abonnement."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'abbonamento è stato acquistato tramite l'App Store di Apple. Per modificare il tuo piano o le impostazioni di fatturazione, vai a Impostazioni di sistema > ID Apple > Media e acquisti > Abbonamenti > Gestisci su un dispositivo connesso allo stesso ID Apple usato per acquistare l'abbonamento."
+            "value" : "L'abbonamento è stato acquistato tramite l'App Store di Apple. Per modificare il piano o le impostazioni di fatturazione, vai a Impostazioni di sistema > Account Apple > Media e acquisti > Abbonamenti > Gestisci su un dispositivo connesso allo stesso account Apple utilizzato per acquistare l'abbonamento."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je abonnement is aangeschaft via de Apple App Store. Je kunt je abonnement of factureringsinstellingen wijzigen via 'Systeeminstellingen' > 'Apple-ID' > 'Media en aankopen' > 'Abonnementen' > 'Beheer' op een apparaat dat is aangemeld bij dezelfde Apple-ID waarmee je het abonnement hebt gekocht."
+            "value" : "Je abonnement is aangeschaft via de Apple App Store. Om je abonnement of factureringsinstellingen te wijzigen, ga je naar Systeeminstellingen > Apple-account > Media en aankopen > Abonnementen > Beheer op een apparaat dat is aangemeld bij hetzelfde Apple-account waarmee je het abonnement hebt gekocht."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia systemowe > Apple ID > Multimedia i zakupy > Subskrypcje > Zarządzaj na urządzeniu zalogowanym na konto Apple ID wykorzystane do zakupu subskrypcji."
+            "value" : "Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia systemowe > Konto Apple > Multimedia i zakupy > Subskrypcje > Zarządzaj na urządzeniu zalogowanym na konto Apple wykorzystane do zakupu subskrypcji."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A tua subscrição foi adquirida na Apple App Store. Para alterares o teu plano ou as definições de faturação, acede a Definições do Sistema > ID Apple > Multimédia e Compras > Subscrições > Gerir num dispositivo com sessão iniciada com o mesmo Apple ID utilizado para comprar a tua subscrição."
+            "value" : "A tua subscrição foi adquirida na Apple App Store. Para alterares o teu plano ou as definições de faturação, acede a Definições do Sistema > Conta Apple > Multimédia e Compras > Subscrições > Gerir num dispositivo com sessão iniciada na mesma conta Apple utilizada para comprar a tua subscrição."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Подписка приобретена в Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Системные настройки > Apple ID > Контент и покупки > Подписки > Управление» на устройстве, где выполнен вход под тем же идентификатором Apple ID, с помощью которого была оформлена подписка."
+            "value" : "Подписка приобретена в магазине приложений Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Системные настройки > Аккаунт Apple > Контент и покупки > Подписки > Управление» на устройстве, где выполнен вход в тот же аккаунт Apple, с помощью которого была оформлена подписка."
           }
         }
       }
@@ -3118,55 +3118,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Füge eine optionale E-Mail-Adresse zu deinem Abo hinzu oder verwende deine Apple-ID, um auf anderen Geräten auf Privacy Pro zuzugreifen. [Mehr erfahren](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Füge eine optionale E-Mail-Adresse zu deinem Abo hinzu oder verwende dein Apple-Konto, um auf anderen Geräten auf Privacy Pro zuzugreifen. [Mehr erfahren](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Add an optional email to your subscription or use your Apple ID to access Privacy Pro on other devices. [Learn more](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Add an optional email to your subscription or use your Apple Account to access Privacy Pro on other devices. [Learn more](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añade un correo electrónico opcional a tu suscripción o usa tu ID de Apple para acceder a Privacy Pro en otros dispositivos. [Más información](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Añade un correo electrónico opcional a tu suscripción o usa tu Cuenta de Apple para acceder a Privacy Pro en otros dispositivos. [Más información](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajoutez un e-mail facultatif à votre abonnement ou utilisez votre identifiant Apple pour accéder à Privacy Pro sur d'autres appareils. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Ajoutez un e-mail facultatif à votre abonnement ou utilisez votre compte Apple pour accéder à Privacy Pro sur d'autres appareils. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiungi un'e-mail opzionale al tuo abbonamento o usa il tuo ID Apple per accedere a Privacy Pro su altri dispositivi. [Scopri di più](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Aggiungi un'e-mail opzionale all'abbonamento o usa il tuo account Apple per accedere a Privacy Pro su altri dispositivi. [Scopri di più](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voeg een optioneel e-mailadres toe aan je abonnement of gebruik je Apple-ID om toegang te krijgen tot Privacy Pro op andere apparaten. [Meer informatie](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Voeg een optioneel e-mailadres toe aan je abonnement of gebruik je Apple-account om toegang te krijgen tot Privacy Pro op andere apparaten. [Meer informatie](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaj opcjonalny adres e-mail do subskrypcji lub użyj Apple ID, aby uzyskać dostęp do Privacy Pro na innych urządzeniach. [Więcej informacji](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Dodaj opcjonalny adres e-mail do subskrypcji lub użyj konta Apple, aby uzyskać dostęp do Privacy Pro na innych urządzeniach. [Więcej informacji](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adiciona um e-mail opcional à tua subscrição ou usa o teu Apple ID para acederes ao Privacy Pro noutros dispositivos. [Sabe mais](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Adiciona um e-mail opcional à tua subscrição ou utiliza a tua conta Apple para aceder ao Privacy Pro noutros dispositivos. [Sabe mais](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Привяжите к подписке дополнительный адрес электронной почты, чтобы пользоваться преимуществами тарифа Privacy Pro на других устройствах с тем же Apple ID. [Подробнее...](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+            "value" : "Чтобы пользоваться подпиской Privacy Pro на других устройствах, привяжите адрес электронной почты или аккаунт Apple. [Подробнее...](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
           }
         }
       }

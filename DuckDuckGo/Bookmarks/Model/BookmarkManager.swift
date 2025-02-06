@@ -21,6 +21,7 @@ import Cocoa
 import Combine
 import Common
 import os.log
+import BrowserServicesKit
 
 protocol BookmarkManager: AnyObject {
 

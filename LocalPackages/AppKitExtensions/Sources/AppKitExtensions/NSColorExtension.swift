@@ -66,4 +66,29 @@ extension NSColor {
         }
     }
 
+    public func blended(with color: NSColor) -> NSColor {
+        // Get the RGBA components of both colors
+        guard let components1 = self.usingColorSpace(.sRGB)?.cgColor.components,
+              let components2 = color.usingColorSpace(.sRGB)?.cgColor.components else { return self }
+
+        // Extract the individual RGBA values
+        let r1 = components1[0]
+        let g1 = components1[1]
+        let b1 = components1[2]
+        let a1 = components1[3]
+
+        let r2 = components2[0]
+        let g2 = components2[1]
+        let b2 = components2[2]
+        let a2 = components2[3]
+
+        // Calculate the resulting color components
+        let r = r1 * (1 - a2) + r2 * a2
+        let g = g1 * (1 - a2) + g2 * a2
+        let b = b1 * (1 - a2) + b2 * a2
+
+        // Return the blended color
+        return NSColor(red: r, green: g, blue: b, alpha: a1)
+    }
+
 }

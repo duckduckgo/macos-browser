@@ -18,6 +18,7 @@
 
 import Foundation
 import GRDB
+import BrowserServicesKit
 
 final class FirefoxBookmarksReader {
 

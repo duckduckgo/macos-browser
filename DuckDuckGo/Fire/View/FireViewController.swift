@@ -43,6 +43,7 @@ final class FireViewController: NSViewController {
     @IBOutlet weak var progressIndicatorWrapperBG: NSView!
     private var fireAnimationView: LottieAnimationView?
     private var fireAnimationViewLoadingTask: Task<(), Never>?
+    private(set) lazy var fireIndicatorVisibilityManager = FireIndicatorVisibilityManager { [weak self] in self?.view.superview }
 
     static func create(tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) -> FireViewController {
         NSStoryboard(name: "Fire", bundle: nil).instantiateInitialController { coder in
@@ -91,8 +92,8 @@ final class FireViewController: NSViewController {
     private var fireAnimationEventsCancellable: AnyCancellable?
     private func subscribeToFireAnimationEvents() {
         fireAnimationEventsCancellable = fireViewModel.isFirePresentationInProgress
-            .sink { [weak self] isFirePresentationInProgress in
-                self?.view.superview?.isHidden = !isFirePresentationInProgress
+            .sink { [weak self] shouldShowFirePresentation in
+                self?.fireIndicatorVisibilityManager.updateVisibility(shouldShowFirePresentation)
             }
     }
 
@@ -248,4 +249,44 @@ private actor FireAnimationViewLoader {
     private var animation: LottieAnimation? {
         LottieAnimation.named(animationName, animationCache: LottieAnimationCache.shared)
     }
+}
+
+/**
+ * This class is responsible for showing the modal dialog during burning process.
+ *
+ * It ensures that the dialog, once shown, stays on screen for at least 1 second.
+ */
+final class FireIndicatorVisibilityManager {
+    var view: () -> NSView?
+
+    init(_ view: @escaping () -> NSView?) {
+        self.view = view
+    }
+
+    func updateVisibility(_ shouldShow: Bool) {
+        if shouldShow {
+            fireIndicatorDialogPresentedAt = Date()
+            timer?.invalidate()
+            view()?.isHidden = false
+        } else {
+            if let fireIndicatorDialogPresentedAt {
+                let presentationDuration = Date().timeIntervalSince(fireIndicatorDialogPresentedAt)
+                self.fireIndicatorDialogPresentedAt = nil
+                if presentationDuration > Self.fireIndicatorPresentationDuration {
+                    view()?.isHidden = true
+                } else {
+                    let remainingPresentationTime = Self.fireIndicatorPresentationDuration - presentationDuration
+                    timer = Timer.scheduledTimer(withTimeInterval: remainingPresentationTime, repeats: false) { [weak self] _ in
+                        self?.view()?.isHidden = true
+                    }
+                }
+            } else {
+                view()?.isHidden = true
+            }
+        }
+    }
+
+    private var fireIndicatorDialogPresentedAt: Date?
+    private var timer: Timer?
+    private static let fireIndicatorPresentationDuration = TimeInterval.seconds(1)
 }

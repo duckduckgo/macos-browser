@@ -22,6 +22,7 @@ import Combine
 import Common
 import FeatureFlags
 import Freemium
+import HistoryView
 import NewTabPage
 import Onboarding
 import os.log
@@ -44,16 +45,23 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
     private let activeRemoteMessageModel: ActiveRemoteMessageModel
-    private let newTabPageActionsManager: NewTabPageActionsManaging
+    private let newTabPageActionsManager: NewTabPageActionsManager
     private(set) lazy var newTabPageWebViewModel: NewTabPageWebViewModel = NewTabPageWebViewModel(
         featureFlagger: featureFlagger,
         actionsManager: newTabPageActionsManager,
         activeRemoteMessageModel: activeRemoteMessageModel
     )
+    private let historyViewActionsManager: HistoryViewActionsManager
+    private(set) lazy var historyWebViewModel: HistoryWebViewModel = HistoryWebViewModel(
+        featureFlagger: featureFlagger,
+        actionsManager: historyViewActionsManager
+    )
     private(set) weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
     private var containerStackView: NSStackView
+
+    private weak var webExtensionWebView: WebView?
 
     weak var delegate: BrowserTabViewControllerDelegate?
     var tabViewModel: TabViewModel?
@@ -93,7 +101,8 @@ final class BrowserTabViewController: NSViewController {
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-         newTabPageActionsManager: NewTabPageActionsManaging = NSApp.delegateTyped.newTabPageActionsManager,
+         newTabPageActionsManager: NewTabPageActionsManager = NSApp.delegateTyped.newTabPageCoordinator.actionsManager,
+         historyViewActionsManager: HistoryViewActionsManager = NSApp.delegateTyped.historyViewActionsManager,
          activeRemoteMessageModel: ActiveRemoteMessageModel = NSApp.delegateTyped.activeRemoteMessageModel
     ) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -102,6 +111,7 @@ final class BrowserTabViewController: NSViewController {
         self.onboardingDialogFactory = onboardingDialogFactory
         self.featureFlagger = featureFlagger
         self.newTabPageActionsManager = newTabPageActionsManager
+        self.historyViewActionsManager = historyViewActionsManager
         self.activeRemoteMessageModel = activeRemoteMessageModel
         containerStackView = NSStackView()
 
@@ -551,7 +561,7 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
+            let newWebView = webView(for: tabViewModel)
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
@@ -572,6 +582,17 @@ final class BrowserTabViewController: NSViewController {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
         adjustFirstResponderAfterAddingContentViewIfNeeded()
+    }
+
+    private func webView(for tabViewModel: TabViewModel) -> WebView {
+        switch tabViewModel.tab.content {
+        case .newtab:
+            return newTabPageWebViewModel.webView
+        case .history:
+            return historyWebViewModel.webView
+        default:
+            return tabViewModel.tab.webView
+        }
     }
 
     private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
@@ -667,10 +688,11 @@ final class BrowserTabViewController: NSViewController {
              .url(_, _, source: .ui),
              .url(_, _, source: .link),
              .url(_, _, source: .appOpenUrl),
+             .url(_, _, source: .switchToOpenTab),
              .url(_, _, source: .reload):
             return true
 
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboardingDeprecated, .onboarding, .releaseNotes, .identityTheftRestoration:
+        case .settings, .bookmarks, .history, .dataBrokerProtection, .subscription, .onboardingDeprecated, .onboarding, .releaseNotes, .identityTheftRestoration, .webExtensionUrl:
             return true
 
         case .none:
@@ -691,7 +713,7 @@ final class BrowserTabViewController: NSViewController {
             return
         case .onboardingDeprecated:
             getView = { [weak self] in self?.transientTabContentViewController?.view }
-        case .url, .subscription, .identityTheftRestoration, .onboarding, .releaseNotes:
+        case .url, .subscription, .identityTheftRestoration, .onboarding, .releaseNotes, .history:
             getView = { [weak self] in self?.webView }
         case .settings:
             getView = { [weak self] in self?.preferencesViewController?.view }
@@ -699,6 +721,8 @@ final class BrowserTabViewController: NSViewController {
             getView = { [weak self] in self?.bookmarksViewController?.view }
         case .dataBrokerProtection:
             getView = { [weak self] in self?.dataBrokerProtectionHomeViewController?.view }
+        case .webExtensionUrl:
+            getView = { [weak self] in self?.webExtensionWebView }
         case .none:
             getView = nil
         }
@@ -735,16 +759,17 @@ final class BrowserTabViewController: NSViewController {
         window.makeFirstResponder(contentView)
     }
 
-    func openNewTab(with content: Tab.TabContent) {
+    @discardableResult
+    func openNewTab(with content: Tab.TabContent) -> Tab? {
         guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
-            return
+            return nil
         }
 
         // shouldn't open New Tabs in PopUp window
         if view.window?.isPopUpWindow ?? true {
             // Prefer Tab's Parent
             WindowControllersManager.shared.showTab(with: content)
-            return
+            return nil
         }
 
         let tab = Tab(content: content,
@@ -753,6 +778,8 @@ final class BrowserTabViewController: NSViewController {
                       webViewSize: view.frame.size)
 
         tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
+
+        return tab
     }
 
     // MARK: - Browser Tabs
@@ -762,6 +789,8 @@ final class BrowserTabViewController: NSViewController {
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
         homePageViewController?.removeCompletely()
+        webExtensionWebView?.superview?.removeFromSuperview()
+        webExtensionWebView = nil
         dataBrokerProtectionHomeViewController?.removeCompletely()
         if includingWebView {
             self.removeWebViewFromHierarchy()
@@ -819,11 +848,29 @@ final class BrowserTabViewController: NSViewController {
                 addAndLayoutChild(homePageViewControllerCreatingIfNeeded())
             }
 
+        case .history:
+            if featureFlagger.isFeatureOn(.historyView) {
+                updateTabIfNeeded(tabViewModel: tabViewModel)
+            } else {
+                removeAllTabContent()
+            }
+
         case .dataBrokerProtection:
             removeAllTabContent()
             let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
             self.previouslySelectedTab = tabCollectionViewModel.selectedTab
             addAndLayoutChild(dataBrokerProtectionViewController)
+
+        case .webExtensionUrl:
+            removeAllTabContent()
+            if #available(macOS 14.4, *) {
+                if let tab = tabViewModel?.tab,
+                   let url = tab.url,
+                   let webExtensionWebView = WebExtensionManager.shared.internalSiteHandler.webViewForExtensionUrl(url) {
+                    self.webExtensionWebView = webExtensionWebView
+                    self.addWebViewToViewHierarchy(webExtensionWebView, tab: tab)
+                }
+            }
         default:
             removeAllTabContent()
         }
@@ -854,8 +901,7 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
-
+        let newWebView = webView(for: tabViewModel)
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
 

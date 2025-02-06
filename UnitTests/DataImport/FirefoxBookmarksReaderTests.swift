@@ -19,6 +19,7 @@
 import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
 
 class FirefoxBookmarksReaderTests: XCTestCase {
 

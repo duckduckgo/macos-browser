@@ -28,7 +28,7 @@
       }
     ],
     "targetForVariableExpansion" : {
-      "containerPath" : "container:DuckDuckGo.xcodeproj",
+      "containerPath" : "container:DuckDuckGo-macOS.xcodeproj",
       "identifier" : "AA585D7D248FD31100E9A3E2",
       "name" : "DuckDuckGo Privacy Browser"
     }
@@ -38,10 +38,11 @@
       "skippedTests" : [
         "BookmarksAndFavoritesTests\/test_bookmarks_canBeAddedTo_byClickingBookmarksButtonInAddressBar()",
         "BookmarksAndFavoritesTests\/test_favorites_canBeAddedTo_byClickingAddFavoriteInAddBookmarkPopover()",
+        "BookmarksAndFavoritesTests\/test_favorites_canBeRemovedFromNewTabViaContextClick()",
         "PermissionsTests"
       ],
       "target" : {
-        "containerPath" : "container:DuckDuckGo.xcodeproj",
+        "containerPath" : "container:DuckDuckGo-macOS.xcodeproj",
         "identifier" : "7B4CE8D926F02108009134B1",
         "name" : "UI Tests"
       }

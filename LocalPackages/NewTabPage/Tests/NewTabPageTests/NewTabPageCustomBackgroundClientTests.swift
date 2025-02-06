@@ -24,17 +24,27 @@ import XCTest
 final class NewTabPageCustomBackgroundClientTests: XCTestCase {
     private var client: NewTabPageCustomBackgroundClient!
     private var model: CapturingNewTabPageCustomBackgroundProvider!
+    private var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
     private var userScript: NewTabPageUserScript!
     private var messageHelper: MessageHelper<NewTabPageCustomBackgroundClient.MessageName>!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         model = CapturingNewTabPageCustomBackgroundProvider()
-        client = NewTabPageCustomBackgroundClient(model: model)
+        contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
+        client = NewTabPageCustomBackgroundClient(model: model, contextMenuPresenter: contextMenuPresenter)
 
         userScript = NewTabPageUserScript()
         messageHelper = .init(userScript: userScript)
         client.registerMessageHandlers(for: userScript)
+    }
+
+    // MARK: - contextMenu
+
+    func testThatContextMenuActionIsForwardedToTheModel() async throws {
+        let action = NewTabPageDataModel.UserImageContextMenu(target: .userImage, id: "abcd.jpg")
+        try await messageHelper.handleMessageExpectingNilResponse(named: .contextMenu, parameters: action)
+        XCTAssertEqual(model.showContextMenuCalls, ["abcd.jpg"])
     }
 
     // MARK: - deleteImage

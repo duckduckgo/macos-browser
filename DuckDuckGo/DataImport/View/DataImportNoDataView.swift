@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftUI
+import BrowserServicesKit
 
 struct DataImportNoDataView: View {
 

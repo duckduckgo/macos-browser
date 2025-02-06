@@ -161,6 +161,12 @@ extension AppDelegate {
     }
 
     @MainActor
+    @objc func addToDock(_ sender: Any?) {
+        DockCustomizer().addToDock()
+        PixelKit.fire(GeneralPixel.userAddedToDockFromMainMenu)
+    }
+
+    @MainActor
     @objc func setAsDefault(_ sender: Any?) {
         PixelKit.fire(GeneralPixel.defaultRequestedFromMainMenu)
         DefaultBrowserPreferences.shared.becomeDefault()
@@ -578,7 +584,7 @@ extension MainViewController {
 
         let dateString = sender.dateString
         let isToday = sender.isToday
-        let visits = sender.getVisits()
+        let visits = sender.getVisits(featureFlagger: featureFlagger)
         let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
         alert.beginSheetModal(for: window, completionHandler: { response in
             guard case .alertFirstButtonReturn = response else {
@@ -657,6 +663,11 @@ extension MainViewController {
     @objc func showManageBookmarks(_ sender: Any?) {
         makeKeyIfNeeded()
         browserTabViewController.openNewTab(with: .bookmarks)
+    }
+
+    @objc func showHistory(_ sender: Any?) {
+        makeKeyIfNeeded()
+        browserTabViewController.openNewTab(with: .history)
     }
 
     // MARK: - Window
@@ -838,7 +849,8 @@ extension MainViewController {
         }
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
 
-        let autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard,
+        let autofillPixelReporter = AutofillPixelReporter(standardUserDefaults: .standard,
+                                                          appGroupUserDefaults: nil,
                                                           autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
@@ -899,6 +911,21 @@ extension MainViewController {
 
     @objc func resetSyncPromoPrompts(_ sender: Any?) {
         SyncPromoManager().resetPromos()
+    }
+
+    @objc func resetAddToDockFeatureNotification(_ sender: Any?) {
+#if SPARKLE
+        guard let dockCustomizer = Application.appDelegate.dockCustomization else { return }
+        dockCustomizer.resetData()
+#endif
+    }
+
+    @objc func resetLaunchDateToToday(_ sender: Any?) {
+        UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Any>.Key.firstLaunchDate.rawValue)
+    }
+
+    @objc func setLaunchDayAWeekInThePast(_ sender: Any?) {
+        UserDefaults.standard.set(Date.weekAgo, forKey: UserDefaultsWrapper<Any>.Key.firstLaunchDate.rawValue)
     }
 
     @objc func resetTipKit(_ sender: Any?) {
@@ -1104,7 +1131,8 @@ extension MainViewController: NSMenuItemValidation {
         // Pin Tab
         case #selector(MainViewController.pinOrUnpinTab(_:)):
             guard getActiveTabAndIndex()?.tab.isUrl == true,
-                  tabCollectionViewModel.pinnedTabsManager != nil
+                  tabCollectionViewModel.pinnedTabsManager != nil,
+                  !isBurner
             else {
                 return false
             }
@@ -1146,7 +1174,10 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
-            return activeTabViewModel?.canReload == true || (featureFlagger.isFeatureOn(.htmlNewTabPage) && activeTabViewModel?.tab.content == .newtab)
+            let canReload = activeTabViewModel?.canReload == true
+            let isHTMLNewTabPage = featureFlagger.isFeatureOn(.htmlNewTabPage) && activeTabViewModel?.tab.content == .newtab
+            let isHistoryView = featureFlagger.isFeatureOn(.historyView) && activeTabViewModel?.tab.content == .history
+            return canReload || isHTMLNewTabPage || isHistoryView
 
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown
@@ -1240,7 +1271,7 @@ extension MainViewController: FindInPageDelegate {
 extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
 
     func privacyDashboardViewControllerDidChange(size: NSSize) {
-        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: true)
+        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: false)
     }
 }
 

@@ -407,7 +407,7 @@ platform :mac do
 
     build_app(
       export_method: "app-store",
-      scheme: "DuckDuckGo Privacy Browser App Store",
+      scheme: "macOS Browser App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist",
       xcargs: "-skipPackagePluginValidation -skipMacroValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
     )
@@ -420,7 +420,7 @@ platform :mac do
 
     build_app(
       export_method: "app-store",
-      scheme: "Product Review Release App Store",
+      scheme: "macOS Browser Review App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist",
       xcargs: "-skipPackagePluginValidation -skipMacroValidation"
     )
@@ -635,7 +635,7 @@ release in progress and you're making a follow-up internal release that includes
     end
 
     # Run tests (CI will run them separately)
-    run_tests(scheme: 'DuckDuckGo Privacy Browser') unless is_ci
+    run_tests(scheme: 'macOS Browser') unless is_ci
 
     # Every thing looks good: commit and push
     unless modified_files.empty?

@@ -35,6 +35,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var internalUserDecider: InternalUserDeciderMock!
     var defaultBrowserProvider: DefaultBrowserProviderMock!
+    var dockCustomizer: DockCustomizerMock!
 
     var storePurchaseManager: StorePurchaseManager!
 
@@ -57,6 +58,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
         defaultBrowserProvider = DefaultBrowserProviderMock()
+        dockCustomizer = DockCustomizerMock()
+        dockCustomizer.addToDock()
         defaultBrowserProvider.isDefault = true
 
         storePurchaseManager = StorePurchaseManagerMock()
@@ -100,6 +103,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
                                           freemiumDBPFeature: mockFreemiumDBPFeature,
                                           freemiumDBPPresenter: mockFreemiumDBPPresenter,
+                                          dockCustomizer: dockCustomizer,
                                           defaultBrowserPreferences: .init(defaultBrowserProvider: defaultBrowserProvider),
                                           notificationCenter: mockNotificationCenter,
                                           freemiumDBPExperimentPixelHandler: mockPixelHandler)
@@ -298,7 +302,43 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedBookmarkAllOpenTabsCalled)
     }
 
-    // MARK: - Default Browser Action
+    // MARK: - Default Browser Action and Add To Dock
+
+#if SPARKLE
+    @MainActor
+    func testWhenBrowserIsNotAddedToDockThenMenuItemIsVisible() {
+        dockCustomizer.didShowFeatureFromMoreOptionsMenu = true
+        dockCustomizer.dockStatus = false
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.addDuckDuckGoToDock)
+    }
+
+    @MainActor
+    func testWhenBrowserIsNotInTheDockAndIsNotSetAsDefaultThenTheOrderIsCorrect() {
+        dockCustomizer.didShowFeatureFromMoreOptionsMenu = true
+        dockCustomizer.dockStatus = false
+        defaultBrowserProvider.isDefault = false
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.addDuckDuckGoToDock)
+        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.setAsDefaultBrowser)
+    }
+#endif
+
+    @MainActor
+    func testWhenBrowserIsAddedToDockThenMenuItemIsNotVisible() {
+        dockCustomizer.dockStatus = true
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertNotEqual(moreOptionsMenu.items[1].title, UserText.addDuckDuckGoToDock)
+    }
 
     @MainActor
     func testWhenBrowserIsDefaultThenSetAsDefaultBrowserMenuItemIsHidden() {

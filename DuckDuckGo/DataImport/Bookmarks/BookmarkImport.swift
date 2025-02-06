@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 enum BookmarkImportSource: Equatable {
     case duckduckgoWebKit

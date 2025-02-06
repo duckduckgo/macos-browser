@@ -20,6 +20,7 @@ import AppKit
 import Foundation
 import CommonCrypto
 import GRDB
+import BrowserServicesKit
 
 final class ChromiumLoginReader {
 

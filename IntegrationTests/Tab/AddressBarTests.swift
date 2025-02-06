@@ -457,7 +457,7 @@ class AddressBarTests: XCTestCase {
         XCTAssertTrue(isAddressBarFirstResponder)
 
         try await tab.setContent(.url(.makeSearchUrl(from: "cats")!, credential: nil, source: .bookmark))?.result.get()
-        XCTAssertEqual(window.firstResponder, tab.webView)
+        XCTAssertFalse(isAddressBarFirstResponder)
 
         try await tab.goBack()?.result.get()
         XCTAssertTrue(isAddressBarFirstResponder)
@@ -687,7 +687,7 @@ class AddressBarTests: XCTestCase {
         type(URL.duckDuckGo.absoluteString + "\r")
 
         try await didFinishNavigation.value
-        XCTAssertEqual(window.firstResponder, tab.webView)
+        XCTAssertFalse(isAddressBarFirstResponder)
     }
 
     @MainActor

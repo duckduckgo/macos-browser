@@ -28,6 +28,10 @@ import PixelKit
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
+    private let trackerDataManager: TrackerDataManager
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private var contentBlockingManager: ContentBlockerRulesManagerProtocol
+
     private enum Constants {
         static let lastConfigurationInstallDateKey = "config.last.installed"
     }
@@ -53,10 +57,18 @@ final class ConfigurationManager: DefaultConfigurationManager {
         PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
-    override init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
-                  store: ConfigurationStoring = ConfigurationStore(),
-                  defaults: KeyValueStoring = UserDefaults.appConfiguration) {
+    init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
+         store: ConfigurationStoring = ConfigurationStore(),
+         defaults: KeyValueStoring = UserDefaults.appConfiguration,
+         trackerDataManager: TrackerDataManager = ContentBlocking.shared.trackerDataManager,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+         contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager) {
+
+        self.trackerDataManager = trackerDataManager
+        self.privacyConfigurationManager = privacyConfigurationManager
+        self.contentBlockingManager = contentBlockingManager
         self.defaults = defaults
+
         super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
 
@@ -107,10 +119,30 @@ final class ConfigurationManager: DefaultConfigurationManager {
     private func fetchTrackerBlockingDependencies(isDebug: Bool) async -> Bool {
         var didFetchAnyTrackerBlockingDependencies = false
 
-        var tasks = [Configuration: Task<(), Swift.Error>]()
-        tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet, isDebug: isDebug) }
-        tasks[.surrogates] = Task { try await fetcher.fetch(.surrogates, isDebug: isDebug) }
-        tasks[.privacyConfiguration] = Task { try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug) }
+        // Start surrogates fetch task
+        let surrogatesTask = Task { try await fetcher.fetch(.surrogates, isDebug: isDebug) }
+
+        // Perform privacyConfiguration fetch and update
+        do {
+            try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug)
+            didFetchAnyTrackerBlockingDependencies = true
+            privacyConfigurationManager.reload(etag: store.loadEtag(for: .privacyConfiguration),
+                                               data: store.loadData(for: .privacyConfiguration))
+        } catch {
+            Logger.config.error(
+                "Failed to complete configuration update to \(Configuration.privacyConfiguration.rawValue, privacy: .public): \(error.localizedDescription, privacy: .public)"
+            )
+            tryAgainSoon()
+        }
+
+        // Start trackerDataSet fetch task after privacyConfiguration completes
+        let trackerDataSetTask = Task { try await fetcher.fetch(.trackerDataSet, isDebug: isDebug) }
+
+        // Wait for surrogates and trackerDataSet tasks
+        let tasks: [(Configuration, Task<(), Swift.Error>)] = [
+            (.surrogates, surrogatesTask),
+            (.trackerDataSet, trackerDataSetTask)
+        ]
 
         for (configuration, task) in tasks {
             do {
@@ -141,11 +173,12 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
     private func updateTrackerBlockingDependencies() {
         lastConfigurationInstallDate = Date()
-        ContentBlocking.shared.trackerDataManager.reload(etag: store.loadEtag(for: .trackerDataSet),
-                                                         data: store.loadData(for: .trackerDataSet))
-        ContentBlocking.shared.privacyConfigurationManager.reload(etag: store.loadEtag(for: .privacyConfiguration),
-                                                                  data: store.loadData(for: .privacyConfiguration))
-        ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+
+        trackerDataManager.reload(etag: store.loadEtag(for: .trackerDataSet),
+                                  data: store.loadData(for: .trackerDataSet))
+        privacyConfigurationManager.reload(etag: store.loadEtag(for: .privacyConfiguration),
+                                           data: store.loadData(for: .privacyConfiguration))
+        contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() async throws {

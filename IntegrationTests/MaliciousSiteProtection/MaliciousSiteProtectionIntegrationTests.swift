@@ -20,6 +20,8 @@ import BrowserServicesKit
 import Combine
 import Common
 import MaliciousSiteProtection
+import OHHTTPStubs
+import OHHTTPStubsSwift
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -44,11 +46,19 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
         let featureFlagger = MockFeatureFlagger()
-        detector = MaliciousSiteProtectionManager(featureFlagger: featureFlagger, configManager: MockPrivacyConfigurationManager(), updateIntervalProvider: { _ in nil })
+        let configManager = MockPrivacyConfigurationManager()
+        let privacyConfig = MockPrivacyConfiguration()
+        privacyConfig.isSubfeatureKeyEnabled = { (subfeature: any PrivacySubfeature, _: AppVersionProvider) -> Bool in
+            if case MaliciousSiteProtectionSubfeature.onByDefault = subfeature { true } else { false }
+        }
+        configManager.privacyConfig = privacyConfig
+        detector = MaliciousSiteProtectionManager(featureFlags: featureFlagger.maliciousSiteProtectionFeatureFlags(configManager: configManager), updateIntervalProvider: { _ in nil })
         schemeHandler = TestSchemeHandler()
         schemeHandler.middleware = [{
             if $0.url!.lastPathComponent == "phishing.html" {
                 XCTFail("Phishing request loaded")
+            } else if $0.url!.lastPathComponent == "malware.html" {
+                XCTFail("Malware request loaded")
             }
             return .ok(.html(""))
         }]
@@ -58,6 +68,15 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         let webViewConfiguration = WKWebViewConfiguration()
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
+
+        let matchesUrlPrefix = MaliciousSiteDetector.APIEnvironment.production.url(for: .matches(.init(hashPrefix: "")), platform: .macOS)
+            .absoluteString.prefix(while: { $0 != "?" })
+        stub { request in
+            request.url?.absoluteString.hasPrefix(matchesUrlPrefix) == true
+        } response: { _ in
+            let path = OHPathForFile("match.api.response.json", type(of: self))!
+            return fixture(filePath: path, status: 200, headers: nil)
+        }
 
         contentBlockingMock = ContentBlockingMock()
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
@@ -81,11 +100,12 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         tab = nil
         tabViewModel = nil
         schemeHandler = nil
+        HTTPStubs.removeAllStubs()
         WKWebView.customHandlerSchemes = []
         WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
-    // MARK: - Tests
+    // MARK: - Phishing Detection Tests
 
     @MainActor
     func testPhishingNotDetected_tabIsNotMarkedPhishing() async throws {
@@ -187,6 +207,101 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         XCTAssertEqual(tabViewModel.tab.error as NSError? as? MaliciousSiteError, MaliciousSiteError(code: .phishing, failingUrl: redirectUrl))
     }
 
+    // MARK: - Malware Detection Tests
+
+    @MainActor
+    func testMalwareDetected_tabIsMarkedMalware() async throws {
+        let url = URL(string: "http://privacy-test-pages.site/security/badware/malware.html")!
+        try await loadUrl(url)
+        XCTAssertEqual(tabViewModel.tab.error as NSError? as? MaliciousSiteError, MaliciousSiteError(code: .malware, failingUrl: url))
+    }
+
+    @MainActor
+    func testFeatureDisabledAndMalwareDetection_tabIsNotMarkedMalware() async throws {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = false
+        let e = expectation(description: "request sent")
+        schemeHandler.middleware = [{ _ in
+            e.fulfill()
+            return .ok(.html(""))
+        }]
+        let url = URL(string: "http://privacy-test-pages.site/security/badware/malware.html")!
+        try await loadUrl(url)
+        await fulfillment(of: [e], timeout: 1)
+        XCTAssertNil(tabViewModel.tab.error)
+    }
+
+    @MainActor
+    func testMalwareDetectedThenNotDetected_tabIsNotMarkedMalware() async throws {
+        let url1 = URL(string: "http://privacy-test-pages.site/security/badware/malware.html")!
+        try await loadUrl(url1)
+        XCTAssertEqual(tabViewModel.tab.error as NSError? as? MaliciousSiteError, MaliciousSiteError(code: .malware, failingUrl: url1))
+
+        let url2 = URL(string: "http://broken.third-party.site/")!
+        try await loadUrl(url2)
+        XCTAssertNil(tabViewModel.tab.error)
+    }
+
+    @MainActor
+    func testMalwareDetectedThenDDGLoaded_tabIsNotMarkedMalware() async throws {
+        let url1 = URL(string: "http://privacy-test-pages.site/security/badware/malware.html")!
+        try await loadUrl(url1)
+        XCTAssertEqual(tabViewModel.tab.error as NSError? as? MaliciousSiteError, MaliciousSiteError(code: .malware, failingUrl: url1))
+
+        let url2 = URL(string: "http://duckduckgo.com/")!
+        try await loadUrl(url2)
+        let tabErrorCode2 = tabViewModel.tab.error?.errorCode
+        XCTAssertNil(tabErrorCode2)
+    }
+
+    @MainActor
+    func testMalwareDetectedViaHTTPRedirectChain_tabIsMarkedMalware() async throws {
+        let eRedirected = expectation(description: "Request redirected")
+        let url = URL(string: "http://privacy-test-pages.site/security/badware/malware-redirect/")!
+        let redirectUrl = URL(string: "http://privacy-test-pages.site/security/badware/malware.html")!
+
+        schemeHandler.middleware = [{
+            if $0.url?.lastPathComponent == "malware-redirect" {
+                eRedirected.fulfill()
+                return .redirect(to: "/security/badware/malware.html")
+            }
+            XCTFail("\(self.name): Malware request loaded")
+            return nil
+        }]
+        try await loadUrl(url)
+        await fulfillment(of: [eRedirected], timeout: 0)
+
+        XCTAssertEqual(tabViewModel.tab.error as NSError? as? MaliciousSiteError, MaliciousSiteError(code: .malware, failingUrl: redirectUrl))
+    }
+
+    @MainActor
+    func testMalwareDetectedViaJSRedirectChain_tabIsMarkedMalware() async throws {
+        let eRequested = expectation(description: "Request sent")
+        let url = URL(string: "http://my-test-pages.site/security/badware/malware-js-redirector.html")!
+        let redirectUrl = URL(string: "http://privacy-test-pages.site/security/badware/malware.html")!
+
+        schemeHandler.middleware = [{
+            if $0.url?.lastPathComponent == "malware-js-redirector.html" {
+                eRequested.fulfill()
+                return .ok(.html("""
+                <html>
+                <head>
+                    <script>
+                        window.location = 'http://privacy-test-pages.site/security/badware/malware.html';
+                    </script>
+                </head>
+                </html>
+                """))
+            }
+            XCTFail("\(self.name): Malware request loaded for \($0.url!.absoluteString)")
+            return nil
+        }]
+        try await loadUrl(url)
+        await fulfillment(of: [eRequested], timeout: 0)
+        try await wait { self.tab.error != nil }
+
+        XCTAssertEqual(tabViewModel.tab.error as NSError? as? MaliciousSiteError, MaliciousSiteError(code: .malware, failingUrl: redirectUrl))
+    }
+
     // MARK: - Helper Methods
 
     @MainActor
@@ -227,15 +342,11 @@ class MockFeatureFlagger: FeatureFlagger {
         return true
     }
 
-    func getCohortIfEnabled(_ subfeature: any PrivacySubfeature) -> CohortID? {
+    func resolveCohort<Flag>(for featureFlag: Flag, allowOverride: Bool) -> (any FeatureFlagCohortDescribing)? where Flag: FeatureFlagDescribing {
         return nil
     }
 
-    func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
-        return nil
-    }
-
-    func getAllActiveExperiments() -> Experiments {
+    var allActiveExperiments: Experiments {
         return [:]
     }
 }

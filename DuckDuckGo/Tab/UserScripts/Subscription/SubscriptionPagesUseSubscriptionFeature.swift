@@ -26,6 +26,7 @@ import PixelKit
 import os.log
 import Freemium
 import DataBrokerProtection
+import Networking
 
 /// Use Subscription sub-feature
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
@@ -96,6 +97,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
+        Logger.subscription.debug("WebView handler: \(methodName)")
+
         switch methodName {
         case Handlers.getSubscription: return getSubscription
         case Handlers.setSubscription: return setSubscription
@@ -537,7 +540,7 @@ private extension SubscriptionPagesUseSubscriptionFeature {
      `notificationCenter`.
 
      - Important: The notification will only be posted if `didActivate` is `true`.
-    */
+     */
     func sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated() {
         if freemiumDBPUserStateManager.didActivate {
             notificationCenter.post(name: .subscriptionUpgradeFromFreemium, object: nil)

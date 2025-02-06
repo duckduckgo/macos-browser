@@ -21,6 +21,8 @@ import Foundation
 
 public enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
     case justOpen
+    case manageExcludedApps
+    case manageExcludedDomains
     case shareFeedback
     case showFAQ
     case showStatus
@@ -33,6 +35,10 @@ public enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
         switch self {
         case .justOpen:
             return "networkprotection://just-open"
+        case .manageExcludedApps:
+            return "networkprotection://excluded-apps"
+        case .manageExcludedDomains:
+            return "networkprotection://excluded-domains"
         case .shareFeedback:
             return "networkprotection://share-feedback"
         case .showFAQ:

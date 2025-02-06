@@ -92,10 +92,6 @@ final class AddressBarTextField: NSTextField {
     // flag when updating the Value from `handleTextDidChange()`
     private var currentTextDidChangeEvent: TextDidChangeEventType = .none
 
-//    var subscriptionEnvironment: SubscriptionEnvironment {
-//        Application.appDelegate.subscriptionManager.currentEnvironment
-//    }
-
     // MARK: - Lifecycle
 
     override func awakeFromNib() {
@@ -361,6 +357,8 @@ final class AddressBarTextField: NSTextField {
                 }
             case .historyEntry:
                 return .autocompleteClickHistory(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
+            case .openTab:
+                return .autocompleteClickOpenTab(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
             default:
                 return nil
             }
@@ -370,7 +368,13 @@ final class AddressBarTextField: NSTextField {
             PixelKit.fire(autocompletePixel)
         }
 
-        if NSApp.isCommandPressed {
+        if case .internalPage(title: let title, url: let url) = suggestion,
+           url == .bookmarks || url.isSettingsURL {
+            // when choosing an internal page suggestion prefer already open tab
+            switchTo(OpenTab(title: title, url: url))
+        } else if case .openTab(let title, url: let url) = suggestion {
+            switchTo(OpenTab(title: title, url: url))
+        } else if NSApp.isCommandPressed {
             openNew(NSApp.isOptionPressed ? .window : .tab, selected: NSApp.isShiftPressed, suggestion: suggestion)
         } else {
             hideSuggestionWindow()
@@ -483,6 +487,12 @@ final class AddressBarTextField: NSTextField {
                 WindowsManager.openNewWindow(with: tab, showWindow: selected, popUp: false)
             }
         }
+    }
+
+    private func switchTo(_ tab: OpenTab) {
+        // reset value so it‘s not restored next time we come back to the tab
+        value = .text("", userTyped: false)
+        WindowControllersManager.shared.show(url: tab.url, source: .switchToOpenTab, newTab: true /* in case not found */)
     }
 
     private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, String, Bool) -> Void) {
@@ -889,8 +899,7 @@ extension AddressBarTextField {
 
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
                  .historyEntry(title: _, url: let url, allowedInTopHits: _),
-                 .internalPage(title: _, url: let url),
-                 .openTab(title: _, url: let url):
+                 .internalPage(title: _, url: let url):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
@@ -900,7 +909,8 @@ extension AddressBarTextField {
                 } else {
                     self = .url(url)
                 }
-
+            case .openTab(title: _, url: let url):
+                self = .openTab(url)
             case .unknown:
                 self = Suffix.search
             }
@@ -910,6 +920,7 @@ extension AddressBarTextField {
         case visit(host: String)
         case url(URL)
         case title(String)
+        case openTab(URL)
 
         func toAttributedString(size: CGFloat, isBurner: Bool) -> NSAttributedString {
             let suffixColor = isBurner ? NSColor.burnerAccent : NSColor.addressBarSuffix
@@ -921,6 +932,8 @@ extension AddressBarTextField {
         }
 
         static let searchSuffix = " – \(UserText.searchDuckDuckGoSuffix)"
+        static let searchOpenTabSuffix = " – \(UserText.duckDuckGoSearchSuffix)"
+        static let internalPageOpenTabSuffix = " – \(UserText.duckDuckGo)"
         static let visitSuffix = " – \(UserText.addressBarVisitSuffix)"
 
         var string: String {
@@ -929,14 +942,16 @@ extension AddressBarTextField {
                 return Self.searchSuffix
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
-            case .url(let url):
-                if url.isDuckDuckGoSearch {
-                    return Self.searchSuffix
-                } else {
-                    return " – " + url.toString(decodePunycode: false,
-                                                dropScheme: true,
-                                                dropTrailingSlash: false)
-                }
+            case .openTab(let url) where url.isDuckDuckGoSearch:
+                return Self.searchOpenTabSuffix
+            case .openTab(let url) where url.isDuckURLScheme:
+                return Self.internalPageOpenTabSuffix
+            case .url(let url) where url.isDuckDuckGoSearch:
+                return Self.searchSuffix
+            case .url(let url), .openTab(let url):
+                return " – " + url.toString(decodePunycode: false,
+                                            dropScheme: true,
+                                            dropTrailingSlash: false)
             case .title(let title):
                 return " – " + title
             }
@@ -1034,19 +1049,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
             case #selector(NSResponder.moveUp(_:)):
                 suggestionContainerViewModel?.selectPreviousIfPossible()
                 return true
-
-            case #selector(NSResponder.deleteBackward(_:)),
-                #selector(NSResponder.deleteForward(_:)),
-                #selector(NSResponder.deleteToMark(_:)),
-                #selector(NSResponder.deleteWordForward(_:)),
-                #selector(NSResponder.deleteWordBackward(_:)),
-                #selector(NSResponder.deleteToEndOfLine(_:)),
-                #selector(NSResponder.deleteToEndOfParagraph(_:)),
-                #selector(NSResponder.deleteToBeginningOfLine(_:)),
-                #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
-
-                suggestionContainerViewModel?.clearSelection()
-                return false
 
             default:
                 return false

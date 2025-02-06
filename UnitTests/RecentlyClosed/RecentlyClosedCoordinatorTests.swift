@@ -88,6 +88,9 @@ private extension RecentlyClosedWindow {
 }
 
 final class WindowControllersManagerMock: WindowControllersManagerProtocol {
+
+    var mainWindowControllers: [DuckDuckGo_Privacy_Browser.MainWindowController] = []
+
     var pinnedTabsManager = PinnedTabsManager(tabCollection: .init())
 
     var didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
@@ -112,12 +115,12 @@ final class WindowControllersManagerMock: WindowControllersManagerProtocol {
 
     struct OpenNewWindowArgs: Equatable {
         var contents: [TabContent]?
-        var burnerMode: BurnerMode = .regular, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool = true, popUp: Bool = false, lazyLoadTabs: Bool = false, isMiniaturized: Bool = false
+        var burnerMode: BurnerMode = .regular, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool = true, popUp: Bool = false, lazyLoadTabs: Bool = false, isMiniaturized: Bool = false, isMaximized: Bool = false, isFullscreen: Bool = false
     }
     var openNewWindowCalled: OpenNewWindowArgs?
     @discardableResult
-    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?, burnerMode: BurnerMode, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool, popUp: Bool, lazyLoadTabs: Bool, isMiniaturized: Bool) -> MainWindow? {
-        openNewWindowCalled = .init(contents: tabCollectionViewModel?.tabs.map(\.content), burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized)
+    func openNewWindow(with tabCollectionViewModel: DuckDuckGo_Privacy_Browser.TabCollectionViewModel?, burnerMode: DuckDuckGo_Privacy_Browser.BurnerMode, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool, popUp: Bool, lazyLoadTabs: Bool, isMiniaturized: Bool, isMaximized: Bool, isFullscreen: Bool) -> DuckDuckGo_Privacy_Browser.MainWindow? {
+        openNewWindowCalled = .init(contents: tabCollectionViewModel?.tabs.map(\.content), burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized, isMaximized: isMaximized, isFullscreen: isFullscreen)
         return nil
     }
     func showTab(with content: DuckDuckGo_Privacy_Browser.Tab.TabContent) { }

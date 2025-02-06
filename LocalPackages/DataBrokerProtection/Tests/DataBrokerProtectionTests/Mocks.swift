@@ -117,6 +117,13 @@ extension BrokerProfileQueryData {
         return [broker1Data, broker2Data, broker3Data]
     }
 
+    static func createOptOutJobData(extractedProfileId: Int64, brokerId: Int64, profileQueryId: Int64, preferredRunDate: Date?) -> OptOutJobData {
+
+        let extractedProfile = ExtractedProfile(id: extractedProfileId)
+
+        return OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: .now, preferredRunDate: preferredRunDate, historyEvents: [], attemptCount: 0, extractedProfile: extractedProfile)
+    }
+
     static func createOptOutJobData(extractedProfileId: Int64, brokerId: Int64, profileQueryId: Int64, startEventHoursAgo: Int, requestEventHoursAgo: Int, jobCreatedHoursAgo: Int) -> OptOutJobData {
 
         let extractedProfile = ExtractedProfile(id: extractedProfileId)
@@ -222,6 +229,10 @@ final class PrivacyConfigurationMock: PrivacyConfiguration {
 
     func settings(for feature: BrowserServicesKit.PrivacyFeature) -> BrowserServicesKit.PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
         [String: Any]()
+    }
+
+    func settings(for subfeature: any BrowserServicesKit.PrivacySubfeature) -> PrivacyConfigurationData.PrivacyFeature.SubfeatureSettings? {
+        return nil
     }
 
     func userEnabledProtection(forDomain: String) {
@@ -414,96 +425,6 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
     func reset() {
         wasSubmitCaptchaInformationCalled = false
         wasSubmitCaptchaToBeResolvedCalled = false
-    }
-}
-
-final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
-    var shouldSendNilAuthHeader = false
-
-    func getAuthHeader() -> String? {
-        if shouldSendNilAuthHeader {
-            return nil
-        }
-        return "auth header"
-    }
-
-    func shouldAskForInviteCode() -> Bool {
-        false
-    }
-
-    func redeem(inviteCode: String) async throws {
-
-    }
-
-    func reset() {
-        shouldSendNilAuthHeader = false
-    }
-}
-
-final class MockAuthenticationService: DataBrokerProtectionAuthenticationService {
-
-    var wasRedeemCalled = false
-    var shouldThrow = false
-
-    func redeem(inviteCode: String) async throws -> String {
-        wasRedeemCalled = true
-        if shouldThrow {
-            throw AuthenticationError.issueRedeemingInviteCode(error: "mock")
-        }
-
-        return "accessToken"
-    }
-
-    func reset() {
-        wasRedeemCalled = false
-        shouldThrow = false
-    }
-}
-
-final class MockAuthenticationRepository: AuthenticationRepository {
-    var shouldSendNilInviteCode = false
-    var shouldSendNilAccessToken = false
-    var wasInviteCodeSaveCalled = false
-    var wasAccessTokenSaveCalled = false
-    var shouldSendNilWaitlistTimeStamp = false
-
-    func getInviteCode() -> String? {
-        if shouldSendNilInviteCode {
-            return nil
-        }
-
-        return "inviteCode"
-    }
-
-    func getAccessToken() -> String? {
-        if shouldSendNilAccessToken {
-            return nil
-        }
-
-        return "accessToken"
-    }
-
-    func save(inviteCode: String) {
-        wasInviteCodeSaveCalled = true
-    }
-
-    func save(accessToken: String) {
-        wasAccessTokenSaveCalled = true
-    }
-
-    func getWaitlistTimestamp() -> Int? {
-        if shouldSendNilWaitlistTimeStamp {
-            return nil
-        }
-        return 123
-    }
-
-    func reset() {
-        shouldSendNilInviteCode = false
-        shouldSendNilAccessToken = false
-        wasInviteCodeSaveCalled = false
-        wasAccessTokenSaveCalled = false
-        shouldSendNilWaitlistTimeStamp = false
     }
 }
 

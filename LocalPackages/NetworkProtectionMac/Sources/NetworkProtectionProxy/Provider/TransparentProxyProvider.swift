@@ -130,6 +130,9 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
                 Task {
                     try await self.updateNetworkSettings()
                 }
+            case .proxyAvailable:
+                // no-op, handled by app
+                break
             }
         }.store(in: &cancellables)
     }
@@ -453,7 +456,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         case .block:
             return .block(dueTo: .appRule)
         case .exclude:
-            return .excludeFromVPN(dueTo: .domainRule)
+            return .excludeFromVPN(dueTo: .appRule)
         }
     }
 

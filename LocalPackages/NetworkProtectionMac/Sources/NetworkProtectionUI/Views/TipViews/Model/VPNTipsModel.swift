@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Common
 import NetworkProtection
+import NetworkProtectionProxy
 import os.log
 import TipKit
 import PixelKit
@@ -57,6 +58,7 @@ public final class VPNTipsModel: ObservableObject {
 
     private let isMenuApp: Bool
     private let vpnSettings: VPNSettings
+    private let proxySettings: TransparentProxySettings
     private let logger: Logger
     private var cancellables = Set<AnyCancellable>()
 
@@ -65,6 +67,7 @@ public final class VPNTipsModel: ObservableObject {
                 activeSitePublisher: CurrentValuePublisher<ActiveSiteInfo?, Never>,
                 forMenuApp isMenuApp: Bool,
                 vpnSettings: VPNSettings,
+                proxySettings: TransparentProxySettings,
                 logger: Logger) {
 
         self.activeSiteInfo = activeSitePublisher.value
@@ -73,6 +76,7 @@ public final class VPNTipsModel: ObservableObject {
         self.isMenuApp = isMenuApp
         self.logger = logger
         self.vpnSettings = vpnSettings
+        self.proxySettings = proxySettings
 
         guard !isMenuApp else {
             return
@@ -134,6 +138,44 @@ public final class VPNTipsModel: ObservableObject {
     let geoswitchingTip = VPNGeoswitchingTip()
 
     var geoswitchingStatusUpdateTask: Task<Void, Never>?
+
+    @available(macOS 14.0, *)
+    var canShowDomainExclusionsTip: Bool {
+        guard canShowTips else {
+            return false
+        }
+
+        // If the proxy is available, we can show this tip after the geoswitchin tip
+        // Otherwise we can't show this tip
+        if proxySettings.proxyAvailable,
+           case .invalidated = geoswitchingTip.status {
+
+            return true
+        }
+
+        return false
+    }
+
+    @available(macOS 14.0, *)
+    var canShowAutoconnectTip: Bool {
+        guard canShowTips else {
+            return false
+        }
+
+        // If the proxy is available, we need to wait until the domain exclusions tip was shown.
+        // If the proxy is not available, we can show this tip after the geoswitchin tip
+        if proxySettings.proxyAvailable,
+           case .invalidated = domainExclusionsTip.status {
+
+            return true
+        } else if !proxySettings.proxyAvailable,
+           case .invalidated = geoswitchingTip.status {
+
+            return true
+        }
+
+        return false
+    }
 
     // MARK: - Tip Action handling
 

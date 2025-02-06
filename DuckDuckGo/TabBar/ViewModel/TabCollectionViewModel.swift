@@ -89,6 +89,17 @@ final class TabCollectionViewModel: NSObject {
         didSet {
             previouslySelectedTabViewModel = oldValue
             oldValue?.tab.renderTabSnapshot()
+
+            if #available(macOS 14.4, *) {
+                if let oldValue {
+                    WebExtensionManager.shared.eventsListener.didDeselectTabs([oldValue.tab])
+                }
+                if let selectedTabViewModel {
+                    WebExtensionManager.shared.eventsListener.didSelectTabs([selectedTabViewModel.tab])
+                    WebExtensionManager.shared.eventsListener.didActivateTab(selectedTabViewModel.tab,
+                                                              previousActiveTab: oldValue?.tab)
+                }
+            }
         }
     }
     private weak var previouslySelectedTabViewModel: TabViewModel?
@@ -782,6 +793,16 @@ extension TabCollectionViewModel {
             return .pinned(index)
         }
         if let index = tabCollection.tabs.firstIndex(of: tab) {
+            return .unpinned(index)
+        }
+        return nil
+    }
+
+    func indexInAllTabs(where condition: (Tab) -> Bool) -> TabIndex? {
+        if let index = pinnedTabsCollection?.tabs.firstIndex(where: condition) {
+            return .pinned(index)
+        }
+        if let index = tabCollection.tabs.firstIndex(where: condition) {
             return .unpinned(index)
         }
         return nil

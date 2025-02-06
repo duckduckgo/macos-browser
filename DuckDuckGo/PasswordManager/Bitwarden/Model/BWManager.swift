@@ -28,14 +28,16 @@ final class BWManager: BWManagement, ObservableObject {
     static let shared = BWManager()
     static let bundleId = "com.bitwarden.desktop"
     static let applicationName = "Bitwarden"
+    static let applicationPath = "/Applications/Bitwarden.app/Contents/MacOS/Bitwarden"
+    static let arguments = ["chrome-extension://bitwarden"]
 
     private init() {}
 
-    init(communicator: BWCommunication) {
+    init(communicator: NativeMessagingCommunication) {
         self.communicator = communicator
     }
 
-    private lazy var communicator: BWCommunication = BWCommunicator()
+    private lazy var communicator: NativeMessagingCommunication = NativeMessagingCommunicator(appPath: Self.applicationPath, arguments: Self.arguments)
 
     func initCommunication() {
         communicator.delegate = self
@@ -606,9 +608,9 @@ final class BWManager: BWManagement, ObservableObject {
 
 }
 
-extension BWManager: BWCommunicatorDelegate {
+extension BWManager: NativeMessagingCommunicatorDelegate {
 
-    func bitwardenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication) {
+    func nativeMessagingCommunicatorProcessDidTerminate(_ bitwardenCommunicator: NativeMessagingCommunication) {
         guard isBitwardenPasswordManager else {
             return
         }
@@ -618,7 +620,7 @@ extension BWManager: BWCommunicatorDelegate {
         scheduleConnectionAttempt()
     }
 
-    func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication, didReceiveMessageData messageData: Data) {
+    func nativeMessagingCommunicator(_ bitwardenCommunicator: NativeMessagingCommunication, didReceiveMessageData messageData: Data) {
         guard let response = BWResponse(from: messageData) else {
             Logger.bitWarden.fault("BWManager: Can't decode the message")
             assertionFailure("BWManager: Can't decode the message")

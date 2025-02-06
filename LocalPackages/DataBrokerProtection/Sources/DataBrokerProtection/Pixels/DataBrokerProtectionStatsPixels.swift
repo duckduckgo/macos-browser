@@ -172,6 +172,10 @@ extension Date {
     static func nowMinus(hours: Int) -> Date {
         Calendar.current.date(byAdding: .hour, value: -hours, to: Date()) ?? Date()
     }
+
+    static func nowPlus(hours: Int) -> Date {
+        nowMinus(hours: -hours)
+    }
 }
 
 final class DataBrokerProtectionStatsPixels: StatsPixels {

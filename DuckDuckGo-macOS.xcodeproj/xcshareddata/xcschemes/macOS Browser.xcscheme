@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "1520"
+   version = "1.7">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
+               BuildableName = "DuckDuckGo.app"
+               BlueprintName = "DuckDuckGo Privacy Browser"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4B1AD89C25FC27E200261379"
+               BuildableName = "Integration Tests.xctest"
+               BlueprintName = "Integration Tests"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AA585D8F248FD31400E9A3E2"
+               BuildableName = "Unit Tests.xctest"
+               BlueprintName = "Unit Tests"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DataBrokerProtectionTests"
+               BuildableName = "DataBrokerProtectionTests"
+               BlueprintName = "DataBrokerProtectionTests"
+               ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UDSHelperTests"
+               BuildableName = "UDSHelperTests"
+               BlueprintName = "UDSHelperTests"
+               ReferencedContainer = "container:LocalPackages/UDSHelper">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      language = "en"
+      codeCoverageEnabled = "YES">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "killall tests-server&#10;killall sandbox-test-tool&#10;# integration tests resources dir&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "4B1AD89C25FC27E200261379"
+                     BuildableName = "Integration Tests.xctest"
+                     BlueprintName = "Integration Tests"
+                     ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
+      <PostActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "killall tests-server&#10;killall sandbox-test-tool&#10;">
+            </ActionContent>
+         </ExecutionAction>
+      </PostActions>
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AA585D8F248FD31400E9A3E2"
+               BuildableName = "Unit Tests.xctest"
+               BlueprintName = "Unit Tests"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
+               </Test>
+               <Test
+                  Identifier = "BrowserTabViewControllerOnboardingTests/testWhenNavigationCompletedAndNoDialogTypeThenOnlyWebViewVisible()">
+               </Test>
+               <Test
+                  Identifier = "CBRCompileTimeReporterTests">
+               </Test>
+               <Test
+                  Identifier = "PixelExperimentTests">
+               </Test>
+               <Test
+                  Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
+               </Test>
+               <Test
+                  Identifier = "PixelStoreTests/testWhenValuesAreRemovedThenTheyAreNotInCache()">
+               </Test>
+               <Test
+                  Identifier = "PreferencesSidebarModelTests/testWhenResetTabSelectionIfNeededCalledThenPreferencesTabIsSelected()">
+               </Test>
+               <Test
+                  Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
+               </Test>
+               <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsErrorOnFetchingAccountDetails()">
+               </Test>
+               <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsSuccess()">
+               </Test>
+               <Test
+                  Identifier = "SyncPreferencesTests/test_recoverDevice_accountAlreadyExists_twoOrMoreDevices_showsAccountSwitchingMessage()">
+               </Test>
+               <Test
+                  Identifier = "TabSnapshotExtensionTests/testWhenSnapshotIsRestored_ThenRenderingIsSkippedAfterLoading()">
+               </Test>
+               <Test
+                  Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4B1AD89C25FC27E200261379"
+               BuildableName = "Integration Tests.xctest"
+               BlueprintName = "Integration Tests"
+               ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "AutoconsentIntegrationTests/testFilterlistRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden()">
+               </Test>
+               <Test
+                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
+               </Test>
+               <Test
+                  Identifier = "ConfigurationManagerIntegrationTests/testTdsAreFetchedFromURLBasedOnPrivacyConfigExperiment()">
+               </Test>
+               <Test
+                  Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
+               </Test>
+               <Test
+                  Identifier = "EncryptionKeyStoreTests">
+               </Test>
+               <Test
+                  Identifier = "HTTPSUpgradeIntegrationTests">
+               </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
+               </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetected_tabIsMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingNotDetected_tabIsNotMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFContextMenuPrintChosen_printDialogOpens()">
+               </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFContextMenuSaveAsChosen_saveDialogOpens()">
+               </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFMainMenuPrintChosen_printDialogOpens()">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NetworkProtectionUITests"
+               BuildableName = "NetworkProtectionUITests"
+               BlueprintName = "NetworkProtectionUITests"
+               ReferencedContainer = "container:LocalPackages/NetworkProtectionMac">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DataBrokerProtectionTests"
+               BuildableName = "DataBrokerProtectionTests"
+               BlueprintName = "DataBrokerProtectionTests"
+               ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UDSHelperTests"
+               BuildableName = "UDSHelperTests"
+               BlueprintName = "UDSHelperTests"
+               ReferencedContainer = "container:LocalPackages/UDSHelper">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AppKitExtensionsTests"
+               BuildableName = "AppKitExtensionsTests"
+               BlueprintName = "AppKitExtensionsTests"
+               ReferencedContainer = "container:LocalPackages/AppKitExtensions">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NewTabPageTests"
+               BuildableName = "NewTabPageTests"
+               BlueprintName = "NewTabPageTests"
+               ReferencedContainer = "container:LocalPackages/NewTabPage">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "HistoryViewTests"
+               BuildableName = "HistoryViewTests"
+               BlueprintName = "HistoryViewTests"
+               ReferencedContainer = "container:LocalPackages/HistoryView">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UserScriptActionsManagerTests"
+               BuildableName = "UserScriptActionsManagerTests"
+               BlueprintName = "UserScriptActionsManagerTests"
+               ReferencedContainer = "container:LocalPackages/UserScriptActionsManager">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SyncUITests"
+               BuildableName = "SyncUITests"
+               BlueprintName = "SyncUITests"
+               ReferencedContainer = "container:LocalPackages/SyncUI-macOS">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      enableGPUValidationMode = "1"
+      allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
+            BuildableName = "DuckDuckGo.app"
+            BlueprintName = "DuckDuckGo Privacy Browser"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints YES"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-SUEnableAutomaticChecks NO"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-com.apple.CoreData.ConcurrencyDebug 1"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
+            BuildableName = "DuckDuckGo.app"
+            BlueprintName = "DuckDuckGo Privacy Browser"
+            ReferencedContainer = "container:DuckDuckGo-macOS.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>

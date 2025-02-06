@@ -21,6 +21,7 @@ import Common
 import UniformTypeIdentifiers
 import PixelKit
 import os.log
+import BrowserServicesKit
 
 struct DataImportViewModel {
 
@@ -137,7 +138,7 @@ struct DataImportViewModel {
 
     init(importSource: Source? = nil,
          screen: Screen? = nil,
-         availableImportSources: [DataImport.Source] = Source.allCases.filter { $0.canImportData },
+         availableImportSources: [DataImport.Source] = DataImport.Source.allCases.filter { $0.canImportData },
          preferredImportSources: [Source] = [.chrome, .firefox, .safari],
          summary: [DataTypeImportResult] = [],
          isPasswordManagerAutolockEnabled: Bool = AutofillPreferences().isAutoLockEnabled,
@@ -409,11 +410,11 @@ private func dataImporter(for source: DataImport.Source, fileDataType: DataImpor
 
     case .onePassword8, .onePassword7, .bitwarden, .lastPass, .csv,
          /* any */_ where fileDataType == .passwords:
-        CSVImporter(fileURL: url, loginImporter: SecureVaultLoginImporter(), defaultColumnPositions: .init(source: source))
+        CSVImporter(fileURL: url, loginImporter: SecureVaultLoginImporter(loginImportState: AutofillLoginImportState()), defaultColumnPositions: .init(source: source), reporter: SecureVaultReporter.shared)
 
     case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi:
         ChromiumDataImporter(profile: profile,
-                             loginImporter: SecureVaultLoginImporter(),
+                             loginImporter: SecureVaultLoginImporter(loginImportState: AutofillLoginImportState()),
                              bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared))
     case .yandex:
         YandexDataImporter(profile: profile,
@@ -421,7 +422,7 @@ private func dataImporter(for source: DataImport.Source, fileDataType: DataImpor
     case .firefox, .tor:
         FirefoxDataImporter(profile: profile,
                             primaryPassword: primaryPassword,
-                            loginImporter: SecureVaultLoginImporter(),
+                            loginImporter: SecureVaultLoginImporter(loginImportState: AutofillLoginImportState()),
                             bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared),
                             faviconManager: FaviconManager.shared)
     case .safari, .safariTechnologyPreview:

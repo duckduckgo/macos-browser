@@ -20,6 +20,7 @@
 
 import Bookmarks
 import Foundation
+import BrowserServicesKit
 
 final class BookmarkStoreMock: BookmarkStore, CustomDebugStringConvertible {
 

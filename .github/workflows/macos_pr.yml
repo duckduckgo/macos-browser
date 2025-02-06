@@ -1,0 +1,435 @@
+name: macOS - PR Checks
+
+on:
+  push:
+    branches: [ main, "release/**" ]
+  pull_request:
+  workflow_call:
+    inputs:
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+    secrets:
+      APPLE_API_KEY_BASE64:
+        required: true
+      APPLE_API_KEY_ID:
+        required: true
+      APPLE_API_KEY_ISSUER:
+        required: true
+      ASANA_ACCESS_TOKEN:
+        required: true
+      MATCH_PASSWORD:
+        required: true
+      SSH_PRIVATE_KEY_FASTLANE_MATCH:
+        required: true
+
+jobs:
+  swiftlint:
+
+    name: SwiftLint
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: SwiftLint
+        uses: docker://norionomura/swiftlint:0.54.0
+        with:
+          args: swiftlint --reporter github-actions-logging --strict
+
+  shellcheck:
+
+    name: ShellCheck
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the code
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
+      uses: actions/checkout@v4
+
+    - name: Check out the code
+      if: github.event_name != 'pull_request' && github.event_name != 'push'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Run ShellCheck
+      uses: ludeeus/action-shellcheck@master
+      with:
+        format: gcc
+        ignore_paths: scripts/helpers
+        scandir: scripts
+      env:
+        SHELLCHECK_OPTS: -x -P scripts -P scripts/helpers
+
+  bats:
+
+    name: Test Shell Scripts
+
+    runs-on: macos-15
+
+    steps:
+    - name: Check out the code
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
+      uses: actions/checkout@v4
+
+    - name: Check out the code
+      if: github.event_name != 'pull_request' && github.event_name != 'push'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Install Bats
+      run: brew install bats-core
+
+    - name: Run Bats tests
+      run: bats --formatter junit scripts/tests/* > bats-tests.xml
+
+    - name: Publish unit tests report
+      uses: mikepenz/action-junit-report@v4
+      if: always() # always run even if the previous step fails
+      with:
+        check_name: "Test Report: Shell Scripts"
+        report_paths: 'bats-tests.xml'
+
+  tests:
+    name: Test
+
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [ "Sandbox", "Non-Sandbox" ]
+        include:
+          - scheme: macOS Browser
+            flavor: Non-Sandbox
+          - scheme: macOS Browser App Store
+            flavor: Sandbox
+          - active-arch: YES
+            flavor: Non-Sandbox
+          - active-arch: NO
+            flavor: Sandbox
+          - integration-tests-target: Integration Tests
+            flavor: Non-Sandbox
+          - integration-tests-target: Integration Tests App Store
+            flavor: Sandbox
+          - cache-key:
+            flavor: Non-Sandbox
+          - cache-key: sandbox-
+            flavor: Sandbox
+
+    runs-on: macos-15-xlarge
+    timeout-minutes: 30
+
+    outputs:
+      private-api-check-report: ${{ steps.private-api.outputs.report }}
+      commit_author: ${{ steps.fetch_commit_author.outputs.commit_author }}
+
+    steps:
+    - name: Register SSH key for certificates repository access
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+
+    - name: Check out the code
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Check out the code
+      if: github.event_name != 'pull_request' && github.event_name != 'push'
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Set up fastlane
+      run: bundle install
+
+    - name: Sync code signing assets
+      env:
+        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+      run: bundle exec fastlane sync_signing_ci
+
+    - name: Set cache key hash
+      run: |
+        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        if [[ "$has_only_tags" == "true" ]]; then
+          echo "cache_key_hash=${{ hashFiles('DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
+        else
+          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
+        fi
+
+    - name: Cache SPM
+      if: env.cache_key_hash
+      uses: actions/cache@v4
+      with:
+        path: DerivedData/SourcePackages
+        key: ${{ runner.os }}-spm-${{ matrix.cache-key }}${{ env.cache_key_hash }}
+        restore-keys: |
+          ${{ runner.os }}-spm-${{ matrix.cache-key }}
+
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+
+    - name: Build and run unit tests
+      run: |
+        echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
+        export OS_ACTIVITY_MODE=debug
+
+        set -o pipefail && xcodebuild test \
+          -scheme "${{ matrix.scheme }}" \
+          -derivedDataPath "DerivedData" \
+          -configuration "CI" \
+          -skipPackagePluginValidation -skipMacroValidation \
+          ENABLE_TESTABILITY=true \
+          ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
+          "-skip-testing:${{ matrix.integration-tests-target }}" \
+          | tee ${{ matrix.flavor }}-unittests-xcodebuild.log \
+          | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-unittests.xml \
+          || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-unittests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-unittests.xcresult && exit 1; }
+
+    - name: Run integration tests
+      run: |
+        set -o pipefail && xcodebuild test \
+          -scheme "${{ matrix.scheme }}" \
+          -derivedDataPath "DerivedData" \
+          -configuration "CI" \
+          -skipPackagePluginValidation -skipMacroValidation \
+          ENABLE_TESTABILITY=true \
+          ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
+          "-only-testing:${{ matrix.integration-tests-target }}" \
+          -retry-tests-on-failure \
+          | tee ${{ matrix.flavor }}-integrationtests-xcodebuild.log \
+          | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-integrationtests.xml \
+          || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-integrationtests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-integrationtests.xcresult && exit 1; }
+
+    - name: Check private API usage
+      id: private-api
+      run: |
+        if [[ ${{ matrix.flavor }} != "Sandbox" ]]; then
+          echo "Skipping private API usage check for ${{ matrix.flavor }} build"
+        else
+          binary_path="DerivedData/Build/Products/CI/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store"
+          ./scripts/find_private_symbols.sh "${binary_path}" | tee private_api_report.txt
+
+          cat private_api_report.txt >> $GITHUB_STEP_SUMMARY
+
+          output=$(cat private_api_report.txt)
+          output="${output//$'\n'/%0A}" # step outputs can't contain newline characters
+
+          #
+          # After a non-zero exit code is returned in GHA we can't do too much,
+          # e.g. set step outputs, so the script always returns 0 and we can tell
+          # that it's a failure if there's more than 1 line in the output.
+          #
+          report_num_lines=$(wc -l < private_api_report.txt | tr -d '[:space:]')
+          if [[ $report_num_lines > 1 ]]; then
+            echo "report=${output}" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+        fi
+
+    - name: Publish unit tests report
+      uses: mikepenz/action-junit-report@v4
+      if: always() # always run even if the previous step fails
+      with:
+        check_name: "Test Report: ${{ matrix.flavor }}"
+        report_paths: '${{ matrix.flavor }}*.xml'
+        check_retries: true
+
+    - name: Update Asana with failed unit tests
+      if: always() # always run even if the previous step fails
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
+      run: |
+        # Extract failed tests from the junit report
+        # Only keep failures unique by classname and name (column 1 and 2 of the yq output)
+        for file in "${{ matrix.flavor }}-unittests.xml" "${{ matrix.flavor }}-integrationtests.xml"; do
+          yq < "$file" -p xml -o json -r \
+            $'[.testsuites.testsuite[].testcase] | flatten | map(select(.failure) | .+@classname + " " + .+@name + " \'" + .failure.+@message + "\' ${{ env.WORKFLOW_URL }}") | .[]' \
+            | sort -u -k 1,2 \
+            | xargs -L 1 ./scripts/report-failed-unit-test.sh
+        done
+
+    - name: Upload failed unit tests log
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: ${{ matrix.flavor }}-unittests-xcodebuild.log
+        path: ${{ matrix.flavor }}-unittests-xcodebuild.log
+        retention-days: 7
+
+    - name: Upload failed unit tests xcresult
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: ${{ matrix.flavor }}-unittests.xcresult
+        path: ${{ matrix.flavor }}-unittests.xcresult
+        retention-days: 7
+
+    - name: Upload failed integration tests log
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
+        path: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
+        retention-days: 7
+
+    - name: Upload failed integration tests xcresult
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: ${{ matrix.flavor }}-integrationtests.xcresult
+        path: ${{ matrix.flavor }}-integrationtests.xcresult
+        retention-days: 7
+
+    - name: Fetch latest commit author
+      if: always() && github.ref_name == 'main'
+      id: fetch_commit_author
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        head_commit=$(git rev-parse HEAD)
+        author=$(gh api https://api.github.com/repos/${{ github.repository }}/commits/${head_commit} --jq .author.login)
+        echo "commit_author=${author}" >> $GITHUB_OUTPUT
+
+  private-api:
+    name: Private API Report
+    needs: tests
+    if: ${{ success() || needs.tests.outputs.private-api-check-report }}
+    uses: ./.github/workflows/macos_private_api_report.yml
+    with:
+      report: ${{ needs.tests.outputs.private-api-check-report }}
+
+  release-build:
+
+    name: Make Release Build
+
+    # Dependabot doesn't have access to all secrets, so we skip this job
+    # workflow_call is used by bump_internal_release and is followed by a proper release job
+    if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
+
+    runs-on: macos-15-xlarge
+    timeout-minutes: 30
+
+    steps:
+    - name: Register SSH key for certificates repository access
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up fastlane
+      run: bundle install
+
+    - name: Sync code signing assets
+      env:
+        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+      run: bundle exec fastlane sync_signing_dmg_release
+
+    - name: Set cache key hash
+      run: |
+        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        if [[ "$has_only_tags" == "true" ]]; then
+          echo "cache_key_hash=${{ hashFiles('DuckDuckGo-macOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
+        else
+          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
+        fi
+
+    - name: Cache SPM
+      if: env.cache_key_hash
+      uses: actions/cache@v4
+      with:
+        path: DerivedData/SourcePackages
+        key: ${{ runner.os }}-spm-test-release-${{ env.cache_key_hash }}
+        restore-keys: |
+          ${{ runner.os }}-spm-test-release-${{ matrix.cache-key }}
+
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+
+    - name: Build the app
+      run: |
+        export OS_ACTIVITY_MODE=debug
+        set -o pipefail && xcodebuild \
+          -scheme "macOS Browser" \
+          -derivedDataPath "DerivedData" \
+          -configuration "Release" \
+          -skipPackagePluginValidation -skipMacroValidation \
+          | tee release-xcodebuild.log \
+          | xcbeautify
+
+    - name: Upload failed test log
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: release-xcodebuild.log
+        path: release-xcodebuild.log
+        retention-days: 7
+
+  verify-autoconsent-bundle:
+    name: 'Verify autoconsent bundle'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Build bundle
+        run: |
+          npm ci
+          npm run rebuild-autoconsent
+      - name: Verify clean tree
+        run: |
+          git update-index --refresh
+          git diff-index --quiet HEAD --
+
+  create-asana-task:
+    name: Create Asana Task
+    needs: [swiftlint, bats, tests, release-build, verify-autoconsent-bundle, private-api]
+
+    if: failure() && github.ref_name == 'main' && github.run_attempt == 1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Asana Task
+        uses: duckduckgo/BrowserServicesKit/.github/actions/asana-failed-pr-checks@main
+        with:
+          action: create-task
+          asana-access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-section-id: ${{ vars.APPLE_CI_FAILING_TESTS_MACOS_POST_MERGE_SECTION_ID }}
+          commit-author: ${{ needs.tests.outputs.commit_author }}
+
+  close-asana-task:
+    name: Close Asana Task
+    needs: [swiftlint, bats, tests, release-build, verify-autoconsent-bundle, private-api]
+
+    if: success() && github.ref_name == 'main' && github.run_attempt > 1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Close Asana Task
+        uses: duckduckgo/BrowserServicesKit/.github/actions/asana-failed-pr-checks@main
+        with:
+          action: close-task
+          asana-access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-section-id: ${{ vars.APPLE_CI_FAILING_TESTS_MACOS_POST_MERGE_SECTION_ID }}

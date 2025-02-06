@@ -23,24 +23,49 @@ import Suggestions
 
 final class SuggestionTableCellView: NSTableCellView {
 
-    static let identifier = "SuggestionTableCellView"
+    static let identifier = NSUserInterfaceItemIdentifier("SuggestionTableCellView")
 
-    static let textColor: NSColor = .suggestionText
-    static let suffixColor: NSColor = .addressBarSuffix
-    static let burnerSuffixColor: NSColor = .burnerAccent
-    static let iconColor: NSColor = .suggestionIcon
-    static let selectedTintColor: NSColor = .selectedSuggestionTint
+    private enum Constants {
+        static let textColor: NSColor = .suggestionText
+        static let suffixColor: NSColor = .addressBarSuffix
+        static let burnerSuffixColor: NSColor = .burnerAccent
+        static let iconColor: NSColor = .suggestionIcon
+        static let selectedTintColor: NSColor = .selectedSuggestionTint
 
-    @IBOutlet weak var iconImageView: NSImageView!
-    @IBOutlet weak var removeButton: NSButton!
-    @IBOutlet weak var suffixTextField: NSTextField!
-    @IBOutlet weak var suffixTrailingConstraint: NSLayoutConstraint!
+        static let switchToTabExtraSpace: CGFloat = 12 + 6 + 9 + 12
+        static let switchToTabSuffixPadding: CGFloat = 8
+
+        static let trailingSpace: CGFloat = 8
+    }
+
+    @IBOutlet var iconImageView: NSImageView!
+    @IBOutlet var removeButton: NSButton!
+    @IBOutlet var suffixTextField: NSTextField!
+    @IBOutlet var suffixTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet var switchToTabBox: ColorView!
+    @IBOutlet var switchToTabLabel: NSTextField!
+    @IBOutlet var switchToTabArrowView: NSImageView!
+    @IBOutlet var switchToTabBoxLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var switchToTabBoxTrailingConstraint: NSLayoutConstraint!
 
     var suggestion: Suggestion?
 
+    static let switchToTabAttributedString: NSAttributedString = {
+        let text = UserText.switchToTab
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: 11, weight: .regular),
+            .kern: 0.06,
+        ]
+
+        return NSAttributedString(string: text, attributes: attributes)
+    }()
+    private static let switchToTabTextWidth: CGFloat = switchToTabAttributedString.size().width
+    private static let switchToTabBoxWidth: CGFloat = switchToTabTextWidth + Constants.switchToTabExtraSpace
+
     override func awakeFromNib() {
-        suffixTextField.textColor = Self.suffixColor
+        suffixTextField.textColor = Constants.suffixColor
         removeButton.toolTip = UserText.removeSuggestionTooltip
+        switchToTabLabel.attributedStringValue = Self.switchToTabAttributedString
     }
 
     override func viewDidMoveToWindow() {
@@ -59,12 +84,19 @@ final class SuggestionTableCellView: NSTableCellView {
 
     var isBurner: Bool = false
 
-    func display(_ suggestionViewModel: SuggestionViewModel) {
+    func display(_ suggestionViewModel: SuggestionViewModel, isBurner: Bool) {
+        self.isBurner = isBurner
         self.suggestion = suggestionViewModel.suggestion
+
         attributedString = suggestionViewModel.tableCellViewAttributedString
         iconImageView.image = suggestionViewModel.icon
         suffixTextField.stringValue = suggestionViewModel.suffix
         setRemoveButtonHidden(true)
+        if case .openTab = suggestionViewModel.suggestion {
+            switchToTabBox.isHidden = false
+        } else {
+            switchToTabBox.isHidden = true
+        }
 
         updateTextField()
     }
@@ -78,22 +110,28 @@ final class SuggestionTableCellView: NSTableCellView {
         }
         if isSelected {
             textField?.attributedStringValue = attributedString
-            textField?.textColor = Self.selectedTintColor
-            suffixTextField.textColor = Self.selectedTintColor
+            textField?.textColor = Constants.selectedTintColor
+            suffixTextField.textColor = Constants.selectedTintColor
+            switchToTabLabel.textColor = Constants.selectedTintColor
+            switchToTabArrowView.contentTintColor = Constants.selectedTintColor
+            switchToTabBox.backgroundColor = .white.withAlphaComponent(0.09)
         } else {
             textField?.attributedStringValue = attributedString
-            textField?.textColor = Self.textColor
+            textField?.textColor = Constants.textColor
+            switchToTabLabel.textColor = Constants.textColor
+            switchToTabArrowView.contentTintColor = Constants.textColor
+            switchToTabBox.backgroundColor = .buttonMouseOver
             if isBurner {
-                suffixTextField.textColor = Self.burnerSuffixColor
+                suffixTextField.textColor = Constants.burnerSuffixColor
             } else {
-                suffixTextField.textColor = Self.suffixColor
+                suffixTextField.textColor = Constants.suffixColor
             }
         }
     }
 
     private func updateImageViews() {
-        iconImageView.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
-        removeButton.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
+        iconImageView.contentTintColor = isSelected ? Constants.selectedTintColor : Constants.iconColor
+        removeButton.contentTintColor = isSelected ? Constants.selectedTintColor : Constants.iconColor
     }
 
     func updateDeleteImageViewVisibility() {
@@ -113,6 +151,40 @@ final class SuggestionTableCellView: NSTableCellView {
     private func setRemoveButtonHidden(_ hidden: Bool) {
         removeButton.isHidden = hidden
         suffixTrailingConstraint.priority = hidden ? .required : .defaultLow
+    }
+
+    override func layout() {
+        if switchToTabBox.isHidden {
+            switchToTabBoxLeadingConstraint.isActive = false
+            switchToTabBoxTrailingConstraint.isActive = false
+            suffixTrailingConstraint.constant = Constants.trailingSpace
+        } else {
+            var textWidth = attributedString?.boundingRect(with: bounds.size).width ?? 0
+            if textWidth < bounds.width {
+                textWidth += suffixTextField.attributedStringValue.boundingRect(with: bounds.size).width
+            }
+            if textField!.frame.minX
+                + textWidth
+                + Constants.switchToTabSuffixPadding
+                + Self.switchToTabBoxWidth
+                + Constants.trailingSpace > bounds.width {
+
+                // when cropping title+suffix to fit the Switch to Tab box
+                // tie the box to the right boundary
+                switchToTabBoxLeadingConstraint.isActive = false
+                switchToTabBoxTrailingConstraint.isActive = true
+                // crop title+suffix to fit the Switch to Tab box
+                suffixTrailingConstraint.constant = Self.switchToTabBoxWidth + Constants.trailingSpace + Constants.switchToTabSuffixPadding
+            } else {
+                switchToTabBoxTrailingConstraint.isActive = false
+                // we can fit everything: align Switch to Tab box left edge after the suffix
+                switchToTabBoxLeadingConstraint.constant = textField!.frame.minX + textWidth + Constants.switchToTabSuffixPadding
+                switchToTabBoxLeadingConstraint.isActive = true
+                suffixTrailingConstraint.constant = Constants.trailingSpace
+            }
+        }
+
+        super.layout()
     }
 
 }

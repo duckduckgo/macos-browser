@@ -19,6 +19,7 @@
 import Combine
 import Foundation
 import NetworkProtection
+import NetworkProtectionProxy
 import SwiftUI
 import TipKit
 
@@ -47,6 +48,10 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
+    public var exclusionsFeatureEnabled: Bool {
+        proxySettings.proxyAvailable
+    }
+
     /// The type of extension that's being used for NetP
     ///
     @Published
@@ -67,6 +72,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     private let statusReporter: NetworkProtectionStatusReporter
 
     private let vpnSettings: VPNSettings
+    private let proxySettings: TransparentProxySettings
     private let locationFormatter: VPNLocationFormatting
 
     private static let byteCountFormatter: ByteCountFormatter = {
@@ -92,6 +98,7 @@ public final class TunnelControllerViewModel: ObservableObject {
                 statusReporter: NetworkProtectionStatusReporter,
                 runLoopMode: RunLoop.Mode? = nil,
                 vpnSettings: VPNSettings,
+                proxySettings: TransparentProxySettings,
                 locationFormatter: VPNLocationFormatting,
                 uiActionHandler: VPNUIActionHandling) {
 
@@ -100,6 +107,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         self.statusReporter = statusReporter
         self.runLoopMode = runLoopMode
         self.vpnSettings = vpnSettings
+        self.proxySettings = proxySettings
         self.locationFormatter = locationFormatter
         self.uiActionHandler = uiActionHandler
 

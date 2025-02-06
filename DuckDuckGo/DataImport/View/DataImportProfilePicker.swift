@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import BrowserServicesKit
 
 struct DataImportProfilePicker: View {
 

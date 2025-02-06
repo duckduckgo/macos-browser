@@ -34,9 +34,11 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         SearchPreferences.shared.showAutocompleteSuggestions = true
         suggestionLoadingMock = SuggestionLoadingMock()
         historyCoordinatingMock = HistoryCoordinatingMock()
-        suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+        suggestionContainer = SuggestionContainer(openTabsProvider: { [] },
+                                                  suggestionLoading: suggestionLoadingMock,
                                                   historyCoordinating: historyCoordinatingMock,
-                                                  bookmarkManager: LocalBookmarkManager.shared)
+                                                  bookmarkManager: LocalBookmarkManager.shared,
+                                                  burnerMode: .regular)
         suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
     }
 
@@ -58,8 +60,9 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 
     // MARK: - Tests
 
+    @MainActor
     func testWhenSelectionIndexIsNilThenSelectedSuggestionViewModelIsNil() {
-        let suggestionContainer = SuggestionContainer()
+        let suggestionContainer = SuggestionContainer(burnerMode: .regular)
         let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         XCTAssertNil(suggestionContainerViewModel.selectionIndex)
@@ -86,8 +89,9 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0, handler: nil)
     }
 
+    @MainActor
     func testWhenSelectCalledWithIndexOutOfBoundsThenSelectedSuggestionViewModelIsNil() {
-        let suggestionContainer = SuggestionContainer()
+        let suggestionContainer = SuggestionContainer(burnerMode: .regular)
         let suggestionListViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         suggestionListViewModel.select(at: 0)
@@ -294,6 +298,28 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         suggestionLoadingMock.completion?(SuggestionResult.noTopHitsResult, nil)
 
         waitForMainQueueToFlush(for: 1)
+    }
+
+    @MainActor
+    func testWhenSuggestionLoadingDataSourceOpenTabsRequested_ThenOpenTabsProviderIsCalled() {
+        // Setup open tabs with matching URLs and titles
+        let openTabs = [
+            OpenTab(title: "DuckDuckGo", url: URL(string: "http://duckduckgo.com")!),
+            OpenTab(title: "Duck Tales", url: URL(string: "http://ducktales.com")!),
+        ]
+
+        // Mock the open tabs provider to return the defined open tabs
+        suggestionContainer = SuggestionContainer(openTabsProvider: { openTabs },
+                                                  suggestionLoading: suggestionLoadingMock,
+                                                  historyCoordinating: historyCoordinatingMock,
+                                                  bookmarkManager: LocalBookmarkManager.shared,
+                                                  burnerMode: .regular)
+        suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
+
+        suggestionContainer.getSuggestions(for: "Duck")
+
+        let openTabsResult = suggestionLoadingMock.dataSource!.openTabs(for: suggestionLoadingMock) as! [OpenTab]
+        XCTAssertEqual(openTabsResult, openTabs)
     }
 
 }

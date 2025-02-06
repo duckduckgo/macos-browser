@@ -27,7 +27,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var subscriptionDetails: String?
-    @Published var subscriptionStatus: Subscription.Status?
+    @Published var subscriptionStatus: PrivacyProSubscription.Status?
 
     @Published var subscriptionStorefrontRegion: SubscriptionRegion = .usa
 
@@ -44,7 +44,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     let featureFlagger: FeatureFlagger
 
-    private var subscriptionPlatform: Subscription.Platform?
+    private var subscriptionPlatform: PrivacyProSubscription.Platform?
 
     lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: sheetActionHandler,
         purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
@@ -454,7 +454,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
+    func updateDescription(for date: Date, status: PrivacyProSubscription.Status, period: PrivacyProSubscription.BillingPeriod) {
         let formattedDate = dateFormatter.string(from: date)
 
         switch status {

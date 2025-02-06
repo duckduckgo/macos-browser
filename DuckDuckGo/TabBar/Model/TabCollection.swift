@@ -32,6 +32,10 @@ final class TabCollection: NSObject {
 
     func append(tab: Tab) {
         tabs.append(tab)
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didOpenTab(tab)
+        }
     }
 
     @discardableResult
@@ -42,6 +46,9 @@ final class TabCollection: NSObject {
         }
 
         tabs.insert(tab, at: index)
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didOpenTab(tab)
+        }
         return true
     }
 
@@ -53,6 +60,7 @@ final class TabCollection: NSObject {
 
         let tab = tabs[index]
         tabWillClose(at: index, forced: forced)
+
         tabs.remove(at: index)
         if published {
             didRemoveTabPublisher.send((tab, index))
@@ -111,11 +119,19 @@ final class TabCollection: NSObject {
         if !forced {
             keepLocalHistory(of: tabs[index])
         }
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didCloseTab(tabs[index], windowIsClosing: false)
+        }
     }
 
     private func tabsWillClose(range: Range<Int>) {
         for i in range {
             keepLocalHistory(of: tabs[i])
+
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didCloseTab(tabs[i], windowIsClosing: false)
+            }
         }
     }
 
@@ -143,7 +159,12 @@ final class TabCollection: NSObject {
         }
 
         keepLocalHistory(of: tabs[index])
+        let oldTab = tabs[index]
         tabs[index] = tab
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.eventsListener.didReplaceTab(oldTab, with: tab)
+        }
     }
 
     // MARK: - Fire button

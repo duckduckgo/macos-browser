@@ -16,12 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Suggestions
+import BrowserServicesKit
+import Combine
 import Common
+import Foundation
 import History
-import PixelKit
 import os.log
+import PixelKit
+import Suggestions
 
 final class SuggestionContainer {
 
@@ -29,10 +31,15 @@ final class SuggestionContainer {
 
     @PublishedAfter var result: SuggestionResult?
 
+    typealias OpenTabsProvider = @MainActor () -> [any Suggestions.BrowserTab]
+    private let openTabsProvider: OpenTabsProvider
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
     private let startupPreferences: StartupPreferences
+    private let featureFlagger: FeatureFlagger
     private let loading: SuggestionLoading
+    private let burnerMode: BurnerMode
+    private let windowControllersManager: WindowControllersManagerProtocol
 
     // Used for presenting the same suggestions after the removal of the local suggestion
     private(set) var suggestionDataCache: Data?
@@ -41,21 +48,32 @@ final class SuggestionContainer {
 
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
-    init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared) {
+    init(openTabsProvider: @escaping OpenTabsProvider, suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared, featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger, burnerMode: BurnerMode,
+         windowControllersManager: WindowControllersManagerProtocol? = nil) {
+        self.openTabsProvider = openTabsProvider
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.startupPreferences = startupPreferences
+        self.featureFlagger = featureFlagger
         self.loading = suggestionLoading
+        self.burnerMode = burnerMode
+        self.windowControllersManager = windowControllersManager ?? WindowControllersManager.shared
     }
 
-    convenience init () {
+    @MainActor
+    convenience init (burnerMode: BurnerMode,
+                      windowControllersManager: WindowControllersManagerProtocol? = nil) {
         let urlFactory = { urlString in
             return URL.makeURL(fromSuggestionPhrase: urlString)
         }
-
-        self.init(suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
+        let windowControllersManager = windowControllersManager ?? WindowControllersManager.shared
+        self.init(openTabsProvider: Self.defaultOpenTabsProvider(burnerMode: burnerMode,
+                                                                 windowControllersManager: windowControllersManager),
+                  suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
                   historyCoordinating: HistoryCoordinator.shared,
-                  bookmarkManager: LocalBookmarkManager.shared)
+                  bookmarkManager: LocalBookmarkManager.shared,
+                  burnerMode: burnerMode,
+                  windowControllersManager: windowControllersManager)
     }
 
     func getSuggestions(for query: String, useCachedData: Bool = false) {
@@ -90,6 +108,32 @@ final class SuggestionContainer {
         latestQuery = nil
     }
 
+    private static func defaultOpenTabsProvider(burnerMode: BurnerMode, windowControllersManager: WindowControllersManagerProtocol) -> OpenTabsProvider {
+        { @MainActor in
+            let selectedTab = windowControllersManager.selectedTab
+            let openTabViewModels = windowControllersManager.allTabViewModels(for: burnerMode, includingPinnedTabs: !burnerMode.isBurner)
+            var usedUrls = Set<String>() // deduplicate
+            return openTabViewModels.compactMap { model in
+                guard model.tab !== selectedTab,
+                      model.tab.content.isUrl
+                        || model.tab.content.urlForWebView?.isSettingsURL == true
+                        || model.tab.content.urlForWebView == .bookmarks,
+                      let url = model.tab.content.userEditableUrl,
+                      url != selectedTab?.content.userEditableUrl, // doesn‘t match currently selected
+                      usedUrls.insert(url.nakedString ?? "").inserted == true /* if did not contain */ else { return nil }
+
+                return OpenTab(title: model.title, url: url)
+            }
+        }
+    }
+
+}
+
+struct OpenTab: BrowserTab, Hashable {
+
+    let title: String
+    let url: URL
+
 }
 
 extension SuggestionContainer: SuggestionLoadingDataSource {
@@ -103,19 +147,36 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
     }
 
     @MainActor func internalPages(for suggestionLoading: Suggestions.SuggestionLoading) -> [Suggestions.InternalPage] {
-        [
-            // suggestions for Bookmarks&Settings
-            .init(title: UserText.bookmarks, url: .bookmarks),
-            .init(title: UserText.settings, url: .settings),
-        ] + PreferencePaneIdentifier.allCases.map {
+        var result = [Suggestions.InternalPage]()
+        let openTabs = windowControllersManager.allTabViewModels(for: burnerMode, includingPinnedTabs: !burnerMode.isBurner)
+        var isSettingsOpened = false
+        var isBookmarksOpened = false
+        // suggestions for Bookmarks&Settings if not Switch to Tab suggestions
+        for tab in openTabs {
+            if tab.tabContent == .bookmarks {
+                isBookmarksOpened = true
+            } else if case .settings = tab.tabContent {
+                isSettingsOpened = true
+            }
+            if isBookmarksOpened && isSettingsOpened { break }
+        }
+        if !isBookmarksOpened {
+            result.append(.init(title: UserText.bookmarks, url: .bookmarks))
+        }
+        if !isSettingsOpened {
+            result.append(.init(title: UserText.settings, url: .settings))
+        }
+        result += PreferencePaneIdentifier.allCases.map {
             // preference panes URLs
             .init(title: UserText.settings + " → " + $0.displayName, url: .settingsPane($0))
-        } + {
+        }
+        result += {
             guard startupPreferences.launchToCustomHomePage,
                   let homePage = URL(string: startupPreferences.formattedCustomHomePageURL) else { return [] }
             // home page suggestion
             return [.init(title: UserText.homePage, url: homePage)]
         }()
+        return result
     }
 
     @MainActor func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
@@ -123,8 +184,8 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
     }
 
     @MainActor func openTabs(for suggestionLoading: any Suggestions.SuggestionLoading) -> [any Suggestions.BrowserTab] {
-        // Support for this on macOS will come later.
-        []
+        guard featureFlagger.isFeatureOn(.autcompleteTabs) else { return [] }
+        return openTabsProvider()
     }
 
     func suggestionLoading(_ suggestionLoading: SuggestionLoading,

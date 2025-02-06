@@ -366,7 +366,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // navigation stack and immediately replaced with Private Player. That's why skipping it while going back makes sense.
         //
         // SERP+Video -> YT [enable mode always] -> Duck Player ⏎
-        // SERP+Video <<<< YT (redirected to DP) <- Duck Player
+        // SERP+Video ⏪︎⏪︎ YT (redirected to DP) <- Duck Player
         //
         if case .backForward(distance: let distance) = navigationAction.navigationType, distance < 0,
            shouldOpenDuckPlayerDirectly,

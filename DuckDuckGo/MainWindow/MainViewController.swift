@@ -27,7 +27,7 @@ import os.log
 import BrokenSitePrompt
 
 final class MainViewController: NSViewController {
-    private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
+    private(set) lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
 
     let tabBarViewController: TabBarViewController
     let navigationBarViewController: NavigationBarViewController
@@ -78,7 +78,7 @@ final class MainViewController: NSViewController {
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, activeRemoteMessageModel: NSApp.delegateTyped.activeRemoteMessageModel)
         bookmarksBarVisibilityManager = BookmarksBarVisibilityManager(selectedTabPublisher: tabCollectionViewModel.$selectedTabViewModel.eraseToAnyPublisher())
 
-        let networkProtectionPopoverManager: NetPPopoverManager = {
+        let networkProtectionPopoverManager: NetPPopoverManager = { @MainActor in
 #if DEBUG
             guard case .normal = NSApp.runType else {
                 return NetPPopoverManagerMock()
@@ -93,7 +93,8 @@ final class MainViewController: NSViewController {
 
             return NetworkProtectionNavBarPopoverManager(
                 ipcClient: vpnXPCClient,
-                vpnUninstaller: vpnUninstaller)
+                vpnUninstaller: vpnUninstaller,
+                vpnUIPresenting: WindowControllersManager.shared)
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
             var connectivityIssuesObserver: ConnectivityIssueObserver!
@@ -119,7 +120,6 @@ final class MainViewController: NSViewController {
         }()
 
         navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel,
-                                                                         isBurner: isBurner,
                                                                          networkProtectionPopoverManager: networkProtectionPopoverManager,
                                                                          networkProtectionStatusReporter: networkProtectionStatusReporter,
                                                                          autofillPopoverPresenter: autofillPopoverPresenter,
@@ -256,6 +256,14 @@ final class MainViewController: NSViewController {
 
     func windowWillEnterFullScreen() {
         tabBarViewController.hideTabPreview()
+    }
+
+    func disableTabPreviews() {
+        tabBarViewController.shouldDisplayTabPreviews = false
+    }
+
+    func enableTabPreviews() {
+        tabBarViewController.shouldDisplayTabPreviews = true
     }
 
     func toggleBookmarksBarVisibility() {
@@ -580,6 +588,9 @@ extension MainViewController {
             return true
 
         case kVK_ANSI_Y where flags == .command:
+            if NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) {
+                return false
+            }
             (NSApp.mainMenuTyped.historyMenu.accessibilityParent() as? NSMenuItem)?.accessibilityPerformPress()
             return true
 

@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import BrowserServicesKit
 
 extension NSAlert {
 

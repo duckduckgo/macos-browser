@@ -532,6 +532,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection
     ///
     func start() async {
+        Logger.networkProtection.log("Start VPN")
         VPNOperationErrorRecorder().beginRecordingControllerStart()
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
                       frequency: .legacyDailyAndCount)
@@ -572,7 +573,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
                 // It's important to note that we've seen instances where the above call to start()
                 // doesn't throw any errors, yet the tunnel fails to start.  In any case this pixel
-                // should be interpreted as "the controller successfully requrested the tunnel to be
+                // should be interpreted as "the controller successfully requested the tunnel to be
                 // started".  Meaning there's no error caught in this start attempt.  There are pixels
                 // in the packet tunnel provider side that can be used to debug additional logic.
                 //
@@ -580,6 +581,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                               frequency: .legacyDailyAndCount)
             }
         } catch {
+            Logger.networkProtection.error("Starting tunnel error: \(error, privacy: .public)")
+
             VPNOperationErrorRecorder().recordControllerStartFailure(error)
             knownFailureStore.lastKnownFailure = KnownFailure(error)
 
@@ -591,10 +594,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 PixelKit.fire(
                     NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .legacyDailyAndCount, includeAppVersionParameter: true
                 )
-            }
-
-            if await isConnected {
-                await stop()
             }
 
             // Always keep the first error message shown, as it's the more actionable one.
@@ -647,8 +646,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
 
         do {
+            Logger.networkProtection.log("Starting NetworkProtectionTunnelController, options: \(options, privacy: .public)")
             try tunnelManager.connection.startVPNTunnel(options: options)
         } catch {
+            Logger.networkProtection.fault("Failed to start VPN tunnel: \(error, privacy: .public)")
             throw StartError.startTunnelFailure(error)
         }
 
@@ -665,6 +666,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     @MainActor
     func stop() async {
+        Logger.networkProtection.log("Stop VPN")
         await stop(disableOnDemand: true)
     }
 

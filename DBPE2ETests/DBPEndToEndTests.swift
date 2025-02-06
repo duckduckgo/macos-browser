@@ -496,6 +496,10 @@ private extension DBPEndToEndTests {
             [String: Any]()
         }
 
+        func settings(for subfeature: any BrowserServicesKit.PrivacySubfeature) -> PrivacyConfigurationData.PrivacyFeature.SubfeatureSettings? {
+            nil
+        }
+
         func userEnabledProtection(forDomain: String) {
 
         }

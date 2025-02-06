@@ -18,7 +18,7 @@
 
 import Combine
 import PrivacyStats
-import TestUtils
+import PersistenceTestingUtils
 import TrackerRadarKit
 import XCTest
 @testable import NewTabPage
@@ -62,14 +62,14 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
     func testWhenPrivacyStatsViewIsExpandedThenGetConfigReturnsExpandedState() async throws {
         model.isViewExpanded = true
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .noAnimation)
         XCTAssertEqual(config.expansion, .expanded)
     }
 
     func testWhenPrivacyStatsViewIsCollapsedThenGetConfigReturnsCollapsedState() async throws {
         model.isViewExpanded = false
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .noAnimation)
         XCTAssertEqual(config.expansion, .collapsed)
     }
 
@@ -77,14 +77,14 @@ final class NewTabPagePrivacyStatsClientTests: XCTestCase {
 
     func testWhenSetConfigContainsExpandedStateThenModelSettingIsSetToExpanded() async throws {
         model.isViewExpanded = false
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .expanded)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: .expanded)
         try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(model.isViewExpanded, true)
     }
 
     func testWhenSetConfigContainsCollapsedStateThenModelSettingIsSetToCollapsed() async throws {
         model.isViewExpanded = true
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .collapsed)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: .collapsed)
         try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(model.isViewExpanded, false)
     }

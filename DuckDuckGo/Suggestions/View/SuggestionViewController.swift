@@ -278,21 +278,15 @@ extension SuggestionViewController: NSTableViewDataSource {
 extension SuggestionViewController: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard let suggestionTableCellView = tableView.makeView(
-                withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
-                as? SuggestionTableCellView else {
-            assertionFailure("SuggestionViewController: Making of table cell view failed")
-            return nil
-        }
+        let cell = tableView.makeView(withIdentifier: SuggestionTableCellView.identifier, owner: self) as? SuggestionTableCellView ?? SuggestionTableCellView()
 
         guard let suggestionViewModel = suggestionContainerViewModel.suggestionViewModel(at: row) else {
             assertionFailure("SuggestionViewController: Failed to get suggestion")
             return nil
         }
 
-        suggestionTableCellView.isBurner = self.isBurner
-        suggestionTableCellView.display(suggestionViewModel)
-        return suggestionTableCellView
+        cell.display(suggestionViewModel, isBurner: self.isBurner)
+        return cell
     }
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {

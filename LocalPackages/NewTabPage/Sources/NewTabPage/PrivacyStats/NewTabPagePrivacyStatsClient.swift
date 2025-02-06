@@ -19,12 +19,11 @@
 import Combine
 import Common
 import os.log
-import UserScript
+import UserScriptActionsManager
 import WebKit
 
-public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
+public final class NewTabPagePrivacyStatsClient: NewTabPageUserScriptClient {
 
-    public weak var userScriptsSource: NewTabPageUserScriptsSource?
     private let model: NewTabPagePrivacyStatsModel
     private var cancellables: Set<AnyCancellable> = []
 
@@ -40,6 +39,7 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
 
     public init(model: NewTabPagePrivacyStatsModel) {
         self.model = model
+        super.init()
 
         model.$isViewExpanded.dropFirst()
             .sink { [weak self] isExpanded in
@@ -58,7 +58,7 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
             .store(in: &cancellables)
     }
 
-    public func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
+    public override func registerMessageHandlers(for userScript: NewTabPageUserScript) {
         userScript.registerMessageHandlers([
             MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
             MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
@@ -70,19 +70,19 @@ public final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
 
     private func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = model.isViewExpanded ? .expanded : .collapsed
-        return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        return NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: expansion)
     }
 
     @MainActor
     private func notifyConfigUpdated(_ isViewExpanded: Bool) {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = isViewExpanded ? .expanded : .collapsed
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: expansion)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
     }
 
     @MainActor
     private func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
+        guard let config: NewTabPageUserScript.WidgetConfig = CodableHelper.decode(from: params) else {
             return nil
         }
         model.isViewExpanded = config.expansion == .expanded

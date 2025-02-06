@@ -28,17 +28,20 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     let featureFlagger: FeatureFlagger
     let faviconManager: FaviconManagement
     let isNTPSpecialPageSupported: Bool
+    let isHistorySpecialPageSupported: Bool
     let userBackgroundImagesManager: UserBackgroundImagesManaging?
 
     init(
         featureFlagger: FeatureFlagger,
         faviconManager: FaviconManagement = FaviconManager.shared,
         isNTPSpecialPageSupported: Bool = false,
+        isHistorySpecialPageSupported: Bool = false,
         userBackgroundImagesManager: UserBackgroundImagesManaging? = NSApp.delegateTyped.homePageSettingsModel.customImagesManager
     ) {
         self.featureFlagger = featureFlagger
         self.faviconManager = faviconManager
         self.isNTPSpecialPageSupported = isNTPSpecialPageSupported
+        self.isHistorySpecialPageSupported = isHistorySpecialPageSupported
         self.userBackgroundImagesManager = userBackgroundImagesManager
     }
 
@@ -53,7 +56,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         case .onboarding, .releaseNotes:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
-            handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
+            handleDuckPlayer(requestURL: webViewURL, urlSchemeTask: urlSchemeTask, webView: webView)
         case .error:
             handleErrorPage(urlSchemeTask: urlSchemeTask)
         case .newTab where isNTPSpecialPageSupported && featureFlagger.isFeatureOn(.htmlNewTabPage):
@@ -67,12 +70,22 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             default:
                 handleSpecialPages(urlSchemeTask: urlSchemeTask)
             }
+        case .history where isHistorySpecialPageSupported && featureFlagger.isFeatureOn(.historyView):
+            handleSpecialPages(urlSchemeTask: urlSchemeTask)
         default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
     }
 
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+
+    private lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 }
 
 // MARK: - Native UI Paged
@@ -177,10 +190,15 @@ private extension DuckURLSchemeHandler {
             guard let response = HTTPURLResponse(url: requestURL, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil) else {
                 return nil
             }
+            onFaviconMissing()
             return (response, Data())
         }
         let response = URLResponse(url: requestURL, mimeType: "image/png", expectedContentLength: imagePNGData.count, textEncodingName: nil)
         return (response, imagePNGData)
+    }
+
+    private func onFaviconMissing() {
+        faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
     }
 }
 
@@ -250,6 +268,8 @@ private extension DuckURLSchemeHandler {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
         } else if url.isNewTabPage {
             directoryURL = URL(fileURLWithPath: "/pages/new-tab")
+        } else if url.isHistory {
+            directoryURL = URL(fileURLWithPath: "/pages/history")
         } else {
             assertionFailure("Unknown scheme")
             return nil
@@ -271,11 +291,19 @@ private extension DuckURLSchemeHandler {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
             return nil
         }
-        let response = URLResponse(url: url, mimeType: mimeType(for: fileExtension), expectedContentLength: data.count, textEncodingName: nil)
+
+        let headerFields: [String: String] = [
+            "Content-type": mimeType(for: fileExtension),
+            "Content-length": String(data.count)
+        ]
+        guard let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: headerFields) else {
+            return nil
+        }
+
         return (response, data)
     }
 
-    func mimeType(for fileExtension: String) -> String? {
+    func mimeType(for fileExtension: String) -> String {
         switch fileExtension {
         case "html": return "text/html"
         case "css": return "text/css"
@@ -286,7 +314,10 @@ private extension DuckURLSchemeHandler {
         case "svg": return "image/svg+xml"
         case "ico": return "image/x-icon"
         case "riv": return "application/octet-stream"
-        default: return nil
+        case "json": return "application/json"
+        default:
+            assertionFailure("Unknown MIME type for \"\(fileExtension)\" file extension")
+            return "application/octet-stream"
         }
     }
 
@@ -326,6 +357,7 @@ private extension URL {
 
     enum URLType {
         case newTab
+        case history
         case favicon
         case customBackgroundImage
         case customBackgroundImageThumbnail
@@ -354,6 +386,8 @@ private extension URL {
             return .newTab
         } else if self.isFavicon {
             return .favicon
+        } else if self.isHistory {
+            return .history
         } else {
             return nil
         }
@@ -373,6 +407,10 @@ private extension URL {
 
     var isFavicon: Bool {
         return isDuckURLScheme && host == "favicon"
+    }
+
+    var isHistory: Bool {
+        return isDuckURLScheme && host == "history"
     }
 
     var isCustomBackgroundImage: Bool {

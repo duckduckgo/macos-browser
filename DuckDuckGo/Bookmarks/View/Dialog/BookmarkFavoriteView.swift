@@ -18,7 +18,7 @@
 
 import SwiftUI
 import SwiftUIExtensions
-import PreferencesViews
+import PreferencesUI_macOS
 
 struct BookmarkFavoriteView: View {
     @Binding var isFavorite: Bool

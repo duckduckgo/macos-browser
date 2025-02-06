@@ -17,12 +17,12 @@
 //
 
 import Combine
+import Common
 import LoginItems
 import NetworkExtension
 import NetworkProtection
 import ServiceManagement
 import SwiftUI
-import Common
 
 /// This view can be shown from any location where we want the user to be able to interact with VPN.
 /// This view shows status information about the VPN, and offers a chance to toggle it ON and OFF.
@@ -34,13 +34,17 @@ extension NetworkProtectionStatusView {
     @MainActor
     public final class Model: ObservableObject {
 
-        public struct MenuItem {
-            let name: String
-            let action: () async -> Void
+        public enum MenuItem {
+            case divider(uuid: UUID = UUID())
+            case text(uuid: UUID = UUID(), icon: Image? = nil, title: String, action: () async -> Void)
 
-            public init(name: String, action: @escaping () async -> Void) {
-                self.name = name
-                self.action = action
+            public var uuid: UUID {
+                switch self {
+                case .divider(let uuid):
+                    return uuid
+                case .text(let uuid, _, _, _):
+                    return uuid
+                }
             }
         }
 
@@ -128,6 +132,7 @@ extension NetworkProtectionStatusView {
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
                                                                   statusReporter: statusReporter,
                                                                   vpnSettings: .init(defaults: userDefaults),
+                                                                  proxySettings: .init(defaults: userDefaults),
                                                                   locationFormatter: locationFormatter,
                                                                   uiActionHandler: uiActionHandler)
 

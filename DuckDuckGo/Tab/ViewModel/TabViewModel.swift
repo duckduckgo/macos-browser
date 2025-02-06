@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
+import FeatureFlags
 import MaliciousSiteProtection
 import PrivacyDashboard
 import WebKit
@@ -32,6 +33,7 @@ final class TabViewModel {
         static let burnerHome = NSImage.burnerTabFavicon
         static let settings = NSImage.settingsMulticolor16
         static let bookmarks = NSImage.bookmarksFolder
+        static let history = NSImage.bookmarksFolder // temporary
         static let emailProtection = NSImage.emailProtectionIcon
         static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
         static let subscription = NSImage.privacyPro
@@ -84,6 +86,10 @@ final class TabViewModel {
             if oldValue != zoomLevel {
                 zoomLevelSubject.send(zoomLevel)
             }
+
+            if #available(macOS 14.4, *) {
+                WebExtensionManager.shared.eventsListener.didChangeTabProperties([.zoomFactor], for: tab)
+            }
         }
     }
 
@@ -100,10 +106,10 @@ final class TabViewModel {
         switch tab.content {
         case .url(let url, _, _):
             return !(url.isDuckPlayer || url.isDuckURLScheme)
-        case .subscription, .identityTheftRestoration, .releaseNotes:
+        case .subscription, .identityTheftRestoration, .releaseNotes, .webExtensionUrl:
             return true
 
-        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
+        case .newtab, .settings, .bookmarks, .history, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
             return false
         }
     }
@@ -171,17 +177,20 @@ final class TabViewModel {
                      .url(_, _, source: .bookmark),
                      .url(_, _, source: .ui),
                      .url(_, _, source: .appOpenUrl),
+                     .url(_, _, source: .switchToOpenTab),
                      .url(_, _, source: .reload),
                      .newtab,
                      .settings,
                      .bookmarks,
+                     .history,
                      .onboarding,
                      .onboardingDeprecated,
                      .none,
                      .dataBrokerProtection,
                      .subscription,
                      .identityTheftRestoration,
-                     .releaseNotes:
+                     .releaseNotes,
+                     .webExtensionUrl:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
                     return Just( () ).eraseToAnyPublisher()
                 }
@@ -357,6 +366,8 @@ final class TabViewModel {
                 .settingsTrustedIndicator
         case .bookmarks:
                 .bookmarksTrustedIndicator
+        case .history:
+            NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) ? .historyTrustedIndicator : .init()
         case .dataBrokerProtection:
                 .dbpTrustedIndicator
         case .subscription:
@@ -369,7 +380,7 @@ final class TabViewModel {
                 .duckPlayerTrustedIndicator
         case .url(let url, _, _) where url.isEmailProtection:
                 .emailProtectionTrustedIndicator
-        case .url(let url, _, _):
+        case .url(let url, _, _), .webExtensionUrl(let url):
             NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
         }
     }
@@ -417,6 +428,8 @@ final class TabViewModel {
             title = UserText.tabPreferencesTitle
         case .bookmarks:
             title = UserText.tabBookmarksTitle
+        case .history:
+            title = UserText.mainMenuHistory
         case .newtab:
             if tab.burnerMode.isBurner {
                 title = UserText.burnerTabHomeTitle
@@ -425,7 +438,7 @@ final class TabViewModel {
             }
         case .onboardingDeprecated:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription, .identityTheftRestoration, .onboarding:
+        case .url, .none, .subscription, .identityTheftRestoration, .onboarding, .webExtensionUrl:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
@@ -462,6 +475,8 @@ final class TabViewModel {
             Favicon.settings
         case .bookmarks:
             Favicon.bookmarks
+        case .history:
+            NSApp.delegateTyped.featureFlagger.isFeatureOn(.historyView) ? Favicon.history : nil
         case .subscription:
             Favicon.subscription
         case .identityTheftRestoration:
@@ -472,7 +487,7 @@ final class TabViewModel {
             Favicon.duckPlayer
         case .url(let url, _, _) where url.isEmailProtection:
             Favicon.emailProtection
-        case .url, .onboardingDeprecated, .onboarding, .none:
+        case .url, .onboardingDeprecated, .onboarding, .webExtensionUrl, .none:
             tabFavicon ?? tab.favicon
         }
     }
@@ -598,6 +613,8 @@ private extension NSAttributedString {
                                                                            title: UserText.settings)
     static let bookmarksTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
                                                                             title: UserText.bookmarks)
+    static let historyTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
+                                                                          title: UserText.mainMenuHistory)
     static let dbpTrustedIndicator = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
                                                                       title: UserText.tabDataBrokerProtectionTitle)
     static let subscriptionTrustedIndicator = trustedIndicatorAttributedString(with: .privacyPro,

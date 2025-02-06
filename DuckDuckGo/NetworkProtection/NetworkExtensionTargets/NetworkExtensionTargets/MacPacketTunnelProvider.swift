@@ -457,7 +457,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    snoozeTimingStore: NetworkProtectionSnoozeTimingStore(userDefaults: .netP),
                    wireGuardInterface: DefaultWireGuardInterface(),
                    keychainType: Bundle.keychainType,
-                   tokenStore: tokenStore,
+                   tokenHandler: tokenStore,
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
@@ -551,8 +551,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - NEPacketTunnelProvider
 
-    public override func load(options: StartupOptions) throws {
-        try super.load(options: options)
+    public override func load(options: StartupOptions) async throws {
+        try await super.load(options: options)
 
 #if NETP_SYSTEM_EXTENSION
         loadExcludeLocalNetworks(from: options)

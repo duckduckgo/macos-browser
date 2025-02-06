@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -114,7 +114,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="689" height="102"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="689" height="63"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -156,13 +156,51 @@
                                                                                             </textFieldCell>
                                                                                         </textField>
                                                                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
-                                                                                            <rect key="frame" x="149" y="33" width="514" height="15"/>
+                                                                                            <rect key="frame" x="149" y="33" width="483" height="15"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – Search with DuckDuckGo" id="UZv-CE-fbV">
                                                                                                 <font key="font" metaFont="cellTitle"/>
                                                                                                 <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
                                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                             </textFieldCell>
                                                                                         </textField>
+                                                                                        <customView horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="XVZ-QQ-vCg" userLabel="Switch to Tab Box" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                                            <rect key="frame" x="450" y="29" width="211" height="22"/>
+                                                                                            <subviews>
+                                                                                                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Ca0-hX-oSq">
+                                                                                                    <rect key="frame" x="10" y="4" width="176" height="14"/>
+                                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Switch to Tab" id="f8D-af-GM3">
+                                                                                                        <font key="font" metaFont="smallSystem"/>
+                                                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                                    </textFieldCell>
+                                                                                                </textField>
+                                                                                                <imageView horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="MzU-xK-DvN">
+                                                                                                    <rect key="frame" x="190" y="7" width="9" height="9"/>
+                                                                                                    <constraints>
+                                                                                                        <constraint firstAttribute="width" constant="9" id="5u0-I1-zda"/>
+                                                                                                        <constraint firstAttribute="height" constant="9" id="hk6-bE-Ssg"/>
+                                                                                                    </constraints>
+                                                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="Arrow-Right-12" id="0TC-C9-bWo"/>
+                                                                                                    <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                                                </imageView>
+                                                                                            </subviews>
+                                                                                            <constraints>
+                                                                                                <constraint firstItem="Ca0-hX-oSq" firstAttribute="leading" secondItem="XVZ-QQ-vCg" secondAttribute="leading" constant="12" id="1f1-Ua-aRg"/>
+                                                                                                <constraint firstItem="Ca0-hX-oSq" firstAttribute="centerY" secondItem="XVZ-QQ-vCg" secondAttribute="centerY" id="BCl-3H-KYt"/>
+                                                                                                <constraint firstItem="MzU-xK-DvN" firstAttribute="leading" secondItem="Ca0-hX-oSq" secondAttribute="trailing" constant="6" id="SRK-sI-XKg"/>
+                                                                                                <constraint firstItem="MzU-xK-DvN" firstAttribute="firstBaseline" secondItem="Ca0-hX-oSq" secondAttribute="firstBaseline" id="TOo-kb-Z2y"/>
+                                                                                                <constraint firstAttribute="height" constant="22" id="cFr-jD-2Ca"/>
+                                                                                                <constraint firstAttribute="trailing" secondItem="MzU-xK-DvN" secondAttribute="trailing" constant="12" id="nLu-iv-gHq"/>
+                                                                                            </constraints>
+                                                                                            <userDefinedRuntimeAttributes>
+                                                                                                <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                                                                    <color key="value" name="ButtonMouseOverColor"/>
+                                                                                                </userDefinedRuntimeAttribute>
+                                                                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                                                    <real key="value" value="6"/>
+                                                                                                </userDefinedRuntimeAttribute>
+                                                                                            </userDefinedRuntimeAttributes>
+                                                                                        </customView>
                                                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="5Rx-2z-uI7" userLabel="Confirm Button">
                                                                                             <rect key="frame" x="0.0" y="0.0" width="669" height="80"/>
                                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="0t6-3l-16q">
@@ -174,7 +212,7 @@
                                                                                             </connections>
                                                                                         </button>
                                                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="ofA-eI-PSe">
-                                                                                            <rect key="frame" x="649" y="30" width="20" height="20"/>
+                                                                                            <rect key="frame" x="638" y="30" width="20" height="20"/>
                                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Trash" imagePosition="only" alignment="center" inset="2" id="6YI-sN-iij">
                                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                                 <font key="font" metaFont="system"/>
@@ -193,9 +231,12 @@
                                                                                         <constraint firstItem="vli-IP-Nr8" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="ICn-31-LAg"/>
                                                                                         <constraint firstItem="bOr-Go-gyW" firstAttribute="leading" secondItem="vli-IP-Nr8" secondAttribute="trailing" constant="7" id="JNb-pL-G7y"/>
                                                                                         <constraint firstAttribute="trailing" secondItem="5Rx-2z-uI7" secondAttribute="trailing" id="Jod-KE-Yva"/>
+                                                                                        <constraint firstItem="XVZ-QQ-vCg" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="JuY-9g-bsa"/>
                                                                                         <constraint firstItem="ofA-eI-PSe" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="Kph-ln-oM3"/>
+                                                                                        <constraint firstAttribute="trailing" secondItem="XVZ-QQ-vCg" secondAttribute="trailing" constant="8" id="OxD-gm-8AB"/>
                                                                                         <constraint firstItem="5Rx-2z-uI7" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" id="RIg-EO-t8H"/>
                                                                                         <constraint firstAttribute="trailing" secondItem="ofA-eI-PSe" secondAttribute="trailing" constant="11" id="SJB-WB-Upi"/>
+                                                                                        <constraint firstItem="XVZ-QQ-vCg" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" priority="950" constant="450" id="V8Y-Ho-Vtw"/>
                                                                                         <constraint firstItem="5Rx-2z-uI7" firstAttribute="top" secondItem="kX2-C1-38Y" secondAttribute="top" id="W26-g1-Jzq"/>
                                                                                         <constraint firstAttribute="trailing" secondItem="efo-Vy-aEh" secondAttribute="trailing" priority="250" constant="8" id="XRI-uW-7gs"/>
                                                                                         <constraint firstItem="ofA-eI-PSe" firstAttribute="leading" secondItem="efo-Vy-aEh" secondAttribute="trailing" priority="750" constant="8" id="Z5N-iT-yxP"/>
@@ -210,6 +251,11 @@
                                                                                         <outlet property="removeButton" destination="ofA-eI-PSe" id="zJW-zP-qSs"/>
                                                                                         <outlet property="suffixTextField" destination="efo-Vy-aEh" id="vDH-Af-pkR"/>
                                                                                         <outlet property="suffixTrailingConstraint" destination="XRI-uW-7gs" id="5KX-rj-2vE"/>
+                                                                                        <outlet property="switchToTabArrowView" destination="MzU-xK-DvN" id="o5A-X6-LVL"/>
+                                                                                        <outlet property="switchToTabBox" destination="XVZ-QQ-vCg" id="0tc-UV-2v7"/>
+                                                                                        <outlet property="switchToTabBoxLeadingConstraint" destination="V8Y-Ho-Vtw" id="biv-39-JjJ"/>
+                                                                                        <outlet property="switchToTabBoxTrailingConstraint" destination="OxD-gm-8AB" id="5ok-h0-6IE"/>
+                                                                                        <outlet property="switchToTabLabel" destination="Ca0-hX-oSq" id="kE9-w2-47N"/>
                                                                                         <outlet property="textField" destination="bOr-Go-gyW" id="wxi-1N-Bc4"/>
                                                                                     </connections>
                                                                                 </tableCellView>
@@ -257,7 +303,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="102" width="695" height="1"/>
+                                                <rect key="frame" x="1" y="76" width="413" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
@@ -318,6 +364,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Arrow-Right-12" width="9" height="9"/>
         <image name="Trash" width="16" height="16"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
@@ -330,6 +377,9 @@
         </namedColor>
         <namedColor name="AddressBarSeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.11999999731779099" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>

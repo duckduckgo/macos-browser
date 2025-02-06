@@ -19,9 +19,9 @@
 import Bookmarks
 import Combine
 import Persistence
-import SyncUI
+import SyncUI_macOS
 import XCTest
-import TestUtils
+import PersistenceTestingUtils
 @testable import BrowserServicesKit
 @testable import DDGSync
 @testable import DuckDuckGo_Privacy_Browser
@@ -46,7 +46,7 @@ final class SyncPreferencesTests: XCTestCase {
     var appearancePreferences: AppearancePreferences!
     var syncPreferences: SyncPreferences!
     var pausedStateManager: MockSyncPausedStateManaging!
-    var testRecoveryCode = "some code"
+    var testRecoveryCode = "eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiMDZGODhFNzEtNDFBRS00RTUxLUE2UkRtRkEwOTcwMDE5QkYwIiwicHJpbWFyeV9rZXkiOiI1QTk3U3dsQVI5RjhZakJaU09FVXBzTktnSnJEYnE3aWxtUmxDZVBWazgwPSJ9fQ=="
     var cancellables: Set<AnyCancellable>!
 
     var bookmarksDatabase: CoreDataDatabase!
@@ -61,6 +61,8 @@ final class SyncPreferencesTests: XCTestCase {
 
         syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences, syncErrorHandler: SyncErrorHandler())
         syncCredentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: AutofillSecureVaultFactory, syncErrorHandler: SyncErrorHandler())
+        let featureFlagger = MockFeatureFlagger()
+        featureFlagger.isFeatureOn = true
 
         syncPreferences = SyncPreferences(
             syncService: ddgSyncing,
@@ -69,7 +71,8 @@ final class SyncPreferencesTests: XCTestCase {
             appearancePreferences: appearancePreferences,
             managementDialogModel: managementDialogModel,
             userAuthenticator: MockUserAuthenticator(),
-            syncPausedStateManager: pausedStateManager
+            syncPausedStateManager: pausedStateManager,
+            featureFlagger: featureFlagger
         )
     }
 
@@ -266,6 +269,120 @@ final class SyncPreferencesTests: XCTestCase {
         XCTAssertNil(syncPreferences.syncPausedButtonAction)
     }
 
+    func test_recoverDevice_accountAlreadyExists_oneDevice_disconnectsThenLogsInAgain() async {
+        // Must have an account to prevent devices being cleared
+        setUpWithSingleDevice(id: "1")
+        let firstLoginCalledExpectation = XCTestExpectation(description: "Login Called Once")
+        let secondLoginCalledExpectation = XCTestExpectation(description: "Login Called Again")
+
+        ddgSyncing.spyLogin = { [weak self] _, _, _ in
+            self?.ddgSyncing.spyLogin = { [weak self] _, _, _ in
+                guard let self else { return [] }
+                // Assert disconnect before returning from login to ensure correct order
+                XCTAssert(ddgSyncing.disconnectCalled)
+                secondLoginCalledExpectation.fulfill()
+                return [RegisteredDevice(id: "1", name: "iPhone", type: "iPhone"), RegisteredDevice(id: "2", name: "Macbook Pro", type: "Macbook Pro")]
+            }
+            firstLoginCalledExpectation.fulfill()
+            throw SyncError.accountAlreadyExists
+        }
+
+        syncPreferences.recoverDevice(recoveryCode: testRecoveryCode, fromRecoveryScreen: false)
+
+        await fulfillment(of: [firstLoginCalledExpectation, secondLoginCalledExpectation], timeout: 5.0)
+    }
+
+    func test_recoverDevice_accountAlreadyExists_oneDevice_updatesDevicesWithReturnedDevices() async throws {
+        // Must have an account to prevent devices being cleared
+        setUpWithSingleDevice(id: "1")
+
+        ddgSyncing.spyLogin = { [weak self] _, _, _ in
+            self?.ddgSyncing.spyLogin = { _, _, _ in
+                return [RegisteredDevice(id: "1", name: "iPhone", type: "iPhone"), RegisteredDevice(id: "2", name: "Macbook Pro", type: "Macbook Pro")]
+            }
+            throw SyncError.accountAlreadyExists
+        }
+
+        syncPreferences.recoverDevice(recoveryCode: testRecoveryCode, fromRecoveryScreen: false)
+
+        let deviceIDsPublisher = syncPreferences.$devices.map { $0.map { $0.id } }
+        _ = try await waitForPublisher(deviceIDsPublisher, timeout: 15.0, toEmit: ["1", "2"])
+    }
+
+    func test_recoverDevice_accountAlreadyExists_oneDevice_endsFlow() async throws {
+        setUpWithSingleDevice(id: "1")
+        // Removal of currentDialog indicates end of flow
+        managementDialogModel.currentDialog = .enterRecoveryCode(code: "")
+        let loginCalledExpectation = XCTestExpectation(description: "Login Called Once")
+        let secondLoginCalledExpectation = XCTestExpectation(description: "Login Called Again")
+
+        ddgSyncing.spyLogin = { [weak self] _, _, _ in
+            self?.ddgSyncing.spyLogin = { _, _, _ in
+                return [RegisteredDevice(id: "1", name: "iPhone", type: "iPhone"), RegisteredDevice(id: "2", name: "Macbook Pro", type: "Macbook Pro")]
+            }
+            loginCalledExpectation.fulfill()
+            throw SyncError.accountAlreadyExists
+        }
+
+        syncPreferences.recoverDevice(recoveryCode: testRecoveryCode, fromRecoveryScreen: false)
+        await fulfillment(of: [loginCalledExpectation], timeout: 5.0)
+
+        _ = try await waitForPublisher(managementDialogModel.$currentDialog, timeout: 5.0, toEmit: nil)
+    }
+
+    func test_recoverDevice_accountAlreadyExists_twoOrMoreDevices_showsAccountSwitchingMessage() async throws {
+        // Must have an account to prevent devices being cleared
+        ddgSyncing.account = SyncAccount(deviceId: "1", deviceName: "", deviceType: "", userId: "", primaryKey: Data(), secretKey: Data(), token: nil, state: .active)
+        syncPreferences.devices = [SyncDevice(RegisteredDevice(id: "1", name: "iPhone", type: "iPhone")), SyncDevice(RegisteredDevice(id: "2", name: "iPhone", type: "iPhone"))]
+
+        let loginCalledExpectation = XCTestExpectation(description: "Login Called Again")
+
+        ddgSyncing.spyLogin = { _, _, _ in
+            loginCalledExpectation.fulfill()
+            throw SyncError.accountAlreadyExists
+        }
+
+        syncPreferences.recoverDevice(recoveryCode: testRecoveryCode, fromRecoveryScreen: false)
+
+        await fulfillment(of: [loginCalledExpectation], timeout: 5.0)
+
+        XCTAssert(managementDialogModel.shouldShowErrorMessage)
+        XCTAssert(managementDialogModel.shouldShowSwitchAccountsMessage)
+    }
+
+    func test_switchAccounts_disconnectsThenLogsInAgain() async throws {
+        let loginCalledExpectation = XCTestExpectation(description: "Login Called Again")
+
+        ddgSyncing.spyLogin = { [weak self] _, _, _ in
+            guard let self else { return [] }
+            // Assert disconnect before returning from login to ensure correct order
+            XCTAssert(ddgSyncing.disconnectCalled)
+            loginCalledExpectation.fulfill()
+            return [RegisteredDevice(id: "1", name: "iPhone", type: "iPhone"), RegisteredDevice(id: "2", name: "Macbook Pro", type: "Macbook Pro")]
+        }
+
+        syncPreferences.userConfirmedSwitchAccounts(recoveryCode: testRecoveryCode)
+
+        await fulfillment(of: [loginCalledExpectation], timeout: 5.0)
+    }
+
+    func test_switchAccounts_updatesDevicesWithReturnedDevices() async throws {
+        setUpWithSingleDevice(id: "1")
+
+        ddgSyncing.spyLogin = { _, _, _ in
+            return [RegisteredDevice(id: "1", name: "iPhone", type: "iPhone"), RegisteredDevice(id: "2", name: "Macbook Pro", type: "Macbook Pro")]
+        }
+
+        syncPreferences.userConfirmedSwitchAccounts(recoveryCode: testRecoveryCode)
+        let deviceIDsPublisher = syncPreferences.$devices.map { $0.map { $0.id } }
+        try await waitForPublisher(deviceIDsPublisher, toEmit: ["1", "2"])
+    }
+
+    private func setUpWithSingleDevice(id: String)  {
+        ddgSyncing.account = SyncAccount(deviceId: id, deviceName: "iPhone", deviceType: "iPhone", userId: "", primaryKey: Data(), secretKey: Data(), token: nil, state: .active)
+        ddgSyncing.registeredDevices = [RegisteredDevice(id: id, name: "iPhone", type: "iPhone")]
+        syncPreferences.devices = [SyncDevice(RegisteredDevice(id: id, name: "iPhone", type: "iPhone"))]
+    }
 }
 
 class CapturingScheduler: Scheduling {
