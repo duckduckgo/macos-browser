@@ -734,6 +734,7 @@ final class ZoomSubMenu: NSMenu {
         addItem(zoomOutItem)
 
         let actualSizeItem = (NSApp.mainMenuTyped.actualSizeMenuItem.copy() as? NSMenuItem)!
+            .withImage(NSImage()) // add left padding for the Actual Size item
         addItem(actualSizeItem)
 
         addItem(.separator())
