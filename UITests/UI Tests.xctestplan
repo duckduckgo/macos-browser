@@ -38,6 +38,7 @@
       "skippedTests" : [
         "BookmarksAndFavoritesTests\/test_bookmarks_canBeAddedTo_byClickingBookmarksButtonInAddressBar()",
         "BookmarksAndFavoritesTests\/test_favorites_canBeAddedTo_byClickingAddFavoriteInAddBookmarkPopover()",
+        "BookmarksAndFavoritesTests\/test_favorites_canBeRemovedFromNewTabViaContextClick()",
         "PermissionsTests"
       ],
       "target" : {

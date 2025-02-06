@@ -68,7 +68,8 @@ extension NewTabPageActionsManager {
                 sectionsAvailabilityProvider: NewTabPageModeDecider(),
                 sectionsVisibilityProvider: appearancePreferences,
                 customBackgroundProvider: customizationProvider,
-                linkOpener: DefaultHomePageSettingsModelNavigator()
+                linkOpener: DefaultHomePageSettingsModelNavigator(),
+                eventMapper: NewTabPageConfigurationErrorHandler()
             ),
             NewTabPageCustomBackgroundClient(model: customizationProvider),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel),

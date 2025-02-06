@@ -56,6 +56,8 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
     let vpnUninstaller: VPNUninstalling
+    private let vpnUIPresenting: VPNUIPresenting
+    private let proxySettings: TransparentProxySettings
 
     @Published
     private var siteInfo: ActiveSiteInfo?
@@ -64,16 +66,20 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var cancellables = Set<AnyCancellable>()
 
     init(ipcClient: VPNControllerXPCClient,
-         vpnUninstaller: VPNUninstalling) {
+         vpnUninstaller: VPNUninstalling,
+         vpnUIPresenting: VPNUIPresenting,
+         proxySettings: TransparentProxySettings = .init(defaults: .netP)) {
 
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller
+        self.vpnUIPresenting = vpnUIPresenting
+        self.proxySettings = proxySettings
 
         let activeDomainPublisher = ActiveDomainPublisher(windowControllersManager: .shared)
 
         activeSitePublisher = ActiveSiteInfoPublisher(
             activeDomainPublisher: activeDomainPublisher.eraseToAnyPublisher(),
-            proxySettings: TransparentProxySettings(defaults: .netP))
+            proxySettings: proxySettings)
 
         subscribeToCurrentSitePublisher()
     }
@@ -90,17 +96,16 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
     @MainActor
     func manageExcludedApps() {
-        WindowControllersManager.shared.showVPNAppExclusions()
+        vpnUIPresenting.showVPNAppExclusions()
     }
 
     @MainActor
     func manageExcludedSites() {
-        WindowControllersManager.shared.showVPNDomainExclusions()
+        vpnUIPresenting.showVPNDomainExclusions()
     }
 
     private func statusViewSubmenu() -> [StatusBarMenu.MenuItem] {
         let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-        let proxySettings = TransparentProxySettings(defaults: .netP)
         let excludedAppsTitle = UserText.vpnStatusViewExcludedAppsMenuItemTitle(proxySettings.excludedApps.count)
         let excludedWebsitesTitle = UserText.vpnStatusViewExcludedDomainsMenuItemTitle(proxySettings.excludedDomains.count)
 
@@ -182,7 +187,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
             let vpnURLEventHandler = VPNURLEventHandler()
-            let proxySettings = TransparentProxySettings(defaults: .netP)
             let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
 
             let connectionStatusPublisher = CurrentValuePublisher(

@@ -47692,55 +47692,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schutz vor bösartigen Websites"
+            "value" : "Sicherheitswarnungen der Website"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Malicious Site Protection"
+            "value" : "Site Safety Warnings"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protección contra sitios maliciosos"
+            "value" : "Advertencias de seguridad del sitio"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection contre les sites malveillants"
+            "value" : "Avertissements de sécurité du site"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protezione dai siti dannosi"
+            "value" : "Avvisi di sicurezza del sito"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bescherming tegen schadelijke sites"
+            "value" : "Waarschuwingen over de veiligheid van de website"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ochrona przed złośliwymi witrynami"
+            "value" : "Ostrzeżenia dotyczące bezpieczeństwa witryny"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Proteção contra sites maliciosos"
+            "value" : "Avisos de segurança do site"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Защита от вредоносных сайтов"
+            "value" : "Предупреждения о безопасности на сайте"
           }
         }
       }

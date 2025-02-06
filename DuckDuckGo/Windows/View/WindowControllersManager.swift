@@ -342,32 +342,6 @@ extension WindowControllersManager {
         parentWindowController.window?.beginSheet(locationsFormWindow)
     }
 
-    func showVPNAppExclusions() {
-        let windowController = ExcludedAppsViewController.create().wrappedInWindowController()
-
-        guard let window = windowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("Failed to present ExcludedAppsViewController")
-            return
-        }
-
-        parentWindowController.window?.beginSheet(window)
-    }
-
-    func showVPNDomainExclusions() {
-        let windowController = ExcludedDomainsViewController.create().wrappedInWindowController()
-
-        guard let window = windowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("Failed to present ExcludedDomainsViewController")
-            return
-        }
-
-        parentWindowController.window?.beginSheet(window)
-    }
-
     @discardableResult
     func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                        burnerMode: BurnerMode = .regular,

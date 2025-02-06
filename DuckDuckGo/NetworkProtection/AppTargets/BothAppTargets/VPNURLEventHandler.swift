@@ -34,9 +34,9 @@ final class VPNURLEventHandler {
     func handle(_ url: URL) async {
         switch url {
         case VPNAppLaunchCommand.manageExcludedApps.launchURL:
-            showVPNAppExclusions()
+            windowControllerManager.showVPNAppExclusions()
         case VPNAppLaunchCommand.manageExcludedDomains.launchURL:
-            showVPNDomainExclusions()
+            windowControllerManager.showVPNDomainExclusions()
         case VPNAppLaunchCommand.showStatus.launchURL:
             await showStatus()
         case VPNAppLaunchCommand.showSettings.launchURL:

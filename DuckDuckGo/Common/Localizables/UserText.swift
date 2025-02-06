@@ -448,7 +448,7 @@ struct UserText {
 
     static let downloadsOpenPopupOnCompletion = NSLocalizedString("downloads.open.on.completion", value: "Automatically open the Downloads panel when downloads complete", comment: "Checkbox to open a Download Manager popover when downloads are completed")
 
-    static let maliciousSiteDetectionHeader = NSLocalizedString("phishing-detection.enabled.header", value: "Malicious Site Protection", comment: "Header for phishing site protection section in the settings page")
+    static let maliciousSiteDetectionHeader = NSLocalizedString("phishing-detection.enabled.header", value: "Site Safety Warnings", comment: "Header for phishing site protection section in the settings page")
     static let maliciousSiteDetectionIsEnabled = NSLocalizedString("phishing-detection.enabled.checkbox", value: "Warn me on sites flagged for phishing or malware.", comment: "Checkbox that enables or disables the phishing and malware detection feature in the browser")
     static let maliciousDetectionEnabledWarning = NSLocalizedString("phishing-detection.enabled.warning", value: "Disabling this feature can put your personal information at risk.", comment: "A description box to warn users away from disabling the phishing and malware protection feature")
 
