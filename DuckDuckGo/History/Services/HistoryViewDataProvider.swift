@@ -22,13 +22,18 @@ import HistoryView
 final class HistoryViewDataProvider: HistoryView.DataProviding {
 
     private let historyCoordinator: HistoryCoordinating
+    private(set) lazy var history = historyCoordinator.history
 
     init(historyCoordinator: HistoryCoordinating) {
         self.historyCoordinator = historyCoordinator
+
     }
 
-    func visits(for query: String?, filter: HistoryViewFilter, pageSize: UInt, offset: UInt) async -> [HistoryView.DataModel.HistoryItem] {
-        []
+    var ranges: [DataModel.HistoryRange] {
+        [.all, .today, .yesterday, .tuesday, .monday, .recentlyOpened]
     }
 
+    func visits(for query: HistoryView.DataModel.HistoryQueryKind, limit: UInt, offset: UInt) async -> HistoryView.DataModel.HistoryItemsBatch {
+        .init(finished: true, visits: [])
+    }
 }

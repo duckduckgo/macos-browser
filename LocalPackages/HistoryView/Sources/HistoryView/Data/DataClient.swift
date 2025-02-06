@@ -35,7 +35,9 @@ public enum HistoryViewFilter {
 }
 
 public protocol DataProviding: AnyObject {
-    func visits(for query: String?, filter: HistoryViewFilter, pageSize: UInt, offset: UInt) async -> [DataModel.HistoryItem]
+    var ranges: [DataModel.HistoryRange] { get }
+
+    func visits(for query: DataModel.HistoryQueryKind, limit: UInt, offset: UInt) async -> DataModel.HistoryItemsBatch
 }
 
 public final class DataClient: HistoryViewUserScriptClient {
@@ -49,24 +51,27 @@ public final class DataClient: HistoryViewUserScriptClient {
     }
 
     enum MessageName: String, CaseIterable {
+        case getRanges
         case query
     }
 
     public override func registerMessageHandlers(for userScript: HistoryViewUserScript) {
         userScript.registerMessageHandlers([
+            MessageName.getRanges.rawValue: { [weak self] in try await self?.getRanges(params: $0, original: $1) },
             MessageName.query.rawValue: { [weak self] in try await self?.query(params: $0, original: $1) }
         ])
     }
 
     @MainActor
-    private func query(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let query: DataModel.Query = DecodableHelper.decode(from: params) else { return nil }
+    private func getRanges(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        DataModel.GetRangesResponse(ranges: dataProvider.ranges)
+    }
 
-        /// This is a placeholder implementation, to be updated.
-        return DataModel.QueryResponse(
-            info: .init(finished: true, term: query.term),
-            value: [
-                .init(dateRelativeDay: "Today", dateShort: "Jan 16, 2025", dateTimeOfDay: "13:59", domain: "example.com", fallbackFaviconText: "ex", time: Date().timeIntervalSince1970, title: "Example com", url: "https://example.com")
-            ])
+    @MainActor
+    private func query(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let query: DataModel.HistoryQuery = DecodableHelper.decode(from: params) else { return nil }
+
+        let batch = await dataProvider.visits(for: query.query, limit: query.limit, offset: query.offset)
+        return DataModel.HistoryQueryResponse(info: .init(finished: batch.finished, query: query.query), value: batch.visits)
     }
 }
