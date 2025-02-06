@@ -37,7 +37,9 @@ public enum HistoryViewFilter {
 public protocol DataProviding: AnyObject {
     var ranges: [DataModel.HistoryRange] { get }
 
-    func visits(for query: DataModel.HistoryQueryKind, limit: UInt, offset: UInt) async -> DataModel.HistoryItemsBatch
+    func resetCache()
+
+    func visits(for query: DataModel.HistoryQueryKind, limit: Int, offset: Int) async -> DataModel.HistoryItemsBatch
 }
 
 public final class DataClient: HistoryViewUserScriptClient {
@@ -51,15 +53,38 @@ public final class DataClient: HistoryViewUserScriptClient {
     }
 
     enum MessageName: String, CaseIterable {
+        case initialSetup
         case getRanges
         case query
+        case reportInitException
+        case reportPageException
     }
 
     public override func registerMessageHandlers(for userScript: HistoryViewUserScript) {
         userScript.registerMessageHandlers([
+            MessageName.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
             MessageName.getRanges.rawValue: { [weak self] in try await self?.getRanges(params: $0, original: $1) },
-            MessageName.query.rawValue: { [weak self] in try await self?.query(params: $0, original: $1) }
+            MessageName.query.rawValue: { [weak self] in try await self?.query(params: $0, original: $1) },
+            MessageName.reportInitException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
+            MessageName.reportPageException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
         ])
+    }
+
+    @MainActor
+    private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+#if DEBUG || REVIEW
+        let env = "development"
+#else
+        let env = "production"
+#endif
+
+        dataProvider.resetCache()
+
+        return DataModel.Configuration(
+            env: env,
+            locale: Bundle.main.preferredLocalizations.first ?? "en",
+            platform: .init(name: "macos")
+        )
     }
 
     @MainActor
@@ -73,5 +98,13 @@ public final class DataClient: HistoryViewUserScriptClient {
 
         let batch = await dataProvider.visits(for: query.query, limit: query.limit, offset: query.offset)
         return DataModel.HistoryQueryResponse(info: .init(finished: batch.finished, query: query.query), value: batch.visits)
+    }
+
+    private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let params = params as? [String: String] else { return nil }
+        let message = params["message"] ?? ""
+        let id = params["id"] ?? ""
+        Logger.general.error("New Tab Page error: \("\(id): \(message)", privacy: .public)")
+        return nil
     }
 }

@@ -313,6 +313,15 @@ extension TabContent {
         isUrl
     }
 
+    var usesExternalWebView: Bool {
+        switch self {
+        case .newtab, .history:
+            return true
+        default:
+            return false
+        }
+    }
+
     var canBeDuplicated: Bool {
         switch self {
         case .settings, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:

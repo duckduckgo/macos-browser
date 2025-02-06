@@ -329,6 +329,7 @@ final class BrowserTabViewController: NSViewController {
 
                 self.tabViewModelCancellables.removeAll(keepingCapacity: true)
                 self.subscribeToTabContent(of: selectedTabViewModel)
+                self.subscribeToTabReloading(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
 
@@ -637,6 +638,23 @@ final class BrowserTabViewController: NSViewController {
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
             self?.updateStateAndPresentContextualOnboarding()
         }.store(in: &tabViewModelCancellables)
+    }
+
+    private func subscribeToTabReloading(of tabViewModel: TabViewModel?) {
+        guard let tab = tabViewModel?.tab, tab.content.usesExternalWebView else { return }
+        let content = tab.content
+
+        tab.reloadPublisher
+            .sink { [weak self, weak tabViewModel] in
+                guard let self, let tabViewModel else {
+                    return
+                }
+                let webView = webView(for: tabViewModel)
+                if webView != tabViewModel.tab.webView {
+                    webView.reload()
+                }
+            }
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {

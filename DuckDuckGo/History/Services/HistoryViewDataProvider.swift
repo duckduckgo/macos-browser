@@ -16,24 +16,107 @@
 //  limitations under the License.
 //
 
+import Foundation
 import History
 import HistoryView
+
+protocol HistoryViewDateFormatting {
+    func weekDay(for date: Date) -> String
+    func time(for date: Date) -> String
+}
+
+struct DefaultHistoryViewDateFormatter: HistoryViewDateFormatting {
+    let weekDayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "cccc"
+        return formatter
+    }()
+
+    let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
+    func weekDay(for date: Date) -> String {
+        weekDayFormatter.string(from: date)
+    }
+
+    func time(for date: Date) -> String {
+        timeFormatter.string(from: date)
+    }
+}
 
 final class HistoryViewDataProvider: HistoryView.DataProviding {
 
     private let historyCoordinator: HistoryCoordinating
-    private(set) lazy var history = historyCoordinator.history
+    private let dateFormatter: HistoryViewDateFormatting
 
-    init(historyCoordinator: HistoryCoordinating) {
+    private var historyGroupings: [HistoryGrouping] = []
+    private lazy var visits: [DataModel.HistoryItem] = self.populateVisits()
+
+    init(historyCoordinator: HistoryCoordinating, dateFormatter: HistoryViewDateFormatting = DefaultHistoryViewDateFormatter()) {
         self.historyCoordinator = historyCoordinator
+        self.dateFormatter = dateFormatter
+    }
 
+    func resetCache() {
+        visits = populateVisits()
+    }
+
+    private func populateVisits() -> [DataModel.HistoryItem] {
+        let history = historyCoordinator.history ?? []
+        return history.flatMap(\.visits)
+            .sorted { $0.date > $1.date }
+            .removingDuplicates(byKey: \.historyEntry?.url)
+            .compactMap { HistoryView.DataModel.HistoryItem.init($0, dateFormatter: dateFormatter) }
     }
 
     var ranges: [DataModel.HistoryRange] {
         [.all, .today, .yesterday, .tuesday, .monday, .recentlyOpened]
     }
 
-    func visits(for query: HistoryView.DataModel.HistoryQueryKind, limit: UInt, offset: UInt) async -> HistoryView.DataModel.HistoryItemsBatch {
-        .init(finished: true, visits: [])
+    func visits(for query: HistoryView.DataModel.HistoryQueryKind, limit: Int, offset: Int) async -> HistoryView.DataModel.HistoryItemsBatch {
+        guard offset >= 0, limit > 0, offset < visits.count else {
+            return .init(finished: true, visits: [])
+        }
+        var endIndex = offset + limit
+        var finished = false
+        if endIndex >= visits.count {
+            endIndex = visits.count - 1
+            finished = true
+        }
+        return DataModel.HistoryItemsBatch(finished: finished, visits: Array(visits[offset...endIndex]))
+    }
+}
+
+extension HistoryView.DataModel.HistoryItem {
+    init?(_ visit: Visit, dateFormatter: HistoryViewDateFormatting) {
+        guard let historyEntry = visit.historyEntry else {
+            return nil
+        }
+        self.init(
+            id: historyEntry.identifier.uuidString,
+            url: historyEntry.url.absoluteString,
+            title: historyEntry.title ?? "",
+            etldPlusOne: visit.etldPlusOne,
+            dateRelativeDay: dateFormatter.weekDay(for: visit.date),
+            dateShort: "",
+            dateTimeOfDay: dateFormatter.time(for: visit.date)
+        )
+    }
+}
+
+extension Visit {
+    private enum Const {
+        static let wwwPrefix = "www."
+    }
+
+    var etldPlusOne: String? {
+        guard let domain = historyEntry?.url.host else {
+            return nil
+        }
+        return ContentBlocking.shared.tld.eTLDplus1(domain)?.dropping(prefix: Const.wwwPrefix)
     }
 }

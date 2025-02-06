@@ -57,14 +57,13 @@ public extension DataModel {
             let container: KeyedDecodingContainer<CodingKeys> = try decoder.container(keyedBy: CodingKeys.self)
             if let term = try container.decodeIfPresent(String.self, forKey: CodingKeys.term) {
                 self = .searchTerm(term)
-            }
-            if let domain = try container.decodeIfPresent(String.self, forKey: CodingKeys.domain) {
+            } else if let domain = try container.decodeIfPresent(String.self, forKey: CodingKeys.domain) {
                 self = .domainFilter(domain)
-            }
-            if let range = try container.decodeIfPresent(HistoryRange.self, forKey: CodingKeys.range) {
+            } else if let range = try container.decodeIfPresent(HistoryRange.self, forKey: CodingKeys.range) {
                 self = .rangeFilter(range)
+            } else {
+                throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unkown query kind"))
             }
-            throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unkown query kind"))
         }
 
         public func encode(to encoder: any Encoder) throws {
@@ -81,11 +80,11 @@ public extension DataModel {
     }
 
     struct HistoryQuery: Codable, Equatable {
-        let limit: UInt
-        let offset: UInt
+        let limit: Int
+        let offset: Int
         let query: HistoryQueryKind
 
-        public init(limit: UInt, offset: UInt, query: HistoryQueryKind) {
+        public init(limit: Int, offset: Int, query: HistoryQueryKind) {
             self.limit = limit
             self.offset = offset
             self.query = query
@@ -93,29 +92,39 @@ public extension DataModel {
     }
 
     struct HistoryItem: Codable, Equatable {
+        let id: String
+        let url: String
+        let title: String
+
+        let etldPlusOne: String?
+
         let dateRelativeDay: String
         let dateShort: String
         let dateTimeOfDay: String
-        let domain: String
-        let etldPlusOne: String?
-        let id: String
-        let title: String
-        let url: String
 
-        public init(dateRelativeDay: String, dateShort: String, dateTimeOfDay: String, domain: String, etldPlusOne: String?, id: String, title: String, url: String) {
+        public init(id: String, url: String, title: String, etldPlusOne: String?, dateRelativeDay: String, dateShort: String, dateTimeOfDay: String) {
+            self.id = id
+            self.url = url
+            self.title = title
+            self.etldPlusOne = etldPlusOne
             self.dateRelativeDay = dateRelativeDay
             self.dateShort = dateShort
             self.dateTimeOfDay = dateTimeOfDay
-            self.domain = domain
-            self.etldPlusOne = etldPlusOne
-            self.id = id
-            self.title = title
-            self.url = url
         }
     }
 }
 
 extension DataModel {
+
+    struct Configuration: Encodable {
+        var env: String
+        var locale: String
+        var platform: Platform
+
+        struct Platform: Encodable, Equatable {
+            var name: String
+        }
+    }
 
     struct GetRangesResponse: Codable, Equatable {
         let ranges: [HistoryRange]
