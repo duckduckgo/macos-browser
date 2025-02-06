@@ -162,7 +162,7 @@ final class HomePageViewController: NSViewController {
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
         return .init { [weak self] url in
-            PixelKit.fire(GeneralPixel.privacyFeedHistoryLinkOpened, frequency: .dailyAndCount)
+            PixelKit.fire(NewTabPagePixel.privacyFeedHistoryLinkOpened, frequency: .dailyAndCount)
             self?.openUrl(url)
         }
     }

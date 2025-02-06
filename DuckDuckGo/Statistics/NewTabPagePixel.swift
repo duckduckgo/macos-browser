@@ -53,6 +53,18 @@ enum NewTabPagePixel: PixelKitEventV2 {
     case favoriteSectionHidden
 
     /**
+     * Event Trigger: A link in Privacy Feed (a.k.a. Recent Activity) is activated.
+     *
+     * > Related links:
+     * [Privacy Triage](https://app.asana.com/0/69071770703008/1209316863206567)
+     *
+     * Anomaly Investigation:
+     * - Anomaly in this pixel may mean an increase/drop in app use.
+     * - This pixel is fired from `DefaultRecentActivityActionsHandler` when handling `open` JS message.
+     */
+    case privacyFeedHistoryLinkOpened
+
+    /**
      * Event Trigger: Recent Activity section on NTP is hidden.
      *
      * > Related links:
@@ -144,6 +156,7 @@ enum NewTabPagePixel: PixelKitEventV2 {
         switch self {
         case .newTabPageShown: return "m_mac_newtab_shown"
         case .favoriteSectionHidden: return "m_mac_favorite-section-hidden"
+        case .privacyFeedHistoryLinkOpened: return "m_mac_privacy_feed_history_link_opened"
         case .recentActivitySectionHidden: return "m_mac_recent-activity-section-hidden"
         case .blockedTrackingAttemptsSectionHidden: return "m_mac_blocked-tracking-attempts-section-hidden"
         case .blockedTrackingAttemptsShowLess: return "m_mac_new-tab-page_blocked-tracking-attempts_show-less"
@@ -175,6 +188,7 @@ enum NewTabPagePixel: PixelKitEventV2 {
                 .blockedTrackingAttemptsSectionHidden,
                 .blockedTrackingAttemptsShowLess,
                 .blockedTrackingAttemptsShowMore,
+                .privacyFeedHistoryLinkOpened,
                 .privacyStatsCouldNotLoadDatabase,
                 .privacyStatsDatabaseError:
             return nil
