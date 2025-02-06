@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/history-view",
-        "revision" : "e7be4c195a76a66743491d4cba40f0374974f586"
+        "revision" : "e6301596044bca29517dae4765855221e3cba523"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
         "branch" : "pr-releases/pr-1468",
-        "revision" : "54d0668a6d11460715269fcd41281f5491260b0e"
+        "revision" : "fea305d995dfdec82cb361c86c0ba94198bfb8b8"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-crypto.git",
       "state" : {
-        "revision" : "ff0f781cf7c6a22d52957e50b104f5768b50c779",
-        "version" : "3.10.0"
+        "revision" : "f2f3774fd116a305136b6866e5e7cb7dff39d8f2",
+        "version" : "3.10.1"
       }
     },
     {
