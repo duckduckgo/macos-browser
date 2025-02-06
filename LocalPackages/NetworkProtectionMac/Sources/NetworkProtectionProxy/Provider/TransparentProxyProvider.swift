@@ -92,7 +92,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     @MainActor
     public var isRunning = false
 
-    private let appExclusionsManager: AppExclusionsManager
+    private let appRoutingRulesManager: AppRoutingRulesManager
     private let logger: Logger
     private let appMessageHandler: TransparentProxyAppMessageHandler
     private let eventHandler: TransparentProxyProviderEventHandler
@@ -110,7 +110,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         self.settings = settings
         self.eventHandler = eventHandler
 
-        appExclusionsManager = AppExclusionsManager(settings: settings)
+        appRoutingRulesManager = AppRoutingRulesManager(settings: settings)
 
         super.init()
 
@@ -449,7 +449,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     private func path(for flow: NEAppProxyFlow) -> FlowPath {
         let appIdentifier = flow.metaData.sourceAppSigningIdentifier
 
-        switch appExclusionsManager.appRoutingRules[appIdentifier] {
+        switch appRoutingRulesManager.rules[appIdentifier] {
         case .none:
             if let hostname = flow.remoteHostname,
                isExcludedDomain(hostname) {

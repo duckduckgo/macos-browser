@@ -1,7 +1,7 @@
 //
-//  AppExclusionsManager.swift
+//  AppRoutingRulesManager.swift
 //
-//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ import Combine
 /// of all embedded binaries.  This is useful because when blocking or excluding an app the user
 /// likely expects the rule to extend to all child processes.
 ///
-final class AppExclusionsManager {
+final class AppRoutingRulesManager {
 
-    private(set) var appRoutingRules: VPNAppRoutingRules
+    private(set) var rules: VPNAppRoutingRules
     private var cancellables = Set<AnyCancellable>()
 
     init(settings: TransparentProxySettings) {
-        self.appRoutingRules = Self.expandAppRoutingRules(settings.appRoutingRules)
+        self.rules = Self.expandAppRoutingRules(settings.appRoutingRules)
 
         subscribeToAppRoutingRulesChanges(settings)
     }
@@ -63,7 +63,7 @@ final class AppExclusionsManager {
             .map { rules in
                 return Self.expandAppRoutingRules(rules)
             }
-            .assign(to: \.appRoutingRules, onWeaklyHeld: self)
+            .assign(to: \.rules, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 }
