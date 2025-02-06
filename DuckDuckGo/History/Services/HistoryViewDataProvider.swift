@@ -50,15 +50,9 @@ struct DefaultHistoryViewDateFormatter: HistoryViewDateFormatting {
 
 final class HistoryViewDataProvider: HistoryView.DataProviding {
 
-    private let historyCoordinator: HistoryCoordinating
-    private let dateFormatter: HistoryViewDateFormatting
-
-    private var historyGroupings: [HistoryGrouping] = []
-    private lazy var visits: [DataModel.HistoryItem] = self.populateVisits()
-
-    init(historyCoordinator: HistoryCoordinating, dateFormatter: HistoryViewDateFormatting = DefaultHistoryViewDateFormatter()) {
-        self.historyCoordinator = historyCoordinator
+    init(historyGroupingDataSource: HistoryGroupingDataSource, dateFormatter: HistoryViewDateFormatting = DefaultHistoryViewDateFormatter()) {
         self.dateFormatter = dateFormatter
+        historyGroupingProvider = HistoryGroupingProvider(dataSource: historyGroupingDataSource)
     }
 
     func resetCache() {
@@ -66,11 +60,9 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     }
 
     private func populateVisits() -> [DataModel.HistoryItem] {
-        let history = historyCoordinator.history ?? []
-        return history.flatMap(\.visits)
-            .sorted { $0.date > $1.date }
-            .removingDuplicates(byKey: \.historyEntry?.url)
-            .compactMap { HistoryView.DataModel.HistoryItem.init($0, dateFormatter: dateFormatter) }
+        historyGroupingProvider.getVisitGroupings()
+            .flatMap(\.visits)
+            .compactMap { DataModel.HistoryItem($0, dateFormatter: dateFormatter) }
     }
 
     var ranges: [DataModel.HistoryRange] {
@@ -87,8 +79,14 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
             endIndex = visits.count - 1
             finished = true
         }
-        return DataModel.HistoryItemsBatch(finished: finished, visits: Array(visits[offset...endIndex]))
+        return DataModel.HistoryItemsBatch(finished: finished, visits: Array(visits[offset..<endIndex]))
     }
+
+    private let historyGroupingProvider: HistoryGroupingProvider
+    private let dateFormatter: HistoryViewDateFormatting
+
+    private var historyGroupings: [HistoryGrouping] = []
+    private lazy var visits: [DataModel.HistoryItem] = self.populateVisits()
 }
 
 extension HistoryView.DataModel.HistoryItem {

@@ -23,7 +23,7 @@ extension HistoryViewActionsManager {
 
     convenience init() {
         self.init(scriptClients: [
-            DataClient(dataProvider: HistoryViewDataProvider(historyCoordinator: HistoryCoordinator.shared))
+            DataClient(dataProvider: HistoryViewDataProvider(historyGroupingDataSource: HistoryCoordinator.shared))
         ])
     }
 }
