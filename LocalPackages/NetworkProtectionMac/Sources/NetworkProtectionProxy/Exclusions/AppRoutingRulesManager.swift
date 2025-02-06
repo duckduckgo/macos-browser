@@ -28,18 +28,22 @@ import Combine
 ///
 final class AppRoutingRulesManager {
 
+    private let appInfoRetriever: AppInfoRetrieving
     private(set) var rules: VPNAppRoutingRules
     private var cancellables = Set<AnyCancellable>()
 
-    init(settings: TransparentProxySettings) {
-        self.rules = Self.expandAppRoutingRules(settings.appRoutingRules)
+    init(settings: TransparentProxySettings,
+         appInfoRetriever: AppInfoRetrieving = AppInfoRetriever()) {
+
+        self.appInfoRetriever = appInfoRetriever
+        self.rules = Self.expandAppRoutingRules(settings.appRoutingRules, appInfoRetriever: appInfoRetriever)
 
         subscribeToAppRoutingRulesChanges(settings)
     }
 
-    static func expandAppRoutingRules(_ rules: VPNAppRoutingRules) -> VPNAppRoutingRules {
+    static func expandAppRoutingRules(_ rules: VPNAppRoutingRules,
+                                      appInfoRetriever: AppInfoRetrieving) -> VPNAppRoutingRules {
 
-        let appInfoRetriever = AppInfoRetriever()
         var expandedRules = rules
 
         for (bundleID, rule) in rules {
@@ -60,8 +64,8 @@ final class AppRoutingRulesManager {
     private func subscribeToAppRoutingRulesChanges(_ settings: TransparentProxySettings) {
         settings.appRoutingRulesPublisher
             .receive(on: DispatchQueue.main)
-            .map { rules in
-                return Self.expandAppRoutingRules(rules)
+            .map { [appInfoRetriever] rules in
+                return Self.expandAppRoutingRules(rules, appInfoRetriever: appInfoRetriever)
             }
             .assign(to: \.rules, onWeaklyHeld: self)
             .store(in: &cancellables)
