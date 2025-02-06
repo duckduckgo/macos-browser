@@ -112,12 +112,10 @@ public class AppInfoRetriever: AppInfoRetrieveing {
             return []
         }
 
-        for case let fileURL as URL in enumerator {
-            if fileURL.pathExtension == "app" {
-                let embeddedBundle = Bundle(url: fileURL)
-                if let bundleID = embeddedBundle?.bundleIdentifier {
-                    bundleIDs.append(bundleID)
-                }
+        for case let fileURL as URL in enumerator where fileURL.pathExtension == "app" {
+            let embeddedBundle = Bundle(url: fileURL)
+            if let bundleID = embeddedBundle?.bundleIdentifier {
+                bundleIDs.append(bundleID)
             }
         }
 
