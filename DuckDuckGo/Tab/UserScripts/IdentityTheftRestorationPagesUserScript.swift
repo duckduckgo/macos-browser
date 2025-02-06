@@ -78,7 +78,8 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "duckduckgo.com"),
         .exact(hostname: "abrown.duckduckgo.com"),
-        .exact(hostname: "vkraucunas.duckduckgo.com")
+        .exact(hostname: "vkraucunas.duckduckgo.com"),
+        .exact(hostname: "pro.duckduckgo.com")
     ])
 
     init(subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
