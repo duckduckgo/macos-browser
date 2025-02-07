@@ -1,5 +1,5 @@
 //
-//  HistoryViewActionsManagerExtension.swift
+//  ActionsHandler.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -16,17 +16,8 @@
 //  limitations under the License.
 //
 
-import History
-import HistoryView
+import Foundation
 
-extension HistoryViewActionsManager {
-
-    convenience init() {
-        self.init(scriptClients: [
-            DataClient(
-                dataProvider: HistoryViewDataProvider(historyGroupingDataSource: HistoryCoordinator.shared),
-                actionsHandler: HistoryViewActionsHandler()
-            )
-        ])
-    }
+public protocol ActionsHandling {
+    @MainActor func open(_ url: URL)
 }

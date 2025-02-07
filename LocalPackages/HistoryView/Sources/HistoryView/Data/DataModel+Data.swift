@@ -97,16 +97,18 @@ public extension DataModel {
         public let url: String
         public let title: String
 
+        public let domain: String
         public let etldPlusOne: String?
 
         public let dateRelativeDay: String
         public let dateShort: String
         public let dateTimeOfDay: String
 
-        public init(id: String, url: String, title: String, etldPlusOne: String?, dateRelativeDay: String, dateShort: String, dateTimeOfDay: String) {
+        public init(id: String, url: String, title: String, domain: String, etldPlusOne: String?, dateRelativeDay: String, dateShort: String, dateTimeOfDay: String) {
             self.id = id
             self.url = url
             self.title = title
+            self.domain = domain
             self.etldPlusOne = etldPlusOne
             self.dateRelativeDay = dateRelativeDay
             self.dateShort = dateShort
@@ -139,5 +141,10 @@ extension DataModel {
     struct HistoryQueryResponse: Codable, Equatable {
         let info: HistoryQueryInfo
         let value: [HistoryItem]
+    }
+
+    struct HistoryOpenAction: Codable {
+        let id: String
+        let url: String
     }
 }

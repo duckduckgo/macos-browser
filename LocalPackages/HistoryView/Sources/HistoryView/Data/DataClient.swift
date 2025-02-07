@@ -46,15 +46,18 @@ public final class DataClient: HistoryViewUserScriptClient {
 
     private var cancellables = Set<AnyCancellable>()
     private let dataProvider: DataProviding
+    private let actionsHandler: ActionsHandling
 
-    public init(dataProvider: DataProviding) {
+    public init(dataProvider: DataProviding, actionsHandler: ActionsHandling) {
         self.dataProvider = dataProvider
+        self.actionsHandler = actionsHandler
         super.init()
     }
 
     enum MessageName: String, CaseIterable {
         case initialSetup
         case getRanges
+        case open
         case query
         case reportInitException
         case reportPageException
@@ -65,6 +68,7 @@ public final class DataClient: HistoryViewUserScriptClient {
             MessageName.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
             MessageName.getRanges.rawValue: { [weak self] in try await self?.getRanges(params: $0, original: $1) },
             MessageName.query.rawValue: { [weak self] in try await self?.query(params: $0, original: $1) },
+            MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) },
             MessageName.reportInitException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
             MessageName.reportPageException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
         ])
@@ -98,6 +102,16 @@ public final class DataClient: HistoryViewUserScriptClient {
 
         let batch = await dataProvider.visits(for: query.query, limit: query.limit, offset: query.offset)
         return DataModel.HistoryQueryResponse(info: .init(finished: batch.finished, query: query.query), value: batch.visits)
+    }
+
+    @MainActor
+    private func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let action: DataModel.HistoryOpenAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        guard let url = URL(string: action.url), url.isValid else { return nil }
+        actionsHandler.open(url)
+        return nil
     }
 
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {

@@ -155,7 +155,8 @@ extension HistoryView.DataModel.HistoryItem {
             id: historyEntry.identifier.uuidString,
             url: historyEntry.url.absoluteString,
             title: historyEntry.title ?? "",
-            etldPlusOne: visit.etldPlusOne,
+            domain: historyEntry.url.host ?? historyEntry.url.absoluteString,
+            etldPlusOne: historyEntry.etldPlusOne,
             dateRelativeDay: dateFormatter.weekDay(for: visit.date),
             dateShort: "",
             dateTimeOfDay: dateFormatter.time(for: visit.date)
@@ -214,18 +215,5 @@ extension HistoryView.DataModel.HistoryRange {
         default:
             return nil
         }
-    }
-}
-
-extension Visit {
-    private enum Const {
-        static let wwwPrefix = "www."
-    }
-
-    var etldPlusOne: String? {
-        guard let domain = historyEntry?.url.host else {
-            return nil
-        }
-        return ContentBlocking.shared.tld.eTLDplus1(domain)?.dropping(prefix: Const.wwwPrefix)
     }
 }
