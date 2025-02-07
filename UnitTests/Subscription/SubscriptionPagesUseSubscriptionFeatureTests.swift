@@ -426,7 +426,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
-                                                                                     subscription: SubscriptionMockFactory.subscription))
+                                                                                     subscription: SubscriptionMockFactory.appleSubscription))
         authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
                                                                    email: Constants.email,
                                                                    externalID: Constants.externalID,
@@ -470,7 +470,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
-                                                                                     subscription: SubscriptionMockFactory.subscription))
+                                                                                     subscription: SubscriptionMockFactory.appleSubscription))
         authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
                                                                    email: Constants.email,
                                                                    externalID: Constants.externalID,
@@ -516,7 +516,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
-                                                                                     subscription: SubscriptionMockFactory.subscription))
+                                                                                     subscription: SubscriptionMockFactory.appleSubscription))
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -547,7 +547,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
-                                                                                     subscription: SubscriptionMockFactory.subscription))
+                                                                                     subscription: SubscriptionMockFactory.appleSubscription))
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -609,7 +609,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
                                                                    status: "authenticated"))
         authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
         authService.validateTokenResult = .success(Constants.validateTokenResponse)
-        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.subscription)
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.appleSubscription)
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -1009,7 +1009,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
-                                                                                     subscription: SubscriptionMockFactory.subscription))
+                                                                                     subscription: SubscriptionMockFactory.appleSubscription))
         authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
                                                                    email: Constants.email,
                                                                    externalID: Constants.externalID,
@@ -1048,7 +1048,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
-                                                                                     subscription: SubscriptionMockFactory.subscription))
+                                                                                     subscription: SubscriptionMockFactory.appleSubscription))
         authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
                                                                    email: Constants.email,
                                                                    externalID: Constants.externalID,
@@ -1088,7 +1088,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
-                                                                                     subscription: SubscriptionMockFactory.subscription))
+                                                                                     subscription: SubscriptionMockFactory.appleSubscription))
         authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
                                                                    email: Constants.email,
                                                                    externalID: Constants.externalID,
@@ -1131,7 +1131,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
         subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
                                                                                      entitlements: Constants.entitlements,
-                                                                                     subscription: SubscriptionMockFactory.subscription))
+                                                                                     subscription: SubscriptionMockFactory.appleSubscription))
 
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
         feature.with(broker: broker)

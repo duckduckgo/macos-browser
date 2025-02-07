@@ -287,7 +287,7 @@ final internal class PixelExperimentLogic {
 
         DispatchQueue.main.async {
             let now = self.now()
-            if now >= AppDelegate.firstLaunchDate.adding(.days(21)) && now <= AppDelegate.firstLaunchDate.adding(.days(27)) {
+            if now >= AppDelegate.firstLaunchDate.addingTimeInterval(.days(21)) && now <= AppDelegate.firstLaunchDate.addingTimeInterval(.days(27)) {
                 PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
             }
         }
