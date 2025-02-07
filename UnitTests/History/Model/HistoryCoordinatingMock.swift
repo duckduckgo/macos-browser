@@ -35,7 +35,7 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
 
     var addVisitCalled = false
     var visit: Visit?
-    func addVisit(of url: URL) -> Visit? {
+    func addVisit(of url: URL, at date: Date) -> Visit? {
         addVisitCalled = true
         return visit
     }

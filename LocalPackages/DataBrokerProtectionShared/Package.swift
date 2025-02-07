@@ -3,7 +3,7 @@
 //
 //  Package.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -21,16 +21,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "DataBrokerProtection",
+    name: "DataBrokerProtectionShared",
     platforms: [ .macOS("11.4") ],
     products: [
         .library(
-            name: "DataBrokerProtection",
-            targets: ["DataBrokerProtection"])
+            name: "DataBrokerProtectionShared",
+            targets: ["DataBrokerProtectionShared"])
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "236.0.1"),
-        .package(path: "../DataBrokerProtectionShared"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../AppKitExtensions"),
         .package(path: "../XPCHelper"),
@@ -38,10 +37,9 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "DataBrokerProtection",
+            name: "DataBrokerProtectionShared",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
-                .product(name: "DataBrokerProtectionShared", package: "DataBrokerProtectionShared"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "AppKitExtensions", package: "AppKitExtensions"),
                 .byName(name: "XPCHelper"),
@@ -56,9 +54,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "DataBrokerProtectionTests",
+            name: "DataBrokerProtectionSharedTests",
             dependencies: [
-                "DataBrokerProtection",
+                "DataBrokerProtectionShared",
                 "BrowserServicesKit",
                 "Freemium",
                 .product(name: "PersistenceTestingUtils", package: "BrowserServicesKit"),
