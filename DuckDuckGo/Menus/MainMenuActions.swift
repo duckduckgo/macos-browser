@@ -475,7 +475,6 @@ extension MainViewController {
 
     @objc func actualSize(_ sender: Any) {
         getActiveTabAndIndex()?.tab.webView.resetZoomLevel()
-        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.openZoomPopover(source: .menu)
     }
 
     @objc func toggleDownloads(_ sender: Any) {

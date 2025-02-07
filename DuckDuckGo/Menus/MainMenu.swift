@@ -766,7 +766,6 @@ final class MainMenu: NSMenu {
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
-            NSMenuItem(title: "Zoom UI popover").submenu(ZoomPopoverDebugMenu())
 
             if #available(macOS 14.4, *) {
                 NSMenuItem.separator()
