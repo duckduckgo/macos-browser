@@ -18,6 +18,7 @@
 
 import AppInfoRetriever
 import Foundation
+import NetworkProtectionIPC
 import NetworkProtectionProxy
 import NetworkProtectionUI
 import PixelKit
@@ -34,13 +35,16 @@ final class DefaultExcludedAppsModel {
     private let appInfoRetriever: AppInfoRetrieving = AppInfoRetriever()
     let proxySettings = TransparentProxySettings(defaults: .netP)
     private let pixelKit: PixelFiring?
+    private let vpnXPCClient: VPNControllerXPCClient
 
-    init(pixelKit: PixelFiring? = PixelKit.shared) {
+    init(vpnXPCClient: VPNControllerXPCClient = VPNControllerXPCClient.shared, pixelKit: PixelFiring? = PixelKit.shared) {
         self.pixelKit = pixelKit
+        self.vpnXPCClient = vpnXPCClient
     }
 }
 
 extension DefaultExcludedAppsModel: ExcludedAppsModel {
+
     var excludedApps: [String] {
         proxySettings.excludedApps
     }
@@ -72,5 +76,16 @@ extension DefaultExcludedAppsModel: ExcludedAppsModel {
     ///
     func getAppInfo(bundleID: String) -> AppInfo {
         appInfoRetriever.getAppInfo(bundleID: bundleID) ?? AppInfo(bundleID: bundleID, name: bundleID, icon: NSImage.window16)
+    }
+
+    func reloadVPN() {
+        Task {
+            // Allow some time for the change to propagate
+            try await Task.sleep(interval: 0.05)
+
+            // We need to allow some time for the setting to propagate
+            // But ultimately this should actually be a user choice
+            try await vpnXPCClient.command(.restartAdapter)
+        }
     }
 }
