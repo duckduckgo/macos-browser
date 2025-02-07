@@ -27,6 +27,9 @@ extension Array {
     }
 
     func chunk(with limit: Int, offset: Int) -> [Element] {
+        guard !isEmpty, offset < count else {
+            return []
+        }
         var endIndex = offset + limit
         if endIndex >= count {
             endIndex = count - 1
