@@ -149,6 +149,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.updateEmptyState(state: self.listModel?.emptyState)
 
                 self.searchField.isEditable = !isEditing
+
+                self.recalculateKeyViewLoop()
             })
         }
     }
@@ -531,6 +533,15 @@ final class PasswordManagementViewController: NSViewController {
         itemContainer.addSubview(view)
         itemContainer.wantsLayer = true
         itemContainer.layer?.masksToBounds = false
+
+        recalculateKeyViewLoop()
+    }
+
+    private func recalculateKeyViewLoop() {
+        // Manually call NSWindow.recalculateKeyViewLoop() after the item view changes so that user can tab between text fields. This is necessary because MainWindow sets autorecalculatesKeyViewLoop to false.
+        DispatchQueue.main.async {
+            self.view.window?.recalculateKeyViewLoop()
+        }
     }
 
     private func doSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
