@@ -23,6 +23,7 @@ import Configuration
 import Combine
 import TrackerRadarKit
 
+// Temporarily disabled because they are flaky in CI
 final class ConfigurationManagerTests: XCTestCase {
     private var operationLog: OperationLog!
     private var configManager: ConfigurationManager!
