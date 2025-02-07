@@ -97,7 +97,8 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     var ranges: [DataModel.HistoryRange] {
         var ranges: [DataModel.HistoryRange] = [.all]
         ranges.append(contentsOf: groupings.map(\.range))
-        ranges.append(.recentlyOpened)
+        // to be implemented
+//        ranges.append(.recentlyOpened)
         return ranges
     }
 

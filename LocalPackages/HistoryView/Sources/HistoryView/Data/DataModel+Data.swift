@@ -144,7 +144,6 @@ extension DataModel {
     }
 
     struct HistoryOpenAction: Codable {
-        let id: String
         let url: String
     }
 }
