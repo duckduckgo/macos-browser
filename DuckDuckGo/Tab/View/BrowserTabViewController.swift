@@ -641,7 +641,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToTabReloading(of tabViewModel: TabViewModel?) {
-        guard let tab = tabViewModel?.tab, tab.content.usesExternalWebView else { return }
+        guard featureFlagger.isFeatureOn(.historyView), let tab = tabViewModel?.tab, tab.content.usesExternalWebView else { return }
 
         tab.reloadPublisher
             .sink { [weak self, weak tabViewModel] in
