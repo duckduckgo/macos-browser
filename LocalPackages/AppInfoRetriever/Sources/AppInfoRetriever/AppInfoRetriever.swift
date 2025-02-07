@@ -19,24 +19,71 @@
 import AppKit
 import Foundation
 
-public protocol AppInfoRetrieveing {
+/// Protocol to provide a mechanism to query information about installed Applications.
+///
+public protocol AppInfoRetrieving {
 
-    /// Provides a structure featuring commonly-used app info.
+    /// Provides a structure featuring commonly-used app info given the Application's bundleID.
     ///
-    /// It's also possible to retrieve the individual information directly by calling other methods in this class.
+    /// - Parameters:
+    ///     - bundleID: the bundleID of the target Application.
     ///
     func getAppInfo(bundleID: String) -> AppInfo?
+
+    /// Provides a structure featuring commonly-used app info, given the Application's URL.
+    ///
+    /// - Parameters:
+    ///     - appURL: the URL where the target Application is installed.
+    ///
     func getAppInfo(appURL: URL) -> AppInfo?
+
+    /// Obtains the icon for a specified application.
+    ///
+    /// - Parameters:
+    ///     - bundleID: the bundleID of the target Application.
+    ///
     func getAppIcon(bundleID: String) -> NSImage?
+
+    /// Obtains the URL for a specified application.
+    ///
+    /// - Parameters:
+    ///     - bundleID: the bundleID of the target Application.
+    ///
+    func getAppURL(bundleID: String) -> URL?
+
+    /// Obtains the visible name for a specified application.
+    ///
+    /// - Parameters:
+    ///     - bundleID: the bundleID of the target Application.
+    ///
     func getAppName(bundleID: String) -> String?
+
+    /// Obtains the bundleID for a specified application.
+    ///
+    /// - Parameters:
+    ///     - appURL: the URL where the target Application is installed.
+    ///
     func getBundleID(appURL: URL) -> String?
 
+    /// Obtains the bundleIDs for all Applications embedded within a speciried application.
+    ///
+    /// - Parameters:
+    ///     - bundleURL: the URL where the parent Application is installed.
+    ///
+    func findEmbeddedBundleIDs(in bundleURL: URL) -> Set<String>
 }
 
-public class AppInfoRetriever: AppInfoRetrieveing {
+/// Provides a mechanism to query information about installed Applications.
+///
+public class AppInfoRetriever: AppInfoRetrieving {
 
     public init() {}
 
+    /// Provides a structure featuring commonly-used app info given the Application's bundleID.
+    ///
+    /// - Parameters:
+    ///     - bundleID: the bundleID of the target Application.
+    ///
     public func getAppInfo(bundleID: String) -> AppInfo? {
         guard let appName = getAppName(bundleID: bundleID) else {
             return nil
@@ -46,6 +93,11 @@ public class AppInfoRetriever: AppInfoRetrieveing {
         return AppInfo(bundleID: bundleID, name: appName, icon: appIcon)
     }
 
+    /// Provides a structure featuring commonly-used app info, given the Application's URL.
+    ///
+    /// - Parameters:
+    ///     - appURL: the URL where the target Application is installed.
+    ///
     public func getAppInfo(appURL: URL) -> AppInfo? {
         guard let bundleID = getBundleID(appURL: appURL) else {
             return nil
@@ -54,6 +106,11 @@ public class AppInfoRetriever: AppInfoRetrieveing {
         return getAppInfo(bundleID: bundleID)
     }
 
+    /// Obtains the icon for a specified application.
+    ///
+    /// - Parameters:
+    ///     - bundleID: the bundleID of the target Application.
+    ///
     public func getAppIcon(bundleID: String) -> NSImage? {
         guard let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
             return nil
@@ -72,6 +129,11 @@ public class AppInfoRetriever: AppInfoRetrieveing {
         return NSImage(contentsOf: iconURL)
     }
 
+    /// Obtains the visible name for a specified application.
+    ///
+    /// - Parameters:
+    ///     - bundleID: the bundleID of the target Application.
+    ///
     public func getAppName(bundleID: String) -> String? {
         if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
             // Try reading from Info.plist
@@ -86,6 +148,20 @@ public class AppInfoRetriever: AppInfoRetrieveing {
         return nil
     }
 
+    /// Obtains the URL for a specified application.
+    ///
+    /// - Parameters:
+    ///     - bundleID: the bundleID of the target Application.
+    ///
+    public func getAppURL(bundleID: String) -> URL? {
+        NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
+    }
+
+    /// Obtains the bundleID for a specified application.
+    ///
+    /// - Parameters:
+    ///     - appURL: the URL where the target Application is installed.
+    ///
     public func getBundleID(appURL: URL) -> String? {
         let infoPlistURL = appURL.appendingPathComponent("Contents/Info.plist")
         if let plist = NSDictionary(contentsOf: infoPlistURL),
@@ -93,5 +169,33 @@ public class AppInfoRetriever: AppInfoRetrieveing {
             return bundleID
         }
         return nil
+    }
+
+    // MARK: - Embedded Bundle IDs
+
+    /// Obtains the bundleIDs for all Applications embedded within a speciried application.
+    ///
+    /// - Parameters:
+    ///     - bundleURL: the URL where the parent Application is installed.
+    ///
+    public func findEmbeddedBundleIDs(in bundleURL: URL) -> Set<String> {
+        var bundleIDs: [String] = []
+        let fileManager = FileManager.default
+
+        guard let enumerator = fileManager.enumerator(at: bundleURL,
+                                                      includingPropertiesForKeys: nil,
+                                                      options: [.skipsHiddenFiles],
+                                                      errorHandler: nil) else {
+            return []
+        }
+
+        for case let fileURL as URL in enumerator where fileURL.pathExtension == "app" {
+            let embeddedBundle = Bundle(url: fileURL)
+            if let bundleID = embeddedBundle?.bundleIdentifier {
+                bundleIDs.append(bundleID)
+            }
+        }
+
+        return Set(bundleIDs)
     }
 }

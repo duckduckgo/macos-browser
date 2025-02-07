@@ -31,7 +31,7 @@ protocol ExcludedAppsModel {
 }
 
 final class DefaultExcludedAppsModel {
-    private let appInfoRetriever: AppInfoRetrieveing = AppInfoRetriever()
+    private let appInfoRetriever: AppInfoRetrieving = AppInfoRetriever()
     let proxySettings = TransparentProxySettings(defaults: .netP)
     private let pixelKit: PixelFiring?
 
