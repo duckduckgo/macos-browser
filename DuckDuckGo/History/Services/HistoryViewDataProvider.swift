@@ -101,9 +101,22 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
         return ranges
     }
 
-    func visits(for query: HistoryView.DataModel.HistoryQueryKind, limit: Int, offset: Int) async -> HistoryView.DataModel.HistoryItemsBatch {
+    func visits(for query: DataModel.HistoryQueryKind, limit: Int, offset: Int) async -> HistoryView.DataModel.HistoryItemsBatch {
+        let items = perform(query)
+        let visits = items.chunk(with: limit, offset: offset)
+        let finished = items.count < limit
+        return DataModel.HistoryItemsBatch(finished: finished, visits: visits)
+    }
+
+    private func perform(_ query: DataModel.HistoryQueryKind) -> [DataModel.HistoryItem] {
+        if let lastQuery, lastQuery.query == query {
+            return lastQuery.items
+        }
+
         let items: [DataModel.HistoryItem] = {
             switch query {
+            case .rangeFilter(.recentlyOpened):
+                return [] // to be implemented
             case .rangeFilter(.all), .searchTerm(""):
                 return visits
             case .rangeFilter(let range):
@@ -114,16 +127,9 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
                 return visits.filter { URL(string: $0.url)?.host == domain }
             }
         }()
-        guard offset >= 0, limit > 0, offset < items.count else {
-            return .init(finished: true, visits: [])
-        }
-        var endIndex = offset + limit
-        var finished = false
-        if endIndex >= items.count {
-            endIndex = items.count - 1
-            finished = true
-        }
-        return DataModel.HistoryItemsBatch(finished: finished, visits: Array(items[offset..<endIndex]))
+
+        lastQuery = .init(query: query, items: items)
+        return items
     }
 
     private let historyGroupingProvider: HistoryGroupingProvider
@@ -131,6 +137,13 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
 
     private var groupings: [HistoryViewGrouping] = []
     private var visits: [DataModel.HistoryItem] = []
+
+    private struct QueryInfo {
+        let query: DataModel.HistoryQueryKind
+        let items: [DataModel.HistoryItem]
+    }
+
+    private var lastQuery: QueryInfo?
 }
 
 extension HistoryView.DataModel.HistoryItem {

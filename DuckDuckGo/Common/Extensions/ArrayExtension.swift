@@ -26,6 +26,14 @@ extension Array {
         }
     }
 
+    func chunk(with limit: Int, offset: Int) -> [Element] {
+        var endIndex = offset + limit
+        if endIndex >= count {
+            endIndex = count - 1
+        }
+        return Array(self[offset ..< endIndex])
+    }
+
     /// Map collection insertion indexes for a filtered collection into a non-filtered collection
     /// Used to skip `stub` or `pendingDeletion` object indices in a full (non-filtered) database
     /// items collection and use insertion indexes of a filtered collection, the one that‘s displaying non-stub, non-deleted items.
