@@ -48,6 +48,21 @@ struct DefaultHistoryViewDateFormatter: HistoryViewDateFormatting {
     }
 }
 
+struct HistoryViewGrouping {
+    let range: DataModel.HistoryRange
+    let visits: [DataModel.HistoryItem]
+
+    init(range: DataModel.HistoryRange, visits: [DataModel.HistoryItem]) {
+        self.range = range
+        self.visits = visits
+    }
+
+    init(_ historyGrouping: HistoryGrouping, dateFormatter: HistoryViewDateFormatting) {
+        range = .init(date: historyGrouping.date, referenceDate: Date())
+        visits = historyGrouping.visits.compactMap { DataModel.HistoryItem($0, dateFormatter: dateFormatter) }
+    }
+}
+
 final class HistoryViewDataProvider: HistoryView.DataProviding {
 
     init(historyGroupingDataSource: HistoryGroupingDataSource, dateFormatter: HistoryViewDateFormatting = DefaultHistoryViewDateFormatter()) {
@@ -56,37 +71,66 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     }
 
     func resetCache() {
-        visits = populateVisits()
+        populateVisits()
     }
 
-    private func populateVisits() -> [DataModel.HistoryItem] {
-        historyGroupingProvider.getVisitGroupings()
-            .flatMap(\.visits)
-            .compactMap { DataModel.HistoryItem($0, dateFormatter: dateFormatter) }
+    private func populateVisits() {
+
+        var groupings = historyGroupingProvider.getVisitGroupings()
+            .map { HistoryViewGrouping($0, dateFormatter: dateFormatter) }
+        var olderVisits = [DataModel.HistoryItem]()
+
+        groupings = groupings.filter { grouping in
+            guard grouping.range != .older else {
+                olderVisits.append(contentsOf: grouping.visits)
+                return false
+            }
+            return true
+        }
+
+        groupings.append(.init(range: .older, visits: olderVisits))
+
+        self.groupings = groupings
+        self.visits = groupings.flatMap(\.visits)
     }
 
     var ranges: [DataModel.HistoryRange] {
-        [.all, .today, .yesterday, .tuesday, .monday, .recentlyOpened]
+        var ranges: [DataModel.HistoryRange] = [.all]
+        ranges.append(contentsOf: groupings.map(\.range))
+        ranges.append(.recentlyOpened)
+        return ranges
     }
 
     func visits(for query: HistoryView.DataModel.HistoryQueryKind, limit: Int, offset: Int) async -> HistoryView.DataModel.HistoryItemsBatch {
-        guard offset >= 0, limit > 0, offset < visits.count else {
+        let items: [DataModel.HistoryItem] = {
+            switch query {
+            case .rangeFilter(.all), .searchTerm(""):
+                return visits
+            case .rangeFilter(let range):
+                return groupings.first(where: { $0.range == range })?.visits ?? []
+            case .searchTerm(let term):
+                return visits.filter { $0.title.contains(term) || $0.url.contains(term) }
+            case .domainFilter(let domain):
+                return visits.filter { URL(string: $0.url)?.host == domain }
+            }
+        }()
+        guard offset >= 0, limit > 0, offset < items.count else {
             return .init(finished: true, visits: [])
         }
         var endIndex = offset + limit
         var finished = false
-        if endIndex >= visits.count {
-            endIndex = visits.count - 1
+        if endIndex >= items.count {
+            endIndex = items.count - 1
             finished = true
         }
-        return DataModel.HistoryItemsBatch(finished: finished, visits: Array(visits[offset..<endIndex]))
+        return DataModel.HistoryItemsBatch(finished: finished, visits: Array(items[offset..<endIndex]))
     }
 
     private let historyGroupingProvider: HistoryGroupingProvider
     private let dateFormatter: HistoryViewDateFormatting
 
-    private var historyGroupings: [HistoryGrouping] = []
-    private lazy var visits: [DataModel.HistoryItem] = self.populateVisits()
+    private var groupings: [HistoryViewGrouping] = []
+    private var visits: [DataModel.HistoryItem] = []
 }
 
 extension HistoryView.DataModel.HistoryItem {
@@ -103,6 +147,60 @@ extension HistoryView.DataModel.HistoryItem {
             dateShort: "",
             dateTimeOfDay: dateFormatter.time(for: visit.date)
         )
+    }
+}
+
+extension HistoryView.DataModel.HistoryRange {
+    init(date: Date, referenceDate: Date) {
+        let calendar = Calendar.autoupdatingCurrent
+        let numberOfDaysSinceReferenceDate = calendar.numberOfDaysBetween(date, and: referenceDate)
+
+        switch numberOfDaysSinceReferenceDate {
+        case 0:
+            self = .today
+            return
+        case 1:
+            self = .yesterday
+            return
+        default:
+            break
+        }
+
+        let referenceWeekday = calendar.component(.weekday, from: referenceDate)
+        let twoDaysAgo = referenceWeekday > 2 ? referenceWeekday - 2 : referenceWeekday + 5
+        let threeDaysAgo = referenceWeekday > 3 ? referenceWeekday - 3 : referenceWeekday + 4
+        let fourDaysAgo = referenceWeekday > 4 ? referenceWeekday - 4 : referenceWeekday + 3
+
+        let weekday = calendar.component(.weekday, from: date)
+        if [twoDaysAgo, threeDaysAgo, fourDaysAgo].contains(weekday),
+           let numberOfDaysSinceReferenceDate, numberOfDaysSinceReferenceDate <= 4,
+           let range = DataModel.HistoryRange(weekday: weekday) {
+
+            self = range
+        } else {
+            self = .older
+        }
+    }
+
+    init?(weekday: Int) {
+        switch weekday {
+        case 1:
+            self = .sunday
+        case 2:
+            self = .monday
+        case 3:
+            self = .tuesday
+        case 4:
+            self = .wednesday
+        case 5:
+            self = .thursday
+        case 6:
+            self = .friday
+        case 7:
+            self = .saturday
+        default:
+            return nil
+        }
     }
 }
 

@@ -41,6 +41,7 @@ public extension DataModel {
         case friday
         case saturday
         case sunday
+        case older
         case recentlyOpened
     }
 
@@ -92,15 +93,15 @@ public extension DataModel {
     }
 
     struct HistoryItem: Codable, Equatable {
-        let id: String
-        let url: String
-        let title: String
+        public let id: String
+        public let url: String
+        public let title: String
 
-        let etldPlusOne: String?
+        public let etldPlusOne: String?
 
-        let dateRelativeDay: String
-        let dateShort: String
-        let dateTimeOfDay: String
+        public let dateRelativeDay: String
+        public let dateShort: String
+        public let dateTimeOfDay: String
 
         public init(id: String, url: String, title: String, etldPlusOne: String?, dateRelativeDay: String, dateShort: String, dateTimeOfDay: String) {
             self.id = id
