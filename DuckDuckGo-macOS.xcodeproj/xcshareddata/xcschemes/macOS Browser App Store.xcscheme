@@ -104,6 +104,9 @@
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
+                  Identifier = "ConfigurationManagerTests">
+               </Test>
+               <Test
                   Identifier = "FireproofingReferenceTests/testFireproofing()">
                </Test>
                <Test

@@ -133,6 +133,9 @@
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
+                  Identifier = "ConfigurationManagerTests">
+               </Test>
+               <Test
                   Identifier = "PixelExperimentTests">
                </Test>
                <Test
