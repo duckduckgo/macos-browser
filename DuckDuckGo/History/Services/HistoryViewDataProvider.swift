@@ -74,11 +74,11 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     }
 
     func resetCache() {
+        lastQuery = nil
         populateVisits()
     }
 
     private func populateVisits() {
-
         var groupings = historyGroupingProvider.getVisitGroupings()
             .compactMap { HistoryViewGrouping($0, dateFormatter: dateFormatter) }
         var olderVisits = [DataModel.HistoryItem]()
@@ -91,7 +91,9 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
             return true
         }
 
-        groupings.append(.init(range: .older, visits: olderVisits))
+        if !olderVisits.isEmpty {
+            groupings.append(.init(range: .older, visits: olderVisits))
+        }
 
         self.groupings = groupings
         self.visits = groupings.flatMap(\.visits)

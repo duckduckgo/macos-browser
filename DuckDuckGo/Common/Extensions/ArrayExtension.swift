@@ -30,10 +30,7 @@ extension Array {
         guard !isEmpty, offset < count else {
             return []
         }
-        var endIndex = offset + limit
-        if endIndex >= count {
-            endIndex = count - 1
-        }
+        let endIndex = Swift.min(offset + limit, count)
         return Array(self[offset ..< endIndex])
     }
 
