@@ -106,8 +106,6 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
         var activityItems = [DomainActivityRef]()
         var activityItemsByDomain = [String: DomainActivityRef]()
 
-        let oneWeekAgo = Date.weekAgo
-
         browsingHistory
             .filter(\.isValidForRecentActivity)
             .sorted(by: { $0.lastVisit > $1.lastVisit })
@@ -129,7 +127,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
                     return newItemRef
                 }()
 
-                activityItem?.activity.addBlockedEntities(historyEntry.blockedTrackingEntities)
+                activityItem?.activity.addBlockedEntities(from: historyEntry)
                 activityItem?.activity.addPage(fromHistory: historyEntry, dateFormatter: Self.relativeTime)
             }
 
@@ -192,16 +190,14 @@ extension NewTabPageDataModel.DomainActivity {
             favicon: favicon,
             favorite: urlFavoriteStatusProvider.isUrlFavorited(url: rootURL),
             trackersFound: historyEntry.trackersFound,
-            trackingStatus: .init(
-                totalCount: Int64(historyEntry.numberOfTrackersBlocked),
-                trackerCompanies: historyEntry.blockedTrackingEntities.map(NewTabPageDataModel.TrackingStatus.TrackerCompany.init)
-            ),
+            trackingStatus: .init(totalCount: 0, trackerCompanies: []), // keep this empty because it's updated separately
             history: []
         )
     }
 
-    mutating func addBlockedEntities(_ entities: Set<String>) {
-        let trackerCompanies = Set(entities.map(NewTabPageDataModel.TrackingStatus.TrackerCompany.init))
+    mutating func addBlockedEntities(from entry: HistoryEntry) {
+        let trackerCompanies = Set(entry.blockedTrackingEntities.filter({ !$0.isEmpty }).map(NewTabPageDataModel.TrackingStatus.TrackerCompany.init))
+        trackingStatus.totalCount += Int64(entry.numberOfTrackersBlocked)
         trackingStatus.trackerCompanies = Array(Set(trackingStatus.trackerCompanies).union(trackerCompanies))
     }
 

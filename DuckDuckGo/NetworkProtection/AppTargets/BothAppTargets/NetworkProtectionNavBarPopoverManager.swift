@@ -56,23 +56,30 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
     let vpnUninstaller: VPNUninstalling
+    private let vpnUIPresenting: VPNUIPresenting
+    private let proxySettings: TransparentProxySettings
 
     @Published
     private var siteInfo: ActiveSiteInfo?
     private let activeSitePublisher: ActiveSiteInfoPublisher
+    private let featureFlagger = NSApp.delegateTyped.featureFlagger
     private var cancellables = Set<AnyCancellable>()
 
     init(ipcClient: VPNControllerXPCClient,
-         vpnUninstaller: VPNUninstalling) {
+         vpnUninstaller: VPNUninstalling,
+         vpnUIPresenting: VPNUIPresenting,
+         proxySettings: TransparentProxySettings = .init(defaults: .netP)) {
 
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller
+        self.vpnUIPresenting = vpnUIPresenting
+        self.proxySettings = proxySettings
 
         let activeDomainPublisher = ActiveDomainPublisher(windowControllersManager: .shared)
 
         activeSitePublisher = ActiveSiteInfoPublisher(
             activeDomainPublisher: activeDomainPublisher.eraseToAnyPublisher(),
-            proxySettings: TransparentProxySettings(defaults: .netP))
+            proxySettings: proxySettings)
 
         subscribeToCurrentSitePublisher()
     }
@@ -85,6 +92,78 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
     var isShown: Bool {
         networkProtectionPopover?.isShown ?? false
+    }
+
+    @MainActor
+    func manageExcludedApps() {
+        vpnUIPresenting.showVPNAppExclusions()
+    }
+
+    @MainActor
+    func manageExcludedSites() {
+        vpnUIPresenting.showVPNDomainExclusions()
+    }
+
+    private func statusViewSubmenu() -> [StatusBarMenu.MenuItem] {
+        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+        let excludedAppsTitle = UserText.vpnStatusViewExcludedAppsMenuItemTitle(proxySettings.excludedApps.count)
+        let excludedWebsitesTitle = UserText.vpnStatusViewExcludedDomainsMenuItemTitle(proxySettings.excludedDomains.count)
+
+        var menuItems = [StatusBarMenu.MenuItem]()
+
+        if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
+            menuItems.append(
+                .text(icon: Image(.settings16), title: UserText.vpnStatusViewVPNSettingsMenuItemTitle, action: {
+                    try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
+                }))
+        }
+
+        menuItems.append(contentsOf: [
+            .text(icon: Image(.window16), title: excludedAppsTitle, action: { [weak self] in
+                self?.manageExcludedApps()
+            }),
+            .text(icon: Image(.globe16), title: excludedWebsitesTitle, action: { [weak self] in
+                self?.manageExcludedSites()
+            }),
+            .divider(),
+            .text(icon: Image(.help16), title: UserText.vpnStatusViewFAQMenuItemTitle, action: {
+                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
+            }),
+            .text(icon: Image(.support16), title: UserText.vpnStatusViewSendFeedbackMenuItemTitle, action: {
+                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+            })
+        ])
+
+        return menuItems
+    }
+
+    /// Only used if the .networkProtectionAppExclusions feature flag is disabled
+    ///
+    private func legacyStatusViewSubmenu() -> [StatusBarMenu.MenuItem] {
+        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+
+        if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
+            return [
+                .text(title: UserText.networkProtectionNavBarStatusViewVPNSettings, action: {
+                    try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
+                }),
+                .text(title: UserText.networkProtectionNavBarStatusViewFAQ, action: {
+                    try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
+                }),
+                .text(title: UserText.networkProtectionNavBarStatusViewSendFeedback, action: {
+                    try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+                })
+            ]
+        } else {
+            return [
+                .text(title: UserText.networkProtectionNavBarStatusViewFAQ, action: {
+                    try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
+                }),
+                .text(title: UserText.networkProtectionNavBarStatusViewSendFeedback, action: {
+                    try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+                })
+            ]
+        }
     }
 
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
@@ -107,9 +186,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             )
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
-            let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
             let vpnURLEventHandler = VPNURLEventHandler()
-            let proxySettings = TransparentProxySettings(defaults: .netP)
             let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
 
             let connectionStatusPublisher = CurrentValuePublisher(
@@ -129,36 +206,15 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                               onboardingStatusPublisher: onboardingStatusPublisher,
                                               statusReporter: statusReporter,
                                               uiActionHandler: uiActionHandler,
-                                              menuItems: {
-                if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
-                    return [
-                        NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewVPNSettings, action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
-                            }),
-                        NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewFAQ, action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
-                            }),
-                        NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewSendFeedback,
-                            action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
-                            })
-                    ]
-                } else {
-                    return [
-                        NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewFAQ, action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
-                            }),
-                        NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewSendFeedback,
-                            action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
-                            })
-                    ]
+                                              menuItems: { [weak self] in
+
+                guard let self else { return [] }
+
+                guard featureFlagger.isFeatureOn(.networkProtectionAppExclusions) else {
+                    return legacyStatusViewSubmenu()
                 }
+
+                return statusViewSubmenu()
             },
                                               agentLoginItem: LoginItem.vpnMenu,
                                               isMenuBarStatusView: false,
@@ -168,7 +224,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
 
-            let featureFlagger = NSApp.delegateTyped.featureFlagger
             let tipsFeatureFlagInitialValue = featureFlagger.isFeatureOn(.networkProtectionUserTips)
             let tipsFeatureFlagPublisher: CurrentValuePublisher<Bool, Never>
 

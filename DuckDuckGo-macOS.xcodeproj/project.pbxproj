@@ -12095,6 +12095,7 @@
 				9F6434622BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
 				843AD3DC2CD389CC00163067 /* XMLNodeExtension.swift in Sources */,
 				7B969B3E2D52A81D004AE4E8 /* VPNUIPresenting.swift in Sources */,
+				3706FC32293F65D500E42796 /* MoreOptionsMenu.swift in Sources */,
 				3706FC34293F65D500E42796 /* PermissionAuthorizationViewController.swift in Sources */,
 				3706FC35293F65D500E42796 /* BookmarkNode.swift in Sources */,
 				B6ABD0CB2BC03F610000EB69 /* SecurityScopedFileURLController.swift in Sources */,
@@ -13258,6 +13259,7 @@
 				4B9DB01D2A983B24000927DB /* Waitlist.swift in Sources */,
 				BB9BDD4A2D09BAA80069E9EF /* TabBarRemoteMessageViewModel.swift in Sources */,
 				3745DE062D536DCF00024FC8 /* HistoryGroupingProvider.swift in Sources */,
+				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				1DA84D2F2C11989D0011C80F /* Update.swift in Sources */,
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,
 				1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */,
@@ -15395,7 +15397,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 236.0.0;
+				version = 236.0.1;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

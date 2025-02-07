@@ -808,7 +808,12 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 #endif
-        setContent(PixelExperiment.cohort == .newOnboarding ? .onboarding : .onboardingDeprecated)
+        if PixelExperiment.cohort == .newOnboarding {
+            Application.appDelegate.onboardingStateMachine.state = .notStarted
+            setContent(.onboarding)
+        } else {
+            setContent(.onboardingDeprecated)
+        }
     }
 
     @MainActor(unsafe)
@@ -1317,7 +1322,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             let additionalParameters = await SystemInfo.pixelParameters()
 #endif
 
-            PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error), withAdditionalParameters: additionalParameters)
+            PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error), frequency: .dailyAndStandard, withAdditionalParameters: additionalParameters)
         }
     }
 

@@ -78,7 +78,7 @@ final class MainViewController: NSViewController {
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, activeRemoteMessageModel: NSApp.delegateTyped.activeRemoteMessageModel)
         bookmarksBarVisibilityManager = BookmarksBarVisibilityManager(selectedTabPublisher: tabCollectionViewModel.$selectedTabViewModel.eraseToAnyPublisher())
 
-        let networkProtectionPopoverManager: NetPPopoverManager = {
+        let networkProtectionPopoverManager: NetPPopoverManager = { @MainActor in
 #if DEBUG
             guard case .normal = NSApp.runType else {
                 return NetPPopoverManagerMock()
@@ -93,7 +93,8 @@ final class MainViewController: NSViewController {
 
             return NetworkProtectionNavBarPopoverManager(
                 ipcClient: vpnXPCClient,
-                vpnUninstaller: vpnUninstaller)
+                vpnUninstaller: vpnUninstaller,
+                vpnUIPresenting: WindowControllersManager.shared)
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
             var connectivityIssuesObserver: ConnectivityIssueObserver!

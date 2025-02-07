@@ -43,6 +43,10 @@ extension NewTabPageDataModel {
         }
     }
 
+    struct Exception: Codable, Equatable {
+        let message: String
+    }
+
     struct NewTabPageConfiguration: Encodable {
         var widgets: [Widget]
         var widgetConfigs: [WidgetConfig]

@@ -28,18 +28,21 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
     private var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
     private var userScript: NewTabPageUserScript!
     private var messageHelper: MessageHelper<NewTabPageConfigurationClient.MessageName>!
+    private var eventMapper: CapturingNewTabPageConfigurationEventHandler!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         sectionsAvailabilityProvider = MockNewTabPageSectionsAvailabilityProvider()
         sectionsVisibilityProvider = MockNewTabPageSectionsVisibilityProvider()
         contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
+        eventMapper = CapturingNewTabPageConfigurationEventHandler()
         client = NewTabPageConfigurationClient(
             sectionsAvailabilityProvider: sectionsAvailabilityProvider,
             sectionsVisibilityProvider: sectionsVisibilityProvider,
             customBackgroundProvider: CapturingNewTabPageCustomBackgroundProvider(),
             contextMenuPresenter: contextMenuPresenter,
-            linkOpener: CapturingNewTabPageLinkOpener()
+            linkOpener: CapturingNewTabPageLinkOpener(),
+            eventMapper: eventMapper
         )
 
         userScript = NewTabPageUserScript()
@@ -158,5 +161,23 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         XCTAssertEqual(sectionsVisibilityProvider.isFavoritesVisible, initialIsFavoritesVisible)
         XCTAssertEqual(sectionsVisibilityProvider.isPrivacyStatsVisible, false)
         XCTAssertEqual(sectionsVisibilityProvider.isRecentActivityVisible, true)
+    }
+
+    // MARK: - reportInitException
+
+    func testThatReportInitExceptionForwardsEventToTheMapper() async throws {
+        let exception = NewTabPageDataModel.Exception(message: "sample message")
+        try await messageHelper.handleMessageExpectingNilResponse(named: .reportInitException, parameters: exception)
+
+        XCTAssertEqual(eventMapper.events, [.newTabPageError(message: "sample message")])
+    }
+
+    // MARK: - reportPageException
+
+    func testThatReportPageExceptionForwardsEventToTheMapper() async throws {
+        let exception = NewTabPageDataModel.Exception(message: "sample message")
+        try await messageHelper.handleMessageExpectingNilResponse(named: .reportPageException, parameters: exception)
+
+        XCTAssertEqual(eventMapper.events, [.newTabPageError(message: "sample message")])
     }
 }

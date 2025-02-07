@@ -42,6 +42,10 @@ public protocol NewTabPageLinkOpening {
     func openLink(_ target: NewTabPageDataModel.OpenAction.Target) async
 }
 
+public enum NewTabPageConfigurationEvent: Equatable {
+    case newTabPageError(message: String)
+}
+
 public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
 
     private var cancellables = Set<AnyCancellable>()
@@ -50,19 +54,22 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
     private let customBackgroundProvider: NewTabPageCustomBackgroundProviding
     private let contextMenuPresenter: NewTabPageContextMenuPresenting
     private let linkOpener: NewTabPageLinkOpening
+    private let eventMapper: EventMapping<NewTabPageConfigurationEvent>?
 
     public init(
         sectionsAvailabilityProvider: NewTabPageSectionsAvailabilityProviding,
         sectionsVisibilityProvider: NewTabPageSectionsVisibilityProviding,
         customBackgroundProvider: NewTabPageCustomBackgroundProviding,
         contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
-        linkOpener: NewTabPageLinkOpening
+        linkOpener: NewTabPageLinkOpening,
+        eventMapper: EventMapping<NewTabPageConfigurationEvent>?
     ) {
         self.sectionsAvailabilityProvider = sectionsAvailabilityProvider
         self.sectionsVisibilityProvider = sectionsVisibilityProvider
         self.customBackgroundProvider = customBackgroundProvider
         self.contextMenuPresenter = contextMenuPresenter
         self.linkOpener = linkOpener
+        self.eventMapper = eventMapper
         super.init()
 
         Publishers.Merge3(
@@ -237,10 +244,11 @@ public final class NewTabPageConfigurationClient: NewTabPageUserScriptClient {
     }
 
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [String: String] else { return nil }
-        let message = params["message"] ?? ""
-        let id = params["id"] ?? ""
-        Logger.general.error("New Tab Page error: \("\(id): \(message)", privacy: .public)")
+        guard let exception: NewTabPageDataModel.Exception = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        eventMapper?.fire(.newTabPageError(message: exception.message))
+        Logger.general.error("New Tab Page error: \("\(exception.message)", privacy: .public)")
         return nil
     }
 }
