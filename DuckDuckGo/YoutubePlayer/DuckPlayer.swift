@@ -246,7 +246,13 @@ final class DuckPlayer {
             return self.encodeUserValues()
         }
     }
-
+    
+    public func handleYoutubeError(params: Any, message: UserScriptMessage) -> Encodable? {
+        print("Youtube Error \(message)");
+        return nil;
+    }
+    
+    
     public func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
         encodeUserValues()
     }

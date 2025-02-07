@@ -43,6 +43,7 @@ final class YoutubePlayerUserScript: NSObject, Subfeature {
         case setUserValues
         case getUserValues
         case initialSetup
+        case reportYouTubeError
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
@@ -56,6 +57,8 @@ final class YoutubePlayerUserScript: NSObject, Subfeature {
             return DuckPlayer.shared.handleSetUserValuesMessage(from: .duckPlayer)
         case .initialSetup:
             return DuckPlayer.shared.initialPlayerSetup(with: webView)
+        case .reportYouTubeError:
+            return DuckPlayer.shared.handleYoutubeError
         default:
             assertionFailure("YoutubePlayerUserScript: Failed to parse User Script message: \(methodName)")
             return nil
