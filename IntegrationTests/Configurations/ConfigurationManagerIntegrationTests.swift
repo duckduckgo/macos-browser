@@ -49,7 +49,7 @@ final class ConfigurationManagerIntegrationTests: XCTestCase {
         // THEN
         var newEtag = ContentBlocking.shared.trackerDataManager.fetchedData?.etag
         XCTAssertNotEqual(etag, newEtag)
-        XCTAssertEqual(newEtag, "\"2ce60c57c3d384f986ccbe2c422aac44\"")
+        XCTAssertEqual(newEtag, "\"5c0f8d8cdcd80e3f26889323dae1dff9\"")
 
         // RESET
         _ = AppConfigurationURLProvider(customPrivacyConfiguration: AppConfigurationURLProvider.Constants.defaultPrivacyConfigurationURL)
