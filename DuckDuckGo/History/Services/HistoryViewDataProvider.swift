@@ -57,8 +57,11 @@ struct HistoryViewGrouping {
         self.visits = visits
     }
 
-    init(_ historyGrouping: HistoryGrouping, dateFormatter: HistoryViewDateFormatting) {
-        range = .init(date: historyGrouping.date, referenceDate: Date())
+    init?(_ historyGrouping: HistoryGrouping, dateFormatter: HistoryViewDateFormatting) {
+        guard let range = DataModel.HistoryRange(date: historyGrouping.date, referenceDate: Date()) else {
+            return nil
+        }
+        self.range = range
         visits = historyGrouping.visits.compactMap { DataModel.HistoryItem($0, dateFormatter: dateFormatter) }
     }
 }
@@ -77,7 +80,7 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     private func populateVisits() {
 
         var groupings = historyGroupingProvider.getVisitGroupings()
-            .map { HistoryViewGrouping($0, dateFormatter: dateFormatter) }
+            .compactMap { HistoryViewGrouping($0, dateFormatter: dateFormatter) }
         var olderVisits = [DataModel.HistoryItem]()
 
         groupings = groupings.filter { grouping in
@@ -136,6 +139,7 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     private let historyGroupingProvider: HistoryGroupingProvider
     private let dateFormatter: HistoryViewDateFormatting
 
+    /// this is to be optimized: https://app.asana.com/0/72649045549333/1209339909309306
     private var groupings: [HistoryViewGrouping] = []
     private var visits: [DataModel.HistoryItem] = []
 
@@ -159,14 +163,28 @@ extension HistoryView.DataModel.HistoryItem {
             domain: historyEntry.url.host ?? historyEntry.url.absoluteString,
             etldPlusOne: historyEntry.etldPlusOne,
             dateRelativeDay: dateFormatter.weekDay(for: visit.date),
-            dateShort: "",
+            dateShort: "", // not in use at the moment
             dateTimeOfDay: dateFormatter.time(for: visit.date)
         )
     }
 }
 
 extension HistoryView.DataModel.HistoryRange {
-    init(date: Date, referenceDate: Date) {
+
+    /**
+     * Initializes HistoryRange based on `date`s proximity to `referenceDate`.
+     *
+     * Possible values are:
+     * - `today`,
+     * - `yesterday`,
+     * - week day name for 2-4 days ago,
+     * - `older`.
+     * - `nil` when `date` is newer than `referenceDate` (which shouldn't happen).
+     */
+    init?(date: Date, referenceDate: Date) {
+        guard referenceDate > date else {
+            return nil
+        }
         let calendar = Calendar.autoupdatingCurrent
         let numberOfDaysSinceReferenceDate = calendar.numberOfDaysBetween(date, and: referenceDate)
 
