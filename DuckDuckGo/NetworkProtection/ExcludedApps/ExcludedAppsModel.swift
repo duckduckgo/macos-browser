@@ -55,6 +55,7 @@ extension DefaultExcludedAppsModel: ExcludedAppsModel {
         }
 
         proxySettings.appRoutingRules[appInfo.bundleID] = .exclude
+        reloadVPN()
         return appInfo
     }
 
@@ -64,6 +65,7 @@ extension DefaultExcludedAppsModel: ExcludedAppsModel {
         }
 
         proxySettings.appRoutingRules.removeValue(forKey: bundleID)
+        reloadVPN()
     }
 
     /// Provides AppInfo for the specified bundleID for the scope of presenting the information to the user.
@@ -81,7 +83,7 @@ extension DefaultExcludedAppsModel: ExcludedAppsModel {
     func reloadVPN() {
         Task {
             // Allow some time for the change to propagate
-            try await Task.sleep(interval: 0.05)
+            try await Task.sleep(interval: 0.1)
 
             // We need to allow some time for the setting to propagate
             // But ultimately this should actually be a user choice
