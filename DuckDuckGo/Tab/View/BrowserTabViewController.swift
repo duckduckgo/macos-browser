@@ -863,6 +863,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .webExtensionUrl:
             removeAllTabContent()
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 if let tab = tabViewModel?.tab,
                    let url = tab.url,
@@ -871,6 +872,7 @@ final class BrowserTabViewController: NSViewController {
                     self.addWebViewToViewHierarchy(webExtensionWebView, tab: tab)
                 }
             }
+#endif
         default:
             removeAllTabContent()
         }

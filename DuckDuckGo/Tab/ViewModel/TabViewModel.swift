@@ -87,9 +87,11 @@ final class TabViewModel {
                 zoomLevelSubject.send(zoomLevel)
             }
 
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 WebExtensionManager.shared.eventsListener.didChangeTabProperties([.zoomFactor], for: tab)
             }
+#endif
         }
     }
 
