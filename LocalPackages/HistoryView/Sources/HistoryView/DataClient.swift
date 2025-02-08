@@ -37,6 +37,7 @@ public enum HistoryViewFilter {
 public protocol DataProviding: AnyObject {
     var ranges: [DataModel.HistoryRange] { get }
 
+    @MainActor
     func resetCache()
 
     func visits(for query: DataModel.HistoryQueryKind, limit: Int, offset: Int) async -> DataModel.HistoryItemsBatch

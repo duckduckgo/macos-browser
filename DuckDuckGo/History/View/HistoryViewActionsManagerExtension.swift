@@ -24,7 +24,7 @@ extension HistoryViewActionsManager {
     convenience init() {
         self.init(scriptClients: [
             DataClient(
-                dataProvider: HistoryViewDataProvider(historyGroupingDataSource: HistoryCoordinator.shared),
+                dataProvider: HistoryViewDataProvider(historyGroupingDataSource: HistoryCoordinator.shared, recentlyClosedCoordinator: RecentlyClosedCoordinator.shared),
                 actionsHandler: HistoryViewActionsHandler()
             )
         ])

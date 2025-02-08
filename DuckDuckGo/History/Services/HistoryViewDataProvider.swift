@@ -68,14 +68,21 @@ struct HistoryViewGrouping {
 
 final class HistoryViewDataProvider: HistoryView.DataProviding {
 
-    init(historyGroupingDataSource: HistoryGroupingDataSource, dateFormatter: HistoryViewDateFormatting = DefaultHistoryViewDateFormatter()) {
-        self.dateFormatter = dateFormatter
+    init(
+        historyGroupingDataSource: HistoryGroupingDataSource,
+        recentlyClosedCoordinator: RecentlyClosedCoordinating,
+        dateFormatter: HistoryViewDateFormatting = DefaultHistoryViewDateFormatter()
+    ) {
         historyGroupingProvider = HistoryGroupingProvider(dataSource: historyGroupingDataSource)
+        self.recentlyClosedCoordinator = recentlyClosedCoordinator
+        self.dateFormatter = dateFormatter
     }
 
+    @MainActor
     func resetCache() {
         lastQuery = nil
         populateVisits()
+        recentlyClosedTabs = recentlyClosedCoordinator.cache.compactMap { $0 as? RecentlyClosedTab }
     }
 
     private func populateVisits() {
@@ -102,8 +109,7 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     var ranges: [DataModel.HistoryRange] {
         var ranges: [DataModel.HistoryRange] = [.all]
         ranges.append(contentsOf: groupings.map(\.range))
-        // to be implemented
-//        ranges.append(.recentlyOpened)
+        ranges.append(.recentlyOpened)
         return ranges
     }
 
@@ -122,7 +128,7 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
         let items: [DataModel.HistoryItem] = {
             switch query {
             case .rangeFilter(.recentlyOpened):
-                return [] // to be implemented
+                return recentlyClosedTabs.compactMap(DataModel.HistoryItem.init)
             case .rangeFilter(.all), .searchTerm(""):
                 return visits
             case .rangeFilter(let range):
@@ -139,11 +145,13 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     }
 
     private let historyGroupingProvider: HistoryGroupingProvider
+    private let recentlyClosedCoordinator: RecentlyClosedCoordinating
     private let dateFormatter: HistoryViewDateFormatting
 
     /// this is to be optimized: https://app.asana.com/0/72649045549333/1209339909309306
     private var groupings: [HistoryViewGrouping] = []
     private var visits: [DataModel.HistoryItem] = []
+    private var recentlyClosedTabs: [RecentlyClosedTab] = []
 
     private struct QueryInfo {
         let query: DataModel.HistoryQueryKind
@@ -168,6 +176,35 @@ extension HistoryView.DataModel.HistoryItem {
             dateShort: "", // not in use at the moment
             dateTimeOfDay: dateFormatter.time(for: visit.date)
         )
+    }
+
+    init?(_ recentlyClosedTab: RecentlyClosedTab) {
+        guard let url = recentlyClosedTab.tabContent.urlForWebView else {
+            return nil
+        }
+        self.init(
+            id: url.absoluteString,
+            url: url.absoluteString,
+            title: recentlyClosedTab.title ?? url.absoluteString,
+            domain: url.host ?? url.absoluteString,
+            etldPlusOne: url.etldPlusOne,
+            dateRelativeDay: "",
+            dateShort: "", // not in use at the moment
+            dateTimeOfDay: ""
+        )
+    }
+}
+
+extension URL {
+    private enum Const {
+        static let wwwPrefix = "www."
+    }
+
+    var etldPlusOne: String? {
+        guard let domain = host else {
+            return nil
+        }
+        return ContentBlocking.shared.tld.eTLDplus1(domain)?.dropping(prefix: Const.wwwPrefix)
     }
 }
 
