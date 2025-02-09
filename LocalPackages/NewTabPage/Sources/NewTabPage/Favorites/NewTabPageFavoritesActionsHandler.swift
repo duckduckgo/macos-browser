@@ -32,6 +32,7 @@ public protocol FavoritesActionsHandling {
     @MainActor func open(_ url: URL, target: LinkOpenTarget)
     @MainActor func addNewFavorite()
     @MainActor func edit(_ favorite: FavoriteType)
+    @MainActor func copyURL(for favorite: FavoriteType)
 
     func removeFavorite(_ favorite: FavoriteType)
     func deleteBookmark(for favorite: FavoriteType)

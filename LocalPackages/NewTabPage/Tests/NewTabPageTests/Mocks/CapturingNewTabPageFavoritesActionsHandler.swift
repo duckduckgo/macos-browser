@@ -45,6 +45,7 @@ final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling
     var openCalls: [OpenCall] = []
     var addNewFavoriteCallCount: Int = 0
     var editCalls: [MockNewTabPageFavorite] = []
+    var copyCalls: [MockNewTabPageFavorite] = []
     var onFaviconMissingCallCount: Int = 0
     var removeFavoriteCalls: [MockNewTabPageFavorite] = []
     var deleteBookmarkCalls: [MockNewTabPageFavorite] = []
@@ -60,6 +61,10 @@ final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling
 
     func edit(_ favorite: MockNewTabPageFavorite) {
         editCalls.append(favorite)
+    }
+
+    func copyURL(for favorite: MockNewTabPageFavorite) {
+        copyCalls.append(favorite)
     }
 
     func removeFavorite(_ favorite: MockNewTabPageFavorite) {

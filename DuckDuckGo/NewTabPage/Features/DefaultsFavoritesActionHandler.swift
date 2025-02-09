@@ -68,6 +68,11 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
         BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: favorite).show(in: window)
     }
 
+    @MainActor
+    func copyURL(for favorite: Bookmark) {
+        favorite.copyUrlToPasteboard()
+    }
+
     func move(_ bookmarkID: String, toIndex index: Int) {
         bookmarkManager.moveFavorites(with: [bookmarkID], toIndex: index) { _ in }
     }

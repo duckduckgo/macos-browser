@@ -21,6 +21,7 @@ import Foundation
 enum UserText {
     static let openInNewTab = NSLocalizedString("open.in.new.tab", value: "Open in New Tab", comment: "Menu item that opens the link in a new tab")
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
+    static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
     static let edit = NSLocalizedString("edit", value: "Edit", comment: "Edit button")
     static let deleteBookmark = NSLocalizedString("delete-bookmark", value: "Delete Bookmark", comment: "Delete Bookmark button")
     static let removeFavorite = NSLocalizedString("remove-favorite", value: "Remove Favorite", comment: "Remove Favorite button")
