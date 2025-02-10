@@ -71,7 +71,6 @@ public struct DefaultActionButtonStyle: ButtonStyle {
             configuration.label
                 .font(.system(size: 13))
                 .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
                 .frame(minWidth: 44)
                 .padding(.top, 2.5)
                 .padding(.bottom, 3)

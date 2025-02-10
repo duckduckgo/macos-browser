@@ -39,18 +39,24 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
          image: NSImage? = nil,
          buttonText: String? = nil,
          buttonAction: (() -> Void)? = nil,
+         secondaryButtonText: String? = nil,
+         secondaryButtonAction: (() -> Void)? = nil,
          shouldShowCloseButton: Bool = false,
          presentMultiline: Bool = false,
          autoDismissDuration: TimeInterval? = Constants.autoDismissDuration,
          onDismiss: (() -> Void)? = nil,
-         onClick: (() -> Void)? = nil) {
+         onClick: (() -> Void)? = nil,
+         alignment: PopoverMessageViewAlignment = .horizontal) {
         self.viewModel = PopoverMessageViewModel(title: title,
                                                  message: message,
                                                  image: image,
                                                  buttonText: buttonText,
                                                  buttonAction: buttonAction,
+                                                 secondaryButtonText: secondaryButtonText,
+                                                 secondaryButtonAction: secondaryButtonAction,
                                                  shouldShowCloseButton: shouldShowCloseButton,
-                                                 shouldPresentMultiline: presentMultiline)
+                                                 shouldPresentMultiline: presentMultiline,
+                                                 alignment: alignment)
         self.onDismiss = onDismiss
         self.autoDismissDuration = autoDismissDuration
         self.onClick = onClick
