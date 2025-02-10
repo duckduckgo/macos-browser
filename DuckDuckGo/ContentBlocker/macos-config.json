@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1738666818938,
+    "version": 1738959898999,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -497,6 +497,18 @@
                     "domain": "bibliotheek.be"
                 },
                 {
+                    "domain": "volcanoteide.com"
+                },
+                {
+                    "domain": "dwaalzin.nu"
+                },
+                {
+                    "domain": "omegawatches.com"
+                },
+                {
+                    "domain": "russafasingluten.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -666,7 +678,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "b59eaa7f6528092315e4eff388f74f3b"
+            "hash": "93c96a1b8fc5f28f95cf31f0d9044bf3"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -703,10 +715,10 @@
                     "state": "enabled"
                 },
                 "partialFormSaves": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
-            "hash": "49fa3fee320aa10b90ba364f22d98285"
+            "hash": "0fb08dee0e98a5a3a907ccbef485f71b"
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
@@ -1573,7 +1585,33 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
+            "features": {
+                "tdsNextExperimentBaseline": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/temp/macos-tds.json",
+                        "treatmentUrl": "v6/temp/macos-tds-b.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            },
+            "hash": "76ec7b96839562e7c53f0829d65d4322"
         },
         "contextualOnboarding": {
             "exceptions": [],
@@ -2523,6 +2561,21 @@
                         ]
                     },
                     {
+                        "domain": "abcnews.go.com",
+                        "rules": [
+                            {
+                                "selector": ".navigation",
+                                "type": "modify-style",
+                                "values": [
+                                    {
+                                        "property": "top",
+                                        "value": "0px"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "domain": "accuweather.com",
                         "rules": [
                             {
@@ -2623,6 +2676,15 @@
                             {
                                 "selector": ".h12container",
                                 "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "autoby.jp",
+                        "rules": [
+                            {
+                                "selector": ".ad-center",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -5420,7 +5482,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "3e451680205a7a8afac59239b3da04d4"
+            "hash": "3c580a906dab85d3be38ec438f413580"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6017,6 +6079,11 @@
             "hash": "fb598c4167ff166d85dd49c701cc5579"
         },
         "history": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "htmlHistoryPage": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -6924,7 +6991,7 @@
                     "alicdn.com": {
                         "rules": [
                             {
-                                "rule": "alicdn.com/g/qwenweb/qwen-webui-fe/0.0.15",
+                                "rule": "alicdn.com/g/qwenweb/qwen-webui-fe/",
                                 "domains": [
                                     "qwenlm.ai"
                                 ]
@@ -10192,7 +10259,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "d47bf4befb860a9fb200a9408b986b04"
+            "hash": "5bec6eef5bd756f392d81b23d0febc50"
         },
         "trackingCookies1p": {
             "settings": {
