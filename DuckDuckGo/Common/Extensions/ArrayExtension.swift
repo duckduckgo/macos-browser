@@ -27,7 +27,7 @@ extension Array {
     }
 
     func chunk(with limit: Int, offset: Int) -> [Element] {
-        guard !isEmpty, offset < count else {
+        guard !isEmpty, limit >= 0, offset >= 0, offset < count else {
             return []
         }
         let endIndex = Swift.min(offset + limit, count)
