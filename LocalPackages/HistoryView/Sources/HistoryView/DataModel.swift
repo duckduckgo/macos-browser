@@ -42,7 +42,6 @@ public enum DataModel {
         case saturday
         case sunday
         case older
-        case recentlyOpened
     }
 
     public enum HistoryQueryKind: Codable, Equatable {

@@ -102,8 +102,6 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
     var ranges: [DataModel.HistoryRange] {
         var ranges: [DataModel.HistoryRange] = [.all]
         ranges.append(contentsOf: groupings.map(\.range))
-        // to be implemented
-//        ranges.append(.recentlyOpened)
         return ranges
     }
 
@@ -121,8 +119,6 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
 
         let items: [DataModel.HistoryItem] = {
             switch query {
-            case .rangeFilter(.recentlyOpened):
-                return [] // to be implemented
             case .rangeFilter(.all), .searchTerm(""):
                 return visits
             case .rangeFilter(let range):

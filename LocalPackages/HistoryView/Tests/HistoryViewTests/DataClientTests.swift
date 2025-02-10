@@ -54,10 +54,10 @@ final class DataClientTests: XCTestCase {
     // MARK: - getRanges
 
     func testThatGetRangesReturnsRangesFromDataProvider() async throws {
-        dataProvider._ranges = [.all, .friday, .recentlyOpened]
+        dataProvider._ranges = [.all, .friday]
         let rangesResponse: DataModel.GetRangesResponse = try await messageHelper.handleMessage(named: .getRanges)
         XCTAssertEqual(dataProvider.rangesCallCount, 1)
-        XCTAssertEqual(rangesResponse.ranges, [.all, .friday, .recentlyOpened])
+        XCTAssertEqual(rangesResponse.ranges, [.all, .friday])
     }
 
     // MARK: - query
