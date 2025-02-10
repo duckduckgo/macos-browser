@@ -129,6 +129,10 @@ extension DataModel {
         }
     }
 
+    struct Exception: Codable, Equatable {
+        let message: String
+    }
+
     struct GetRangesResponse: Codable, Equatable {
         let ranges: [HistoryRange]
     }

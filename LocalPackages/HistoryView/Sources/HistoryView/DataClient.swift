@@ -42,15 +42,21 @@ public protocol DataProviding: AnyObject {
     func visits(for query: DataModel.HistoryQueryKind, limit: Int, offset: Int) async -> DataModel.HistoryItemsBatch
 }
 
+public enum HistoryViewEvent: Equatable {
+    case historyViewError(message: String)
+}
+
 public final class DataClient: HistoryViewUserScriptClient {
 
     private var cancellables = Set<AnyCancellable>()
     private let dataProvider: DataProviding
     private let actionsHandler: ActionsHandling
+    private let errorHandler: EventMapping<HistoryViewEvent>?
 
-    public init(dataProvider: DataProviding, actionsHandler: ActionsHandling) {
+    public init(dataProvider: DataProviding, actionsHandler: ActionsHandling, errorHandler: EventMapping<HistoryViewEvent>?) {
         self.dataProvider = dataProvider
         self.actionsHandler = actionsHandler
+        self.errorHandler = errorHandler
         super.init()
     }
 
@@ -115,10 +121,11 @@ public final class DataClient: HistoryViewUserScriptClient {
     }
 
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [String: String] else { return nil }
-        let message = params["message"] ?? ""
-        let id = params["id"] ?? ""
-        Logger.general.error("New Tab Page error: \("\(id): \(message)", privacy: .public)")
+        guard let exception: DataModel.Exception = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        errorHandler?.fire(.historyViewError(message: exception.message))
+        Logger.general.error("History View error: \("\(exception.message)", privacy: .public)")
         return nil
     }
 }
