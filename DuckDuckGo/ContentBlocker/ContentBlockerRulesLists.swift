@@ -36,7 +36,8 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         if adClickAttribution.isEnabled,
            let tdsRulesIndex = result.firstIndex(where: { $0.name == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName }) {
             let tdsRules = result[tdsRulesIndex]
-            let allowlistedTrackerNames = adClickAttribution.allowlist.map { $0.entity }
+            let allowlist = adClickAttribution.allowlist
+            let allowlistedTrackerNames = allowlist.map { $0.entity }
             let adSplitter = AdClickAttributionRulesSplitter(rulesList: tdsRules, allowlistedTrackerNames: allowlistedTrackerNames)
             if let splitRules = adSplitter.split() {
                 result.remove(at: tdsRulesIndex)

@@ -37,13 +37,13 @@ final class HistoryDebugMenu: NSMenu {
                 representedObject: (10, FakeURLsPool.random10Domains)
             )
             NSMenuItem(
-                title: "Populate 100 history visits each day (10 domains)",
+                title: "Add 100 history visits each day (10 domains)",
                 action: #selector(populateFakeHistory),
                 target: self,
                 representedObject: (100, FakeURLsPool.random10Domains)
             )
             NSMenuItem(
-                title: "Populate 100 history visits each day (200 domains – SLOW!)",
+                title: "Add 100 history visits each day (200 domains – SLOW!)",
                 action: #selector(populateFakeHistory),
                 target: self,
                 representedObject: (100, FakeURLsPool.random200Domains)
@@ -75,7 +75,9 @@ final class HistoryDebugMenu: NSMenu {
                 continue
             }
             let visitDate = Date(timeIntervalSince1970: TimeInterval.random(in: date.startOfDay.timeIntervalSince1970..<date.timeIntervalSince1970))
+            let title = url.host?.split(separator: ".").first.flatMap(String.init) ?? "Test"
             historyCoordinator.addVisit(of: url, at: visitDate)
+            historyCoordinator.updateTitleIfNeeded(title: title, url: url)
             visitsPerDay += 1
             if visitsPerDay >= maxVisitsPerDay {
                 date = date.daysAgo(1)
