@@ -1190,6 +1190,8 @@
 		37598EF82D5A1D5800720EAF /* HistoryViewCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37598EF62D5A1D5500720EAF /* HistoryViewCoordinator.swift */; };
 		37598EFA2D5A278400720EAF /* ArrayExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37598EF92D5A278100720EAF /* ArrayExtensionTests.swift */; };
 		37598EFB2D5A278400720EAF /* ArrayExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37598EF92D5A278100720EAF /* ArrayExtensionTests.swift */; };
+		37598EFD2D5A33DA00720EAF /* HistoryViewCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37598EFC2D5A33D200720EAF /* HistoryViewCoordinatorTests.swift */; };
+		37598EFE2D5A33DA00720EAF /* HistoryViewCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37598EFC2D5A33D200720EAF /* HistoryViewCoordinatorTests.swift */; };
 		376113CC2B29CD5B00E794BB /* CriticalPathsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565E46DF2B2725DD0013AC2A /* CriticalPathsTests.swift */; };
 		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
 		376731822C7E226A00EB097B /* HomePageViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731812C7E226A00EB097B /* HomePageViewBackground.swift */; };
@@ -3825,6 +3827,7 @@
 		37598EF32D5A18FB00720EAF /* HistoryViewPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewPixel.swift; sourceTree = "<group>"; };
 		37598EF62D5A1D5500720EAF /* HistoryViewCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewCoordinator.swift; sourceTree = "<group>"; };
 		37598EF92D5A278100720EAF /* ArrayExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtensionTests.swift; sourceTree = "<group>"; };
+		37598EFC2D5A33D200720EAF /* HistoryViewCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewCoordinatorTests.swift; sourceTree = "<group>"; };
 		376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITests.xcconfig; sourceTree = "<group>"; };
 		376113D42B29CD5B00E794BB /* SyncE2EUITests App Store.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SyncE2EUITests App Store.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITestsAppStore.xcconfig; sourceTree = "<group>"; };
@@ -9291,6 +9294,7 @@
 		AAEC74B02642C48B00C2EFBC /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				37598EFC2D5A33D200720EAF /* HistoryViewCoordinatorTests.swift */,
 				3745DE072D536EF000024FC8 /* HistoryGroupingProviderTests.swift */,
 				AAEC74B52642CC6A00C2EFBC /* HistoryStoringMock.swift */,
 				AAEC74B72642E43800C2EFBC /* HistoryStoreTests.swift */,
@@ -12790,6 +12794,7 @@
 				1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
 				F1F861172C1B25D4005DB446 /* SubscriptionUIHandlerMock.swift in Sources */,
 				317295D52AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */,
+				37598EFD2D5A33DA00720EAF /* HistoryViewCoordinatorTests.swift in Sources */,
 				3706FE49293F661700E42796 /* BookmarkNodePathTests.swift in Sources */,
 				1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */,
 				3706FE4A293F661700E42796 /* BookmarkManagedObjectTests.swift in Sources */,
@@ -14329,6 +14334,7 @@
 				B6619F062B17138D00CD9186 /* DataImportSourceViewModelTests.swift in Sources */,
 				4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
+				37598EFE2D5A33DA00720EAF /* HistoryViewCoordinatorTests.swift in Sources */,
 				9F982F132B822B7B00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift in Sources */,
 				B630E7FE29C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */,
 				370270C02C78EB13002E44E4 /* HomePageSettingsModelTests.swift in Sources */,
