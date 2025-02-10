@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "DDGInstall-Mac-128.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
