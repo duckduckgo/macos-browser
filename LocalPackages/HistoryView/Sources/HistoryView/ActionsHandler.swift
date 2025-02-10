@@ -1,5 +1,5 @@
 //
-//  HistoryViewDataModel+Configuration.swift
+//  ActionsHandler.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -18,15 +18,6 @@
 
 import Foundation
 
-extension HistoryViewDataModel {
-
-    struct HistoryViewConfiguration: Encodable {
-        var env: String
-        var locale: String
-        var platform: Platform
-
-        struct Platform: Encodable, Equatable {
-            var name: String
-        }
-    }
+public protocol ActionsHandling {
+    @MainActor func open(_ url: URL)
 }

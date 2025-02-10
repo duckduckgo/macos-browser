@@ -30,6 +30,11 @@ protocol HistoryGroupingDataSource: AnyObject {
     var history: BrowsingHistory? { get }
 }
 
+struct HistoryGrouping {
+    let date: Date
+    let visits: [Visit]
+}
+
 extension HistoryCoordinator: HistoryGroupingDataSource {}
 
 /**
@@ -59,10 +64,10 @@ final class HistoryGroupingProvider {
     /**
      * Returns history visits bucketed per day.
      */
-    func getVisitGroupings() -> [HistoryMenu.HistoryGrouping] {
+    func getVisitGroupings() -> [HistoryGrouping] {
         Dictionary(grouping: getSortedArrayOfVisits(), by: \.date.startOfDay)
             .map { date, sortedVisits in
-                HistoryMenu.HistoryGrouping(date: date, visits: removeDuplicatesIfNeeded(from: sortedVisits))
+                HistoryGrouping(date: date, visits: removeDuplicatesIfNeeded(from: sortedVisits))
             }
             .sorted { $0.date > $1.date }
     }

@@ -33,7 +33,7 @@ final class TabViewModel {
         static let burnerHome = NSImage.burnerTabFavicon
         static let settings = NSImage.settingsMulticolor16
         static let bookmarks = NSImage.bookmarksFolder
-        static let history = NSImage.bookmarksFolder // temporary
+        static let history = NSImage.historyFavicon
         static let emailProtection = NSImage.emailProtectionIcon
         static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
         static let subscription = NSImage.privacyPro
@@ -615,7 +615,7 @@ private extension NSAttributedString {
                                                                            title: UserText.settings)
     static let bookmarksTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
                                                                             title: UserText.bookmarks)
-    static let historyTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
+    static let historyTrustedIndicator = trustedIndicatorAttributedString(with: .historyFavicon,
                                                                           title: UserText.mainMenuHistory)
     static let dbpTrustedIndicator = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
                                                                       title: UserText.tabDataBrokerProtectionTitle)

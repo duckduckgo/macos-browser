@@ -187,7 +187,7 @@ extension TabContent {
 
     var isDisplayable: Bool {
         switch self {
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .identityTheftRestoration, .releaseNotes:
+        case .settings, .bookmarks, .history, .dataBrokerProtection, .subscription, .identityTheftRestoration, .releaseNotes:
             return true
         default:
             return false
@@ -199,6 +199,8 @@ extension TabContent {
         case (.settings, .settings):
             return true
         case (.bookmarks, .bookmarks):
+            return true
+        case (.history, .history):
             return true
         case (.dataBrokerProtection, .dataBrokerProtection):
             return true
@@ -311,6 +313,15 @@ extension TabContent {
 
     var displaysContentInWebView: Bool {
         isUrl
+    }
+
+    var usesExternalWebView: Bool {
+        switch self {
+        case .newtab, .history:
+            return true
+        default:
+            return false
+        }
     }
 
     var canBeDuplicated: Bool {
