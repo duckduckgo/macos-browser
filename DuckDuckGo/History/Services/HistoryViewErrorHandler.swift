@@ -35,4 +35,3 @@ final class HistoryViewErrorHandler: EventMapping<HistoryViewEvent> {
         fatalError("Use init()")
     }
 }
-
