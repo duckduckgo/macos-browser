@@ -62,8 +62,12 @@ final class HistoryWebViewModel: NSObject {
 }
 
 extension HistoryWebViewModel: WKNavigationDelegate {
+    /// Allow loading all URLs with `duck` scheme and `history` host.
+    /// Deny all other URLs.
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-        navigationAction.request.url == .history ? .allow : .cancel
+        let isDuckScheme = navigationAction.request.url?.isDuckURLScheme == true
+        let isHistoryHost = navigationAction.request.url?.host == URL.history.host
+        return (isDuckScheme && isHistoryHost) ? .allow : .cancel
     }
 }
 
