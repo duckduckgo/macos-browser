@@ -22,11 +22,9 @@ import Subscription
 
 final public class DataBrokerAuthenticationManagerBuilder {
 
-    static func buildAuthenticationManager(redeemUseCase: RedeemUseCase = RedeemUseCase(),
-                                           subscriptionManager: SubscriptionManager) -> DataBrokerProtectionAuthenticationManager {
+    static func buildAuthenticationManager(subscriptionManager: SubscriptionManager) -> DataBrokerProtectionAuthenticationManager {
         let subscriptionManager = DataBrokerProtectionSubscriptionManager(subscriptionManager: subscriptionManager)
-        return DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                         subscriptionManager: subscriptionManager)
+        return DataBrokerProtectionAuthenticationManager(subscriptionManager: subscriptionManager)
 
     }
 }

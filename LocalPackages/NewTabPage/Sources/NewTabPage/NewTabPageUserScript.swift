@@ -66,14 +66,12 @@ extension NewTabPageUserScript {
         struct Animation: Codable, Equatable {
             let kind: AnimationKind
 
-            static let none = Animation(kind: .none)
+            static let noAnimation = Animation(kind: .none)
             static let viewTransitions = Animation(kind: .viewTransitions)
-            static let auto = Animation(kind: .auto)
 
             enum AnimationKind: String, Codable {
                 case none
                 case viewTransitions = "view-transitions"
-                case auto = "auto-animate"
             }
         }
     }

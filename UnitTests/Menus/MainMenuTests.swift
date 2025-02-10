@@ -271,13 +271,11 @@ private class DummyFeatureFlagger: FeatureFlagger {
         return nil
     }
 
-    func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
+    func resolveCohort<Flag>(for featureFlag: Flag, allowOverride: Bool) -> (any FeatureFlagCohortDescribing)? where Flag: FeatureFlagDescribing {
         return nil
     }
 
-    func getAllActiveExperiments() -> Experiments {
-        return [:]
-    }
+    var allActiveExperiments: Experiments = [:]
 }
 
 private class DummyAIChatConfig: AIChatMenuVisibilityConfigurable {

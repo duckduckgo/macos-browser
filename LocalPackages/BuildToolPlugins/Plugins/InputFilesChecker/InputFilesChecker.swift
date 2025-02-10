@@ -20,7 +20,21 @@ import Foundation
 import PackagePlugin
 import XcodeProjectPlugin
 
-let nonSandboxedExtraInputFiles: Set<InputFile> = [
+let extensionsInputFiles: [InputFile] = [
+    .init("WebExtensionsDebugMenu.swift", .source),
+    .init("WebExtensionManager.swift", .source),
+    .init("WebExtensionPathsCache.swift", .source),
+    .init("WebExtensionLoader.swift", .source),
+    .init("WebExtensionEventsListener.swift", .source),
+    .init("WebExtensionInternalSiteNavigationDelegate.swift", .source),
+    .init("WebExtensionInternalSiteHandler.swift", .source),
+    .init("NativeMessagingHandler.swift", .source),
+    .init("NativeMessagingConnection.swift", .source),
+    .init("WKWebExtensionTab.swift", .source),
+    .init("WKWebExtensionWindow.swift", .source)
+]
+
+let nonSandboxedExtraInputFiles: Set<InputFile> = Set([
     .init("BWEncryption.m", .source),
     .init("BWEncryptionOutput.m", .source),
     .init("BWManager.swift", .source),
@@ -30,7 +44,7 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("DuckDuckGo VPN.app", .unknown),
     .init("DuckDuckGo Notifications.app", .unknown),
     .init("DuckDuckGo Personal Information Removal.app", .unknown)
-]
+] + extensionsInputFiles)
 
 /**
  * This dictionary keeps track of input files that are not present in all targets.
@@ -51,7 +65,10 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
-        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
+        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source),
+        .init("WebExtensionManagerTests.swift", .source),
+        .init("WebExtensionPathsCacheMock.swift", .source),
+        .init("WebExtensionLoaderMock.swift", .source)
     ],
 
     "Integration Tests": []

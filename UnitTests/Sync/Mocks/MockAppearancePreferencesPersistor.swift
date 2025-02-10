@@ -46,6 +46,8 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var isRecentActivityVisible: Bool = true
 
+    var isPrivacyStatsVisible: Bool = false
+
     var isSearchBarVisible: Bool = true
 
     var showBookmarksBar: Bool = false

@@ -18,17 +18,21 @@
 
 import Foundation
 
+public enum AuthenticationError: Error, Equatable {
+    case noInviteCode
+    case cantGenerateURL
+    case noAuthToken
+    case issueRedeemingInviteCode(error: String)
+}
+
 public protocol DataBrokerProtectionAuthenticationManaging {
     var isUserAuthenticated: Bool { get }
     var accessToken: String? { get }
     func hasValidEntitlement() async throws -> Bool
-    func shouldAskForInviteCode() -> Bool
-    func redeem(inviteCode: String) async throws
     func getAuthHeader() -> String?
 }
 
 public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtectionAuthenticationManaging {
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let subscriptionManager: DataBrokerProtectionSubscriptionManaging
 
     public var isUserAuthenticated: Bool {
@@ -39,9 +43,7 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
         subscriptionManager.accessToken
     }
 
-    public init(redeemUseCase: any DataBrokerProtectionRedeemUseCase,
-                subscriptionManager: any DataBrokerProtectionSubscriptionManaging) {
-        self.redeemUseCase = redeemUseCase
+    public init(subscriptionManager: any DataBrokerProtectionSubscriptionManaging) {
         self.subscriptionManager = subscriptionManager
     }
 
@@ -51,19 +53,5 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
 
     public func getAuthHeader() -> String? {
         ServicesAuthHeaderBuilder().getAuthHeader(accessToken)
-    }
-
-    // MARK: - Redeem code flow
-
-    // We might want the ability to ask for invite code later on, keeping this here to make things easier
-    // https://app.asana.com/0/1204167627774280/1207270521849479/f
-
-    public func shouldAskForInviteCode() -> Bool {
-        // redeemUseCase.shouldAskForInviteCode()
-        return false
-    }
-
-    public func redeem(inviteCode: String) async throws {
-        // await redeemUseCase.redeem(inviteCode: inviteCode)
     }
 }

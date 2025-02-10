@@ -382,7 +382,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     public var session: NETunnelProviderSession? {
         get async {
-            guard let manager = internalManager,
+            guard let manager = await manager,
                   let session = manager.connection as? NETunnelProviderSession else {
 
                 // The active connection is not running, so there's no session, this is acceptable
@@ -594,10 +594,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 PixelKit.fire(
                     NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .legacyDailyAndCount, includeAppVersionParameter: true
                 )
-            }
-
-            if await isConnected {
-                await stop()
             }
 
             // Always keep the first error message shown, as it's the more actionable one.

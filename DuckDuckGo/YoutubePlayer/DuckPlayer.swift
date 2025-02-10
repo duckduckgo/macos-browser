@@ -21,6 +21,7 @@ import Common
 import Combine
 import Foundation
 import Navigation
+import NewTabPage
 import WebKit
 import UserScript
 import PixelKit
@@ -391,22 +392,29 @@ extension DuckPlayer {
     }
 
     func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
-        guard isAvailable, mode != .disabled else {
+        title(forHistoryItemWithTitle: page.actualTitle, url: page.url)
+    }
+
+    func title(for historyEntry: NewTabPageDataModel.HistoryEntry) -> String? {
+        title(forHistoryItemWithTitle: historyEntry.title, url: historyEntry.url.url)
+    }
+
+    func title(forHistoryItemWithTitle title: String?, url: URL?) -> String? {
+        guard isAvailable, mode != .disabled, let url else {
             return nil
         }
 
-        guard page.url.isDuckPlayer else {
+        guard url.isDuckPlayer else {
             return nil
         }
 
         // Private Player page titles are "Duck Player - <YouTube video title>".
         // Extract YouTube video title or fall back to the video ID.
-        guard let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
-            return page.url.youtubeVideoID
+        guard let title, title.starts(with: Self.websiteTitlePrefix) else {
+            return url.youtubeVideoID
         }
-        return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
+        return title.dropping(prefix: Self.websiteTitlePrefix)
     }
-
 }
 
 #if DEBUG

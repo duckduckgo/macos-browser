@@ -105,8 +105,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case importDataInitial
 
     // New Tab section removed
-    case favoriteSectionHidden
-    case recentActivitySectionHidden
     case continueSetUpSectionHidden
 
     // Fire Button
@@ -146,9 +144,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerYouTubeOverlayNavigationOutsideYoutube
     case duckPlayerYouTubeOverlayNavigationClosed
     case duckPlayerYouTubeNavigationIdle30
-
-    // Temporary Home Page Pixels
-    case privacyFeedHistoryLinkOpened
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -475,6 +470,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case siteNotWorkingShown
     case siteNotWorkingWebsiteIsBroken
 
+    // Enhanced statistics
+    case usageSegments
+
     var name: String {
         switch self {
         case .crash:
@@ -630,10 +628,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_import-data_initial"
         case .newTabInitial:
             return "m_mac_new-tab-opened_initial"
-        case .favoriteSectionHidden:
-            return "m_mac_favorite-section-hidden"
-        case .recentActivitySectionHidden:
-            return "m_mac_recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac_continue-setup-section-hidden"
 
@@ -705,9 +699,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_youtube_overlay_navigation_closed"
         case .duckPlayerYouTubeNavigationIdle30:
             return "duckplayer_youtube_overlay_idle-30"
-
-        case .privacyFeedHistoryLinkOpened:
-            return "privacy_feed_history_link_opened"
 
         case .dashboardProtectionAllowlistAdd:
             return "mp_wla"
@@ -1168,6 +1159,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
+
+            // Enhanced statistics
+        case .usageSegments: return "retention_segments"
         }
     }
 

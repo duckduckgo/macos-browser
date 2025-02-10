@@ -63,14 +63,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     func testWhenFavoritesViewIsExpandedThenGetConfigReturnsExpandedState() async throws {
         favoritesModel.isViewExpanded = true
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .viewTransitions)
         XCTAssertEqual(config.expansion, .expanded)
     }
 
     func testWhenFavoritesViewIsCollapsedThenGetConfigReturnsCollapsedState() async throws {
         favoritesModel.isViewExpanded = false
         let config: NewTabPageUserScript.WidgetConfig = try await messageHelper.handleMessage(named: .getConfig)
-        XCTAssertEqual(config.animation, .auto)
+        XCTAssertEqual(config.animation, .viewTransitions)
         XCTAssertEqual(config.expansion, .collapsed)
     }
 
@@ -78,14 +78,14 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
     func testWhenSetConfigContainsExpandedStateThenFavoritesModelSettingIsSetToExpanded() async throws {
         favoritesModel.isViewExpanded = false
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .expanded)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: .expanded)
         try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(favoritesModel.isViewExpanded, true)
     }
 
     func testWhenSetConfigContainsCollapsedStateThenFavoritesModelSettingIsSetToCollapsed() async throws {
         favoritesModel.isViewExpanded = true
-        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .collapsed)
+        let config = NewTabPageUserScript.WidgetConfig(animation: .noAnimation, expansion: .collapsed)
         try await messageHelper.handleMessageExpectingNilResponse(named: .setConfig, parameters: config)
         XCTAssertEqual(favoritesModel.isViewExpanded, false)
     }

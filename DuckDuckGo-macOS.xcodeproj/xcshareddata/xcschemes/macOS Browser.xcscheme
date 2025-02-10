@@ -181,6 +181,9 @@
                   Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
                </Test>
                <Test
+                  Identifier = "ConfigurationManagerIntegrationTests/testTdsAreFetchedFromURLBasedOnPrivacyConfigExperiment()">
+               </Test>
+               <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test

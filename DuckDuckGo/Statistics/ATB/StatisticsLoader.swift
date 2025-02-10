@@ -33,6 +33,7 @@ final class StatisticsLoader {
     private let statisticsStore: StatisticsStore
     private let emailManager: EmailManager
     private let attributionPixelHandler: InstallationAttributionsPixelHandler
+    private let usageSegmentation: UsageSegmenting
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
     private let fireSearchExperimentPixels: () -> Void
@@ -42,12 +43,14 @@ final class StatisticsLoader {
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         emailManager: EmailManager = EmailManager(),
         attributionPixelHandler: InstallationAttributionsPixelHandler = AppInstallationAttributionPixelHandler(),
+        usageSegmentation: UsageSegmenting = UsageSegmentation(pixelEvents: UsageSegmentation.pixelEvents),
         fireAppRetentionExperimentPixels: @escaping () -> Void = PixelKit.fireAppRetentionExperimentPixels,
         fireSearchExperimentPixels: @escaping () -> Void = PixelKit.fireSearchExperimentPixels
     ) {
         self.statisticsStore = statisticsStore
         self.emailManager = emailManager
         self.attributionPixelHandler = attributionPixelHandler
+        self.usageSegmentation = usageSegmentation
         self.fireSearchExperimentPixels = fireSearchExperimentPixels
         self.fireAppRetentionExperimentPixels = fireAppRetentionExperimentPixels
     }
@@ -154,7 +157,10 @@ final class StatisticsLoader {
         guard let atbWithVariant = statisticsStore.atbWithVariant,
               let searchRetentionAtb = statisticsStore.searchRetentionAtb ?? statisticsStore.atb
         else {
-            requestInstallStatistics(completion: completion)
+            requestInstallStatistics {
+                self.updateUsageSegmentationAfterInstall(activityType: .search)
+                completion()
+            }
             return
         }
 
@@ -175,6 +181,7 @@ final class StatisticsLoader {
             if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                 self.statisticsStore.searchRetentionAtb = atb.version
                 self.storeUpdateVersionIfPresent(atb)
+                self.updateUsageSegmentationWithAtb(atb, activityType: .search)
                 NotificationCenter.default.post(name: .searchDAU, object: nil, userInfo: nil)
             }
 
@@ -189,7 +196,10 @@ final class StatisticsLoader {
               let atbWithVariant = statisticsStore.atbWithVariant,
               let appRetentionAtb = statisticsStore.appRetentionAtb ?? statisticsStore.atb
         else {
-            requestInstallStatistics(completion: completion)
+            requestInstallStatistics {
+                self.updateUsageSegmentationAfterInstall(activityType: .appUse)
+                completion()
+            }
             return
         }
 
@@ -215,6 +225,7 @@ final class StatisticsLoader {
                 self.statisticsStore.appRetentionAtb = atb.version
                 self.statisticsStore.lastAppRetentionRequestDate = Date()
                 self.storeUpdateVersionIfPresent(atb)
+                self.updateUsageSegmentationWithAtb(atb, activityType: .appUse)
             }
 
             completion()
@@ -249,4 +260,38 @@ final class StatisticsLoader {
         }
     }
 
+    // MARK: - Usage segmentation
+
+    private func processUsageSegmentation(atb: Atb?, activityType: UsageActivityType) {
+        guard let installAtbValue = statisticsStore.atb else { return }
+        let installAtb = Atb(version: installAtbValue + (statisticsStore.variant ?? ""), updateVersion: nil)
+        let usageAtb = atb ?? installAtb
+
+        self.usageSegmentation.processATB(usageAtb, withInstallAtb: installAtb, andActivityType: activityType)
+    }
+
+    private func updateUsageSegmentationWithAtb(_ atb: Atb, activityType: UsageActivityType) {
+        processUsageSegmentation(atb: atb, activityType: activityType)
+    }
+
+    private func updateUsageSegmentationAfterInstall(activityType: UsageActivityType) {
+        processUsageSegmentation(atb: nil, activityType: activityType)
+    }
+
+}
+
+extension UsageSegmentation {
+
+    static let pixelEvents: EventMapping<UsageSegmentationPixel> = .init { event, _, params, _ in
+        switch event {
+        case .usageSegments:
+            guard let params = params else {
+                assertionFailure("Missing pixel parameters")
+                return
+            }
+
+            PixelKit.fire(GeneralPixel.usageSegments,
+                          withAdditionalParameters: params)
+        }
+    }
 }

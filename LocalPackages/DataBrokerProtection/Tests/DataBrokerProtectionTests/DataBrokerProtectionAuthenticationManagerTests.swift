@@ -21,25 +21,21 @@ import XCTest
 
 class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     var authenticationManager: DataBrokerProtectionAuthenticationManager!
-    var redeemUseCase: DataBrokerProtectionRedeemUseCase!
     var subscriptionManager: MockDataBrokerProtectionSubscriptionManaging!
 
     override func setUp() async throws {
-        redeemUseCase = MockRedeemUseCase()
         subscriptionManager = MockDataBrokerProtectionSubscriptionManaging()
     }
 
     override func tearDown() async throws {
         authenticationManager = nil
-        redeemUseCase = nil
         subscriptionManager = nil
     }
 
     func testUserNotAuthenticatedWhenSubscriptionManagerReturnsFalse() {
         subscriptionManager.userAuthenticatedValue = false
 
-        authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                          subscriptionManager: subscriptionManager)
+        authenticationManager = DataBrokerProtectionAuthenticationManager(subscriptionManager: subscriptionManager)
 
         XCTAssertEqual(authenticationManager.isUserAuthenticated, false)
     }
@@ -47,8 +43,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     func testEmptyAccessTokenResultsInNilAuthHeader() {
         subscriptionManager.accessTokenValue = nil
 
-        authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                          subscriptionManager: subscriptionManager)
+        authenticationManager = DataBrokerProtectionAuthenticationManager(subscriptionManager: subscriptionManager)
 
         XCTAssertNil(authenticationManager.getAuthHeader())
     }
@@ -56,8 +51,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     func testUserAuthenticatedWhenSubscriptionManagerReturnsTrue() {
         subscriptionManager.userAuthenticatedValue = true
 
-        authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                          subscriptionManager: subscriptionManager)
+        authenticationManager = DataBrokerProtectionAuthenticationManager(subscriptionManager: subscriptionManager)
 
         XCTAssertEqual(authenticationManager.isUserAuthenticated, true)
     }
@@ -66,8 +60,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
         let accessToken = "validAccessToken"
         subscriptionManager.accessTokenValue = accessToken
 
-        authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                          subscriptionManager: subscriptionManager)
+        authenticationManager = DataBrokerProtectionAuthenticationManager(subscriptionManager: subscriptionManager)
 
         XCTAssertNotNil(authenticationManager.getAuthHeader())
     }
@@ -75,8 +68,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     func testValidEntitlementCheckWithSuccess() async {
         subscriptionManager.entitlementResultValue = true
 
-        authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                          subscriptionManager: subscriptionManager)
+        authenticationManager = DataBrokerProtectionAuthenticationManager(subscriptionManager: subscriptionManager)
         do {
             let result = try await authenticationManager.hasValidEntitlement()
             XCTAssertTrue(result, "Entitlement check should return true for valid entitlement")
@@ -88,8 +80,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     func testValidEntitlementCheckWithSuccessFalse() async {
         subscriptionManager.entitlementResultValue = false
 
-        authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                          subscriptionManager: subscriptionManager)
+        authenticationManager = DataBrokerProtectionAuthenticationManager(subscriptionManager: subscriptionManager)
 
         do {
             let result = try await authenticationManager.hasValidEntitlement()
@@ -103,8 +94,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
         let mockError = NSError(domain: "TestErrorDomain", code: 123, userInfo: nil)
         subscriptionManager.entitlementError = mockError
 
-        authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                          subscriptionManager: subscriptionManager)
+        authenticationManager = DataBrokerProtectionAuthenticationManager(subscriptionManager: subscriptionManager)
 
         do {
             _ = try await authenticationManager.hasValidEntitlement()

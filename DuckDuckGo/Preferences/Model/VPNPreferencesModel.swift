@@ -275,30 +275,12 @@ final class VPNPreferencesModel: ObservableObject {
 
     @MainActor
     func manageExcludedApps() {
-        let windowController = ExcludedAppsViewController.create().wrappedInWindowController()
-
-        guard let window = windowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("DataClearingPreferences: Failed to present ExcludedAppsViewController")
-            return
-        }
-
-        parentWindowController.window?.beginSheet(window)
+        WindowControllersManager.shared.showVPNAppExclusions()
     }
 
     @MainActor
     func manageExcludedSites() {
-        let windowController = ExcludedDomainsViewController.create().wrappedInWindowController()
-
-        guard let window = windowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("DataClearingPreferences: Failed to present ExcludedDomainsViewController")
-            return
-        }
-
-        parentWindowController.window?.beginSheet(window)
+        WindowControllersManager.shared.showVPNDomainExclusions()
     }
 }
 

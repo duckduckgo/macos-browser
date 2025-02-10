@@ -35,31 +35,26 @@ protocol DataBrokerProtectionBackendServicePixels {
 final class DefaultDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBackendServicePixels {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let settings: DataBrokerProtectionSettings
-    private let authRepository: AuthenticationRepository
 
     init(pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
-         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
-         authRepository: AuthenticationRepository = KeychainAuthenticationData()) {
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
         self.pixelHandler = pixelHandler
         self.settings = settings
-        self.authRepository = authRepository
     }
 
     func fireGenerateEmailHTTPError(statusCode: Int) {
         let environment = settings.selectedEnvironment.rawValue
-        let wasOnWaitlist = authRepository.getWaitlistTimestamp() != nil
 
         pixelHandler.fire(.generateEmailHTTPErrorDaily(statusCode: statusCode,
                                                        environment: environment,
-                                                       wasOnWaitlist: wasOnWaitlist))
+                                                       wasOnWaitlist: false))
     }
 
     func fireEmptyAccessToken(callSite: BackendServiceCallSite) {
         let environment = settings.selectedEnvironment.rawValue
-        let wasOnWaitlist = authRepository.getWaitlistTimestamp() != nil
 
         pixelHandler.fire(.emptyAccessTokenDaily(environment: environment,
-                                                 wasOnWaitlist: wasOnWaitlist,
+                                                 wasOnWaitlist: false,
                                                  callSite: callSite))
     }
 }

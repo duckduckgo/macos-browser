@@ -448,7 +448,7 @@ struct UserText {
 
     static let downloadsOpenPopupOnCompletion = NSLocalizedString("downloads.open.on.completion", value: "Automatically open the Downloads panel when downloads complete", comment: "Checkbox to open a Download Manager popover when downloads are completed")
 
-    static let maliciousSiteDetectionHeader = NSLocalizedString("phishing-detection.enabled.header", value: "Malicious Site Protection", comment: "Header for phishing site protection section in the settings page")
+    static let maliciousSiteDetectionHeader = NSLocalizedString("phishing-detection.enabled.header", value: "Site Safety Warnings", comment: "Header for phishing site protection section in the settings page")
     static let maliciousSiteDetectionIsEnabled = NSLocalizedString("phishing-detection.enabled.checkbox", value: "Warn me on sites flagged for phishing or malware.", comment: "Checkbox that enables or disables the phishing and malware detection feature in the browser")
     static let maliciousDetectionEnabledWarning = NSLocalizedString("phishing-detection.enabled.warning", value: "Disabling this feature can put your personal information at risk.", comment: "A description box to warn users away from disabling the phishing and malware protection feature")
 
@@ -1184,6 +1184,8 @@ struct UserText {
 
     // Recent Activity
     static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")
+    static let newTabPrivacyStatsSectionTitle = NSLocalizedString("newTab.privacy.stats.section.title", value: "Protection Stats", comment: "Title of the Privacy Stats section in the home page")
+    static let justNow = NSLocalizedString("newTab.recent.activity.just.now", value: "Just now", comment: "Relative timestamp for a URL that was last visited within recent 60 seconds")
     static let burnerWindowHeader = NSLocalizedString("burner.window.header", value: "Fire Window", comment: "Header shown on the hompage of the Fire Window")
     static let burnerTabHomeTitle = NSLocalizedString("burner.tab.home.title", value: "New Fire Tab", comment: "Tab title for Fire Tab")
     static let burnerHomepageDescription1 = NSLocalizedString("burner.homepage.description.1", value: "Browse without saving local history", comment: "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.")

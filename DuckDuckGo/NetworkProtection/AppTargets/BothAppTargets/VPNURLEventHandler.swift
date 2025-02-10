@@ -33,6 +33,10 @@ final class VPNURLEventHandler {
     ///
     func handle(_ url: URL) async {
         switch url {
+        case VPNAppLaunchCommand.manageExcludedApps.launchURL:
+            windowControllerManager.showVPNAppExclusions()
+        case VPNAppLaunchCommand.manageExcludedDomains.launchURL:
+            windowControllerManager.showVPNDomainExclusions()
         case VPNAppLaunchCommand.showStatus.launchURL:
             await showStatus()
         case VPNAppLaunchCommand.showSettings.launchURL:
@@ -84,6 +88,16 @@ final class VPNURLEventHandler {
         windowControllerManager.showTab(with: .subscription(url))
 
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+    }
+
+    func showVPNAppExclusions() {
+        windowControllerManager.showPreferencesTab(withSelectedPane: .vpn)
+        windowControllerManager.showVPNAppExclusions()
+    }
+
+    func showVPNDomainExclusions() {
+        windowControllerManager.showPreferencesTab(withSelectedPane: .vpn)
+        windowControllerManager.showVPNDomainExclusions()
     }
 
 #if !APPSTORE && !DEBUG

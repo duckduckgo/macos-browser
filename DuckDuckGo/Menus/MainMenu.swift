@@ -95,6 +95,8 @@ final class MainMenu: NSMenu {
     // MARK: Debug
 
     private var loggingMenu: NSMenu?
+    let newTabPagePrivacyStatsModeMenuItem = NSMenuItem(title: "Privacy Stats", action: #selector(MainMenu.updateNewTabPageMode), representedObject: NewTabPageMode.privacyStats)
+    let newTabPageRecentActivityModeMenuItem = NSMenuItem(title: "Recent Activity", action: #selector(MainMenu.updateNewTabPageMode), representedObject: NewTabPageMode.recentActivity)
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
     let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: nil)
     let autofillDebugScriptMenuItem = NSMenuItem(title: "Autofill Debug Script", action: #selector(MainMenu.toggleAutofillScriptDebugSettingsAction))
@@ -457,6 +459,7 @@ final class MainMenu: NSMenu {
         updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
+        updateNewTabPageModeMenuItem()
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
         updateAutofillDebugScriptMenuItem()
@@ -646,20 +649,18 @@ final class MainMenu: NSMenu {
             NSMenuItem.separator()
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()
-            NSMenuItem(title: "Tab") {
-                NSMenuItem(title: "Append Tabs") {
-                    NSMenuItem(title: "10 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 10)
-                    NSMenuItem(title: "50 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 50)
-                    NSMenuItem(title: "100 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 100)
-                    NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
-                }
-                NSMenuItem(title: "New Tab") {
-                    NSMenuItem(title: "Reset Continue Setup", action: #selector(MainViewController.debugResetContinueSetup))
-                    NSMenuItem(title: "Shift New Tab daily impression", action: #selector(MainViewController.debugShiftNewTabOpeningDate))
-                    NSMenuItem(title: "Shift \(AppearancePreferences.Constants.dismissNextStepsCardsAfterDays) days", action: #selector(MainViewController.debugShiftNewTabOpeningDateNtimes))
-                }
-            }
             NSMenuItem(title: "Skip Onboarding", action: #selector(MainViewController.skipOnboarding))
+            NSMenuItem(title: "New Tab Page") {
+                NSMenuItem(title: "Mode") {
+                    newTabPagePrivacyStatsModeMenuItem.targetting(self)
+                    newTabPageRecentActivityModeMenuItem.targetting(self)
+                }
+                NSMenuItem(title: "Reset Continue Setup", action: #selector(MainViewController.debugResetContinueSetup))
+                NSMenuItem(title: "Shift New Tab daily impression", action: #selector(MainViewController.debugShiftNewTabOpeningDate))
+                NSMenuItem(title: "Shift \(AppearancePreferences.Constants.dismissNextStepsCardsAfterDays) days", action: #selector(MainViewController.debugShiftNewTabOpeningDateNtimes))
+            }
+            NSMenuItem(title: "History")
+                .submenu(HistoryDebugMenu())
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
@@ -690,6 +691,12 @@ final class MainMenu: NSMenu {
 
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
+                NSMenuItem(title: "Append Tabs") {
+                    NSMenuItem(title: "10 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 10)
+                    NSMenuItem(title: "50 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 50)
+                    NSMenuItem(title: "100 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 100)
+                    NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
+                }
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
@@ -762,11 +769,13 @@ final class MainMenu: NSMenu {
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
 
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 NSMenuItem.separator()
                 NSMenuItem(title: "Web Extensions").submenu(WebExtensionsDebugMenu())
                 NSMenuItem.separator()
             }
+#endif
         }
 
         debugMenu.addItem(internalUserItem)
@@ -793,6 +802,19 @@ final class MainMenu: NSMenu {
 
     private func setupAIChatMenu() {
         aiChatMenu.isHidden = !aiChatMenuConfig.shouldDisplayApplicationMenuShortcut
+    }
+
+    private func updateNewTabPageModeMenuItem() {
+        let mode = NewTabPageModeDecider().effectiveMode
+        newTabPagePrivacyStatsModeMenuItem.state = mode == .privacyStats ? .on : .off
+        newTabPageRecentActivityModeMenuItem.state = mode == .recentActivity ? .on : .off
+    }
+
+    @objc private func updateNewTabPageMode(_ sender: NSMenuItem) {
+        guard let mode = sender.representedObject as? NewTabPageMode else {
+            return
+        }
+        NewTabPageModeDecider().modeOverride = mode
     }
 
     private func updateInternalUserItem() {

@@ -35,7 +35,7 @@ import WebKit
 final class NewTabPageWebViewModel: NSObject {
     let newTabPageUserScript: NewTabPageUserScript
     let webView: WebView
-    private var windowCancellable: AnyCancellable?
+    private var cancellables: Set<AnyCancellable> = []
 
     init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManager, activeRemoteMessageModel: ActiveRemoteMessageModel) {
         newTabPageUserScript = NewTabPageUserScript()
@@ -51,7 +51,7 @@ final class NewTabPageWebViewModel: NSObject {
         webView.load(URLRequest(url: URL.newtab))
         newTabPageUserScript.webView = webView
 
-        windowCancellable = webView.publisher(for: \.window)
+        webView.publisher(for: \.window)
             .map { $0 != nil }
             .sink { [weak activeRemoteMessageModel] isOnScreen in
                 activeRemoteMessageModel?.isViewOnScreen = isOnScreen
@@ -59,6 +59,14 @@ final class NewTabPageWebViewModel: NSObject {
                     NotificationCenter.default.post(name: .newTabPageWebViewDidAppear, object: nil)
                 }
             }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: .newTabPageModeDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.webView.reload()
+            }
+            .store(in: &cancellables)
     }
 }
 

@@ -32,7 +32,7 @@ let package = Package(
             targets: ["NewTabPage"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "233.1.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "236.1.0"),
         .package(path: "../WebKitExtensions"),
         .package(path: "../UserScriptActionsManager"),
         .package(path: "../Utilities"),
@@ -44,9 +44,9 @@ let package = Package(
             name: "NewTabPage",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
+                .product(name: "PersistenceTestingUtils", package: "BrowserServicesKit"),
                 .product(name: "PrivacyStats", package: "BrowserServicesKit"),
                 .product(name: "RemoteMessaging", package: "BrowserServicesKit"),
-                .product(name: "PersistenceTestingUtils", package: "BrowserServicesKit"),
                 .product(name: "UserScript", package: "BrowserServicesKit"),
                 .product(name: "UserScriptActionsManager", package: "UserScriptActionsManager"),
                 .product(name: "WebKitExtensions", package: "WebKitExtensions"),

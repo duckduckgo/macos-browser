@@ -67,9 +67,11 @@ extension WKWebViewConfiguration {
             }
         }
 
+#if !APPSTORE
         if #available(macOS 14.4, *), WebExtensionManager.shared.areExtenstionsEnabled {
             self._webExtensionController = WebExtensionManager.shared.controller
         }
+#endif
 
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
                                                           privacyConfigurationManager: contentBlocking.privacyConfigurationManager,

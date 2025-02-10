@@ -20,7 +20,7 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 @testable import BrowserServicesKit
 
-class MockBookmarkManager: BookmarkManager {
+class MockBookmarkManager: BookmarkManager, URLFavoriteStatusProviding {
     var bookmarksReturnedForSearch = [BaseBookmarkEntity]()
     var wasSearchByQueryCalled = false
 
