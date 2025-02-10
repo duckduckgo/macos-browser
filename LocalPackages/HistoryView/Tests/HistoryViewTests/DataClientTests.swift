@@ -46,6 +46,40 @@ final class DataClientTests: XCTestCase {
         XCTAssertEqual(configuration.platform, .init(name: "macos"))
     }
 
+    func testThatInitialSetupResetsDataProviderCache() async throws {
+        try await messageHelper.handleMessageIgnoringResponse(named: .initialSetup)
+        XCTAssertEqual(dataProvider.resetCacheCallCount, 1)
+    }
+
+    // MARK: - getRanges
+
+    func testThatGetRangesReturnsRangesFromDataProvider() async throws {
+        dataProvider._ranges = [.all, .friday, .recentlyOpened]
+        let rangesResponse: DataModel.GetRangesResponse = try await messageHelper.handleMessage(named: .getRanges)
+        XCTAssertEqual(dataProvider.rangesCallCount, 1)
+        XCTAssertEqual(rangesResponse.ranges, [.all, .friday, .recentlyOpened])
+    }
+
+    // MARK: - query
+
+    func testThatQueryReturnsDataFromProviderAndEchoesQueryKind() async throws {
+        let historyItem = DataModel.HistoryItem(id: "1", url: "https://example.com", title: "Example.com", domain: "example.com", etldPlusOne: "example.com", dateRelativeDay: "Today", dateShort: "", dateTimeOfDay: "10:08")
+        dataProvider.visits = { _, _, _ in return .init(finished: true, visits: [historyItem]) }
+        let query = DataModel.HistoryQuery(query: .searchTerm(""), limit: 150, offset: 0)
+
+        let queryResponse: DataModel.HistoryQueryResponse = try await messageHelper.handleMessage(named: .query, parameters: query)
+        XCTAssertEqual(dataProvider.visitsCalls.count, 1)
+        XCTAssertEqual(queryResponse, .init(info: .init(finished: true, query: query.query), value: [historyItem]))
+    }
+
+    // MARK: - open
+
+    func testThatOpenCallsActionHandler() async throws {
+        let url = "https://example.com"
+        try await messageHelper.handleMessageExpectingNilResponse(named: .open, parameters: DataModel.HistoryOpenAction(url: url))
+        XCTAssertEqual(actionsHandler.openCalls, [try XCTUnwrap(URL(string: url))])
+    }
+
     // MARK: - reportInitException
 
     func testThatReportInitExceptionForwardsEventToTheMapper() async throws {
