@@ -158,10 +158,16 @@ extension HistoryView.DataModel.HistoryItem {
         guard let historyEntry = visit.historyEntry else {
             return nil
         }
+        let title: String = {
+            guard let title = historyEntry.title, !title.isEmpty else {
+                return historyEntry.url.absoluteString
+            }
+            return title
+        }()
         self.init(
             id: historyEntry.identifier.uuidString,
             url: historyEntry.url.absoluteString,
-            title: historyEntry.title ?? "",
+            title: title,
             domain: historyEntry.url.host ?? historyEntry.url.absoluteString,
             etldPlusOne: historyEntry.etldPlusOne,
             dateRelativeDay: dateFormatter.weekDay(for: visit.date),
