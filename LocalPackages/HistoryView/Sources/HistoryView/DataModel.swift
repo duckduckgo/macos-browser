@@ -81,14 +81,14 @@ public enum DataModel {
     }
 
     public struct HistoryQuery: Codable, Equatable {
+        let query: HistoryQueryKind
         let limit: Int
         let offset: Int
-        let query: HistoryQueryKind
 
-        public init(limit: Int, offset: Int, query: HistoryQueryKind) {
+        public init(query: HistoryQueryKind, limit: Int, offset: Int) {
+            self.query = query
             self.limit = limit
             self.offset = offset
-            self.query = query
         }
     }
 
@@ -127,6 +127,10 @@ extension DataModel {
         struct Platform: Encodable, Equatable {
             var name: String
         }
+    }
+
+    struct Exception: Codable, Equatable {
+        let message: String
     }
 
     struct GetRangesResponse: Codable, Equatable {
