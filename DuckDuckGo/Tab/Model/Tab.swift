@@ -76,6 +76,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
+    let reloadPublisher = PassthroughSubject<Void, Never>()
     let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
@@ -681,11 +682,16 @@ protocol NewWindowPolicyDecisionMaker {
 
         let canGoBack = webView.canGoBack
         let canGoForward = webView.canGoForward
-        let canReload = if case .url(let url, credential: _, source: _) = content, !(url.isDuckPlayer || url.isDuckURLScheme) {
-            true
-        } else {
-            false
-        }
+        let canReload = {
+            switch content {
+            case .url(let url, _, _):
+                return !(url.isDuckPlayer || url.isDuckURLScheme)
+            case .history:
+                return true
+            default:
+                return false
+            }
+        }()
 
         if canGoBack != self.canGoBack {
             self.canGoBack = canGoBack
@@ -828,6 +834,7 @@ protocol NewWindowPolicyDecisionMaker {
         userInteractionDialog = nil
 
         self.brokenSiteInfo?.tabReloadRequested()
+        reloadPublisher.send()
         if let url = webView.url {
             pageRefreshMonitor.register(for: url)
         }
