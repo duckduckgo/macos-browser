@@ -32,7 +32,7 @@ let package = Package(
             targets: ["HistoryView"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "236.0.2"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "bunn/featureflag"),
         .package(path: "../WebKitExtensions"),
         .package(path: "../UserScriptActionsManager"),
         .package(path: "../Utilities"),
