@@ -56322,10 +56322,58 @@
       "comment" : "About screen",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schutz. Privatsphäre. Extra an Sicherheit."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Protection. Privacy. Peace of Mind."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protección. Privacidad. Tranquilidad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protection. Confidentialité. Tranquillité d'esprit."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protezione. Privacy.  Serenità."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bescherming. Privacy. Gemoedsrust."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ochrona. Prywatność. Spokój."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteção. Privacidade. Tranquilidade."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Защита. Конфиденциальность. Спокойствие."
           }
         }
       }
