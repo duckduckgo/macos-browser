@@ -1,5 +1,5 @@
 //
-//  HistoryViewDataModel.swift
+//  HistoryViewErrorHandler.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -16,4 +16,22 @@
 //  limitations under the License.
 //
 
-public enum HistoryViewDataModel {}
+import Common
+import HistoryView
+import PixelKit
+
+final class HistoryViewErrorHandler: EventMapping<HistoryViewEvent> {
+
+    init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .historyViewError(let message):
+                PixelKit.fire(DebugEvent(HistoryViewPixel.historyPageExceptionReported(message: message)), frequency: .dailyAndStandard)
+            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<HistoryViewEvent>.Mapping) {
+        fatalError("Use init()")
+    }
+}

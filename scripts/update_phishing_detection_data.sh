@@ -15,7 +15,7 @@ if [ -z "$old_revision" ]; then
 fi
 
 temp_filename="phishing_data_new_file"
-new_revision=$(curl -s "${API_URL}/revision" | jq -r '.revision')
+new_revision=$(curl --compressed -s "${API_URL}/revision" | jq -r '.revision')
 
 printf "Embedded revision: %s, actual revision: %s\n\n" "${old_revision}" "${new_revision}"
 rm -f "$temp_filename"
@@ -37,7 +37,7 @@ performUpdate() {
 
     url="${API_URL}/${data_type}?category=${threat_type}"
     printf "Fetching %s\n" "${url}"
-    curl -o "$temp_filename" -H "Cache-Control: no-cache" -s "${url}"
+    curl --compressed -o "$temp_filename" -H "Cache-Control: no-cache" -s "${url}"
     # Extract the revision from the fetched JSON
     revision=$(jq -r '.revision' "$temp_filename")
 

@@ -63,9 +63,11 @@ final class MainWindowController: NSWindowController {
         subscribeToResolutionChange()
         subscribeToFullScreenToolbarChanges()
 
+#if !APPSTORE
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.eventsListener.didOpenWindow(self)
         }
+#endif
     }
 
     required init?(coder: NSCoder) {
@@ -241,9 +243,11 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
 
+#if !APPSTORE
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.eventsListener.didFocusWindow(self)
         }
+#endif
     }
 
     func windowDidResignKey(_ notification: Notification) {
@@ -349,9 +353,11 @@ extension MainWindowController: NSWindowDelegate {
         _=Unmanaged.passRetained(self).autorelease()
         WindowControllersManager.shared.unregister(self)
 
+#if !APPSTORE
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.eventsListener.didCloseWindow(self)
         }
+#endif
     }
 
     func windowShouldClose(_ window: NSWindow) -> Bool {

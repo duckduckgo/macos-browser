@@ -152,7 +152,7 @@ final class RecentActivityProvider: NewTabPageRecentActivityProviding {
     }
 }
 
-private extension HistoryEntry {
+extension HistoryEntry {
     private enum Const {
         static let wwwPrefix = "www."
     }

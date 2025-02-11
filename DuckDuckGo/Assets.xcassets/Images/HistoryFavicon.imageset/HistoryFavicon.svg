@@ -1,0 +1,21 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Favicon" clip-path="url(#clip0_4008_4776)">
+<path id="Fill" d="M15.5 8C15.5 12.1421 12.1421 15.5 8 15.5C3.85786 15.5 0.5 12.1421 0.5 8C0.5 3.85786 3.85786 0.5 8 0.5C12.1421 0.5 15.5 3.85786 15.5 8Z" fill="#FFD65C"/>
+<path id="Intersect" fill-rule="evenodd" clip-rule="evenodd" d="M15.0478 7.30677C14.2926 4.81754 11.9147 3 9.09811 3C7.14016 3 5.39419 3.87831 4.25794 5.25H0.852314C1.98571 2.46835 4.78771 0.5 8.06477 0.5C12.0039 0.5 15.2566 3.34396 15.75 7.02588L15.0478 7.30677Z" fill="url(#paint0_radial_4008_4776)"/>
+<path id="Union" fill-rule="evenodd" clip-rule="evenodd" d="M1.6735 5H4.5C4.77614 5 5 5.22386 5 5.5C5 5.77614 4.77614 6 4.5 6H0.5C0.223857 6 0 5.77614 0 5.5V1C0 0.723858 0.223857 0.5 0.5 0.5C0.776142 0.5 1 0.723858 1 1V4.12422C2.36428 1.66539 4.98718 0 8 0C12.4183 0 16 3.58172 16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 7.72386 0.223858 7.5 0.5 7.5C0.776142 7.5 1 7.72386 1 8C1 11.866 4.13401 15 8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C5.2084 1 2.79743 2.63419 1.6735 5Z" fill="url(#paint1_linear_4008_4776)"/>
+<path id="Vector 202 (Stroke)" fill-rule="evenodd" clip-rule="evenodd" d="M8 3C8.27614 3 8.5 3.22386 8.5 3.5V7.79289L10.8536 10.1464C11.0488 10.3417 11.0488 10.6583 10.8536 10.8536C10.6583 11.0488 10.3417 11.0488 10.1464 10.8536L7.64645 8.35355C7.55268 8.25979 7.5 8.13261 7.5 8V3.5C7.5 3.22386 7.72386 3 8 3Z" fill="#92540C"/>
+</g>
+<defs>
+<radialGradient id="paint0_radial_4008_4776" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(2.81463 3.98895) scale(12.5 25.8662)">
+<stop stop-color="#DE5833" stop-opacity="0.3"/>
+<stop offset="1" stop-color="#DE5833" stop-opacity="0.1"/>
+</radialGradient>
+<linearGradient id="paint1_linear_4008_4776" x1="8" y1="0" x2="8" y2="16" gradientUnits="userSpaceOnUse">
+<stop stop-color="#92540C"/>
+<stop offset="1" stop-color="#C18010"/>
+</linearGradient>
+<clipPath id="clip0_4008_4776">
+<rect width="16" height="16" fill="white"/>
+</clipPath>
+</defs>
+</svg>

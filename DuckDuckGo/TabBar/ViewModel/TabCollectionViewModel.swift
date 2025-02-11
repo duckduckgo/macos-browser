@@ -90,6 +90,7 @@ final class TabCollectionViewModel: NSObject {
             previouslySelectedTabViewModel = oldValue
             oldValue?.tab.renderTabSnapshot()
 
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 if let oldValue {
                     WebExtensionManager.shared.eventsListener.didDeselectTabs([oldValue.tab])
@@ -100,6 +101,7 @@ final class TabCollectionViewModel: NSObject {
                                                               previousActiveTab: oldValue?.tab)
                 }
             }
+#endif
         }
     }
     private weak var previouslySelectedTabViewModel: TabViewModel?
