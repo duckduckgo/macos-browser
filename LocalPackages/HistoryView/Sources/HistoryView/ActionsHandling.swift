@@ -1,5 +1,5 @@
 //
-//  HistoryViewTests.swift
+//  ActionsHandling.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -16,9 +16,8 @@
 //  limitations under the License.
 //
 
-import Testing
-@testable import HistoryView
+import Foundation
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+public protocol ActionsHandling {
+    @MainActor func open(_ url: URL)
 }

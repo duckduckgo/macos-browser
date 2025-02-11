@@ -1,5 +1,5 @@
 //
-//  HistoryViewActionsManagerExtension.swift
+//  CapturingErrorHandler.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -16,18 +16,28 @@
 //  limitations under the License.
 //
 
-import History
+import Combine
+import Common
 import HistoryView
 
-extension HistoryViewActionsManager {
+final class CapturingErrorHandler: EventMapping<HistoryViewEvent> {
+    var events: [HistoryViewEvent] = []
 
-    convenience init(historyCoordinator: HistoryGroupingDataSource) {
-        self.init(scriptClients: [
-            DataClient(
-                dataProvider: HistoryViewDataProvider(historyGroupingDataSource: historyCoordinator),
-                actionsHandler: HistoryViewActionsHandler(),
-                errorHandler: HistoryViewErrorHandler()
-            )
-        ])
+    init() {
+        let localEvents = PassthroughSubject<HistoryViewEvent, Never>()
+        super.init { event, _, _, _ in
+            localEvents.send(event)
+        }
+
+        cancellable = localEvents
+            .sink { [weak self] value in
+                self?.events.append(value)
+            }
     }
+
+    override init(mapping: @escaping EventMapping<HistoryViewEvent>.Mapping) {
+        fatalError("Use init()")
+    }
+
+    private var cancellable: AnyCancellable?
 }

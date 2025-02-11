@@ -128,7 +128,7 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
             case .rangeFilter(let range):
                 return groupings.first(where: { $0.range == range })?.visits ?? []
             case .searchTerm(let term):
-                return visits.filter { $0.title.contains(term) || $0.url.contains(term) }
+                return visits.filter { $0.title.localizedCaseInsensitiveContains(term) || $0.url.localizedCaseInsensitiveContains(term) }
             case .domainFilter(let domain):
                 return visits.filter { URL(string: $0.url)?.host == domain }
             }
