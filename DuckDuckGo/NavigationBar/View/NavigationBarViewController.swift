@@ -235,21 +235,6 @@ final class NavigationBarViewController: NSViewController {
                 .leading: .leading(multiplier: 1.0, const: 72)
             ]))
         }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
-            let viewController = PopoverMessageViewController(title: "Let DuckDuckGo protect more of what you do online",
-                                                              message: "Make us your default browser so all site links open in DuckDuckGo, and add us to your Dock for quick access.",
-                                                              image: .addAsDefaultPopoverIcon,
-                                                              buttonText: "Set As Default Browser",
-                                                              buttonAction: { print("Tapped primary action") },
-                                                              secondaryButtonText: "Not now",
-                                                              secondaryButtonAction: { print("Tapped secondary action") },
-                                                              shouldShowCloseButton: false,
-                                                              presentMultiline: true,
-                                                              autoDismissDuration: nil,
-                                                              alignment: .vertical)
-            viewController.show(onParent: self, relativeTo: self.optionsButton)
-        }
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
@@ -461,6 +446,11 @@ final class NavigationBarViewController: NSViewController {
                                                name: .pageRefreshMonitorDidDetectRefreshPattern,
                                                object: nil)
 
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showPopoverPromptForDefaultBrowser(_:)),
+                                               name: .showPopoverPromptForDefaultBrowser,
+                                               object: nil)
+
         UserDefaults.netP
             .publisher(for: \.networkProtectionShouldShowVPNUninstalledMessage)
             .receive(on: DispatchQueue.main)
@@ -582,6 +572,13 @@ final class NavigationBarViewController: NSViewController {
               isOnboardingFinished
         else { return }
         showBrokenSitePrompt()
+    }
+
+    @objc private func showPopoverPromptForDefaultBrowser(_ sender: Notification) {
+        let promptsCoordinator = PromptsCoordinator()
+        let popover = promptsCoordinator.getPopover()
+
+        popover.show(onParent: self, relativeTo: self.optionsButton)
     }
 
     private var isOnboardingFinished: Bool {
