@@ -210,7 +210,7 @@ extension UserText {
 
     static let vpnLocationTitle = NSLocalizedString("vpn.location.title", value: "Location", comment: "Location section title in VPN settings")
 
-    static let vpnExclusionsTitle = NSLocalizedString("vpn.exclusions.title", value: "Exclusions", comment: "Exclusions section title in VPN settings")
+    static let vpnExclusionsTitle = NSLocalizedString("vpn.exclusions.title", value: "VPN Exclusions", comment: "Exclusions section title in VPN settings")
 
     static let vpnExcludedSitesTitle = NSLocalizedString("vpn.excluded.sites.title", value: "Excluded Websites", comment: "Excluded Sites title in VPN settings")
 
