@@ -69363,8 +69363,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ausschlüsse"
+            "state" : "translated",
+            "value" : "VPN-Ausschlüsse"
           }
         },
         "en" : {
@@ -69375,44 +69375,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exclusiones"
+            "state" : "translated",
+            "value" : "Exclusiones de VPN"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exclusions"
+            "state" : "translated",
+            "value" : "Exclusions VPN"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Esclusioni"
+            "state" : "translated",
+            "value" : "Esclusioni VPN"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Uitsluitingen"
+            "state" : "translated",
+            "value" : "VPN-uitsluitingen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wykluczenia"
+            "state" : "translated",
+            "value" : "Wykluczenia działania VPN"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exclusões"
+            "state" : "translated",
+            "value" : "Exclusões VPN"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Исключения"
+            "state" : "translated",
+            "value" : "Исключения из VPN"
           }
         }
       }
