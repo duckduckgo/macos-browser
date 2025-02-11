@@ -39867,7 +39867,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection Stats"
+            "value" : "Schutzstatistiken"
           }
         },
         "en" : {
@@ -39879,43 +39879,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection Stats"
+            "value" : "Estadísticas de protección"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection Stats"
+            "value" : "Statistiques de protection"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection Stats"
+            "value" : "Statistiche di protezione"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection Stats"
+            "value" : "Beschermingsstatistieken"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection Stats"
+            "value" : "Statystyki ochrony"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection Stats"
+            "value" : "Estatísticas de proteção"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protection Stats"
+            "value" : "Статистика защиты"
           }
         }
       }
