@@ -25,6 +25,7 @@ import NetworkProtection
 import NetworkProtectionIPC
 import os.log
 import BrokenSitePrompt
+import SwiftUI
 
 final class MainViewController: NSViewController {
     private(set) lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
@@ -164,6 +165,7 @@ final class MainViewController: NSViewController {
         super.viewDidAppear()
         mainView.setMouseAboveWebViewTrackingAreaEnabled(true)
         registerForBookmarkBarPromptNotifications()
+        registerForBannerNotifications()
         adjustFirstResponder(force: true)
     }
 
@@ -175,6 +177,16 @@ final class MainViewController: NSViewController {
             object: nil,
             queue: .main) { [weak self] _ in
                 self?.showBookmarkPromptIfNeeded()
+        }
+    }
+
+    var bannerPromptObserver: Any?
+    private func registerForBannerNotifications() {
+        bannerPromptObserver = NotificationCenter.default.addObserver(
+            forName: .showBannerPromptForDefaultBrowser,
+            object: nil,
+            queue: .main) { [weak self] _ in
+                self?.showBanner()
         }
     }
 
@@ -239,6 +251,18 @@ final class MainViewController: NSViewController {
         DispatchQueue.main.async {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
         }
+    }
+
+    private func showBanner() {
+        let promptsCoordinator = PromptsCoordinator()
+        guard let banner = promptsCoordinator.getBanner(closeAction: { self.hideBanner() }) else { return }
+        addAndLayoutChild(banner, into: mainView.bannerContainerView)
+        mainView.bannerHeightConstraint.animator().constant = 48
+    }
+
+    private func hideBanner() {
+        mainView.bannerContainerView.subviews.forEach { $0.removeFromSuperview() }
+        mainView.bannerHeightConstraint.animator().constant = 0
     }
 
     override func encodeRestorableState(with coder: NSCoder) {

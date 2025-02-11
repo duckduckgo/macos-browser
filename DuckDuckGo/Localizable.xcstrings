@@ -62093,6 +62093,9 @@
         }
       }
     },
+    "Set As Default Browser" : {
+
+    },
     "settings" : {
       "comment" : "Menu item for opening settings",
       "extractionState" : "extracted_with_value",

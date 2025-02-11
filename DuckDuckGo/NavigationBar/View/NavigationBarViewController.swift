@@ -576,7 +576,7 @@ final class NavigationBarViewController: NSViewController {
 
     @objc private func showPopoverPromptForDefaultBrowser(_ sender: Notification) {
         let promptsCoordinator = PromptsCoordinator()
-        let popover = promptsCoordinator.getPopover()
+        guard let popover = promptsCoordinator.getPopover() else { return }
 
         popover.show(onParent: self, relativeTo: self.optionsButton)
     }

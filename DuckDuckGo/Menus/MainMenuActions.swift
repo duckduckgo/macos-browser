@@ -978,12 +978,12 @@ extension MainViewController {
         #endif
     }
 
-    @objc func showPopoverPromptForDefaultBrowser(_ sender: Any?) {
-        NotificationCenter.default.post(name: .showPopoverPromptForDefaultBrowser, object: nil)
-    }
-
     @objc func showBannerPromptForDefaultBrowser(_ sender: Any?) {
         NotificationCenter.default.post(name: .showBannerPromptForDefaultBrowser, object: nil)
+    }
+
+    @objc func showPopoverPromptForDefaultBrowser() {
+        NotificationCenter.default.post(name: .showPopoverPromptForDefaultBrowser, object: nil)
     }
 
     /// debug menu popup window test
