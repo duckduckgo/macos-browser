@@ -146,7 +146,14 @@ extension Preferences {
                 PreferencePaneSection(UserText.vpnDnsServerTitle) {
                     PreferencePaneSubSection {
                         Picker(selection: $model.isCustomDNSSelected, label: EmptyView()) {
-                            Text(UserText.vpnDnsServerPickerDefaultTitle).tag(false)
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(UserText.vpnDnsServerPickerDefaultTitle)
+                                // We have to use a custom toggle here, as with a SwiftUI Toggle on macOS 10.x to 13.x, the checkbox gets rendered
+                                // to the right when inside a picker 🤷
+                                NativeCheckboxToggle(isOn: $model.blockRiskyDomains, label: "Malware protection")
+                                    .disabled(model.isCustomDNSSelected)
+                                    .padding(.bottom, 6)
+                            }.tag(false)
                             VStack(alignment: .leading, spacing: 0) {
                                 HStack(spacing: 15) {
                                     Text(UserText.vpnDnsServerPickerCustomTitle)

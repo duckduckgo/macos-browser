@@ -114,9 +114,15 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-    @Published public var dnsSettings: NetworkProtectionDNSSettings = .default
+    @Published public var dnsSettings: NetworkProtectionDNSSettings = .ddg(maliciousSiteProtection: true)
     @Published public var isCustomDNSSelected = false
     @Published public var customDNSServers: String?
+    @Published var blockRiskyDomains: Bool {
+        didSet {
+            guard settings.isProtectionEnabled != blockRiskyDomains else { return }
+            settings.dnsSettings = .ddg(maliciousSiteProtection: blockRiskyDomains)
+        }
+    }
 
     private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
@@ -150,6 +156,7 @@ final class VPNPreferencesModel: ObservableObject {
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
+        blockRiskyDomains = settings.isProtectionEnabled
 
         subscribeToAppRoutingRulesChanges()
         subscribeToOnboardingStatusChanges(defaults: defaults)
@@ -160,6 +167,14 @@ final class VPNPreferencesModel: ObservableObject {
         subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
         subscribeToDNSSettingsChanges()
+        subscribeToBlockRiskyDomainsChanges()
+    }
+
+    private func subscribeToBlockRiskyDomainsChanges() {
+        settings.isProtectionEnabledPublisher
+            .map { $0 }
+            .assign(to: \.blockRiskyDomains, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private func subscribeToAppRoutingRulesChanges() {
@@ -239,7 +254,7 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     func resetDNSSettings() {
-        settings.dnsSettings = .default
+        settings.dnsSettings = .ddg(maliciousSiteProtection: settings.isProtectionEnabled)
     }
 
     @MainActor
@@ -287,7 +302,7 @@ final class VPNPreferencesModel: ObservableObject {
 extension NetworkProtectionDNSSettings {
     var dnsServersText: String? {
         switch self {
-        case .default: return nil
+        case .ddg: return nil
         case .custom(let servers): return servers.joined(separator: ", ")
         }
     }
