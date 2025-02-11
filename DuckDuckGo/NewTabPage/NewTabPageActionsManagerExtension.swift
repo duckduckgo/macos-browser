@@ -38,7 +38,7 @@ extension NewTabPageActionsManager {
         let favoritesModel = NewTabPageFavoritesModel(
             actionsHandler: DefaultFavoritesActionsHandler(),
             favoritesPublisher: favoritesPublisher,
-            getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowAllFavorites, defaultValue: false).wrappedValue
+            getLegacyIsViewExpandedSetting: UserDefaultsWrapper<Bool>(key: .homePageShowAllFavorites, defaultValue: true).wrappedValue
         )
 
         let customizationProvider = NewTabPageCustomizationProvider(homePageSettingsModel: settingsModel)
