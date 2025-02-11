@@ -39867,7 +39867,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schutzstatistiken"
+            "value" : "Protection Stats"
           }
         },
         "en" : {
@@ -39879,43 +39879,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estadísticas de protección"
+            "value" : "Protection Stats"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Statistiques de protection"
+            "value" : "Protection Stats"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Statistiche di protezione"
+            "value" : "Protection Stats"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beschermingsstatistieken"
+            "value" : "Protection Stats"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Statystyki ochrony"
+            "value" : "Protection Stats"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estatísticas de proteção"
+            "value" : "Protection Stats"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Статистика защиты"
+            "value" : "Protection Stats"
           }
         }
       }
@@ -56804,7 +56804,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo zum Dock hinzufügen…"
+            "value" : "DuckDuckGo zum Dock hinzufügen …"
           }
         },
         "en" : {
@@ -56834,25 +56834,25 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voeg DuckDuckGo toe aan Dock…"
+            "value" : "DuckDuckGo toevoegen aan Dock…"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaj DuckDuckGo do Dock…"
+            "value" : "Dodaj DuckDuckGo do Docka…"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adicionar DuckDuckGo ao Dock…"
+            "value" : "Adicionar DuckDuckGo à Dock…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавить DuckDuckGo в док-панель…"
+            "value" : "Добавить DuckDuckGo на док-панель…"
           }
         }
       }
@@ -69363,8 +69363,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ausschlüsse"
+            "state" : "translated",
+            "value" : "VPN-Ausschlüsse"
           }
         },
         "en" : {
@@ -69375,44 +69375,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exclusiones"
+            "state" : "translated",
+            "value" : "Exclusiones de VPN"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exclusions"
+            "state" : "translated",
+            "value" : "Exclusions VPN"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Esclusioni"
+            "state" : "translated",
+            "value" : "Esclusioni VPN"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Uitsluitingen"
+            "state" : "translated",
+            "value" : "VPN-uitsluitingen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wykluczenia"
+            "state" : "translated",
+            "value" : "Wykluczenia działania VPN"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Exclusões"
+            "state" : "translated",
+            "value" : "Exclusões VPN"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Исключения"
+            "state" : "translated",
+            "value" : "Исключения из VPN"
           }
         }
       }
