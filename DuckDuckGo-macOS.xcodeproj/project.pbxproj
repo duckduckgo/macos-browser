@@ -3409,6 +3409,20 @@
 			remoteGlobalIDString = 4B2537592A11BE7300610219;
 			remoteInfo = NetworkProtectionSystemExtension;
 		};
+		7BBDC8162D5B5D430061E9EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B4BEC1F2A11B4E2001D9AC5;
+			remoteInfo = DuckDuckGoNotifications;
+		};
+		7BBDC8182D5B5D4A0061E9EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B4BEC1F2A11B4E2001D9AC5;
+			remoteInfo = DuckDuckGoNotifications;
+		};
 		7BDA36F72B7E082100AD5388 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -10228,6 +10242,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				7BBDC8192D5B5D4A0061E9EC /* PBXTargetDependency */,
 				4BBA2D2B2B6AD01E00F6A470 /* PBXTargetDependency */,
 				4BBA2D292B6ACD4D00F6A470 /* PBXTargetDependency */,
 				4B5F14FE2A1529230060320F /* PBXTargetDependency */,
@@ -10713,6 +10728,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				7BBDC8172D5B5D430061E9EC /* PBXTargetDependency */,
 				7B4627742B9AF2C8004ACE0B /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				31C6E9AD2B0C07BA0086DC30 /* PBXTargetDependency */,
@@ -14726,6 +14742,16 @@
 			isa = PBXTargetDependency;
 			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
 			targetProxy = 7B4627732B9AF2C8004ACE0B /* PBXContainerItemProxy */;
+		};
+		7BBDC8172D5B5D430061E9EC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B4BEC1F2A11B4E2001D9AC5 /* DuckDuckGoNotifications */;
+			targetProxy = 7BBDC8162D5B5D430061E9EC /* PBXContainerItemProxy */;
+		};
+		7BBDC8192D5B5D4A0061E9EC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B4BEC1F2A11B4E2001D9AC5 /* DuckDuckGoNotifications */;
+			targetProxy = 7BBDC8182D5B5D4A0061E9EC /* PBXContainerItemProxy */;
 		};
 		7BDA36F82B7E082100AD5388 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

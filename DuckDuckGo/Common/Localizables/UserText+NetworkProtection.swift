@@ -214,8 +214,6 @@ extension UserText {
 
     static let vpnExcludedSitesTitle = NSLocalizedString("vpn.excluded.sites.title", value: "Excluded Websites", comment: "Excluded Sites title in VPN settings")
 
-    static let vpnExcludedAppsTitle = NSLocalizedString("vpn.excluded.apps.title", value: "Excluded Apps", comment: "Excluded Apps title in VPN settings")
-
     static let vpnGeneralTitle = NSLocalizedString("vpn.general.title", value: "General", comment: "General section title in VPN settings")
 
     static let vpnShortcutsSettingsTitle = NSLocalizedString("vpn.shortcuts.settings.title", value: "Shortcuts", comment: "Shortcuts section title in VPN settings")
@@ -225,6 +223,12 @@ extension UserText {
     static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced", comment: "VPN Advanced section title in VPN settings")
 
     static let vpnNotificationsConnectionDropsOrStatusChangesTitle = NSLocalizedString("vpn.notifications.connection.drops.or.status.changes.title", value: "VPN connection drops or status changes", comment: "Title of the VPN notification option")
+
+    // MARK: - Excluded Apps
+
+    static let vpnExcludedAppsTitle = NSLocalizedString("vpn.excluded.apps.title", value: "Excluded Apps", comment: "Excluded Apps title in VPN settings")
+
+    static let vpnExcludedAppsDescription = NSLocalizedString("vpn.excluded.apps.description", value: "Add apps that aren’t compatible with VPNs to use them without turning off the VPN.", comment: "Excluded Apps description in VPN settings")
 
     // MARK: - Location
 
