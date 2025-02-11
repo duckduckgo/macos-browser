@@ -265,7 +265,7 @@ extension UserText {
 
     // MARK: - Excluded Apps
 
-    static let vpnExcludedAppsAddApp = NSLocalizedString("vpn.excluded.apps.add.app", value: "Add Application", comment: "Add Application button for the excluded apps view")
+    static let vpnExcludedAppsAddApp = NSLocalizedString("vpn.excluded.apps.add.app", value: "Browse Applications", comment: "Add Application button for the excluded apps view")
 
     // MARK: - Excluded Domains
 
