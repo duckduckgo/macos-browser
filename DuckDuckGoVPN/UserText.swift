@@ -33,23 +33,15 @@ final class UserText {
         value: "VPN Settings",
         comment: "The VPN status view's 'VPN Settings' menu item for our status menu app. The number shown is how many Apps are excluded.")
 
-    static func vpnStatusViewExcludedAppsMenuItemTitle(_ count: Int) -> String {
-        let message = NSLocalizedString(
-            "vpn.status-view.excluded-apps.menu-item.title",
-            value: "Excluded Apps (%d)",
-            comment: "The VPN status view's 'Excluded Apps' menu item for our status menu app. The number shown is how many Apps are excluded.")
+    static let vpnStatusViewExcludedAppsMenuItemTitle = NSLocalizedString(
+        "vpn.status-view.excluded-apps.menu-item.title",
+        value: "Excluded Apps",
+        comment: "The VPN status view's 'Excluded Apps' menu item for our status menu app.")
 
-        return String(format: message, count)
-    }
-
-    static func vpnStatusViewExcludedDomainsMenuItemTitle(_ count: Int) -> String {
-        let message = NSLocalizedString(
-            "vpn.status-view.excluded-domains.menu-item.title",
-            value: "Excluded Websites (%d)",
-            comment: "The VPN status view's 'Excluded Websites' menu item for our status menu app. The number shown is how many websites are excluded.")
-
-        return String(format: message, count)
-    }
+    static let vpnStatusViewExcludedDomainsMenuItemTitle = NSLocalizedString(
+        "vpn.status-view.excluded-domains.menu-item.title",
+        value: "Excluded Websites",
+        comment: "The VPN status view's 'Excluded Websites' menu item for our status menu app.")
 
     static let vpnStatusViewFAQMenuItemTitle = NSLocalizedString(
         "vpn.status-view.faq.menu-item.title",

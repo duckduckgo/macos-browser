@@ -324,8 +324,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private func statusViewSubmenu() -> [StatusBarMenu.MenuItem] {
         let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
         let proxySettings = TransparentProxySettings(defaults: .netP)
-        let excludedAppsTitle = UserText.vpnStatusViewExcludedAppsMenuItemTitle(proxySettings.excludedApps.count)
-        let excludedWebsitesTitle = UserText.vpnStatusViewExcludedDomainsMenuItemTitle(proxySettings.excludedDomains.count)
 
         var menuItems = [StatusBarMenu.MenuItem]()
 
@@ -337,11 +335,21 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         }
 
         menuItems.append(contentsOf: [
-            .text(icon: Image(.window16), title: excludedAppsTitle, action: { [weak self] in
-                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.manageExcludedApps)
+            .textWithDetail(
+                icon: Image(.window16),
+                title: UserText.vpnStatusViewExcludedAppsMenuItemTitle,
+                detail: "(\(proxySettings.excludedApps.count))",
+                action: { [weak self] in
+
+                    try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.manageExcludedApps)
             }),
-            .text(icon: Image(.globe16), title: excludedWebsitesTitle, action: { [weak self] in
-                try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.manageExcludedDomains)
+            .textWithDetail(
+                icon: Image(.globe16),
+                title: UserText.vpnStatusViewExcludedDomainsMenuItemTitle,
+                detail: "(\(proxySettings.excludedDomains.count))",
+                action: { [weak self] in
+
+                    try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.manageExcludedDomains)
             }),
             .divider(),
             .text(icon: Image(.help16), title: UserText.vpnStatusViewFAQMenuItemTitle, action: { [weak self] in
