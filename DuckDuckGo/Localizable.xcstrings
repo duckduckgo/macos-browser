@@ -56804,7 +56804,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo zum Dock hinzufügen …"
+            "value" : "DuckDuckGo zum Dock hinzufügen…"
           }
         },
         "en" : {
@@ -56834,25 +56834,25 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo toevoegen aan Dock…"
+            "value" : "Voeg DuckDuckGo toe aan Dock…"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaj DuckDuckGo do Docka…"
+            "value" : "Dodaj DuckDuckGo do Dock…"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adicionar DuckDuckGo à Dock…"
+            "value" : "Adicionar DuckDuckGo ao Dock…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавить DuckDuckGo на док-панель…"
+            "value" : "Добавить DuckDuckGo в док-панель…"
           }
         }
       }
@@ -69363,8 +69363,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "VPN-Ausschlüsse"
+            "state" : "needs_review",
+            "value" : "Ausschlüsse"
           }
         },
         "en" : {
@@ -69375,44 +69375,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exclusiones de VPN"
+            "state" : "needs_review",
+            "value" : "Exclusiones"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exclusions VPN"
+            "state" : "needs_review",
+            "value" : "Exclusions"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esclusioni VPN"
+            "state" : "needs_review",
+            "value" : "Esclusioni"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "VPN-uitsluitingen"
+            "state" : "needs_review",
+            "value" : "Uitsluitingen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wykluczenia działania VPN"
+            "state" : "needs_review",
+            "value" : "Wykluczenia"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exclusões VPN"
+            "state" : "needs_review",
+            "value" : "Exclusões"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Исключения из VPN"
+            "state" : "needs_review",
+            "value" : "Исключения"
           }
         }
       }

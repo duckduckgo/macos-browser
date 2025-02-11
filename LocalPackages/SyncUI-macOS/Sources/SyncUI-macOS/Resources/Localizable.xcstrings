@@ -365,7 +365,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dieses Gerät ist bereits synchronisiert. Bist du sicher, dass du es mit einem anderen Back-up oder Gerät synchronisieren möchtest? Beim Wechsel werden keine bereits mit diesem Gerät synchronisierten Daten entfernt."
           }
         },
@@ -377,43 +377,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Este dispositivo ya está sincronizado. ¿Seguro que deseas sincronizarlo con una copia de seguridad o con un dispositivo diferente? Cambiar no eliminará ningún dato ya sincronizado en este dispositivo."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Cet appareil est déjà synchronisé. Voulez-vous vraiment le synchroniser avec une autre sauvegarde ou un autre appareil ? Ce changement ne supprimera aucune donnée déjà synchronisée sur cet appareil."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Questo dispositivo è già sincronizzato. Vuoi davvero sincronizzarlo con un backup o un dispositivo diverso? L'operazione non rimuoverà alcun dato già sincronizzato su questo dispositivo."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dit apparaat is al gesynchroniseerd, weet je zeker dat je het met een andere back-up of een ander apparaat wilt synchroniseren? Als je overschakelt, worden er geen gegevens verwijderd die al met dit apparaat zijn gesynchroniseerd."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "To urządzenie jest już synchronizowane, czy na pewno chcesz je synchronizować z inną kopią zapasową lub urządzeniem? Przełączenie nie usunie żadnych danych już zsynchronizowanych z tym urządzeniem."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Este dispositivo já está sincronizado, tens a certeza de que queres sincronizá-lo com uma cópia de segurança ou um dispositivo diferente? A mudança não vai remover nenhum dado já sincronizado com este dispositivo."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Это устройство уже синхронизировано. Действительно синхронизировать его с другой резервной копией или устройством? Переключение не приведет к удалению данных, синхронизированных с этим устройством ранее."
           }
         }
