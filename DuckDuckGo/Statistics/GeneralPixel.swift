@@ -136,6 +136,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerNewTabSettingsOff
     case duckPlayerContingencySettingsDisplayed
     case duckPlayerContingencyLearnMoreClicked
+    case duckPlayerYouTubeErrorImpression
 
     // Temporary Overlay Pixels
     case duckPlayerYouTubeOverlayNavigationBack
@@ -685,6 +686,8 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_mac_contingency_settings-displayed"
         case .duckPlayerContingencyLearnMoreClicked:
             return "duckplayer_mac_contingency_learn-more-clicked"
+        case .duckPlayerYouTubeErrorImpression:
+            return "duckplayer_mac_youtube-error_impression"
 
             // Duck Player Temporary Overlay Pixels
         case .duckPlayerYouTubeOverlayNavigationBack:
@@ -1341,7 +1344,8 @@ enum GeneralPixel: PixelKitEventV2 {
                 .duckPlayerNewTabSettingsOff,
                 .duckPlayerContingencySettingsDisplayed,
                 .duckPlayerWeeklyUniqueView,
-                .duckPlayerContingencyLearnMoreClicked:
+                .duckPlayerContingencyLearnMoreClicked,
+                .duckPlayerYouTubeErrorImpression:
             return nil
 
         case .bookmarksSortButtonClicked(let origin),

@@ -59,6 +59,7 @@ struct InitialPlayerSettings: Codable {
         let pip: PIP
         let autoplay: Autoplay
         let focusMode: FocusMode
+        let customError: CustomError
     }
 
     struct PIP: Codable {
@@ -86,6 +87,11 @@ struct InitialPlayerSettings: Codable {
     /// Default should be enabled.
     struct FocusMode: Codable {
         let state: State
+    }
+
+    struct CustomError: Codable {
+        let state: State
+        let signInRequiredSelector: String
     }
 
     enum State: String, Codable {
@@ -137,6 +143,11 @@ public struct UIUserValues: Codable {
     }
 }
 
+// Custom Error privacy config settings
+struct CustomErrorSettings: Codable {
+    let signInRequiredSelector: String
+}
+
 final class DuckPlayer {
     static let usesSimulatedRequests: Bool = {
         if #available(macOS 12.0, *) {
@@ -178,6 +189,16 @@ final class DuckPlayer {
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
         isAutoplayFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
+        isCustomErrorFeatureEnabled =
+            privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.customError)
+
+        // Question for Daniel: is the string return type for Subfeature settings just a stub or intentional?
+        if let customErrorSettingsJSON = privacyConfigurationManager.privacyConfig.settings(for: DuckPlayerSubfeature.customError),
+           let jsonData = customErrorSettingsJSON.data(using: .utf8),
+           let customErrorSettings: CustomErrorSettings = DecodableHelper.decode(jsonData: jsonData) {
+            customErrorSignInRequiredSelector = customErrorSettings.signInRequiredSelector
+        }
+
         self.onboardingDecider = onboardingDecider
 
         mode = preferences.duckPlayerMode
@@ -246,13 +267,21 @@ final class DuckPlayer {
             return self.encodeUserValues()
         }
     }
-    
+
     public func handleYoutubeError(params: Any, message: UserScriptMessage) -> Encodable? {
-        print("Youtube Error \(message)");
-        return nil;
+        var pixelParams: [String: String] = [:]
+        if let paramsDict = params as? [String: Any],
+           let errorParam = paramsDict["error"] as? String {
+            pixelParams["error"] = errorParam
+        } else {
+            pixelParams["error"] = "unknown"
+        }
+
+        // TODO: Fire once daily impression
+        PixelKit.fire(GeneralPixel.duckPlayerYouTubeErrorImpression, withAdditionalParameters: pixelParams)
+        return nil
     }
-    
-    
+
     public func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
         encodeUserValues()
     }
@@ -300,7 +329,8 @@ final class DuckPlayer {
         let environment = InitialPlayerSettings.Environment.development
         let locale = InitialPlayerSettings.Locale.en
         let focusMode = InitialPlayerSettings.FocusMode(state: onboardingDecider.shouldOpenFirstVideoOnDuckPlayer ? .disabled : .enabled)
-        let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay, focusMode: focusMode)
+        let customError = InitialPlayerSettings.CustomError(state: isCustomErrorFeatureEnabled ? .enabled : .disabled, signInRequiredSelector: customErrorSignInRequiredSelector ?? "")
+        let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay, focusMode: focusMode, customError: customError)
         let userValues = encodeUserValues()
 
         /// Since the FE is requesting player-encoded values, we can assume that the first player video setup is complete from the onboarding point of view.
@@ -345,6 +375,8 @@ final class DuckPlayer {
     private var isFeatureEnabledCancellable: AnyCancellable?
     private var isPiPFeatureEnabled: Bool
     private var isAutoplayFeatureEnabled: Bool
+    private var isCustomErrorFeatureEnabled: Bool
+    private var customErrorSignInRequiredSelector: String?
     private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldOpenNextVideoOnYoutube: Bool = false
 
