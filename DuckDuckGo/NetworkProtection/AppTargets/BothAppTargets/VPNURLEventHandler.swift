@@ -90,6 +90,16 @@ final class VPNURLEventHandler {
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
+    func showVPNAppExclusions() {
+        windowControllerManager.showPreferencesTab(withSelectedPane: .vpn)
+        windowControllerManager.showVPNAppExclusions()
+    }
+
+    func showVPNDomainExclusions() {
+        windowControllerManager.showPreferencesTab(withSelectedPane: .vpn)
+        windowControllerManager.showVPNDomainExclusions()
+    }
+
 #if !APPSTORE && !DEBUG
     func moveAppToApplicationsFolder() {
         // this should be run after NSApplication.shared is set

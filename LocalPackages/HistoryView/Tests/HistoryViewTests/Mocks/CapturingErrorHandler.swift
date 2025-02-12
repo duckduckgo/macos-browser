@@ -1,5 +1,5 @@
 //
-//  HistoryViewDataModel+Configuration.swift
+//  CapturingErrorHandler.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -16,17 +16,28 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Combine
+import Common
+import HistoryView
 
-extension HistoryViewDataModel {
+final class CapturingErrorHandler: EventMapping<HistoryViewEvent> {
+    var events: [HistoryViewEvent] = []
 
-    struct HistoryViewConfiguration: Encodable {
-        var env: String
-        var locale: String
-        var platform: Platform
-
-        struct Platform: Encodable, Equatable {
-            var name: String
+    init() {
+        let localEvents = PassthroughSubject<HistoryViewEvent, Never>()
+        super.init { event, _, _, _ in
+            localEvents.send(event)
         }
+
+        cancellable = localEvents
+            .sink { [weak self] value in
+                self?.events.append(value)
+            }
     }
+
+    override init(mapping: @escaping EventMapping<HistoryViewEvent>.Mapping) {
+        fatalError("Use init()")
+    }
+
+    private var cancellable: AnyCancellable?
 }

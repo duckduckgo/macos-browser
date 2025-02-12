@@ -63,9 +63,11 @@ final class MainWindowController: NSWindowController {
         subscribeToResolutionChange()
         subscribeToFullScreenToolbarChanges()
 
+#if !APPSTORE
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.eventsListener.didOpenWindow(self)
         }
+#endif
     }
 
     required init?(coder: NSCoder) {
@@ -241,9 +243,11 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
 
+#if !APPSTORE
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.eventsListener.didFocusWindow(self)
         }
+#endif
     }
 
     func windowDidResignKey(_ notification: Notification) {
@@ -275,6 +279,7 @@ extension MainWindowController: NSWindowDelegate {
             self?.mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultHigh
             self?.mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultLow
             self?.moveTabBarView(toTitlebarView: false)
+            self?.window?.titlebarAppearsTransparent = false
             self?.window?.toolbar = nil
         }
     }
@@ -286,6 +291,7 @@ extension MainWindowController: NSWindowDelegate {
             self?.mainViewController.mainView.navigationBarTopConstraint.animator().constant = 38
             self?.mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultLow
             self?.mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultHigh
+            self?.window?.titlebarAppearsTransparent = true
             self?.setupToolbar()
         }
     }
@@ -349,9 +355,11 @@ extension MainWindowController: NSWindowDelegate {
         _=Unmanaged.passRetained(self).autorelease()
         WindowControllersManager.shared.unregister(self)
 
+#if !APPSTORE
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.eventsListener.didCloseWindow(self)
         }
+#endif
     }
 
     func windowShouldClose(_ window: NSWindow) -> Bool {

@@ -151,11 +151,6 @@ final class HistoryMenu: NSMenu {
 
     // MARK: - History Groupings
 
-    struct HistoryGrouping {
-        let date: Date
-        let visits: [Visit]
-    }
-
     private var historyGroupingsMenuItems = [NSMenuItem]()
 
     private func addHistoryGroupings() {

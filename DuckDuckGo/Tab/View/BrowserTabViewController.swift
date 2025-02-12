@@ -102,7 +102,7 @@ final class BrowserTabViewController: NSViewController {
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
          newTabPageActionsManager: NewTabPageActionsManager = NSApp.delegateTyped.newTabPageCoordinator.actionsManager,
-         historyViewActionsManager: HistoryViewActionsManager = NSApp.delegateTyped.historyViewActionsManager,
+         historyViewActionsManager: HistoryViewActionsManager = NSApp.delegateTyped.historyViewCoordinator.actionsManager,
          activeRemoteMessageModel: ActiveRemoteMessageModel = NSApp.delegateTyped.activeRemoteMessageModel
     ) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -329,6 +329,7 @@ final class BrowserTabViewController: NSViewController {
 
                 self.tabViewModelCancellables.removeAll(keepingCapacity: true)
                 self.subscribeToTabContent(of: selectedTabViewModel)
+                self.subscribeToTabReloading(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
 
@@ -639,6 +640,22 @@ final class BrowserTabViewController: NSViewController {
         }.store(in: &tabViewModelCancellables)
     }
 
+    private func subscribeToTabReloading(of tabViewModel: TabViewModel?) {
+        guard featureFlagger.isFeatureOn(.historyView), let tab = tabViewModel?.tab, tab.content.usesExternalWebView else { return }
+
+        tab.reloadPublisher
+            .sink { [weak self, weak tabViewModel] in
+                guard let self, let tabViewModel else {
+                    return
+                }
+                let webView = webView(for: tabViewModel)
+                if webView != tabViewModel.tab.webView {
+                    webView.reload()
+                }
+            }
+            .store(in: &tabViewModelCancellables)
+    }
+
     private func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
         guard let tabViewModel else { return }
 
@@ -863,6 +880,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .webExtensionUrl:
             removeAllTabContent()
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 if let tab = tabViewModel?.tab,
                    let url = tab.url,
@@ -871,6 +889,7 @@ final class BrowserTabViewController: NSViewController {
                     self.addWebViewToViewHierarchy(webExtensionWebView, tab: tab)
                 }
             }
+#endif
         default:
             removeAllTabContent()
         }

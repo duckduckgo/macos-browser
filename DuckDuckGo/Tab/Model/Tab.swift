@@ -76,6 +76,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
+    let reloadPublisher = PassthroughSubject<Void, Never>()
     let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
@@ -458,9 +459,11 @@ protocol NewWindowPolicyDecisionMaker {
             if navigationDelegate.currentNavigation == nil {
                 updateCanGoBackForward(withCurrentNavigation: nil)
             }
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 WebExtensionManager.shared.eventsListener.didChangeTabProperties([.URL], for: self)
             }
+#endif
         }
     }
 
@@ -533,9 +536,11 @@ protocol NewWindowPolicyDecisionMaker {
 
     @Published var title: String? {
         didSet {
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 WebExtensionManager.shared.eventsListener.didChangeTabProperties([.title], for: self)
             }
+#endif
         }
     }
 
@@ -566,9 +571,11 @@ protocol NewWindowPolicyDecisionMaker {
 
     @Published private(set) var isLoading: Bool = false {
         didSet {
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 WebExtensionManager.shared.eventsListener.didChangeTabProperties([.loading], for: self)
             }
+#endif
         }
     }
     @Published private(set) var loadingProgress: Double = 0.0
@@ -675,11 +682,16 @@ protocol NewWindowPolicyDecisionMaker {
 
         let canGoBack = webView.canGoBack
         let canGoForward = webView.canGoForward
-        let canReload = if case .url(let url, credential: _, source: _) = content, !(url.isDuckPlayer || url.isDuckURLScheme) {
-            true
-        } else {
-            false
-        }
+        let canReload = {
+            switch content {
+            case .url(let url, _, _):
+                return !(url.isDuckPlayer || url.isDuckURLScheme)
+            case .history:
+                return true
+            default:
+                return false
+            }
+        }()
 
         if canGoBack != self.canGoBack {
             self.canGoBack = canGoBack
@@ -822,6 +834,7 @@ protocol NewWindowPolicyDecisionMaker {
         userInteractionDialog = nil
 
         self.brokenSiteInfo?.tabReloadRequested()
+        reloadPublisher.send()
         if let url = webView.url {
             pageRefreshMonitor.register(for: url)
         }
@@ -853,9 +866,11 @@ protocol NewWindowPolicyDecisionMaker {
         webView.audioState.toggle()
         objectWillChange.send()
 
+#if !APPSTORE
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.eventsListener.didChangeTabProperties([.muted], for: self)
         }
+#endif
     }
 
     private enum ReloadIfNeededSource {
