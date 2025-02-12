@@ -92,6 +92,11 @@ public struct NetworkProtectionStatusView: View {
                         await action()
                         dismiss()
                     }.applyMenuAttributes()
+                case .textWithDetail(_, let icon, let title, let detail, let action):
+                    MenuItemButton(icon: icon, title: title, detail: detail, textColor: Color(.defaultText)) {
+                        await action()
+                        dismiss()
+                    }.applyMenuAttributes()
                 }
             }
         }

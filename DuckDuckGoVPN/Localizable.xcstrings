@@ -728,121 +728,121 @@
       }
     },
     "vpn.status-view.excluded-apps.menu-item.title" : {
-      "comment" : "The VPN status view's 'Excluded Apps' menu item for our status menu app. The number shown is how many Apps are excluded.",
+      "comment" : "The VPN status view's 'Excluded Apps' menu item for our status menu app.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ausgeschlossene Apps (%d)"
+            "value" : "Ausgeschlossene Apps"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Excluded Apps (%d)"
+            "value" : "Excluded Apps"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aplicaciones excluidas (%d)"
+            "value" : "Aplicaciones excluidas"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applications exclues (%d)"
+            "value" : "Applications exclues"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App escluse (%d)"
+            "value" : "App escluse"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uitgesloten apps (%d)"
+            "value" : "Uitgesloten apps"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wykluczone aplikacje (%d)"
+            "value" : "Wykluczone aplikacje"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aplicações excluídas (%d)"
+            "value" : "Aplicações excluídas"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Исключенные приложения (%d)"
+            "value" : "Исключенные приложения"
           }
         }
       }
     },
     "vpn.status-view.excluded-domains.menu-item.title" : {
-      "comment" : "The VPN status view's 'Excluded Websites' menu item for our status menu app. The number shown is how many websites are excluded.",
+      "comment" : "The VPN status view's 'Excluded Websites' menu item for our status menu app.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ausgeschlossene Websites (%d)"
+            "value" : "Ausgeschlossene Websites"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Excluded Websites (%d)"
+            "value" : "Excluded Websites"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sitios web excluidos (%d)"
+            "value" : "Sitios web excluidos"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sites Web exclus (%d)"
+            "value" : "Sites Web exclus"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Siti esclusi (%d)"
+            "value" : "Siti web esclusi"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uitgesloten websites (%d)"
+            "value" : "Uitgesloten websites"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wykluczone witryny internetowe (%d)"
+            "value" : "Wykluczone witryny internetowe"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Websites excluídos (%d)"
+            "value" : "Websites excluídos"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Исключенные сайты (%d)"
+            "value" : "Исключенные сайты"
           }
         }
       }

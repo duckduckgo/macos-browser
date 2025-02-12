@@ -23,7 +23,7 @@ struct MenuItemButton: View {
     @Environment(\.colorScheme) private var colorScheme
     private let icon: Image?
     private let title: String
-    private let detailTitle: String?
+    private let detail: String?
     private let textColor: Color
     private let action: () async -> Void
 
@@ -32,10 +32,10 @@ struct MenuItemButton: View {
     @State private var isHovered = false
     @State private var animatingTap = false
 
-    init(icon: Image? = nil, title: String, detailTitle: String? = nil, textColor: Color, action: @escaping () async -> Void) {
+    init(icon: Image? = nil, title: String, detail: String? = nil, textColor: Color, action: @escaping () async -> Void) {
         self.icon = icon
         self.title = title
-        self.detailTitle = detailTitle
+        self.detail = detail
         self.textColor = textColor
         self.action = action
     }
@@ -44,19 +44,20 @@ struct MenuItemButton: View {
         Button(action: {
             buttonTapped()
         }) {
-            HStack {
+            HStack(spacing: 4) {
                 if let icon {
                     icon
                         .foregroundColor(isHovered ? .white : textColor)
                 }
                 Text(title)
                     .foregroundColor(isHovered ? .white : textColor)
-                Spacer()
-                if let detailTitle {
-                    Text(detailTitle)
-                        .opacity(Opacity.detailText(colorScheme: colorScheme))
-                        .foregroundColor(isHovered ? .white : textColor)
+
+                if let detail {
+                    Text(detail)
+                        .foregroundColor(.secondary)
                 }
+
+                Spacer()
             }.padding([.top, .bottom], 3)
                 .padding([.leading, .trailing], 9)
         }

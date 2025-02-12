@@ -45,6 +45,7 @@ final class ExcludedAppsViewController: NSViewController {
     @IBOutlet var removeAppButton: NSButton!
     @IBOutlet var doneButton: NSButton!
     @IBOutlet var titleLabel: NSTextField!
+    @IBOutlet var descriptionLabel: NSTextField!
 
     private let faviconManagement: FaviconManagement = FaviconManager.shared
 
@@ -80,6 +81,7 @@ final class ExcludedAppsViewController: NSViewController {
         removeAppButton.title = UserText.remove
         doneButton.title = UserText.done
         titleLabel.stringValue = UserText.vpnExcludedAppsTitle
+        descriptionLabel.stringValue = UserText.vpnExcludedAppsDescription
     }
 
     private func updateRemoveButtonState() {

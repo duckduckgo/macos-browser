@@ -365,7 +365,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Dieses Gerät ist bereits synchronisiert. Bist du sicher, dass du es mit einem anderen Back-up oder Gerät synchronisieren möchtest? Beim Wechsel werden keine bereits mit diesem Gerät synchronisierten Daten entfernt."
           }
         },
@@ -377,7 +377,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Este dispositivo ya está sincronizado. ¿Seguro que deseas sincronizarlo con una copia de seguridad o con un dispositivo diferente? Cambiar no eliminará ningún dato ya sincronizado en este dispositivo."
           }
         },
