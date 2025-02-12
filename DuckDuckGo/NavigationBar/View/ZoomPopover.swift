@@ -26,7 +26,7 @@ final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
         /// Zoom UI auto-close interval when opened using the Zoom button in the Address Bar (`nil` if auto-close disabled)
         static let toolbarHideUiInterval: TimeInterval? = nil
         /// Auto-close interval when opened using an app (or ⋮ ) menu item or using ⌘+ / ⌘- shortcuts (`nil` if auto-close disabled)
-        static let menuHideUiInterval: TimeInterval? = 4
+        static let menuHideUiInterval: TimeInterval? = 2
     }
 
     private var tabViewModel: TabViewModel
