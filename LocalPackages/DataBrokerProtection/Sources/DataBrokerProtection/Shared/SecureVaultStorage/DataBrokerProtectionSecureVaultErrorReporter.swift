@@ -46,8 +46,5 @@ final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultReporting {
         default:
             pixelHandler.fire(.secureVaultError(error: error))
         }
-
-        // Also fire the general pixel, since for now all errors are kept under one pixel
-        pixelHandler.fire(.generalError(error: error, functionOccurredIn: "secureVaultErrorReporter"))
     }
 }

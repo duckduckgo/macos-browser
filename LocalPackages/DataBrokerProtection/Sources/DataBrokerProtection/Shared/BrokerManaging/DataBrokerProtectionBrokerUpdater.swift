@@ -154,7 +154,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             brokers = try resources.fetchBrokerFromResourceFiles()
         } catch {
             Logger.dataBrokerProtection.error("DataBrokerProtectionBrokerUpdater updateBrokers, error: \(error.localizedDescription, privacy: .public)")
-            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
+            pixelHandler.fire(.miscError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             return
         }
         guard let brokers = brokers else { return }
@@ -164,7 +164,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
                 try update(broker)
             } catch {
                 Logger.dataBrokerProtection.log("Error updating broker: \(broker.name, privacy: .public), with version: \(broker.version, privacy: .public)")
-                pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
+                pixelHandler.fire(.miscError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             }
         }
     }

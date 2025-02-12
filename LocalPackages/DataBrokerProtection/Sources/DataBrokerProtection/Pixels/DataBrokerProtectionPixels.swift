@@ -86,7 +86,6 @@ public enum DataBrokerProtectionPixels {
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
-    case generalError(error: Error, functionOccurredIn: String)
     case secureVaultInitError(error: Error)
     case secureVaultKeyStoreReadError(error: Error)
     case secureVaultKeyStoreUpdateError(error: Error)
@@ -247,7 +246,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .databaseError: return "m_mac_data_broker_database_error"
         case .cocoaError: return "m_mac_data_broker_cocoa_error"
         case .miscError: return "m_mac_data_broker_misc_error"
-        case .generalError: return "m_mac_data_broker_error"
         case .secureVaultInitError: return "m_mac_dbp_secure_vault_init_error"
         case .secureVaultKeyStoreReadError: return "m_mac_dbp_secure_vault_keystore_read_error"
         case .secureVaultKeyStoreUpdateError: return "m_mac_dbp_secure_vault_keystore_update_error"
@@ -366,9 +364,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             } else {
                 return ["dataBroker": dataBroker, "name": error.name]
             }
-        case .databaseError, .cocoaError, .miscError:
-            return [:]
-        case .generalError(_, let functionOccurredIn):
+        case .databaseError(_, let functionOccurredIn),
+                .cocoaError(_, let functionOccurredIn),
+                .miscError(_, let functionOccurredIn):
             return ["functionOccurredIn": functionOccurredIn]
         case .parentChildMatches(let parent, let child, let value):
             return ["parent": parent, "child": child, "value": String(value)]
@@ -541,8 +539,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                 PixelKit.fire(event, frequency: .daily)
             case .error(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
-            case .generalError(let error, _):
-                PixelKit.fire(DebugEvent(event, error: error))
             case .errorLoadingCachedConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .secureVaultInitError(let error),
@@ -551,9 +547,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .secureVaultKeyStoreUpdateError(let error),
                     .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
-            case .databaseError(error: let error, functionOccurredIn: _),
-                    .cocoaError(error: let error, functionOccurredIn: _),
-                    .miscError(error: let error, functionOccurredIn: _):
+            case .databaseError(let error, _),
+                    .cocoaError(let error, _),
+                    .miscError(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
