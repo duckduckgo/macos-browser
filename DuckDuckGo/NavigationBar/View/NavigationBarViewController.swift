@@ -16,26 +16,25 @@
 //  limitations under the License.
 //
 
+import BrokenSitePrompt
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
-import BrowserServicesKit
-import PixelKit
-import os.log
+import Freemium
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import os.log
+import PageRefreshMonitor
+import PixelKit
 import Subscription
 import SubscriptionUI
-import Freemium
-import BrokenSitePrompt
-import PageRefreshMonitor
 
 final class NavigationBarViewController: NSViewController {
 
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
-        static let homeButtonSeparatorSpacing: CGFloat = 12
         static let maxDragDistanceToExpandHoveredFolder: CGFloat = 4
         static let dragOverFolderExpandDelay: TimeInterval = 0.3
     }
@@ -47,7 +46,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
     @IBOutlet weak var homeButton: MouseOverButton!
-    @IBOutlet weak var homeButtonSeparator: NSBox!
+    @IBOutlet weak var homeButtonSeparator: NSView!
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var networkProtectionButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSStackView!
@@ -844,10 +843,6 @@ final class NavigationBarViewController: NSViewController {
                 if Self.homeButtonPosition == .left {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: Self.homeButtonLeftPosition)
                     homeButtonSeparator.isHidden = false
-
-                    // Set spacing/size for the separator
-                    navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[0])
-                    navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[1])
                 } else {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
                     homeButtonSeparator.isHidden = true

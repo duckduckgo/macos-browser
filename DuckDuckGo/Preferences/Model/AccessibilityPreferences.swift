@@ -59,6 +59,10 @@ enum DefaultZoomValue: CGFloat, CaseIterable {
     }
 
     var index: Int {DefaultZoomValue.allCases.firstIndex(of: self) ?? 3}
+
+    static func > (lhs: DefaultZoomValue, rhs: DefaultZoomValue) -> Bool {
+        lhs.rawValue > rhs.rawValue
+    }
 }
 
 final class AccessibilityPreferences: ObservableObject {
