@@ -69081,38 +69081,38 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ajouter une application"
+            "state" : "translated",
+            "value" : "Parcourir les applications"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Aggiungi applicazione"
+            "state" : "translated",
+            "value" : "Sfoglia applicazioni"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Applicatie toevoegen"
+            "state" : "translated",
+            "value" : "Applicaties browsen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dodaj aplikację"
+            "state" : "translated",
+            "value" : "Przeglądaj aplikacje"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Adicionar aplicação"
+            "state" : "translated",
+            "value" : "Procurar aplicações"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Добавить приложение"
+            "state" : "translated",
+            "value" : "Просмотреть приложения"
           }
         }
       }
@@ -69137,6 +69137,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Añade aplicaciones que no sean compatibles con las VPN para poder usarlas sin desactivar la VPN."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez des applications qui ne sont pas compatibles avec les VPN pour les utiliser sans désactiver le VPN."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi app che non sono compatibili con le VPN per usarle senza spegnere la VPN."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voeg apps toe die niet compatibel zijn met VPN's om ze te gebruiken zonder de VPN uit te schakelen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj aplikacje, które nie są zgodne z sieciami VPN, aby móc z nich korzystać bez wyłączania sieci VPN."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adiciona aplicações que não sejam compatíveis com VPNs para as utilizares sem desativares a VPN."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте приложения, несовместимые с VPN, и вы сможете пользоваться ими, не отключая его."
           }
         }
       }
@@ -72447,8 +72483,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ausgeschlossene Apps (%d)"
+            "state" : "translated",
+            "value" : "Ausgeschlossene Apps"
           }
         },
         "en" : {
@@ -72459,44 +72495,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Aplicaciones excluidas (%d)"
+            "state" : "translated",
+            "value" : "Aplicaciones excluidas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Applications exclues (%d)"
+            "state" : "translated",
+            "value" : "Applications exclues"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "App escluse (%d)"
+            "state" : "translated",
+            "value" : "App escluse"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Uitgesloten apps (%d)"
+            "state" : "translated",
+            "value" : "Uitgesloten apps"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wykluczone aplikacje (%d)"
+            "state" : "translated",
+            "value" : "Wykluczone aplikacje"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Aplicações excluídas (%d)"
+            "state" : "translated",
+            "value" : "Aplicações excluídas"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Исключенные приложения (%d)"
+            "state" : "translated",
+            "value" : "Исключенные приложения"
           }
         }
       }
@@ -72507,8 +72543,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ausgeschlossene Websites (%d)"
+            "state" : "translated",
+            "value" : "Ausgeschlossene Websites"
           }
         },
         "en" : {
@@ -72519,44 +72555,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Sitios web excluidos (%d)"
+            "state" : "translated",
+            "value" : "Sitios web excluidos"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Sites Web exclus (%d)"
+            "state" : "translated",
+            "value" : "Sites Web exclus"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Siti esclusi (%d)"
+            "state" : "translated",
+            "value" : "Siti web esclusi"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Uitgesloten websites (%d)"
+            "state" : "translated",
+            "value" : "Uitgesloten websites"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wykluczone witryny internetowe (%d)"
+            "state" : "translated",
+            "value" : "Wykluczone witryny internetowe"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Websites excluídos (%d)"
+            "state" : "translated",
+            "value" : "Websites excluídos"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Исключенные сайты (%d)"
+            "state" : "translated",
+            "value" : "Исключенные сайты"
           }
         }
       }
