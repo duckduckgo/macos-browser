@@ -34,7 +34,6 @@ final class AutofillTabExtension: TabExtension {
 
     static var vaultManagerProvider: (SecureVaultManagerDelegate) -> AutofillSecureVaultDelegate = { delegate in
         let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
-                                         includePartialAccountMatches: true,
                                          shouldAllowPartialFormSaves: featureFlagger.isFeatureOn(.autofillPartialFormSaves),
                                          tld: ContentBlocking.shared.tld)
         manager.delegate = delegate
