@@ -87,13 +87,12 @@ final class DownloadListViewModel {
             .store(in: &cancellables)
     }
 
-    /// macOS 15.0.1 and 14.7.x have a bug that affects downloads. Apple fixed the issue on macOS 15.1
+    /// macOS 15.0.x and 14.7.x have a bug that affects downloads. Apple fixed the issue on macOS 15.1
     /// For more information: https://app.asana.com/0/1204006570077678/1208522448255790/f
     private func isAffectedMacOSVersion() -> Bool {
         let currentVersion = AppVersion.shared.osVersion
-        let targetVersions = ["15.0.1"]
 
-        return targetVersions.contains(currentVersion) || currentVersion.hasPrefix("14.7.")
+        return currentVersion.hasPrefix("15.0") || currentVersion.hasPrefix("14.7.")
     }
 
     func cleanupInactiveDownloads() {
