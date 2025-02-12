@@ -83,7 +83,7 @@ extension DBPUIViewModel: DBPUIScanOps {
             try dataManager.prepareBrokerProfileQueryDataCache()
         } catch {
             Logger.dataBrokerProtection.error("DBPUIViewModel error: updateCacheWithCurrentScans, error: \(error.localizedDescription, privacy: .public)")
-            pixelHandler.fire(.miscError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))
+            pixelHandler.fire(.databaseError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))
         }
     }
 

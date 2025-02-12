@@ -22,6 +22,7 @@ import AppKitExtensions
 import Cocoa
 import SecureStorage
 import os.log
+import GRDB
 
 protocol ResourcesRepository {
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]?
@@ -154,7 +155,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             brokers = try resources.fetchBrokerFromResourceFiles()
         } catch {
             Logger.dataBrokerProtection.error("DataBrokerProtectionBrokerUpdater updateBrokers, error: \(error.localizedDescription, privacy: .public)")
-            pixelHandler.fire(.miscError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
+            pixelHandler.fire(.cocoaError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             return
         }
         guard let brokers = brokers else { return }
@@ -164,7 +165,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
                 try update(broker)
             } catch {
                 Logger.dataBrokerProtection.log("Error updating broker: \(broker.name, privacy: .public), with version: \(broker.version, privacy: .public)")
-                pixelHandler.fire(.miscError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
+                pixelHandler.fire(.databaseError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             }
         }
     }
