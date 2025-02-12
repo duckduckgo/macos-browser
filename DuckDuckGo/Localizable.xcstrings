@@ -69063,8 +69063,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Anwendung hinzufügen"
+            "state" : "translated",
+            "value" : "Anwendungen durchsuchen"
           }
         },
         "en" : {
@@ -69075,8 +69075,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Añadir aplicación"
+            "state" : "translated",
+            "value" : "Explorar aplicaciones"
           }
         },
         "fr" : {
@@ -69121,10 +69121,22 @@
       "comment" : "Excluded Apps description in VPN settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge Apps hinzu, die nicht mit VPNs kompatibel sind, damit du sie nutzen kannst, ohne das VPN zu deaktivieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Add apps that aren’t compatible with VPNs to use them without turning off the VPN."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade aplicaciones que no sean compatibles con las VPN para poder usarlas sin desactivar la VPN."
           }
         }
       }
