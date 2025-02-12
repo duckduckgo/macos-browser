@@ -36,6 +36,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .errorLoadingCachedConfig(let error),
                     .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
+            case .databaseError(error: let error, functionOccurredIn: _),
+                    .cocoaError(error: let error, functionOccurredIn: _),
+                    .miscError(error: let error, functionOccurredIn: _):
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
                     .ipcServerAppLaunchedXPCError(error: let error),
