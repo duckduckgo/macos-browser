@@ -24,9 +24,7 @@ class PinnedTabsTests: UITestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        app = XCUIApplication()
-        app.launchEnvironment["UITEST_MODE"] = "1"
-        app.launch()
+        app = setupAndLaunchApp()
 
         app.typeKey("n", modifierFlags: .command)
     }
@@ -157,8 +155,7 @@ class PinnedTabsTests: UITestCase {
     }
 
     private func assertPinnedTabsRestoredState() {
-        let newApp = XCUIApplication()
-        newApp.launch()
+        let newApp = setupAndLaunchApp()
         newApp.typeKey("n", modifierFlags: .command)
         sleep(10) // This was increased from two to ten, because slower VMs needed more time to re-launch the app.
 
@@ -173,5 +170,12 @@ class PinnedTabsTests: UITestCase {
 
     private func waitForSite(pageTitle: String) {
         XCTAssertTrue(app.windows.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence))
+    }
+
+    private func setupAndLaunchApp() -> XCUIApplication {
+        let application = XCUIApplication()
+        application.launchEnvironment["UITEST_MODE"] = "1"
+        application.launch()
+        return application
     }
 }
