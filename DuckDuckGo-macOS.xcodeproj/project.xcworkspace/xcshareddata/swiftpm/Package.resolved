@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "graeme/etld+1-matching-for-saves",
-        "revision" : "6bf1337a1cc9e9118a4c016bc5a2ef2fa4807a0b"
+        "revision" : "d9305bab6f4328404819b7bb3303bdfcd0bc1dbb",
+        "version" : "237.0.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "7a37fdc86198b0447e9ff17dbf494171bfaddc33",
-        "version" : "7.16.0"
+        "revision" : "1876d68142cf4f9abfaaee235a015d287eb71226",
+        "version" : "7.17.0"
       }
     },
     {
