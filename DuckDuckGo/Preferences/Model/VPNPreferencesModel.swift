@@ -99,10 +99,6 @@ final class VPNPreferencesModel: ObservableObject {
         isExclusionsFeatureAvailableInBuild && isAppExclusionsFeatureEnabled
     }
 
-    var dnsServersText: String {
-        settings.dnsSettings.dnsServersText ?? ""
-    }
-
     @Published
     private(set) var excludedDomainsCount: Int
 
@@ -254,11 +250,10 @@ final class VPNPreferencesModel: ObservableObject {
             .assign(to: \.dnsSettings, onWeaklyHeld: self)
             .store(in: &cancellables)
         isCustomDNSSelected = settings.dnsSettings.usesCustomDNS
-        customDNSServers = settings.dnsSettings.dnsServersText
+        customDNSServers = settings.customDnsServers.joined(separator: ", ")
     }
 
     private func subscribeToBlockRiskyDomainsChanges() {
-        let defaultBlockRiskyDomains = settings.isBlockRiskyDomainsOn
         settings.isBlockRiskyDomainsOnPublisher
             .map { $0 }
             .assign(to: \.isBlockRiskyDomainsOn, onWeaklyHeld: self)
@@ -326,6 +321,7 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     func saveChanges(customDNSServers: String) {
+        self.customDNSServers = customDNSServers
         settings.dnsSettings = .custom([customDNSServers])
         reloadVPN()
         /// Updating dnsSettings does an IPv4 conversion before actually commiting the change,

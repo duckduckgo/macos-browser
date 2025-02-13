@@ -168,19 +168,18 @@ extension Preferences {
                                         showsCustomDNSServerPageSheet.toggle()
                                     }.disabled(!model.isCustomDNSSelected)
                                 }
-                                if let dnsServersText = model.dnsSettings.dnsServersText {
+                                if let dnsServersText = model.customDNSServers {
                                     TextMenuItemCaption(dnsServersText)
                                         .padding(.top, 0)
-                                        .visibility(model.isCustomDNSSelected ? .visible : .gone)
                                 }
                             }.tag(true)
                         }
                         .pickerStyle(.radioGroup)
                         .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                         .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
-                            if isCustomDNSSelected {
+                            if isCustomDNSSelected && (model.customDNSServers?.isEmpty ?? true) {
                                 showsCustomDNSServerPageSheet.toggle()
-                            } else {
+                            } else if !isCustomDNSSelected {
                                 model.resetDNSSettings()
                                 PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
                             }
