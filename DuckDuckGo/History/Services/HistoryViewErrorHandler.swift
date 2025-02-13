@@ -1,5 +1,5 @@
 //
-//  HistoryViewTests.swift
+//  HistoryViewErrorHandler.swift
 //
 //  Copyright © 2025 DuckDuckGo. All rights reserved.
 //
@@ -16,9 +16,22 @@
 //  limitations under the License.
 //
 
-import Testing
-@testable import HistoryView
+import Common
+import HistoryView
+import PixelKit
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+final class HistoryViewErrorHandler: EventMapping<HistoryViewEvent> {
+
+    init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .historyViewError(let message):
+                PixelKit.fire(DebugEvent(HistoryViewPixel.historyPageExceptionReported(message: message)), frequency: .dailyAndStandard)
+            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<HistoryViewEvent>.Mapping) {
+        fatalError("Use init()")
+    }
 }

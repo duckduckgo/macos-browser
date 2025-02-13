@@ -30,7 +30,6 @@ final class BookmarksBarMenuPopover: NSPopover {
     private(set) var rootFolder: BookmarkFolder?
 
     private(set) var preferredEdge: NSRectEdge?
-    private(set) weak var positioningView: NSView?
 
     private var bookmarksMenuPopoverDelegate: BookmarksBarMenuPopoverDelegate? {
         delegate as? BookmarksBarMenuPopoverDelegate
@@ -85,7 +84,6 @@ final class BookmarksBarMenuPopover: NSPopover {
             tableView.addSubview(v)
         }
 
-        self.positioningView = positioningView
         self.preferredEdge = preferredEdge
         viewController.adjustPreferredContentSize(positionedRelativeTo: positioningRect, of: positioningView, at: preferredEdge)
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)

@@ -304,9 +304,9 @@ final class MainMenu: NSMenu {
             toggleFullscreenMenuItem
             NSMenuItem.separator()
 
-            actualSizeMenuItem
             zoomInMenuItem
             zoomOutMenuItem
+            actualSizeMenuItem
             NSMenuItem.separator()
 
             NSMenuItem(title: UserText.mainMenuDeveloper) {
@@ -769,11 +769,13 @@ final class MainMenu: NSMenu {
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
 
+#if !APPSTORE
             if #available(macOS 14.4, *) {
                 NSMenuItem.separator()
                 NSMenuItem(title: "Web Extensions").submenu(WebExtensionsDebugMenu())
                 NSMenuItem.separator()
             }
+#endif
         }
 
         debugMenu.addItem(internalUserItem)

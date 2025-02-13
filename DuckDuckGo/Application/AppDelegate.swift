@@ -97,7 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private(set) lazy var historyViewActionsManager: HistoryViewActionsManager = HistoryViewActionsManager()
+    private(set) lazy var historyViewCoordinator: HistoryViewCoordinator = HistoryViewCoordinator(historyCoordinator: HistoryCoordinator.shared)
     private(set) lazy var newTabPageCoordinator: NewTabPageCoordinator = NewTabPageCoordinator(
         appearancePreferences: .shared,
         settingsModel: homePageSettingsModel,
@@ -374,6 +374,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Freemium DBP
         freemiumDBPFeature.subscribeToDependencyUpdates()
+
+        _=NSPopover.swizzleShowRelativeToRectOnce
     }
 
     // swiftlint:disable:next cyclomatic_complexity

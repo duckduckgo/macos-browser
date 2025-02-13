@@ -20,6 +20,7 @@ import Combine
 import Common
 import Foundation
 import NewTabPage
+import PixelKit
 
 protocol URLFireproofStatusProviding: AnyObject {
     func isDomainFireproof(forURL url: URL) -> Bool
@@ -164,6 +165,8 @@ final class DefaultRecentActivityActionsHandler: RecentActivityActionsHandling {
         guard let tabCollectionViewModel else {
             return
         }
+
+        PixelKit.fire(NewTabPagePixel.privacyFeedHistoryLinkOpened, frequency: .dailyAndCount)
 
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
             WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: tabCollectionViewModel.isBurner)

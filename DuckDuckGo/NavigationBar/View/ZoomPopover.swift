@@ -16,99 +16,46 @@
 //  limitations under the License.
 //
 
-import SwiftUI
+import AppKit
+import AppKitExtensions
 import Combine
 
-struct ZoomPopoverContentView: View {
-    @ObservedObject var viewModel: ZoomPopoverViewModel
+final class ZoomPopover: NSPopover, ZoomPopoverViewControllerDelegate {
 
-    var body: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Text(viewModel.zoomLevel.displayString)
-                .frame(width: 50, height: 28)
-                .padding(.horizontal, 8)
-
-            Button {
-                viewModel.reset()
-            } label: {
-                Text(UserText.resetZoom)
-                    .frame(height: 28)
-                    .fixedSize(horizontal: true, vertical: false)
-                    .padding(.horizontal, 8)
-            }
-
-            HStack(spacing: 1) {
-                Button {
-                    viewModel.zoomOut()
-                } label: {
-                    Image(systemName: "minus")
-                        .frame(width: 32, height: 28)
-                }
-                Button {
-                    viewModel.zoomIn()
-                } label: {
-                    Image(systemName: "plus")
-                        .frame(width: 32, height: 28)
-                }
-            }
-        }
-        .frame(height: 52)
-        .padding(.horizontal, 16)
-    }
-}
-
-final class ZoomPopoverViewModel: ObservableObject {
-    let tabViewModel: TabViewModel
-    @Published var zoomLevel: DefaultZoomValue = .percent100
-    private var cancellables = Set<AnyCancellable>()
-
-    init(tabViewModel: TabViewModel) {
-        self.tabViewModel = tabViewModel
-        zoomLevel = tabViewModel.zoomLevel
-        tabViewModel.zoomLevelSubject
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] newValue in
-                self?.zoomLevel = newValue
-            }.store(in: &cancellables)
+    fileprivate enum Constants {
+        /// Zoom UI auto-close interval when opened using the Zoom button in the Address Bar (`nil` if auto-close disabled)
+        static let toolbarHideUiInterval: TimeInterval? = nil
+        /// Auto-close interval when opened using an app (or ⋮ ) menu item or using ⌘+ / ⌘- shortcuts (`nil` if auto-close disabled)
+        static let menuHideUiInterval: TimeInterval? = 2
     }
 
-    func zoomIn() {
-        tabViewModel.tab.webView.zoomIn()
-    }
-
-    func zoomOut() {
-        tabViewModel.tab.webView.zoomOut()
-    }
-
-    func reset() {
-        tabViewModel.tab.webView.resetZoomLevel()
-    }
-
-}
-
-final class ZoomPopoverViewController: NSViewController {
-    let viewModel: ZoomPopoverViewModel
-
-    init(viewModel: ZoomPopoverViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func loadView() {
-        let swiftUIView = ZoomPopoverContentView(viewModel: viewModel)
-        view = NSHostingView(rootView: swiftUIView)
-    }
-}
-
-final class ZoomPopover: NSPopover {
-
-    var tabViewModel: TabViewModel
-
+    private var tabViewModel: TabViewModel
     private weak var addressBar: NSView?
+    private var positioningViewIsMouseOverCancellable: NSKeyValueObservation?
+    private var autoCloseTimer: Timer? {
+        willSet {
+            autoCloseTimer?.invalidate()
+        }
+    }
+
+    enum Source { case toolbar, menu }
+    private var source: Source?
+
+    private var hideUiInterval: TimeInterval? {
+        let interval: TimeInterval? = switch source {
+        case .toolbar:
+            Constants.toolbarHideUiInterval
+        case .menu:
+            Constants.menuHideUiInterval
+        case .none:
+            nil
+        }
+        guard let interval, interval > 0 else { return nil } // no auto-hide
+        return interval
+    }
+
+    /// offset from the address bar x to avoid popover arrow clipping if positioning view is too close to the edge
+    private var offsetX: CGFloat = 0
 
     /// prefferred bounding box for the popover positioning
     override var boundingFrame: NSRect {
@@ -116,6 +63,7 @@ final class ZoomPopover: NSPopover {
               let window = addressBar.window else { return .infinite }
         var frame = window.convertToScreen(addressBar.convert(addressBar.bounds, to: nil))
         frame = frame.insetBy(dx: 0, dy: -window.frame.size.height)
+        frame.origin.x += offsetX
         return frame
     }
 
@@ -128,12 +76,15 @@ final class ZoomPopover: NSPopover {
         return frame
     }
 
-    init(tabViewModel: TabViewModel) {
+    init(tabViewModel: TabViewModel, addressBar: NSView?, delegate: NSPopoverDelegate?) {
         self.tabViewModel = tabViewModel
+        self.addressBar = addressBar
         super.init()
 
         self.animates = false
         self.behavior = .semitransient
+        self.delegate = delegate
+
         setupContentController()
     }
 
@@ -145,13 +96,70 @@ final class ZoomPopover: NSPopover {
     var viewController: ZoomPopoverViewController { contentViewController as! ZoomPopoverViewController }
     // swiftlint:enable force_cast
 
+    private var isMouseLocationInsideButtonOrContentViewBounds: Bool {
+        contentViewController?.view.isMouseLocationInsideBounds() == true || positioningView?.isMouseLocationInsideBounds() == true
+    }
+
     private func setupContentController() {
         let controller = ZoomPopoverViewController(viewModel: ZoomPopoverViewModel(tabViewModel: tabViewModel))
+        controller.delegate = self
         contentViewController = controller
     }
 
     override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
-        self.addressBar = positioningView.superview
+        if let addressBar {
+            let frame = positioningView.convert(positioningRect, to: addressBar)
+            offsetX = -max(24 - frame.minX, 0)
+        }
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+
+        // auto-close the popover after X seconds when mouse is out from the popover or Zoom button
+        if let positioningView = positioningView as? MouseOverButton {
+            positioningViewIsMouseOverCancellable = positioningView.observe(\.isMouseOver) { [weak self] _, _ in
+                self?.isMouseOverDidChange()
+            }
+        } else {
+            assertionFailure("\(positioningView) expected to be MouseOverButton to observe its isMouseOver state")
+        }
     }
+
+    func scheduleCloseTimer(source: Source) {
+        self.source = source
+        self.autoCloseTimer = nil
+
+        // don‘t close while mouse is inside bounds
+        guard !isMouseLocationInsideButtonOrContentViewBounds else { return }
+
+        // close after interval for the [menu|toolbar] source
+        if let hideUiInterval, hideUiInterval > 0 {
+            autoCloseTimer = Timer.scheduledTimer(withTimeInterval: hideUiInterval, repeats: false) { [weak self] _ in
+                self?.close()
+            }
+        }
+    }
+
+    /// Restart close timer on zoom level change while open
+    func rescheduleCloseTimerIfNeeded() {
+        if let source, !isMouseLocationInsideButtonOrContentViewBounds {
+            scheduleCloseTimer(source: source)
+        }
+    }
+
+    func isMouseOverDidChange() {
+        if !isShown || isMouseLocationInsideButtonOrContentViewBounds {
+            invalidateCloseTimer()
+        } else {
+            rescheduleCloseTimerIfNeeded()
+        }
+    }
+
+    private func invalidateCloseTimer() {
+        autoCloseTimer = nil
+    }
+
+    override func close() {
+        invalidateCloseTimer()
+        super.close()
+    }
+
 }

@@ -106,8 +106,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
     private func statusViewSubmenu() -> [StatusBarMenu.MenuItem] {
         let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-        let excludedAppsTitle = UserText.vpnStatusViewExcludedAppsMenuItemTitle(proxySettings.excludedApps.count)
-        let excludedWebsitesTitle = UserText.vpnStatusViewExcludedDomainsMenuItemTitle(proxySettings.excludedDomains.count)
 
         var menuItems = [StatusBarMenu.MenuItem]()
 
@@ -119,11 +117,19 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         }
 
         menuItems.append(contentsOf: [
-            .text(icon: Image(.window16), title: excludedAppsTitle, action: { [weak self] in
-                self?.manageExcludedApps()
+            .textWithDetail(
+                icon: Image(.window16),
+                title: UserText.vpnStatusViewExcludedAppsMenuItemTitle,
+                detail: "(\(proxySettings.excludedApps.count))",
+                action: { [weak self] in
+                    self?.manageExcludedApps()
             }),
-            .text(icon: Image(.globe16), title: excludedWebsitesTitle, action: { [weak self] in
-                self?.manageExcludedSites()
+            .textWithDetail(
+                icon: Image(.globe16),
+                title: UserText.vpnStatusViewExcludedDomainsMenuItemTitle,
+                detail: "(\(proxySettings.excludedDomains.count))",
+                action: { [weak self] in
+                    self?.manageExcludedSites()
             }),
             .divider(),
             .text(icon: Image(.help16), title: UserText.vpnStatusViewFAQMenuItemTitle, action: {

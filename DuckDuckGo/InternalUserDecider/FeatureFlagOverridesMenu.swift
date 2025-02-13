@@ -112,14 +112,16 @@ final class FeatureFlagOverridesMenu: NSMenu {
 
     private func updateFeatureFlagItem(_ item: NSMenuItem, flag: FeatureFlag) {
         let override = featureFlagger.localOverrides?.override(for: flag)
+        let submenu = NSMenu()
+        submenu.addItem(removeOverrideSubmenuItem(for: flag))
         item.state = override == true ? .on : .off
-        item.submenu = override != nil ? cohortSubmenu(for: flag) : nil
+        item.submenu = override != nil ? submenu : nil
     }
 
     private func updateExperimentFeatureItem(_ item: NSMenuItem, flag: FeatureFlag) {
         let override = featureFlagger.localOverrides?.experimentOverride(for: flag)
         item.state = override != nil ? .on : .off
-        item.submenu = override != nil ? cohortSubmenu(for: flag) : cohortSubmenu(for: flag)
+        item.submenu = cohortSubmenu(for: flag)
     }
 
     // MARK: - Actions
@@ -177,17 +179,23 @@ final class FeatureFlagOverridesMenu: NSMenu {
         submenu.addItem(NSMenuItem.separator())
 
         // "Remove Override" only if an override exists
+        let removeOverrideItem = removeOverrideSubmenuItem(for: flag)
+        removeOverrideItem.isHidden = currentOverride == nil
+
+        submenu.addItem(removeOverrideItem)
+
+        return submenu
+    }
+
+    private func removeOverrideSubmenuItem(for flag: FeatureFlag) -> NSMenuItem {
         let removeOverrideItem = NSMenuItem(
             title: "Remove Override",
             action: #selector(resetOverride(_:)),
             target: self
         )
         removeOverrideItem.representedObject = flag
-        removeOverrideItem.isHidden = currentOverride == nil
-
-        submenu.addItem(removeOverrideItem)
-
-        return submenu
+        removeOverrideItem.isHidden = featureFlagger.localOverrides?.override(for: flag) == nil
+        return removeOverrideItem
     }
 
     private func cohorts<Flag: FeatureFlagDescribing>(for featureFlag: Flag) -> [any FeatureFlagCohortDescribing] {

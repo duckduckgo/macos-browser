@@ -16,14 +16,18 @@
 //  limitations under the License.
 //
 
+import History
 import HistoryView
 
 extension HistoryViewActionsManager {
 
-    convenience init() {
+    convenience init(historyCoordinator: HistoryGroupingDataSource) {
         self.init(scriptClients: [
-            HistoryViewConfigurationClient(),
-            HistoryViewDataClient()
+            DataClient(
+                dataProvider: HistoryViewDataProvider(historyGroupingDataSource: historyCoordinator),
+                actionsHandler: HistoryViewActionsHandler(),
+                errorHandler: HistoryViewErrorHandler()
+            )
         ])
     }
 }

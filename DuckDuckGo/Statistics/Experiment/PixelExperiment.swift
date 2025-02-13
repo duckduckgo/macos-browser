@@ -60,8 +60,8 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control = "oe"
-    case newOnboarding = "of"
+    case control = "og"
+    case newOnboarding = "oh"
 }
 
 // These functions contain the business logic for determining if the pixel should be fired or not.
@@ -287,7 +287,7 @@ final internal class PixelExperimentLogic {
 
         DispatchQueue.main.async {
             let now = self.now()
-            if now >= AppDelegate.firstLaunchDate.adding(.days(21)) && now <= AppDelegate.firstLaunchDate.adding(.days(27)) {
+            if now >= AppDelegate.firstLaunchDate.addingTimeInterval(.days(21)) && now <= AppDelegate.firstLaunchDate.addingTimeInterval(.days(27)) {
                 PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
             }
         }
