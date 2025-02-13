@@ -148,16 +148,18 @@ extension Preferences {
                         Picker(selection: $model.isCustomDNSSelected, label: EmptyView()) {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(UserText.vpnDnsServerPickerDefaultTitle)
-                                NativeCheckboxToggle(isOn: $model.isBlockRiskyDomainsOn, label: "Block risky domains")
-                                    .disabled(model.isCustomDNSSelected)
-                                VStack(alignment: .leading, spacing: 0, content: {
-                                    TextMenuItemCaption("Block 150,000+ domains flagged for hosting malware, phishing attacks, and online scams with a DNS-level blocklist.")
-                                    TextButton(UserText.learnMore) {
-                                        model.openNewTab(with: .maliciousSiteProtectionLearnMore)
-                                    }
-                                })
-                                .padding(.leading, 20)
-                                .padding(.bottom, 8)
+                                if model.isRiskySitesProtectionFeatureEnabled {
+                                    NativeCheckboxToggle(isOn: $model.isBlockRiskyDomainsOn, label: UserText.vpnDnsServerBlockRiskyDomainsToggleTitle)
+                                        .disabled(model.isCustomDNSSelected)
+                                    VStack(alignment: .leading, spacing: 0, content: {
+                                        TextMenuItemCaption(UserText.vpnDnsServerBlockRiskyDomainsToggleFooter)
+                                        TextButton(UserText.learnMore) {
+                                            model.openNewTab(with: .maliciousSiteProtectionLearnMore)
+                                        }
+                                    })
+                                    .padding(.leading, 20)
+                                    .padding(.bottom, 8)
+                                }
                             }.tag(false)
                             VStack(alignment: .leading, spacing: 0) {
                                 HStack(spacing: 15) {
@@ -225,8 +227,6 @@ extension Preferences {
 }
 
 struct CustomDNSServerPageSheet: View {
-//    private let settings: VPNSettings
-
     @State var customDNSServers = ""
     @State var isValidDNSServers = true
     @Binding var isSheetPresented: Bool
@@ -280,23 +280,9 @@ struct CustomDNSServerPageSheet: View {
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
         .frame(width: 400)
         .onAppear {
-//            customDNSServers = model.customDNSServers
             customDNSServers = model.dnsSettings.dnsServersText ?? ""
         }
     }
-
-//    private func saveChanges(customDNSServers: String) {
-//        settings.dnsSettings = .custom([customDNSServers])
-//        isSheetPresented.toggle()
-//
-//        /// Updating dnsSettings does an IPv4 conversion before actually commiting the change,
-//        /// so we do a final check to see which outcome the user ends up with
-//        if settings.dnsSettings.usesCustomDNS {
-//            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .legacyDailyAndCount)
-//        } else {
-//            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
-//        }
-//    }
 
     private func validateDNSServers(_ text: String) {
         isValidDNSServers = !text.isEmpty && text.isValidIpv4Host

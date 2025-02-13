@@ -47,6 +47,8 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/0/72649045549333/1208617860225199/f
     case networkProtectionEnforceRoutes
 
+    case networkProtectionRickyDomainsProtection
+
     /// https://app.asana.com/0/72649045549333/1208241266421040/f
     case htmlNewTabPage
 
@@ -78,7 +80,7 @@ extension FeatureFlag: FeatureFlagDescribing {
 
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .htmlNewTabPage, .autofillPartialFormSaves, .autcompleteTabs, .networkProtectionAppExclusions, .syncSeamlessAccountSwitching, .historyView, .webExtensions:
+        case .htmlNewTabPage, .autofillPartialFormSaves, .autcompleteTabs, .networkProtectionAppExclusions, .networkProtectionRickyDomainsProtection, .syncSeamlessAccountSwitching, .historyView, .webExtensions:
             return true
         case .testExperiment:
             return true
@@ -134,6 +136,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(SyncSubfeature.seamlessAccountSwitching))
         case .testExperiment:
             return .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
+        case .networkProtectionRickyDomainsProtection:
+            return .disabled
         }
     }
 }

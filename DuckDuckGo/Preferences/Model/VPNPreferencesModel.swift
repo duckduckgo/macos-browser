@@ -79,6 +79,10 @@ final class VPNPreferencesModel: ObservableObject {
         featureFlagger.isFeatureOn(.networkProtectionAppExclusions)
     }
 
+    var isRiskySitesProtectionFeatureEnabled: Bool {
+        featureFlagger.isFeatureOn(.networkProtectionRickyDomainsProtection)
+    }
+
     private var isExclusionsFeatureAvailableInBuild: Bool {
         proxySettings.proxyAvailable
     }
@@ -254,8 +258,9 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     private func subscribeToBlockRiskyDomainsChanges() {
+        let defaultBlockRiskyDomains = settings.isBlockRiskyDomainsOn
         settings.isBlockRiskyDomainsOnPublisher
-            .map { $0! }
+            .map { $0 }
             .assign(to: \.isBlockRiskyDomainsOn, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
