@@ -34,10 +34,14 @@ extension NSPasteboard {
     }
 
     var url: URL? {
-        guard let urlString = self.string(forType: .URL) ?? self.string(forType: .fileURL) else { return nil }
-        return URL(string: urlString)
+        if let urlString = self.string(forType: .URL) ?? self.string(forType: .fileURL) {
+            return URL(string: urlString)
+        }
+        if let string = self.string(forType: .string), let url = URL(string: string), url.scheme != nil {
+            return url
+        }
+        return nil
     }
-
 }
 
 extension NSPasteboard.PasteboardType {
