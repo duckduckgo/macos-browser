@@ -1,0 +1,531 @@
+{
+  "name": "PrivateReports",
+  "url": "privatereports.com",
+  "version": "0.6.0",
+  "optOutUrl": "https://www.privatereports.com/optOut/name/landingPage",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.privatereports.com/name/search-result",
+          "id": "ac6686ff-7b1e-4464-9a73-bf7f62967fd0"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-form-2"
+            }
+          ],
+          "id": "2e988ca4-4ad1-4dfc-bbb7-e35b95ad781e"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#email-form-2",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": ".//input[@name='First-Name']"
+            },
+            {
+              "type": "middleName",
+              "selector": ".//input[@name='Middle-Name']"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@name='Last-Name']"
+            },
+            {
+              "type": "city",
+              "selector": ".//input[@name='City']"
+            },
+            {
+              "type": "state",
+              "selector": ".//select[@name='State']"
+            }
+          ],
+          "id": "9f653c52-f6ff-4e54-8884-efd4cdf1858a"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[class~='refine-search-button']"
+            }
+          ],
+          "id": "596bd67f-b0dc-4cc0-9f0f-f9f2f3b06b74"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "28722ef7-0ad7-40f6-8bce-6b1eeb47939c"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.cityState']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[class~='loader-submit-btn']"
+                }
+              ],
+              "id": "c3dd97e9-170d-4b00-95a7-81688537ef76"
+            }
+          ],
+          "id": "d35c1dcd-3fe0-40db-9d66-1ea61e8535cf"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "29722ef7-0ad7-40f6-8bce-6b1eeb47939c"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.moreThanAge']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "choices": [
+                {
+                  "condition": {
+                    "left": "${age}",
+                    "operation": ">=",
+                    "right": "45"
+                  },
+                  "elements": [
+                    {
+                      "type": "button",
+                      "selector": "//div[contains(text(), 'YES')]"
+                    }
+                  ]
+                }
+              ],
+              "default": {
+                "elements": [
+                  {
+                    "type": "button",
+                    "selector": "//div[contains(text(), 'NO')]"
+                  }
+                ]
+              },
+              "id": "5525226e-a0bc-44b0-81f7-e23293332f1a"
+            }
+          ],
+          "id": "945c717f-cb61-406f-a12c-3fafdac10bdc"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "8a632c01-a405-49ee-90c0-e2d40e1eb69d"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".srp-view-more",
+              "multiple": true,
+              "failSilently": true
+            }
+          ],
+          "id": "f69b3a3d-aa7b-457f-971a-f910905f3992"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".srp-table-item",
+          "noResultsSelector": "//div[contains(text(), 'unable to find')]|//h2[contains(text(), 'too many results')]",
+          "profile": {
+            "name": {
+              "selector": ".srp-name"
+            },
+            "age": {
+              "selector": ".srp-item-age"
+            },
+            "addressCityStateList": {
+              "selector": ".srp-item-locations .srp-item-location",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".srp-item-relatives .srp-item-relative",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "204b4965-4f56-4849-b22b-ad8b2f1481da"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.privatereports.com/optOut/name/search-result",
+          "id": "69e45509-bfce-4697-a911-4c442e7e6478"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-form-2"
+            }
+          ],
+          "id": "1d7a4138-a7b1-413e-862c-041f98649664"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-form-2"
+            }
+          ],
+          "id": "24722ef7-0ad7-40f6-8bce-6b1eeb47939c"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#email-form-2",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": ".//input[@name='First-Name']"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@name='Last-Name']"
+            },
+            {
+              "type": "city",
+              "selector": ".//input[@name='City']"
+            },
+            {
+              "type": "state",
+              "selector": ".//select[@name='State']"
+            }
+          ],
+          "id": "0ad21f64-27ee-48ce-b405-73c9b974ac5e"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[class~='refine-search-button']"
+            }
+          ],
+          "id": "4e684fea-b543-4ff7-892b-9d4496e0c74e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "25722ef7-0ad7-40f6-8bce-6b1eeb47939c"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.cityState']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[type='submit']"
+                }
+              ],
+              "id": "f75fe97f-794e-40be-9d05-120bb0a3ddad"
+            }
+          ],
+          "id": "0081ce75-eee3-4302-875d-8a86b49647db"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "25722ef7-0ad7-40f6-8bce-6b1eeb47939c"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.moreThanAge']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "choices": [
+                {
+                  "condition": {
+                    "left": "${age}",
+                    "operation": ">=",
+                    "right": "45"
+                  },
+                  "elements": [
+                    {
+                      "type": "button",
+                      "selector": "//button[contains(text(), 'Yes')]"
+                    }
+                  ]
+                }
+              ],
+              "default": {
+                "elements": [
+                  {
+                    "type": "button",
+                    "selector": "//button[contains(text(), 'No')]"
+                  }
+                ]
+              },
+              "id": "7af1dd0b-dd15-4d4e-827f-c7c8416a7381"
+            }
+          ],
+          "id": "d770cb5e-506b-4d59-9767-45106ab2d834"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".srp-table-item"
+            }
+          ],
+          "id": "daacbff6-149a-4834-944a-3c86267429b8"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".srp-view-more",
+              "multiple": true
+            }
+          ],
+          "id": "1482da11-ab69-4192-8286-dbcb624bb021"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".srp-full-report",
+              "parent": {
+                "profileMatch": {
+                  "selector": ".srp-table-item",
+                  "profile": {
+                    "name": {
+                      "selector": ".srp-name"
+                    },
+                    "age": {
+                      "selector": ".srp-item-age"
+                    },
+                    "addressCityStateList": {
+                      "selector": ".srp-item-locations .srp-item-location",
+                      "findElements": true
+                    },
+                    "relativesList": {
+                      "selector": ".srp-item-relatives .srp-item-relative",
+                      "findElements": true
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "83a22d98-4908-4ed4-8f56-931a84cdbb5e"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".content-box.reports",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "input[id='emailAddress']"
+            }
+          ],
+          "id": "42a98690-08f9-4f0c-9808-a57b53813b5d"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".content-box.reports",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "input[id='fullName']"
+            },
+            {
+              "type": "$generated_street_address$",
+              "selector": "input[id='address']"
+            },
+            {
+              "type": "$generated_phone_number$",
+              "selector": "input[id='phoneNumber']"
+            }
+          ],
+          "id": "04f38bbb-0a48-476b-a459-1c4542fd50a9"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "button[id='submit-btn']"
+            }
+          ],
+          "id": "f8b405e9-07e1-4d39-a18e-cb2cd4d66c73"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "button[id='submit-btn']"
+            }
+          ],
+          "id": "914907cc-fbe8-4bd4-869c-0896664031dd"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "button[id='submit-btn']"
+            }
+          ],
+          "id": "0d0e655e-089d-43ca-96fd-51d50290ff55"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "button[id='submit-btn']"
+            }
+          ],
+          "id": "a50b3905-0d47-4d57-a69e-39b997886427"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "button[id='submit-btn']"
+            }
+          ],
+          "id": "24b2de0c-5e05-48ac-9617-93f535fcdd22"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "button[id='submit-btn']"
+            }
+          ],
+          "id": "a0ab9922-364d-41e8-ba59-367430e5db84"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[id='submit-btn']"
+            }
+          ],
+          "id": "12431494-1d92-40b0-bbca-e882f0366d7b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Confirmation email sent"
+            }
+          ],
+          "id": "f89649a7-da1d-49b8-b3ca-378b8824b7f3"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "52175b19-3fa5-44a3-8535-7b6aebc3dcd9"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Opt-out Confirmed"
+            }
+          ],
+          "id": "1ad9d334-d0a6-4fdb-976e-787ea20366a6"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  },
+  "addedDatetime": 1737035696264
+}
