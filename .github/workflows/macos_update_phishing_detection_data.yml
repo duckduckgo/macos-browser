@@ -1,7 +1,7 @@
 name: macOS - Update Phishing Detection Datasets
 on:
-  schedule:
-    - cron: '0 0 * * 0'  # Midnight UTC every Sunday
+  # schedule:
+  #   - cron: '0 0 * * 0'  # Midnight UTC every Sunday
 jobs:
   update_data:
     runs-on: ubuntu-latest
