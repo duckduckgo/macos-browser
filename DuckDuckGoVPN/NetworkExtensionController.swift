@@ -29,46 +29,47 @@ import SystemExtensions
 ///
 /// Through this class the app that owns the VPN can interact with the network extension.
 ///
-final class NetworkExtensionController {
+/*
+ final class NetworkExtensionController {
 
-#if NETP_SYSTEM_EXTENSION
-    private let systemExtensionManager: SystemExtensionManager
-    private let defaults: UserDefaults
-#endif
+ #if NETP_SYSTEM_EXTENSION
+ private let systemExtensionManager: SystemExtensionManager
+ private let defaults: UserDefaults
+ #endif
 
-    init(extensionBundleID: String, defaults: UserDefaults = .netP) {
-#if NETP_SYSTEM_EXTENSION
-        systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
-        self.defaults = defaults
-#endif
-    }
+ init(extensionBundleID: String, defaults: UserDefaults = .netP) {
+ #if NETP_SYSTEM_EXTENSION
+ systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
+ self.defaults = defaults
+ #endif
+ }
+ }
 
-}
+ extension NetworkExtensionController {
 
-extension NetworkExtensionController {
+ func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
+ #if NETP_SYSTEM_EXTENSION
+ if let extensionVersion = try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval) {
 
-    func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
-#if NETP_SYSTEM_EXTENSION
-        if let extensionVersion = try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval) {
+ NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
+ }
 
-            NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
-        }
+ try await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+ #endif
+ }
 
-        try await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
-#endif
-    }
+ func deactivateSystemExtension() async throws {
+ #if NETP_SYSTEM_EXTENSION
+ do {
+ try await systemExtensionManager.deactivate()
+ } catch OSSystemExtensionError.extensionNotFound {
+ // This is an intentional no-op to silence this type of error
+ // since on deactivation this is ok.
+ } catch {
+ throw error
+ }
+ #endif
+ }
 
-    func deactivateSystemExtension() async throws {
-#if NETP_SYSTEM_EXTENSION
-        do {
-            try await systemExtensionManager.deactivate()
-        } catch OSSystemExtensionError.extensionNotFound {
-            // This is an intentional no-op to silence this type of error
-            // since on deactivation this is ok.
-        } catch {
-            throw error
-        }
-#endif
-    }
-
-}
+ }
+ */

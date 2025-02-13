@@ -52,6 +52,7 @@ public struct SystemExtensionManager {
 
     /// - Returns: The system extension version when it's updated, otherwise `nil`.
     ///
+    @discardableResult
     public func activate(waitingForUserApproval: @escaping () -> Void) async throws -> String? {
 
         workaroundToActivateBeforeSequoia()
@@ -97,10 +98,17 @@ public struct SystemExtensionManager {
     }
 
     public func deactivate() async throws {
-        try await SystemExtensionRequest.deactivationRequest(
-            forExtensionWithIdentifier: extensionBundleID,
-            manager: manager)
-        .submit()
+        do {
+            try await SystemExtensionRequest.deactivationRequest(
+                forExtensionWithIdentifier: extensionBundleID,
+                manager: manager)
+            .submit()
+        } catch OSSystemExtensionError.extensionNotFound {
+            // This is an intentional no-op to silence this type of error
+            // since on deactivation this is ok.
+        } catch {
+            throw error
+        }
     }
 
     // MARK: - Activation: Checking if there are pending requests

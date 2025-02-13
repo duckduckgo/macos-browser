@@ -2,23 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>APP_CONFIGURATION_APP_GROUP</key>
+	<string>$(APP_CONFIGURATION_APP_GROUP)</string>
 	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
 	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
+	<key>IPC_APP_GROUP</key>
+	<string>$(IPC_APP_GROUP)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
 	<key>PROXY_EXTENSION_BUNDLE_ID</key>
 	<string>$(PROXY_EXTENSION_BUNDLE_ID)</string>
+	<key>PROXY_SYSTEM_EXTENSION_BUNDLE_ID</key>
+	<string>$(PROXY_SYSTEM_EXTENSION_BUNDLE_ID)</string>
 	<key>SUBSCRIPTION_APP_GROUP</key>
 	<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	<key>TUNNEL_EXTENSION_BUNDLE_ID</key>
 	<string>$(TUNNEL_EXTENSION_BUNDLE_ID)</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.productivity</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
-	<key>IPC_APP_GROUP</key>
-	<string>$(IPC_APP_GROUP)</string>
-	<key>APP_CONFIGURATION_APP_GROUP</key>
-	<string>$(APP_CONFIGURATION_APP_GROUP)</string>
 </dict>
 </plist>

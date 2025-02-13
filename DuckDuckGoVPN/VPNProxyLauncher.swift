@@ -43,6 +43,10 @@ final class VPNProxyLauncher {
 
         subscribeToStatusChanges()
         subscribeToProxySettingChanges()
+
+        Task {
+            try? await proxyController.start()
+        }
     }
 
     // MARK: - Status Changes
@@ -60,7 +64,7 @@ final class VPNProxyLauncher {
         Task { @MainActor in
             let isProxyConnectionStatusChange = await proxyController.connection == notification.object as? NEVPNConnection
 
-            try await startOrStopProxyIfNeeded(isProxyConnectionStatusChange: isProxyConnectionStatusChange)
+            //try await startOrStopProxyIfNeeded(isProxyConnectionStatusChange: isProxyConnectionStatusChange)
         }
     }
 
@@ -69,14 +73,14 @@ final class VPNProxyLauncher {
     private func subscribeToProxySettingChanges() {
         proxyController.settings.changePublisher
             .sink { [weak self] notification in
-                self?.proxySettingChanged(notification)
+                //self?.proxySettingChanged(notification)
             }
             .store(in: &cancellables)
     }
 
     private func proxySettingChanged(_ change: TransparentProxySettings.Change) {
         Task { @MainActor in
-            try await startOrStopProxyIfNeeded()
+            //try await startOrStopProxyIfNeeded()
         }
     }
 

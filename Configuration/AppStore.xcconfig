@@ -53,6 +53,12 @@ APP_CONFIGURATION_APP_GROUP[config=Review][sdk=*] = $(APP_CONFIGURATION_BASE_APP
 APP_CONFIGURATION_APP_GROUP[config=Debug][sdk=*] = $(APP_CONFIGURATION_BASE_APP_GROUP).debug
 APP_CONFIGURATION_APP_GROUP[config=Release][sdk=*] = $(APP_CONFIGURATION_BASE_APP_GROUP)
 
+PROXY_SYSEX_MACH_SERVICE_NAME[sdk=*] = $(NETP_APP_GROUP).proxy.ipc
+PROXY_SYSEX_MACH_SERVICE_NAME[config=CI][sdk=*] = $(NETP_APP_GROUP).proxy.ipc
+PROXY_SYSEX_MACH_SERVICE_NAME[config=Review][sdk=*] = $(NETP_APP_GROUP).proxy.ipc
+PROXY_SYSEX_MACH_SERVICE_NAME[config=Debug][sdk=*] = $(NETP_APP_GROUP).proxy.ipc
+PROXY_SYSEX_MACH_SERVICE_NAME[config=Release][sdk=*] = $(NETP_APP_GROUP).proxy.ipc
+
 AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.mobile.ios.vpn.agent
 AGENT_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID_BASE)
 AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
@@ -69,6 +75,12 @@ PROXY_EXTENSION_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID).proxy
 PROXY_EXTENSION_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID).proxy
 PROXY_EXTENSION_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID).proxy
 PROXY_EXTENSION_BUNDLE_ID[config=Release][sdk=*] = $(AGENT_BUNDLE_ID).proxy
+
+PROXY_SYSTEM_EXTENSION_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID).proxy.sysex
+PROXY_SYSTEM_EXTENSION_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID).proxy.sysex
+PROXY_SYSTEM_EXTENSION_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID).proxy.sysex
+PROXY_SYSTEM_EXTENSION_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID).proxy.sysex
+PROXY_SYSTEM_EXTENSION_BUNDLE_ID[config=Release][sdk=*] = $(AGENT_BUNDLE_ID).proxy.sysex
 
 TUNNEL_EXTENSION_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID).network-protection-extension
 TUNNEL_EXTENSION_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID).network-protection-extension

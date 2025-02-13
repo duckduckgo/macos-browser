@@ -21,6 +21,7 @@ import NetworkProtection
 import NetworkProtectionIPC
 import PixelKit
 import SystemExtensions
+import SystemExtensionManager
 
 protocol VPNUninstalling {
     func uninstall(includingSystemExtension: Bool) async throws
@@ -32,17 +33,17 @@ protocol VPNUninstalling {
 final class VPNUninstaller: VPNUninstalling {
 
     private let tunnelController: NetworkProtectionTunnelController
-    private let networkExtensionController: NetworkExtensionController
+    private let systemExtensionManager: SystemExtensionManager
     private let defaults: UserDefaults
     private let pixelKit: PixelFiring?
 
     init(tunnelController: NetworkProtectionTunnelController,
-         networkExtensionController: NetworkExtensionController,
+         systemExtensionManager: SystemExtensionManager,
          defaults: UserDefaults = .netP,
          pixelKit: PixelFiring? = PixelKit.shared) {
 
         self.tunnelController = tunnelController
-        self.networkExtensionController = networkExtensionController
+        self.systemExtensionManager = systemExtensionManager
         self.defaults = defaults
         self.pixelKit = pixelKit
     }

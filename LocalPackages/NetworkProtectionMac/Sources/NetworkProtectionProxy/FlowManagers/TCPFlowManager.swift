@@ -59,6 +59,10 @@ final class TCPFlowManager {
     init(flow: NEAppProxyTCPFlow, logger: Logger) {
         self.flow = flow
         self.logger = logger
+
+        Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] timer in
+            self?.printIPAddress()
+        }
     }
 
     deinit {
@@ -108,6 +112,35 @@ final class TCPFlowManager {
         }
     }
 
+    func printIPAddress() {
+        let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.example.app", category: "Network")
+
+        guard let url = URL(string: "https://ifconfig.me/ip") else {
+            logger.error("😎 Invalid URL")
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                logger.error("😎 Error: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                logger.warning("😎 No data received")
+                return
+            }
+
+            if let ipAddress = String(data: data, encoding: .utf8) {
+                logger.log("😎 Your IP address is: \(ipAddress, privacy: .public)")
+            } else {
+                logger.error("😎 Unable to parse IP address")
+            }
+        }
+
+        task.resume()
+    }
+
     func connect(to remoteEndpoint: NWHostEndpoint, interface: NWInterface, completion: @escaping @TCPFlowActor (Result<NWConnection, Error>) -> Void) {
         let host = Network.NWEndpoint.Host(remoteEndpoint.hostname)
         let port = Network.NWEndpoint.Port(remoteEndpoint.port)!
@@ -119,6 +152,8 @@ final class TCPFlowManager {
 
         let connection = NWConnection(host: host, port: port, using: parameters)
         self.connection = connection
+
+        printIPAddress()
 
         connection.stateUpdateHandler = { (state: NWConnection.State) in
             Task { @TCPFlowActor in

@@ -73,7 +73,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     // MARK: - Debug Options Support
 
     private let networkExtensionBundleID: String
-    private let networkExtensionController: NetworkExtensionController
 
     // MARK: - Notification Center
 
@@ -117,7 +116,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 return internalManager
             }
 
-            let manager = try? await NETunnelProviderManager.loadAllFromPreferences().first { manager in
+            guard let allManagers = try? await NETunnelProviderManager.loadAllFromPreferences() else {
+                return nil
+            }
+
+            let manager = allManagers.first { manager in
                 (manager.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == networkExtensionBundleID
             }
             internalManager = manager
@@ -153,7 +156,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
     init(networkExtensionBundleID: String,
-         networkExtensionController: NetworkExtensionController,
          featureFlagger: FeatureFlagger,
          settings: VPNSettings,
          defaults: UserDefaults,
@@ -162,7 +164,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
         self.featureFlagger = featureFlagger
         self.networkExtensionBundleID = networkExtensionBundleID
-        self.networkExtensionController = networkExtensionController
         self.notificationCenter = notificationCenter
         self.settings = settings
         self.defaults = defaults
@@ -425,7 +426,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     private func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
         do {
-            try await networkExtensionController.activateSystemExtension(waitingForUserApproval: waitingForUserApproval)
+            let systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
+
+            if let version = try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval) {
+
+                NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
+            }
         } catch {
             switch error {
             case OSSystemExtensionError.requestSuperseded:
@@ -540,6 +546,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
         do {
 #if NETP_SYSTEM_EXTENSION
+            if let extensionVersion = try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval) {
+
+                NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
+            }
             try await activateSystemExtension { [weak self] in
                 // If we're waiting for user approval we wanna make sure the
                 // onboarding step is set correctly.  This can be useful to

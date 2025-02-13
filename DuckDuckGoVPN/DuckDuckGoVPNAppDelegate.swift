@@ -35,6 +35,7 @@ import ServiceManagement
 import Subscription
 import SwiftUICore
 import VPNAppLauncher
+import SystemExtensionManager
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -168,8 +169,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         Bundle.tunnelExtensionBundleID
     }
 
-    private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: tunnelExtensionBundleID)
-
     private var storeProxySettingsInProviderConfiguration: Bool {
 #if NETP_SYSTEM_EXTENSION
         true
@@ -244,7 +243,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: tunnelExtensionBundleID,
-        networkExtensionController: networkExtensionController,
         featureFlagger: featureFlagger,
         settings: tunnelSettings,
         defaults: userDefaults,
@@ -259,7 +257,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         let ipcServer = TunnelControllerIPCService(
             tunnelController: tunnelController,
             uninstaller: vpnUninstaller,
-            networkExtensionController: networkExtensionController,
             statusReporter: statusReporter)
         ipcServer.activate()
         return ipcServer
@@ -306,10 +303,15 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     }()
 
     @MainActor
+    private lazy var systemExtensionManager = {
+        SystemExtensionManager(extensionBundleID: proxyExtensionBundleID)
+    }()
+
+    @MainActor
     private lazy var vpnUninstaller: VPNUninstaller = {
         VPNUninstaller(
             tunnelController: tunnelController,
-            networkExtensionController: networkExtensionController)
+            systemExtensionManager: systemExtensionManager)
     }()
 
     /// The status bar NetworkProtection menu

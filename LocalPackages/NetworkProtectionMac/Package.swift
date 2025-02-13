@@ -40,6 +40,7 @@ let package = Package(
         .package(path: "../UDSHelper"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
+        .package(path: "../SystemExtensionManager"),
         .package(path: "../LoginItems"),
     ],
     targets: [
@@ -64,6 +65,7 @@ let package = Package(
             name: "NetworkProtectionProxy",
             dependencies: [
                 "AppInfoRetriever",
+                "SystemExtensionManager",
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],

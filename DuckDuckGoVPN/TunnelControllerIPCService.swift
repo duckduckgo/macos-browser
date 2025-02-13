@@ -32,7 +32,6 @@ import UDSHelper
 ///
 final class TunnelControllerIPCService {
     private let tunnelController: NetworkProtectionTunnelController
-    private let networkExtensionController: NetworkExtensionController
     private let uninstaller: VPNUninstalling
     private let server: NetworkProtectionIPC.VPNControllerXPCServer
     private let statusReporter: NetworkProtectionStatusReporter
@@ -75,7 +74,6 @@ final class TunnelControllerIPCService {
 
     init(tunnelController: NetworkProtectionTunnelController,
          uninstaller: VPNUninstalling,
-         networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
          fileManager: FileManager = .default,
          defaults: UserDefaults = .netP,
@@ -83,7 +81,6 @@ final class TunnelControllerIPCService {
 
         self.tunnelController = tunnelController
         self.uninstaller = uninstaller
-        self.networkExtensionController = networkExtensionController
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
         self.defaults = defaults
@@ -226,7 +223,7 @@ extension TunnelControllerIPCService: XPCServerInterface {
     }
 
     func resetAll(uninstallSystemExtension: Bool) async {
-        try? await networkExtensionController.deactivateSystemExtension()
+        try? await uninstaller.removeSystemExtension()
     }
 
     func command(_ command: VPNCommand) async throws {
