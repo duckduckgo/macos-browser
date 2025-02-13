@@ -24,6 +24,7 @@ import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionProxy
 import NetworkProtectionUI
+import PixelKit
 
 final class VPNPreferencesModel: ObservableObject {
 
@@ -94,6 +95,10 @@ final class VPNPreferencesModel: ObservableObject {
         isExclusionsFeatureAvailableInBuild && isAppExclusionsFeatureEnabled
     }
 
+    var dnsServersText: String {
+        settings.dnsSettings.dnsServersText ?? ""
+    }
+
     @Published
     private(set) var excludedDomainsCount: Int
 
@@ -114,13 +119,14 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-    @Published public var dnsSettings: NetworkProtectionDNSSettings = .ddg(maliciousSiteProtection: true)
+    @Published public var dnsSettings: NetworkProtectionDNSSettings
     @Published public var isCustomDNSSelected = false
     @Published public var customDNSServers: String?
-    @Published var blockRiskyDomains: Bool {
+    @Published var isBlockRiskyDomainsOn: Bool {
         didSet {
-            guard settings.isProtectionEnabled != blockRiskyDomains else { return }
-            settings.dnsSettings = .ddg(maliciousSiteProtection: blockRiskyDomains)
+            guard settings.isBlockRiskyDomainsOn != isBlockRiskyDomainsOn else { return }
+            settings.dnsSettings = .ddg(blockRiskyDomains: isBlockRiskyDomainsOn)
+            reloadVPN()
         }
     }
 
@@ -156,7 +162,8 @@ final class VPNPreferencesModel: ObservableObject {
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
-        blockRiskyDomains = settings.isProtectionEnabled
+        isBlockRiskyDomainsOn = settings.isBlockRiskyDomainsOn
+        dnsSettings = settings.dnsSettings
 
         subscribeToAppRoutingRulesChanges()
         subscribeToOnboardingStatusChanges(defaults: defaults)
@@ -168,13 +175,6 @@ final class VPNPreferencesModel: ObservableObject {
         subscribeToLocationSettingChanges()
         subscribeToDNSSettingsChanges()
         subscribeToBlockRiskyDomainsChanges()
-    }
-
-    private func subscribeToBlockRiskyDomainsChanges() {
-        settings.isProtectionEnabledPublisher
-            .map { $0 }
-            .assign(to: \.blockRiskyDomains, onWeaklyHeld: self)
-            .store(in: &cancellables)
     }
 
     private func subscribeToAppRoutingRulesChanges() {
@@ -253,8 +253,25 @@ final class VPNPreferencesModel: ObservableObject {
         customDNSServers = settings.dnsSettings.dnsServersText
     }
 
+    private func subscribeToBlockRiskyDomainsChanges() {
+        settings.isBlockRiskyDomainsOnPublisher
+            .map { $0! }
+            .assign(to: \.isBlockRiskyDomainsOn, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func reloadVPN() {
+        Task {
+            // Allow some time for the change to propagate
+            try await Task.sleep(interval: 0.1)
+
+            try await vpnXPCClient.command(.restartAdapter)
+        }
+    }
+
     func resetDNSSettings() {
-        settings.dnsSettings = .ddg(maliciousSiteProtection: settings.isProtectionEnabled)
+        settings.dnsSettings = .ddg(blockRiskyDomains: settings.isBlockRiskyDomainsOn)
+        reloadVPN()
     }
 
     @MainActor
@@ -297,12 +314,29 @@ final class VPNPreferencesModel: ObservableObject {
     func manageExcludedSites() {
         WindowControllersManager.shared.showVPNDomainExclusions()
     }
+
+    @MainActor
+    func openNewTab(with url: URL) {
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    }
+
+    func saveChanges(customDNSServers: String) {
+        settings.dnsSettings = .custom([customDNSServers])
+        reloadVPN()
+        /// Updating dnsSettings does an IPv4 conversion before actually commiting the change,
+        /// so we do a final check to see which outcome the user ends up with
+        if settings.dnsSettings.usesCustomDNS {
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .legacyDailyAndCount)
+        } else {
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
+        }
+    }
 }
 
 extension NetworkProtectionDNSSettings {
     var dnsServersText: String? {
         switch self {
-        case .ddg: return nil
+        case .ddg: return ""
         case .custom(let servers): return servers.joined(separator: ", ")
         }
     }
