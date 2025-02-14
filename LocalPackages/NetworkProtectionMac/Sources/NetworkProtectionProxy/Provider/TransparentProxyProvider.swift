@@ -393,11 +393,13 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     @MainActor
     private func startMonitoringNetworkInterfaces() {
         bMonitor.pathUpdateHandler = { [weak self, logger] path in
-            logger.log("Available interfaces updated: \(String(reflecting: path.availableInterfaces), privacy: .public)")
+            logger.log("[1] Available interfaces updated: \(String(reflecting: path.availableInterfaces), privacy: .public)")
 
             self?.interface = path.availableInterfaces.first { interface in
                 interface.type != .other
             }
+
+            logger.log("[1] Selected interface is: \(String(reflecting: self?.interface), privacy: .public)")
         }
         bMonitor.start(queue: .main)
 
@@ -406,13 +408,14 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             guard let self else { return }
 
             let interfaces = SCNetworkInterfaceCopyAll()
-            logger.log("Available interfaces updated: \(String(reflecting: interfaces), privacy: .public)")
+            logger.log("[2] Available interfaces updated: \(String(reflecting: interfaces), privacy: .public)")
 
             nw_path_enumerate_interfaces(path) { interface in
                 guard nw_interface_get_type(interface) != nw_interface_type_other else {
                     return true
                 }
 
+                logger.log("[2] Selected interface is: \(String(reflecting: interface), privacy: .public)")
                 self.directInterface = interface
                 return false
             }

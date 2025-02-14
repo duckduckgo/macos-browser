@@ -97,7 +97,14 @@ public final class TransparentProxySettings {
 
     public var proxyAvailable: Bool {
         get {
-            defaults.vpnProxyFeatureAvailable
+            // - TODO: Revert these changes!!!!!
+            // - TODO: Revert these changes!!!!!
+            // - TODO: Revert these changes!!!!!
+            // - TODO: Revert these changes!!!!!
+            // - TODO: Revert these changes!!!!!
+            // - TODO: Revert these changes!!!!!
+            return true
+            //defaults.vpnProxyFeatureAvailable
         }
 
         set {

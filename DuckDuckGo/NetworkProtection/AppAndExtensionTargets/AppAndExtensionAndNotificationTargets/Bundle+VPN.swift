@@ -24,7 +24,7 @@ extension Bundle {
 
     private enum VPNInfoKey: String {
         case tunnelExtensionBundleID = "TUNNEL_EXTENSION_BUNDLE_ID"
-        case proxyExtensionBundleID = "PROXY_EXTENSION_BUNDLE_ID"
+        case proxyExtensionBundleID = "PROXY_SYSTEM_EXTENSION_BUNDLE_ID"
     }
 
     static var tunnelExtensionBundleID: String {
