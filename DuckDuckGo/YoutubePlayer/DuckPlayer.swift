@@ -169,7 +169,7 @@ final class DuckPlayer {
             return false
         }
     }
-
+    
     @Published var mode: DuckPlayerMode
 
     var overlayInteracted: Bool {
@@ -192,7 +192,7 @@ final class DuckPlayer {
         isCustomErrorFeatureEnabled =
             privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.customError)
 
-        // Question for Daniel: is the string return type for Subfeature settings just a stub or intentional?
+        // TODO: Check if this logic can be moved into privacyConfig
         if let customErrorSettingsJSON = privacyConfigurationManager.privacyConfig.settings(for: DuckPlayerSubfeature.customError),
            let jsonData = customErrorSettingsJSON.data(using: .utf8),
            let customErrorSettings: CustomErrorSettings = DecodableHelper.decode(jsonData: jsonData) {
@@ -269,16 +269,9 @@ final class DuckPlayer {
     }
 
     public func handleYoutubeError(params: Any, message: UserScriptMessage) -> Encodable? {
-        var pixelParams: [String: String] = [:]
-        if let paramsDict = params as? [String: Any],
-           let errorParam = paramsDict["error"] as? String {
-            pixelParams["error"] = errorParam
-        } else {
-            pixelParams["error"] = "unknown"
-        }
-
-        // TODO: Fire once daily impression
-        PixelKit.fire(GeneralPixel.duckPlayerYouTubeErrorImpression, withAdditionalParameters: pixelParams)
+        let (volumePixel, dailyPixel) = getPixelsForYouTubeErrorParams(params)
+        PixelKit.fire(NonStandardEvent(dailyPixel), frequency: .daily)
+        PixelKit.fire(NonStandardEvent(volumePixel))
         return nil
     }
 
@@ -329,11 +322,7 @@ final class DuckPlayer {
         let environment = InitialPlayerSettings.Environment.development
         let locale = InitialPlayerSettings.Locale.en
         let focusMode = InitialPlayerSettings.FocusMode(state: onboardingDecider.shouldOpenFirstVideoOnDuckPlayer ? .disabled : .enabled)
-
-        // TODO: Remove temporary override to skip deploying a new config
-        // let customError = InitialPlayerSettings.CustomError(state: isCustomErrorFeatureEnabled ? .enabled : .disabled, signInRequiredSelector: customErrorSignInRequiredSelector ?? "")
-        let customError = InitialPlayerSettings.CustomError(state: .enabled, signInRequiredSelector: "[href*=\"//support.google.com/youtube/answer/3037019\"]")
-
+        let customError = InitialPlayerSettings.CustomError(state: isCustomErrorFeatureEnabled ? .enabled : .disabled, signInRequiredSelector: customErrorSignInRequiredSelector ?? "")
         let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay, focusMode: focusMode, customError: customError)
         let userValues = encodeUserValues()
 
@@ -394,6 +383,23 @@ final class DuckPlayer {
         } else {
             modeCancellable = nil
         }
+    }
+
+    private func getPixelsForYouTubeErrorParams(_ params: Any) -> (GeneralPixel, GeneralPixel) {
+        if let paramsDict = params as? [String: Any],
+           let errorParam = paramsDict["error"] as? String{
+                switch errorParam {
+                case "sign-in-required":
+                    return (GeneralPixel.duckPlayerYouTubeSignInErrorImpression, GeneralPixel.duckPlayerYouTubeSignInErrorDaily)
+                case "age-restricted":
+                    return (GeneralPixel.duckPlayerYouTubeAgeRestrictedErrorImpression, GeneralPixel.duckPlayerYouTubeAgeRestrictedErrorDaily)
+                case "no-embed":
+                    return (GeneralPixel.duckPlayerYouTubeNoEmbedErrorImpression, GeneralPixel.duckPlayerYouTubeNoEmbedErrorDaily)
+                default:
+                    return (GeneralPixel.duckPlayerYouTubeUnknownErrorImpression, GeneralPixel.duckPlayerYouTubeUnknownErrorDaily)
+                }
+        }
+        return (GeneralPixel.duckPlayerYouTubeUnknownErrorImpression, GeneralPixel.duckPlayerYouTubeUnknownErrorDaily)
     }
 }
 
