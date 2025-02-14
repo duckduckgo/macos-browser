@@ -398,6 +398,8 @@ extension URL {
 
     static var maliciousSiteProtectionLearnMore = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/")!
 
+    static var dnsBlocklistLearnMore = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/dns-blocklists")!
+
     static var searchSettings: URL {
         return URL(string: "https://duckduckgo.com/settings/")!
     }

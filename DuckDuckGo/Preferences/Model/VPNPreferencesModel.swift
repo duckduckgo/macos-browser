@@ -120,15 +120,27 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     @Published public var dnsSettings: NetworkProtectionDNSSettings
-    @Published public var isCustomDNSSelected = false
-    @Published public var customDNSServers: String?
-    @Published var isBlockRiskyDomainsOn: Bool {
-        didSet {
-            guard settings.isBlockRiskyDomainsOn != isBlockRiskyDomainsOn else { return }
-            settings.dnsSettings = .ddg(blockRiskyDomains: isBlockRiskyDomainsOn)
-            reloadVPN()
-        }
-    }
+    @Published public var isCustomDNSSelected: Bool {
+           didSet {
+               if oldValue != isCustomDNSSelected {
+                   updateDNSSettings()
+               }
+           }
+       }
+       @Published public var customDNSServers: String? {
+           didSet {
+               if oldValue != customDNSServers {
+                   updateDNSSettings()
+               }
+           }
+       }
+       @Published var isBlockRiskyDomainsOn: Bool {
+           didSet {
+               if oldValue != isBlockRiskyDomainsOn {
+                   updateDNSSettings()
+               }
+           }
+       }
 
     private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
@@ -163,7 +175,9 @@ final class VPNPreferencesModel: ObservableObject {
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
         isBlockRiskyDomainsOn = settings.isBlockRiskyDomainsOn
+        customDNSServers = settings.customDnsServers.joined(separator: ", ")
         dnsSettings = settings.dnsSettings
+        isCustomDNSSelected = settings.dnsSettings.usesCustomDNS
 
         subscribeToAppRoutingRulesChanges()
         subscribeToOnboardingStatusChanges(defaults: defaults)
@@ -174,7 +188,6 @@ final class VPNPreferencesModel: ObservableObject {
         subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
         subscribeToDNSSettingsChanges()
-        subscribeToBlockRiskyDomainsChanges()
     }
 
     private func subscribeToAppRoutingRulesChanges() {
@@ -247,16 +260,21 @@ final class VPNPreferencesModel: ObservableObject {
 
     private func subscribeToDNSSettingsChanges() {
         settings.dnsSettingsPublisher
-            .assign(to: \.dnsSettings, onWeaklyHeld: self)
-            .store(in: &cancellables)
-        isCustomDNSSelected = settings.dnsSettings.usesCustomDNS
-        customDNSServers = settings.customDnsServers.joined(separator: ", ")
-    }
-
-    private func subscribeToBlockRiskyDomainsChanges() {
-        settings.isBlockRiskyDomainsOnPublisher
-            .map { $0 }
-            .assign(to: \.isBlockRiskyDomainsOn, onWeaklyHeld: self)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newDNSSettings in
+                guard let self = self else { return }
+                self.dnsSettings = newDNSSettings
+                if self.isCustomDNSSelected != newDNSSettings.usesCustomDNS {
+                    self.isCustomDNSSelected = newDNSSettings.usesCustomDNS
+                }
+                if self.customDNSServers != self.settings.customDnsServers.joined(separator: ", ") {
+                    self.customDNSServers = self.settings.customDnsServers.joined(separator: ", ")
+                }
+                if case .ddg(let blockRiskyDomains) = newDNSSettings,
+                   self.isBlockRiskyDomainsOn != blockRiskyDomains {
+                    self.isBlockRiskyDomainsOn = blockRiskyDomains
+                }
+            }
             .store(in: &cancellables)
     }
 
@@ -320,17 +338,29 @@ final class VPNPreferencesModel: ObservableObject {
         WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
     }
 
-    func saveChanges(customDNSServers: String) {
-        self.customDNSServers = customDNSServers
-        settings.dnsSettings = .custom([customDNSServers])
-        reloadVPN()
-        /// Updating dnsSettings does an IPv4 conversion before actually commiting the change,
-        /// so we do a final check to see which outcome the user ends up with
-        if settings.dnsSettings.usesCustomDNS {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .legacyDailyAndCount)
-        } else {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
+    private func updateDNSSettings() {
+        // Fire the corresponding pixel events.
+        if settings.dnsSettings != self.dnsSettings {
+            if settings.dnsSettings.usesCustomDNS {
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom,
+                              frequency: .legacyDailyAndCount)
+            } else {
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault,
+                              frequency: .legacyDailyAndCount)
+            }
         }
+
+        if isCustomDNSSelected {
+            guard let serversText = customDNSServers, !serversText.isEmpty else {
+                return
+            }
+            let servers = serversText.split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            settings.dnsSettings = .custom(servers)
+        } else {
+            settings.dnsSettings = .ddg(blockRiskyDomains: isBlockRiskyDomainsOn)
+        }
+        reloadVPN()
     }
 }
 

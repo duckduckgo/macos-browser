@@ -137,7 +137,7 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .testExperiment:
             return .remoteReleasable(.subfeature(ExperimentTestSubfeatures.experimentTestAA))
         case .networkProtectionRickyDomainsProtection:
-            return .disabled
+            return .remoteReleasable(.subfeature(NetworkProtectionSubfeature.riskyDomainsProtection))
         }
     }
 }

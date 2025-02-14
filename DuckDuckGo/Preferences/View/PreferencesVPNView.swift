@@ -154,7 +154,7 @@ extension Preferences {
                                     VStack(alignment: .leading, spacing: 0, content: {
                                         TextMenuItemCaption(UserText.vpnDnsServerBlockRiskyDomainsToggleFooter)
                                         TextButton(UserText.learnMore) {
-                                            model.openNewTab(with: .maliciousSiteProtectionLearnMore)
+                                            model.openNewTab(with: .dnsBlocklistLearnMore)
                                         }
                                     })
                                     .padding(.leading, 20)
@@ -269,7 +269,7 @@ struct CustomDNSServerPageSheet: View {
                     isSheetPresented.toggle()
                 }
                 Button(UserText.vpnDnsServerApplyButtonTitle) {
-                    model.saveChanges(customDNSServers: customDNSServers)
+                    model.customDNSServers = customDNSServers
                     isSheetPresented.toggle()
                 }
                 .keyboardShortcut(.defaultAction)
