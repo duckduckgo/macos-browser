@@ -30,8 +30,6 @@ final class VPNPreferencesModelTests: XCTestCase {
     var vpnSettings: VPNSettings!
     var xpsClient: VPNControllerXPCClient!
     var proxySettings: TransparentProxySettings!
-    var fakeFeature: MockFeatureFlagger!
-    var cancellables = Set<AnyCancellable>()
 
     override func setUpWithError() throws {
         vpnSettings = VPNSettings(defaults: userDefaults)
@@ -50,12 +48,12 @@ final class VPNPreferencesModelTests: XCTestCase {
     func test_WhenUpdateDNSSettingsToCustomThenPropagatesToVpnSettings() {
         // WHEN
         model.isCustomDNSSelected = true
-        model.customDNSServers = "1.1.1.1, 8.8.8.8"
+        model.customDNSServers = "1.1.1.1"
 
         // THEN
         switch vpnSettings.dnsSettings {
         case .custom(let servers):
-            XCTAssertEqual(servers, ["1.1.1.1", "8.8.8.8"], "Custom DNS servers should be updated correctly.")
+            XCTAssertEqual(servers, ["1.1.1.1"], "Custom DNS servers should be updated correctly.")
         default:
             XCTFail("Expected dnsSettings to be .custom, but got \(vpnSettings.dnsSettings)")
         }
@@ -96,7 +94,7 @@ final class VPNPreferencesModelTests: XCTestCase {
 
         // WHEN
         model.isCustomDNSSelected = true
-        model.customDNSServers = "1.1.1.1, 8.8.8.8"
+        model.customDNSServers = "1.1.1.1"
         model.isCustomDNSSelected = false
 
         // THEN
@@ -115,7 +113,7 @@ final class VPNPreferencesModelTests: XCTestCase {
 
         // WHEN
         model.isCustomDNSSelected = true
-        model.customDNSServers = "1.1.1.1, 8.8.8.8"
+        model.customDNSServers = "1.1.1.1"
         model.isCustomDNSSelected = false
 
         // THEN
@@ -130,7 +128,7 @@ final class VPNPreferencesModelTests: XCTestCase {
     func test_WhenMovingFromCustomToDefaultAndBackToCustomThenPreviouslySelectedServerRetained() {
         // GIVEN
         model.isCustomDNSSelected = true
-        model.customDNSServers = "1.1.1.1, 8.8.8.8"
+        model.customDNSServers = "1.1.1.1"
 
         // WHEN
         model.isCustomDNSSelected = false
@@ -139,7 +137,7 @@ final class VPNPreferencesModelTests: XCTestCase {
         // THEN
         switch vpnSettings.dnsSettings {
         case .custom(let servers):
-            XCTAssertEqual(servers, ["1.1.1.1", "8.8.8.8"], "Custom DNS servers should be updated correctly.")
+            XCTAssertEqual(servers, ["1.1.1.1"], "Custom DNS servers should be updated correctly.")
         default:
             XCTFail("Expected dnsSettings to be .custom, but got \(vpnSettings.dnsSettings)")
         }
@@ -161,10 +159,10 @@ final class VPNPreferencesModelTests: XCTestCase {
 }
 
 final class MockPinningManager: PinningManager {
-    func togglePinning(for view: DuckDuckGo_Privacy_Browser.PinnableView) {
+    func togglePinning(for view: PinnableView) {
     }
 
-    func isPinned(_ view: DuckDuckGo_Privacy_Browser.PinnableView) -> Bool {
+    func isPinned(_ view: PinnableView) -> Bool {
         return false
     }
 
@@ -172,13 +170,13 @@ final class MockPinningManager: PinningManager {
         return false
     }
 
-    func pin(_ view: DuckDuckGo_Privacy_Browser.PinnableView) {
+    func pin(_ view: PinnableView) {
     }
 
-    func unpin(_ view: DuckDuckGo_Privacy_Browser.PinnableView) {
+    func unpin(_ view: PinnableView) {
     }
 
-    func shortcutTitle(for view: DuckDuckGo_Privacy_Browser.PinnableView) -> String {
+    func shortcutTitle(for view: PinnableView) -> String {
         return ""
     }
 }
