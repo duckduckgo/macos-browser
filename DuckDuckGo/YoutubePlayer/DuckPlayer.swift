@@ -322,7 +322,8 @@ final class DuckPlayer {
         let environment = InitialPlayerSettings.Environment.development
         let locale = InitialPlayerSettings.Locale.en
         let focusMode = InitialPlayerSettings.FocusMode(state: onboardingDecider.shouldOpenFirstVideoOnDuckPlayer ? .disabled : .enabled)
-        let customError = InitialPlayerSettings.CustomError(state: isCustomErrorFeatureEnabled ? .enabled : .disabled, signInRequiredSelector: customErrorSignInRequiredSelector ?? "")
+//        let customError = InitialPlayerSettings.CustomError(state: isCustomErrorFeatureEnabled ? .enabled : .disabled, signInRequiredSelector: customErrorSignInRequiredSelector ?? "")
+        let customError = InitialPlayerSettings.CustomError(state: .enabled, signInRequiredSelector: "[href*=\"//support.google.com/youtube/answer/3037019\"]")
         let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay, focusMode: focusMode, customError: customError)
         let userValues = encodeUserValues()
 
