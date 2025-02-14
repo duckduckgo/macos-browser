@@ -18,6 +18,7 @@
 
 public extension Notification.Name {
     static let showPopoverPromptForDefaultBrowser = Notification.Name("com.duckduckgo.app.showPopoverPromptForDefaultBrowser")
+    static let showPopoverPromptForDefaultBrowserAddressBar = Notification.Name("com.duckduckgo.app.showPopoverPromptForDefaultBrowserAddressBar")
     static let showBannerPromptForDefaultBrowser = Notification.Name("com.duckduckgo.app.showBannerPromptForDefaultBrowser")
 }
 
@@ -155,9 +156,14 @@ final class PromptsCoordinator {
         self.defaultBrowserProvider = defaultBrowserProvider
     }
 
+    var shouldShowPrompt: Bool {
+        let wasOnboardingCompleted = false // TODO: Swap for real value
+        return AppDelegate.twoDaysPassedSinceFirstLaunch && wasOnboardingCompleted
+    }
+
     func getPopover() -> PopoverMessageViewController? {
-        let isDefaultBrowser = true
-        let isAddedToDock = false
+        let isDefaultBrowser = defaultBrowserProvider.isDefault
+        let isAddedToDock = dockCustomization.isAddedToDock
         guard let content = PromptContent.getStyle(isSparkle: isSparkleBuild, isDefaultBrowser: isDefaultBrowser, isOnDock: isAddedToDock) else {
             return nil
         }
@@ -177,8 +183,8 @@ final class PromptsCoordinator {
     }
 
     func getBanner(closeAction: @escaping (() -> Void)) -> BannerMessageViewController? {
-        let isDefaultBrowser = true
-        let isAddedToDock = false
+        let isDefaultBrowser = defaultBrowserProvider.isDefault
+        let isAddedToDock = dockCustomization.isAddedToDock
         guard let content = PromptContent.getStyle(isSparkle: isSparkleBuild, isDefaultBrowser: isDefaultBrowser, isOnDock: isAddedToDock) else {
             return nil
         }
