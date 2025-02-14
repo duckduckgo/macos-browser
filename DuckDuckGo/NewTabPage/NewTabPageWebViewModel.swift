@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import NewTabPage
+import PixelKit
 import WebKit
 
 /**
@@ -54,6 +55,9 @@ final class NewTabPageWebViewModel: NSObject {
         webView.publisher(for: \.window)
             .map { $0 != nil }
             .sink { [weak activeRemoteMessageModel] isOnScreen in
+                if isOnScreen && OnboardingViewModel.isOnboardingFinished && AppDelegate.isNewUser {
+                    PixelKit.fire(GeneralPixel.newTabInitial, frequency: .legacyInitial)
+                }
                 activeRemoteMessageModel?.isViewOnScreen = isOnScreen
                 if isOnScreen {
                     NotificationCenter.default.post(name: .newTabPageWebViewDidAppear, object: nil)
