@@ -311,8 +311,9 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return .next
         }
 
-        if shouldOpenInNewTab, shouldOpenDuckPlayerDirectly,
+        if shouldOpenDuckPlayerDirectly,
            let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+            webView?.stopAllMediaPlayback()
             webView?.loadInNewWindow(navigationAction.url)
             return .cancel
         }

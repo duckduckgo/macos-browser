@@ -130,7 +130,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         setupMenuItems()
     }
 
-    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
+    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.zoomIn)
 
     @MainActor
     private func setupMenuItems() {
@@ -720,23 +720,29 @@ final class ZoomSubMenu: NSMenu {
         removeAllItems()
 
         let fullScreenItem = (NSApp.mainMenuTyped.toggleFullscreenMenuItem.copy() as? NSMenuItem)!
+            .withImage(.zoomFullScreen)
         addItem(fullScreenItem)
 
         addItem(.separator())
 
         let zoomInItem = (NSApp.mainMenuTyped.zoomInMenuItem.copy() as? NSMenuItem)!
+            .withImage(.zoomIn)
         addItem(zoomInItem)
 
         let zoomOutItem = (NSApp.mainMenuTyped.zoomOutMenuItem.copy() as? NSMenuItem)!
+            .withImage(.zoomOut)
         addItem(zoomOutItem)
 
         let actualSizeItem = (NSApp.mainMenuTyped.actualSizeMenuItem.copy() as? NSMenuItem)!
+            .withImage(NSImage()) // add left padding for the Actual Size item
         addItem(actualSizeItem)
 
         addItem(.separator())
 
-        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem, action: #selector(MoreOptionsMenu.openAccessibilityPreferences(_:)), keyEquivalent: "")
-            .targetting(target)
+        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem,
+                                               action: #selector(MoreOptionsMenu.openAccessibilityPreferences(_:)),
+                                               target: target)
+            .withImage(.zoomChangeDefault)
         addItem(globalZoomSettingItem)
     }
 }

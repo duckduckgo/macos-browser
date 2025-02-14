@@ -279,6 +279,7 @@ extension MainWindowController: NSWindowDelegate {
             self?.mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultHigh
             self?.mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultLow
             self?.moveTabBarView(toTitlebarView: false)
+            self?.window?.titlebarAppearsTransparent = false
             self?.window?.toolbar = nil
         }
     }
@@ -290,6 +291,7 @@ extension MainWindowController: NSWindowDelegate {
             self?.mainViewController.mainView.navigationBarTopConstraint.animator().constant = 38
             self?.mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultLow
             self?.mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultHigh
+            self?.window?.titlebarAppearsTransparent = true
             self?.setupToolbar()
         }
     }

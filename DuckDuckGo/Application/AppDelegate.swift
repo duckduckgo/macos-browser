@@ -374,6 +374,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Freemium DBP
         freemiumDBPFeature.subscribeToDependencyUpdates()
+
+        _=NSPopover.swizzleShowRelativeToRectOnce
     }
 
     // swiftlint:disable:next cyclomatic_complexity

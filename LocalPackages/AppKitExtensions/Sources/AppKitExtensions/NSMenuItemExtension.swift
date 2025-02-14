@@ -105,4 +105,10 @@ public extension NSMenuItem {
         return self
     }
 
+    @discardableResult
+    func withIdentifier(_ identifier: NSUserInterfaceItemIdentifier) -> NSMenuItem {
+        self.identifier = identifier
+        return self
+    }
+
 }

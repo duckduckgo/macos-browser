@@ -37,12 +37,15 @@ extension NetworkProtectionStatusView {
         public enum MenuItem {
             case divider(uuid: UUID = UUID())
             case text(uuid: UUID = UUID(), icon: Image? = nil, title: String, action: () async -> Void)
+            case textWithDetail(uuid: UUID = UUID(), icon: Image? = nil, title: String, detail: String, action: () async -> Void)
 
             public var uuid: UUID {
                 switch self {
                 case .divider(let uuid):
                     return uuid
                 case .text(let uuid, _, _, _):
+                    return uuid
+                case .textWithDetail(let uuid, _, _, _, _):
                     return uuid
                 }
             }

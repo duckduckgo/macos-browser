@@ -304,9 +304,9 @@ final class MainMenu: NSMenu {
             toggleFullscreenMenuItem
             NSMenuItem.separator()
 
-            actualSizeMenuItem
             zoomInMenuItem
             zoomOutMenuItem
+            actualSizeMenuItem
             NSMenuItem.separator()
 
             NSMenuItem(title: UserText.mainMenuDeveloper) {
