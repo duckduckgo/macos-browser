@@ -46,13 +46,13 @@
       }
     },
     {
-      "identity" : "duckduckgo-autofill",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
-      "state" : {
-        "revision" : "3a9606fd26e9a54bf369cc241e6fa3b2571eb13a",
-        "version" : "16.2.1"
-      }
+       "identity" : "duckduckgo-autofill",
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
+       "state" : {
+         "revision" : "676d42679296a175169e433f2332e55644151edd",
+         "version" : "16.2.0"
+       }
     },
     {
       "identity" : "grdb.swift",
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "c05d7ce7debe45593bfd9759d6bcae0cd740c52f",
-        "version" : "8.4.0"
+         "revision" : "099f7ed5faac946e4d80746703aaaf87fdfbee09",
+         "version" : "8.3.0"
       }
     },
     {
