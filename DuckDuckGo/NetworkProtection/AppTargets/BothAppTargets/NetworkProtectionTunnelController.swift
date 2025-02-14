@@ -622,7 +622,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
 #endif
         var dnsSettings = settings.dnsSettings
-        if settings.dnsSettings == .ddg(blockRiskyDomains: true) && !featureFlagger.isFeatureOn(.networkProtectionRickyDomainsProtection) {
+        if settings.dnsSettings == .ddg(blockRiskyDomains: true) && !featureFlagger.isFeatureOn(.networkProtectionRiskyDomainsProtection) {
             dnsSettings = .ddg(blockRiskyDomains: false)
         }
         if let data = try? JSONEncoder().encode(dnsSettings) {

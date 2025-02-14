@@ -47,15 +47,8 @@ final class VPNPreferencesModel: ObservableObject {
             guard settings.excludeLocalNetworks != excludeLocalNetworks else {
                 return
             }
-
             settings.excludeLocalNetworks = excludeLocalNetworks
-
-            Task {
-                // We need to allow some time for the setting to propagate
-                // But ultimately this should actually be a user choice
-                try await Task.sleep(interval: 0.1)
-                try await vpnXPCClient.command(.restartAdapter)
-            }
+            reloadVPN()
         }
     }
 
@@ -80,7 +73,7 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     var isRiskySitesProtectionFeatureEnabled: Bool {
-        featureFlagger.isFeatureOn(.networkProtectionRickyDomainsProtection)
+        featureFlagger.isFeatureOn(.networkProtectionRiskyDomainsProtection)
     }
 
     private var isExclusionsFeatureAvailableInBuild: Bool {
@@ -282,7 +275,6 @@ final class VPNPreferencesModel: ObservableObject {
         Task {
             // Allow some time for the change to propagate
             try await Task.sleep(interval: 0.1)
-
             try await vpnXPCClient.command(.restartAdapter)
         }
     }
