@@ -391,16 +391,16 @@ final class DuckPlayer {
            let errorParam = paramsDict["error"] as? String{
                 switch errorParam {
                 case "sign-in-required":
-                    return (GeneralPixel.duckPlayerYouTubeSignInErrorImpression, GeneralPixel.duckPlayerYouTubeSignInErrorDaily)
+                    return (.duckPlayerYouTubeSignInErrorImpression, .duckPlayerYouTubeSignInErrorDaily)
                 case "age-restricted":
-                    return (GeneralPixel.duckPlayerYouTubeAgeRestrictedErrorImpression, GeneralPixel.duckPlayerYouTubeAgeRestrictedErrorDaily)
+                    return (.duckPlayerYouTubeAgeRestrictedErrorImpression, .duckPlayerYouTubeAgeRestrictedErrorDaily)
                 case "no-embed":
-                    return (GeneralPixel.duckPlayerYouTubeNoEmbedErrorImpression, GeneralPixel.duckPlayerYouTubeNoEmbedErrorDaily)
+                    return (.duckPlayerYouTubeNoEmbedErrorImpression, .duckPlayerYouTubeNoEmbedErrorDaily)
                 default:
-                    return (GeneralPixel.duckPlayerYouTubeUnknownErrorImpression, GeneralPixel.duckPlayerYouTubeUnknownErrorDaily)
+                    return (.duckPlayerYouTubeUnknownErrorImpression, .duckPlayerYouTubeUnknownErrorDaily)
                 }
         }
-        return (GeneralPixel.duckPlayerYouTubeUnknownErrorImpression, GeneralPixel.duckPlayerYouTubeUnknownErrorDaily)
+        return (.duckPlayerYouTubeUnknownErrorImpression, .duckPlayerYouTubeUnknownErrorDaily)
     }
 }
 
