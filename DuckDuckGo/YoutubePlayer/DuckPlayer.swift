@@ -169,7 +169,7 @@ final class DuckPlayer {
             return false
         }
     }
-    
+
     @Published var mode: DuckPlayerMode
 
     var overlayInteracted: Bool {
