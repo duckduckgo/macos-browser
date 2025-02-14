@@ -20,6 +20,20 @@ import HistoryView
 
 final class HistoryViewActionsHandler: HistoryView.ActionsHandling {
 
+    weak var dataProvider: HistoryView.DataProviding?
+
+    init(dataProvider: HistoryView.DataProviding) {
+        self.dataProvider = dataProvider
+    }
+
+    func showDeleteDialog(for range: DataModel.HistoryRange) async -> DataModel.DeleteDialogResponse {
+        guard let dataProvider else {
+            return .noAction
+        }
+        await dataProvider.deleteVisits(for: range)
+        return .delete
+    }
+
     @MainActor
     func open(_ url: URL) {
         guard let tabCollectionViewModel else {

@@ -64,10 +64,11 @@ final class HistoryGroupingProvider {
     /**
      * Returns history visits bucketed per day.
      */
-    func getVisitGroupings() -> [HistoryGrouping] {
+    func getVisitGroupings(removingDuplicates shouldRemoveDuplicates: Bool = true) -> [HistoryGrouping] {
         Dictionary(grouping: getSortedArrayOfVisits(), by: \.date.startOfDay)
             .map { date, sortedVisits in
-                HistoryGrouping(date: date, visits: removeDuplicatesIfNeeded(from: sortedVisits))
+                let visits = shouldRemoveDuplicates ? removeDuplicatesIfNeeded(from: sortedVisits) : sortedVisits
+                return HistoryGrouping(date: date, visits: visits)
             }
             .sorted { $0.date > $1.date }
     }

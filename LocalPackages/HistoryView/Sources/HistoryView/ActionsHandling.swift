@@ -20,4 +20,5 @@ import Foundation
 
 public protocol ActionsHandling {
     @MainActor func open(_ url: URL)
+    @MainActor func showDeleteDialog(for range: DataModel.HistoryRange) async -> DataModel.DeleteDialogResponse
 }

@@ -20,41 +20,27 @@ import Foundation
 import History
 import HistoryView
 
-protocol HistoryViewDateFormatting {
-    func weekDay(for date: Date) -> String
-    func time(for date: Date) -> String
+protocol HistoryDeleting: AnyObject {
+    func delete(_ visits: [Visit]) async
 }
 
-struct DefaultHistoryViewDateFormatter: HistoryViewDateFormatting {
-    let weekDayFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "cccc"
-        return formatter
-    }()
-
-    let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .none
-        formatter.timeStyle = .short
-        return formatter
-    }()
-
-    func weekDay(for date: Date) -> String {
-        weekDayFormatter.string(from: date)
-    }
-
-    func time(for date: Date) -> String {
-        timeFormatter.string(from: date)
+extension HistoryCoordinator: HistoryDeleting {
+    func delete(_ visits: [Visit]) async {
+        await withCheckedContinuation { continuation in
+            burnVisits(visits) {
+                continuation.resume()
+            }
+        }
     }
 }
 
 struct HistoryViewGrouping {
     let range: DataModel.HistoryRange
-    let visits: [DataModel.HistoryItem]
+    let items: [DataModel.HistoryItem]
 
     init(range: DataModel.HistoryRange, visits: [DataModel.HistoryItem]) {
         self.range = range
-        self.visits = visits
+        self.items = visits
     }
 
     init?(_ historyGrouping: HistoryGrouping, dateFormatter: HistoryViewDateFormatting) {
@@ -62,41 +48,50 @@ struct HistoryViewGrouping {
             return nil
         }
         self.range = range
-        visits = historyGrouping.visits.compactMap { DataModel.HistoryItem($0, dateFormatter: dateFormatter) }
+        items = historyGrouping.visits.compactMap { DataModel.HistoryItem($0, dateFormatter: dateFormatter) }
     }
 }
 
 final class HistoryViewDataProvider: HistoryView.DataProviding {
 
-    init(historyGroupingDataSource: HistoryGroupingDataSource, dateFormatter: HistoryViewDateFormatting = DefaultHistoryViewDateFormatter()) {
+    init(historyGroupingDataSource: HistoryGroupingDataSource & HistoryCoordinating & HistoryDeleting, dateFormatter: HistoryViewDateFormatting = DefaultHistoryViewDateFormatter()) {
         self.dateFormatter = dateFormatter
         historyGroupingProvider = HistoryGroupingProvider(dataSource: historyGroupingDataSource)
+        historyCoordinator = historyGroupingDataSource
     }
 
-    func resetCache() {
+    func resetCache() async {
         lastQuery = nil
-        populateVisits()
+        await populateVisits()
     }
 
+    @MainActor
     private func populateVisits() {
-        var groupings = historyGroupingProvider.getVisitGroupings()
-            .compactMap { HistoryViewGrouping($0, dateFormatter: dateFormatter) }
-        var olderVisits = [DataModel.HistoryItem]()
+        var olderHistoryItems = [DataModel.HistoryItem]()
+        var olderVisits = [Visit]()
 
-        groupings = groupings.filter { grouping in
-            guard grouping.range != .older else {
-                olderVisits.append(contentsOf: grouping.visits)
-                return false
+        groupings = historyGroupingProvider.getVisitGroupings()
+            .compactMap { historyGrouping -> HistoryViewGrouping? in
+                guard let grouping = HistoryViewGrouping(historyGrouping, dateFormatter: dateFormatter) else {
+                    return nil
+                }
+                guard grouping.range != .older else {
+                    olderHistoryItems.append(contentsOf: grouping.items)
+                    olderVisits.append(contentsOf: historyGrouping.visits)
+                    return nil
+                }
+                visitsByRange[grouping.range] = historyGrouping.visits
+                return grouping
             }
-            return true
-        }
 
+        if !olderHistoryItems.isEmpty {
+            groupings.append(.init(range: .older, visits: olderHistoryItems))
+        }
         if !olderVisits.isEmpty {
-            groupings.append(.init(range: .older, visits: olderVisits))
+            visitsByRange[.older] = olderVisits
         }
 
-        self.groupings = groupings
-        self.visits = groupings.flatMap(\.visits)
+        self.historyItems = groupings.flatMap(\.items)
     }
 
     var ranges: [DataModel.HistoryRange] {
@@ -112,6 +107,26 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
         return DataModel.HistoryItemsBatch(finished: finished, visits: visits)
     }
 
+    func deleteVisits(for range: DataModel.HistoryRange) async {
+        let history = await Task { @MainActor in
+            self.historyCoordinator.history
+        }.value
+        guard let history else {
+            return
+        }
+        let date = lastQuery?.date ?? Date()
+        let visits: [Visit] = {
+            let allVisits: [Visit] = history.flatMap(\.visits)
+            guard let dateRange = range.dateRange(for: date) else {
+                return allVisits
+            }
+            return allVisits.filter { dateRange.contains($0.date) }
+        }()
+
+        await historyCoordinator.delete(visits)
+        await resetCache()
+    }
+
     private func perform(_ query: DataModel.HistoryQueryKind) -> [DataModel.HistoryItem] {
         if let lastQuery, lastQuery.query == query {
             return lastQuery.items
@@ -120,28 +135,32 @@ final class HistoryViewDataProvider: HistoryView.DataProviding {
         let items: [DataModel.HistoryItem] = {
             switch query {
             case .rangeFilter(.all), .searchTerm(""):
-                return visits
+                return historyItems
             case .rangeFilter(let range):
-                return groupings.first(where: { $0.range == range })?.visits ?? []
+                return groupings.first(where: { $0.range == range })?.items ?? []
             case .searchTerm(let term):
-                return visits.filter { $0.title.localizedCaseInsensitiveContains(term) || $0.url.localizedCaseInsensitiveContains(term) }
+                return historyItems.filter { $0.title.localizedCaseInsensitiveContains(term) || $0.url.localizedCaseInsensitiveContains(term) }
             case .domainFilter(let domain):
-                return visits.filter { URL(string: $0.url)?.host == domain }
+                return historyItems.filter { URL(string: $0.url)?.host == domain }
             }
         }()
 
-        lastQuery = .init(query: query, items: items)
+        lastQuery = .init(date: Date(), query: query, items: items)
         return items
     }
 
     private let historyGroupingProvider: HistoryGroupingProvider
+    private let historyCoordinator: HistoryCoordinating & HistoryDeleting
     private let dateFormatter: HistoryViewDateFormatting
 
     /// this is to be optimized: https://app.asana.com/0/72649045549333/1209339909309306
     private var groupings: [HistoryViewGrouping] = []
-    private var visits: [DataModel.HistoryItem] = []
+    private var historyItems: [DataModel.HistoryItem] = []
+
+    private var visitsByRange: [DataModel.HistoryRange: [Visit]] = [:]
 
     private struct QueryInfo {
+        let date: Date
         let query: DataModel.HistoryQueryKind
         let items: [DataModel.HistoryItem]
     }
@@ -239,4 +258,69 @@ extension HistoryView.DataModel.HistoryRange {
             return nil
         }
     }
+
+    func weekday(for referenceDate: Date) -> Int? {
+        let calendar = Calendar.autoupdatingCurrent
+        let referenceWeekday = calendar.component(.weekday, from: referenceDate)
+
+        switch self {
+        case .all:
+            return nil
+        case .today:
+            return referenceWeekday
+        case .yesterday:
+            return referenceWeekday == 1 ? 7 : referenceWeekday-1
+        case .sunday:
+            return 1
+        case .monday:
+            return 2
+        case .tuesday:
+            return 3
+        case .wednesday:
+            return 4
+        case .thursday:
+            return 5
+        case .friday:
+            return 6
+        case .saturday:
+            return 7
+        case .older:
+            let weekday = referenceWeekday - 5
+            return weekday > 0 ? weekday : weekday+7
+        }
+    }
+
+    func dateRange(for referenceDate: Date) -> Range<Date>? {
+        guard let weekday = weekday(for: referenceDate) else { // this covers .all range
+            return nil
+        }
+
+        let calendar = Calendar.autoupdatingCurrent
+        let startOfDayReferenceDate = referenceDate.startOfDay
+        let date = calendar.firstWeekday(weekday, before: startOfDayReferenceDate)
+        let nextDay = date.daysAgo(-1)
+
+        if self == .older {
+            return Date.distantPast..<nextDay
+        }
+        return date..<nextDay
+    }
+}
+
+extension Calendar {
+    public func firstWeekday(_ weekday: Int, before referenceDate: Date) -> Date {
+        let referenceWeekday = component(.weekday, from: referenceDate)
+        let daysDiff: Int = {
+            switch (weekday, referenceWeekday) {
+            case let (a, b) where a < b:
+                return b - a
+            case let (a, b) where a > b:
+                return b - a + 7
+            default: // same weekday
+                return 7
+            }
+        }()
+        return referenceDate.daysAgo(daysDiff)
+    }
+
 }

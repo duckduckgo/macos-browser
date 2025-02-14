@@ -30,17 +30,21 @@ public enum DataModel {
         }
     }
 
+    public enum DeleteDialogResponse: String, Codable {
+        case delete, noAction = "none"
+    }
+
     public enum HistoryRange: String, Codable {
         case all
         case today
         case yesterday
+        case sunday
         case monday
         case tuesday
         case wednesday
         case thursday
         case friday
         case saturday
-        case sunday
         case older
     }
 
@@ -134,6 +138,14 @@ extension DataModel {
 
     struct GetRangesResponse: Codable, Equatable {
         let ranges: [HistoryRange]
+    }
+
+    struct DeleteRangeRequest: Codable, Equatable {
+        let range: HistoryRange
+    }
+
+    struct DeleteRangeResponse: Codable, Equatable {
+        let action: DeleteDialogResponse
     }
 
     struct HistoryQueryInfo: Codable, Equatable {
