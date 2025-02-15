@@ -2,8 +2,8 @@ name: macOS - PIR E2E Tests
 
 on:
   workflow_dispatch:
-  schedule:
-     - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
+  # schedule:
+  #    - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
   pull_request:
 
 jobs:
