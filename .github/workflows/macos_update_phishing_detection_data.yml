@@ -1,5 +1,6 @@
 name: macOS - Update Phishing Detection Datasets
 on:
+  workflow_dispatch:
   # schedule:
   #   - cron: '0 0 * * 0'  # Midnight UTC every Sunday
 jobs:
