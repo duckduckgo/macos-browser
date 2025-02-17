@@ -85,7 +85,9 @@ public enum DataBrokerProtectionPixels {
         static let calculatedOrphanedRecords = "calculated-orphaned-records"
     }
 
-    case error(error: DataBrokerProtectionError, dataBroker: String)
+    case httpError(error: Error, code: Int, dataBroker: String)
+    case actionFailedError(error: Error, actionId: String, message: String, dataBroker: String)
+    case otherError(error: Error, dataBroker: String)
     case secureVaultInitError(error: Error)
     case secureVaultKeyStoreReadError(error: Error)
     case secureVaultKeyStoreUpdateError(error: Error)
@@ -242,7 +244,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .scanError: return "m_mac_dbp_macos_search_stage_main_status_error"
 
             // Debug Pixels
-        case .error: return "m_mac_data_broker_error"
+        case .httpError: return "m_mac_data_broker_http_error"
+        case .actionFailedError: return "m_mac_data_broker_action-failed_error"
+        case .otherError: return "m_mac_data_broker_other_error"
         case .databaseError: return "m_mac_data_broker_database_error"
         case .cocoaError: return "m_mac_data_broker_cocoa_error"
         case .miscError: return "m_mac_data_broker_misc_error"
@@ -355,15 +359,16 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
     public var parameters: [String: String]? {
         switch self {
-        case .error(let error, let dataBroker):
-            if case let .actionFailed(actionID, message) = error {
-                return ["dataBroker": dataBroker,
-                        "name": error.name,
-                        "actionID": actionID,
-                        "message": message]
-            } else {
-                return ["dataBroker": dataBroker, "name": error.name]
-            }
+        case .httpError(_, let code, let dataBroker):
+            return ["code": String(code),
+                    "dataBroker": dataBroker]
+        case .actionFailedError(_, let actionId, let message, let dataBroker):
+            return ["actionID": actionId,
+                    "message": message,
+                    "dataBroker": dataBroker]
+        case .otherError(let error, let dataBroker):
+            return ["kind": (error as? DataBrokerProtectionError)?.name ?? "unknown",
+                    "dataBroker": dataBroker]
         case .databaseError(_, let functionOccurredIn),
                 .cocoaError(_, let functionOccurredIn),
                 .miscError(_, let functionOccurredIn):
@@ -537,7 +542,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                 PixelKit.fire(event, frequency: .daily)
             case .emptyAccessTokenDaily:
                 PixelKit.fire(event, frequency: .daily)
-            case .error(let error, _):
+            case .httpError(let error, _, _),
+                    .actionFailedError(let error, _, _, _),
+                    .otherError(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .errorLoadingCachedConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))

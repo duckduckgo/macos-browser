@@ -301,7 +301,14 @@ extension DefaultDataBrokerProtectionQueueManager: DataBrokerOperationErrorDeleg
         operationErrors.append(error)
 
         if let error = error as? DataBrokerProtectionError, let dataBrokerName = brokerName {
-            pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
+            switch error {
+            case .httpError(let code):
+                pixelHandler.fire(.httpError(error: error, code: code, dataBroker: dataBrokerName))
+            case .actionFailed(let actionId, let message):
+                pixelHandler.fire(.actionFailedError(error: error, actionId: actionId, message: message, dataBroker: dataBrokerName))
+            default:
+                pixelHandler.fire(.otherError(error: error, dataBroker: dataBrokerName))
+            }
         }
     }
 }

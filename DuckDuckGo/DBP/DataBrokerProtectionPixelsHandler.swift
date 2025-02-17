@@ -26,7 +26,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
     public init() {
         super.init { event, _, _, _ in
             switch event {
-            case .error(let error, _):
+            case .httpError(let error, _, _),
+                    .actionFailedError(let error, _, _, _),
+                    .otherError(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .secureVaultInitError(let error),
                     .secureVaultError(let error),
