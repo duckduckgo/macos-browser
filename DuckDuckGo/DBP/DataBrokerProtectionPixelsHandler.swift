@@ -29,7 +29,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .httpError(let error, _, _),
                     .actionFailedError(let error, _, _, _),
                     .otherError(let error, _):
-                PixelKit.fire(DebugEvent(event, error: error))
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
+            case .databaseError(error: let error, functionOccurredIn: _),
+                    .cocoaError(error: let error, functionOccurredIn: _),
+                    .miscError(error: let error, functionOccurredIn: _):
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
             case .secureVaultInitError(let error),
                     .secureVaultError(let error),
                     .secureVaultKeyStoreReadError(let error),
@@ -37,10 +41,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .errorLoadingCachedConfig(let error),
                     .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
-            case .databaseError(error: let error, functionOccurredIn: _),
-                    .cocoaError(error: let error, functionOccurredIn: _),
-                    .miscError(error: let error, functionOccurredIn: _):
-                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
                     .ipcServerAppLaunchedXPCError(error: let error),

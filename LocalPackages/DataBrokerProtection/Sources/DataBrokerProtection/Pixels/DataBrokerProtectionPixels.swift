@@ -88,13 +88,13 @@ public enum DataBrokerProtectionPixels {
     case httpError(error: Error, code: Int, dataBroker: String)
     case actionFailedError(error: Error, actionId: String, message: String, dataBroker: String)
     case otherError(error: Error, dataBroker: String)
+    case databaseError(error: Error, functionOccurredIn: String)
+    case cocoaError(error: Error, functionOccurredIn: String)
+    case miscError(error: Error, functionOccurredIn: String)
     case secureVaultInitError(error: Error)
     case secureVaultKeyStoreReadError(error: Error)
     case secureVaultKeyStoreUpdateError(error: Error)
     case secureVaultError(error: Error)
-    case databaseError(error: Error, functionOccurredIn: String)
-    case cocoaError(error: Error, functionOccurredIn: String)
-    case miscError(error: Error, functionOccurredIn: String)
     case parentChildMatches(parent: String, child: String, value: Int)
 
     // Stage Pixels
@@ -545,7 +545,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .httpError(let error, _, _),
                     .actionFailedError(let error, _, _, _),
                     .otherError(let error, _):
-                PixelKit.fire(DebugEvent(event, error: error))
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
+            case .databaseError(let error, _),
+                    .cocoaError(let error, _),
+                    .miscError(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
             case .errorLoadingCachedConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .secureVaultInitError(let error),
@@ -554,10 +558,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .secureVaultKeyStoreUpdateError(let error),
                     .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
-            case .databaseError(let error, _),
-                    .cocoaError(let error, _),
-                    .miscError(let error, _):
-                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
                     .ipcServerAppLaunchedXPCError(error: let error),
