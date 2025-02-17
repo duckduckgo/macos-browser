@@ -22,7 +22,6 @@ import AppKitExtensions
 import Cocoa
 import SecureStorage
 import os.log
-import GRDB
 
 protocol ResourcesRepository {
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]?

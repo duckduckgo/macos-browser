@@ -19,7 +19,7 @@
 import Foundation
 import Common
 import SecureStorage
-import GRDB
+import struct GRDB.DatabaseError
 import os.log
 
 public protocol DataBrokerProtectionRepository {

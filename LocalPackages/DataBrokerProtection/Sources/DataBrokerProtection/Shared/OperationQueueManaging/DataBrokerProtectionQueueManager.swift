@@ -300,15 +300,15 @@ extension DefaultDataBrokerProtectionQueueManager: DataBrokerOperationErrorDeleg
     func dataBrokerOperationDidError(_ error: any Error, withBrokerName brokerName: String?) {
         operationErrors.append(error)
 
-        if let error = error as? DataBrokerProtectionError, let dataBrokerName = brokerName {
-            switch error {
-            case .httpError(let code):
-                pixelHandler.fire(.httpError(error: error, code: code, dataBroker: dataBrokerName))
-            case .actionFailed(let actionId, let message):
-                pixelHandler.fire(.actionFailedError(error: error, actionId: actionId, message: message, dataBroker: dataBrokerName))
-            default:
-                pixelHandler.fire(.otherError(error: error, dataBroker: dataBrokerName))
-            }
+        guard let error = error as? DataBrokerProtectionError, let brokerName else { return }
+
+        switch error {
+        case .httpError(let code):
+            pixelHandler.fire(.httpError(error: error, code: code, dataBroker: brokerName))
+        case .actionFailed(let actionId, let message):
+            pixelHandler.fire(.actionFailedError(error: error, actionId: actionId, message: message, dataBroker: brokerName))
+        default:
+            pixelHandler.fire(.otherError(error: error, dataBroker: brokerName))
         }
     }
 }
