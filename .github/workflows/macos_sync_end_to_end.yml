@@ -2,8 +2,8 @@ name: macOS - Sync End-to-End tests
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 5 * * *' # run at 5 AM UTC
+  # schedule:
+  #   - cron: '0 5 * * *' # run at 5 AM UTC
 
 jobs:
   create-notarized-app:
