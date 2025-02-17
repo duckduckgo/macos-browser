@@ -170,6 +170,8 @@ final class SyncPreferences: ObservableObject, SyncUI_macOS.ManagementViewModel 
 
     private let featureFlagger: FeatureFlagger
 
+    private let diagnosisHelper: SyncDiagnosisHelper
+
     init(
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
@@ -193,6 +195,7 @@ final class SyncPreferences: ObservableObject, SyncUI_macOS.ManagementViewModel 
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
 
         self.managementDialogModel = managementDialogModel
+        diagnosisHelper = SyncDiagnosisHelper(syncService: syncService)
         self.managementDialogModel.delegate = self
 
         updateSyncFeatureFlags(self.syncFeatureFlags)
@@ -381,6 +384,10 @@ final class SyncPreferences: ObservableObject, SyncUI_macOS.ManagementViewModel 
                 let registeredDevices = try await syncService.fetchDevices()
                 mapDevices(registeredDevices)
             } catch {
+                if case SyncError.unauthenticatedWhileLoggedIn = error {
+                    // Ruling this out as it's a predictable event likely caused by disabling on another device
+                    diagnosisHelper.didManuallyDisableSync()
+                }
                 PixelKit.fire(DebugEvent(GeneralPixel.syncRefreshDevicesError(error: error), error: error))
                 Logger.sync.debug("Failed to refresh devices: \(error)")
             }
@@ -451,7 +458,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 try await syncService.disconnect()
                 managementDialogModel.endFlow()
                 syncPausedStateManager.syncDidTurnOff()
-                SyncDiagnosisHelper(syncService: syncService).didManuallyDisableSync()
+                diagnosisHelper.didManuallyDisableSync()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
@@ -465,7 +472,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 try await syncService.deleteAccount()
                 managementDialogModel.endFlow()
                 syncPausedStateManager.syncDidTurnOff()
-                SyncDiagnosisHelper(syncService: syncService).didManuallyDisableSync()
+                diagnosisHelper.didManuallyDisableSync()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncDeleteAccountError(error: error)))
@@ -482,6 +489,10 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.endFlow()
                 mapDevices(devices)
             } catch {
+                if case SyncError.unauthenticatedWhileLoggedIn = error {
+                    // Ruling this out as it's a predictable event likely caused by disabling on another device
+                    diagnosisHelper.didManuallyDisableSync()
+                }
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToUpdateDeviceName, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncUpdateDeviceError(error: error)))
             }
