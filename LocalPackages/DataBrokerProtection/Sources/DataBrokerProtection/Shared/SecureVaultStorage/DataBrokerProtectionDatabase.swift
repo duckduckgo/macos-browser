@@ -143,7 +143,6 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) throws -> BrokerProfileQueryData? {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
@@ -228,7 +227,6 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-
     func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
@@ -294,7 +292,6 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-
     func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool,
                                                   forBrokerId brokerId: Int64,
                                                   profileQueryId: Int64,
@@ -340,7 +337,6 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             throw error
         }
     }
-
 
     func add(_ historyEvent: HistoryEvent) throws {
         do {
@@ -489,7 +485,6 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             throw error
         }
     }
-
 
     private func handleError(_ error: Error, context: String) {
         let event: DataBrokerProtectionPixels
