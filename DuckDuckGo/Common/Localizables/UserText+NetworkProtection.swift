@@ -283,6 +283,10 @@ extension UserText {
 
     static let vpnDnsServerPickerDefaultTitle = NSLocalizedString("vpn.dns.server.picker.default.title", value: "DuckDuckGo (Recommended)", comment: "Title of the default DNS server option")
 
+    static let vpnDnsServerBlockRiskyDomainsToggleTitle = NSLocalizedString("vpn.dns.server.block.risky.domains.toggle.title", value: "Block risky domains", comment: "Name of option the user can opt in where the VPN blocks risky domains")
+
+    static let vpnDnsServerBlockRiskyDomainsToggleFooter = NSLocalizedString("vpn.dns.server.block.risky.domains.toggle.footer", value: "Block 150,000+ domains flagged for hosting malware, phishing attacks, and online scams with a DNS-level blocklist.", comment: "Explanation in a footer of option the user can opt in where the VPN blocks risky domains")
+
     static let vpnDnsServerPickerCustomTitle = NSLocalizedString("vpn.dns.server.picker.custom.title", value: "Custom", comment: "Title of the custom DNS server option")
 
     static let vpnDnsServerPickerCustomButtonTitle = NSLocalizedString("vpn.dns.server.picker.custom.button.title", value: "Change…", comment: "Button title of the custom DNS server option")

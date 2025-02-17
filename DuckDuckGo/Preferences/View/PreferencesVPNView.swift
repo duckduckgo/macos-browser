@@ -146,7 +146,21 @@ extension Preferences {
                 PreferencePaneSection(UserText.vpnDnsServerTitle) {
                     PreferencePaneSubSection {
                         Picker(selection: $model.isCustomDNSSelected, label: EmptyView()) {
-                            Text(UserText.vpnDnsServerPickerDefaultTitle).tag(false)
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(UserText.vpnDnsServerPickerDefaultTitle)
+                                if model.isRiskySitesProtectionFeatureEnabled {
+                                    NativeCheckboxToggle(isOn: $model.isBlockRiskyDomainsOn, label: UserText.vpnDnsServerBlockRiskyDomainsToggleTitle)
+                                        .disabled(model.isCustomDNSSelected)
+                                    VStack(alignment: .leading, spacing: 0, content: {
+                                        TextMenuItemCaption(UserText.vpnDnsServerBlockRiskyDomainsToggleFooter)
+                                        TextButton(UserText.learnMore) {
+                                            model.openNewTab(with: .dnsBlocklistLearnMore)
+                                        }
+                                    })
+                                    .padding(.leading, 20)
+                                    .padding(.bottom, 8)
+                                }
+                            }.tag(false)
                             VStack(alignment: .leading, spacing: 0) {
                                 HStack(spacing: 15) {
                                     Text(UserText.vpnDnsServerPickerCustomTitle)
@@ -154,19 +168,18 @@ extension Preferences {
                                         showsCustomDNSServerPageSheet.toggle()
                                     }.disabled(!model.isCustomDNSSelected)
                                 }
-                                if let dnsServersText = model.dnsSettings.dnsServersText {
+                                if let dnsServersText = model.customDNSServers {
                                     TextMenuItemCaption(dnsServersText)
                                         .padding(.top, 0)
-                                        .visibility(model.isCustomDNSSelected ? .visible : .gone)
                                 }
                             }.tag(true)
                         }
                         .pickerStyle(.radioGroup)
                         .offset(x: PreferencesUI_macOS.Const.pickerHorizontalOffset)
                         .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
-                            if isCustomDNSSelected {
+                            if isCustomDNSSelected && (model.customDNSServers?.isEmpty ?? true) {
                                 showsCustomDNSServerPageSheet.toggle()
-                            } else {
+                            } else if !isCustomDNSSelected {
                                 model.resetDNSSettings()
                                 PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
                             }
@@ -186,7 +199,7 @@ extension Preferences {
                         }
                     }
                 }.sheet(isPresented: $showsCustomDNSServerPageSheet) {
-                    CustomDNSServerPageSheet(settings: VPNSettings(defaults: .netP),
+                    CustomDNSServerPageSheet(model: model,
                                              isSheetPresented: $showsCustomDNSServerPageSheet)
                 }
 
@@ -213,14 +226,13 @@ extension Preferences {
 }
 
 struct CustomDNSServerPageSheet: View {
-    private let settings: VPNSettings
-
     @State var customDNSServers = ""
     @State var isValidDNSServers = true
     @Binding var isSheetPresented: Bool
+    private var model: VPNPreferencesModel
 
-    init(settings: VPNSettings, isSheetPresented: Binding<Bool>) {
-        self.settings = settings
+    init(model: VPNPreferencesModel, isSheetPresented: Binding<Bool>) {
+        self.model = model
         self._isSheetPresented = isSheetPresented
     }
 
@@ -257,7 +269,8 @@ struct CustomDNSServerPageSheet: View {
                     isSheetPresented.toggle()
                 }
                 Button(UserText.vpnDnsServerApplyButtonTitle) {
-                    saveChanges()
+                    model.customDNSServers = customDNSServers
+                    isSheetPresented.toggle()
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(!isValidDNSServers)
@@ -266,20 +279,7 @@ struct CustomDNSServerPageSheet: View {
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
         .frame(width: 400)
         .onAppear {
-            customDNSServers = settings.dnsSettings.dnsServersText ?? ""
-        }
-    }
-
-    private func saveChanges() {
-        settings.dnsSettings = .custom([customDNSServers])
-        isSheetPresented.toggle()
-
-        /// Updating `dnsSettings` does an IPv4 conversion before actually commiting the change,
-        /// so we do a final check to see which outcome the user ends up with
-        if settings.dnsSettings.usesCustomDNS {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .legacyDailyAndCount)
-        } else {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
+            customDNSServers = model.dnsSettings.dnsServersText ?? ""
         }
     }
 

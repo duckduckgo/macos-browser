@@ -621,8 +621,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             options[NetworkProtectionOptionKey.selectedLocation] = NSData(data: data)
         }
 #endif
-
-        if let data = try? JSONEncoder().encode(settings.dnsSettings) {
+        var dnsSettings = settings.dnsSettings
+        if settings.dnsSettings == .ddg(blockRiskyDomains: true) && !featureFlagger.isFeatureOn(.networkProtectionRiskyDomainsProtection) {
+            dnsSettings = .ddg(blockRiskyDomains: false)
+        }
+        if let data = try? JSONEncoder().encode(dnsSettings) {
             options[NetworkProtectionOptionKey.dnsSettings] = NSData(data: data)
         }
 

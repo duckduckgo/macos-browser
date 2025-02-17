@@ -68637,6 +68637,30 @@
         }
       }
     },
+    "vpn.dns.server.block.risky.domains.toggle.footer" : {
+      "comment" : "Explanation in a footer of option the user can opt in where the VPN blocks risky domains",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Block 150,000+ domains flagged for hosting malware, phishing attacks, and online scams with a DNS-level blocklist."
+          }
+        }
+      }
+    },
+    "vpn.dns.server.block.risky.domains.toggle.title" : {
+      "comment" : "Name of option the user can opt in where the VPN blocks risky domains",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Block risky domains"
+          }
+        }
+      }
+    },
     "vpn.dns.server.disclaimer" : {
       "comment" : "Disclaimer for the custom DNS server option",
       "extractionState" : "extracted_with_value",
