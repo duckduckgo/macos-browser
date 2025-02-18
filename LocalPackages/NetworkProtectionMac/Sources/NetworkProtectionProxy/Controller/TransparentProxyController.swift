@@ -244,16 +244,6 @@ public final class TransparentProxyController {
         }
     }
 
-//#if NETP_SYSTEM_EXTENSION
-    /// Ensures that the system extension is activated if necessary.
-    ///
-    private func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
-        let systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionID)
-
-        try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval)
-    }
-//#endif
-
     // MARK: - Start & stop the proxy
 
     public var isRequiredForActiveFeatures: Bool {
@@ -271,12 +261,6 @@ public final class TransparentProxyController {
         eventHandler.handle(event: .startAttempt(.begin))
 
         do {
-            //#if NETP_SYSTEM_EXTENSION
-            try await activateSystemExtension { [weak self] in
-                // user needs to allow extension
-            }
-            //#endif
-
             let manager = try await loadOrMakeManager()
             try manager.connection.startVPNTunnel(options: [:])
 

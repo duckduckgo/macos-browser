@@ -424,14 +424,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 #if NETP_SYSTEM_EXTENSION
     /// Ensures that the system extension is activated if necessary.
     ///
-    private func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
+    private func activateSystemExtension(waitingForUserApproval: @escaping (String?) -> Void) async throws {
         do {
-            let systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
+            let systemExtensionManager = SystemExtensionManager(extensionBundleID: networkExtensionBundleID)
 
-            if let version = try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval) {
-
-                NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
-            }
+            try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval)
         } catch {
             switch error {
             case OSSystemExtensionError.requestSuperseded:
@@ -546,15 +543,22 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
         do {
 #if NETP_SYSTEM_EXTENSION
-            if let extensionVersion = try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval) {
+            /*if let extensionVersion = try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval) {
 
                 NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
-            }
-            try await activateSystemExtension { [weak self] in
+            }*/
+            try await activateSystemExtension { [weak self] version in
+
+                guard let self else { return }
+
+                if let version {
+                    NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = version
+                }
+
                 // If we're waiting for user approval we wanna make sure the
                 // onboarding step is set correctly.  This can be useful to
                 // help prevent the value from being de-synchronized.
-                self?.onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
+                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
             }
 #endif
 

@@ -16,7 +16,9 @@
 //  limitations under the License.
 //
 
+#if !NETP_SYSTEM_EXTENSION
 import AppLauncher
+#endif
 import Foundation
 import NetworkProtection
 

@@ -52,8 +52,7 @@ public struct SystemExtensionManager {
 
     /// - Returns: The system extension version when it's updated, otherwise `nil`.
     ///
-    @discardableResult
-    public func activate(waitingForUserApproval: @escaping () -> Void) async throws -> String? {
+    public func activate(waitingForUserApproval: @escaping (String?) -> Void) async throws {
 
         workaroundToActivateBeforeSequoia()
 
@@ -63,8 +62,6 @@ public struct SystemExtensionManager {
             waitingForUserApproval: waitingForUserApproval)
 
         try await activationRequest.submit()
-
-        return activationRequest.version
     }
 
     /// Workaround to help make activation easier for users.
@@ -147,12 +144,12 @@ final class SystemExtensionRequest: NSObject {
 
     private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
-    private let waitingForUserApproval: (() -> Void)?
+    private let waitingForUserApproval: ((String?) -> Void)?
     private(set) var version: String?
 
     private var continuation: CheckedContinuation<Void, Error>?
 
-    private init(request: OSSystemExtensionRequest, manager: OSSystemExtensionManager, waitingForUserApproval: (() -> Void)? = nil) {
+    private init(request: OSSystemExtensionRequest, manager: OSSystemExtensionManager, waitingForUserApproval: ((String?) -> Void)? = nil) {
         self.manager = manager
         self.request = request
         self.waitingForUserApproval = waitingForUserApproval
@@ -160,7 +157,7 @@ final class SystemExtensionRequest: NSObject {
         super.init()
     }
 
-    static func activationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager, waitingForUserApproval: (() -> Void)?) -> Self {
+    static func activationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager, waitingForUserApproval: ((String?) -> Void)?) -> Self {
         self.init(request: .activationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager, waitingForUserApproval: waitingForUserApproval)
     }
 
@@ -208,7 +205,7 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
     }
 
     func requestNeedsUserApproval(_ request: OSSystemExtensionRequest) {
-        waitingForUserApproval?()
+        waitingForUserApproval?(version)
     }
 
     func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
