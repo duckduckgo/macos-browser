@@ -50,6 +50,13 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
         isWarnBeforeClearingEnabled.toggle()
     }
 
+    @Published
+    var oneClickFireButton: Bool {
+        didSet {
+            persistor.oneClickFireButton = oneClickFireButton
+        }
+    }
+
     @MainActor
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
@@ -69,6 +76,7 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
         isLoginDetectionEnabled = persistor.loginDetectionEnabled
         isAutoClearEnabled = persistor.autoClearEnabled
         isWarnBeforeClearingEnabled = persistor.warnBeforeClearingEnabled
+        oneClickFireButton = persistor.oneClickFireButton
     }
 
     private var persistor: FireButtonPreferencesPersistor
@@ -77,6 +85,7 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
 protocol FireButtonPreferencesPersistor {
     var loginDetectionEnabled: Bool { get set }
     var autoClearEnabled: Bool { get set }
+    var oneClickFireButton: Bool { get set }
     var warnBeforeClearingEnabled: Bool { get set }
 }
 
@@ -91,6 +100,8 @@ struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersisto
     @UserDefaultsWrapper(key: .warnBeforeClearingEnabled, defaultValue: false)
     var warnBeforeClearingEnabled: Bool
 
+    @UserDefaultsWrapper(key: .oneClickFireButton, defaultValue: false)
+    var oneClickFireButton: Bool
 }
 
 extension Notification.Name {

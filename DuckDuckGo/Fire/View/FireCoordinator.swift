@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import PixelKit
 
 @MainActor
 final class FireCoordinator {
@@ -46,16 +47,25 @@ final class FireCoordinator {
 
         if waitForOpening {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1/3) {
-                showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
-                                tabCollectionViewModel: mainViewController.tabCollectionViewModel)
+                continueFireButtonActionAfterOpeningWindow(positioningView: mainViewController.tabBarViewController.fireButton,
+                                                           tabCollectionViewModel: mainViewController.tabCollectionViewModel)
             }
         } else {
-            showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
-                            tabCollectionViewModel: mainViewController.tabCollectionViewModel)
+            continueFireButtonActionAfterOpeningWindow(positioningView: mainViewController.tabBarViewController.fireButton,
+                                                       tabCollectionViewModel: mainViewController.tabCollectionViewModel)
         }
     }
 
-    static func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
+    private static func continueFireButtonActionAfterOpeningWindow(positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
+        if DataClearingPreferences.shared.oneClickFireButton {
+            PixelKit.fire(GeneralPixel.fireButton(option: .allSites))
+            fireViewModel.fire.burnAll()
+        } else {
+            showFirePopover(relativeTo: positioningView, tabCollectionViewModel: tabCollectionViewModel)
+        }
+    }
+
+    private static func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
         guard !(firePopover?.isShown ?? false) else {
             firePopover?.close()
             return
